@@ -1,0 +1,19 @@
+# secrets
+.env
+*.key
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# per-run outputs (artifacts are regenerated, not versioned)
+output/*
+!output/.gitkeep
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/

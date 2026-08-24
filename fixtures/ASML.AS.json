@@ -1,0 +1,11 @@
+{
+  "note": "Illustrative fixture for offline/skeleton runs only. Figures are placeholder, not audited. Live runs use AGENT_DATA_SOURCE=yfinance.",
+  "financials": {
+    "period": "2024-12-31",
+    "revenue": 28263000000,
+    "gross_profit": 14700000000,
+    "operating_income": 8800000000,
+    "net_income": 7570000000,
+    "revenue_prior": 27559000000
+  }
+}
