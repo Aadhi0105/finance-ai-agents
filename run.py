@@ -23,6 +23,9 @@ from __future__ import annotations
 import os
 import sys
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from agent.loop import run_agent
 from agent.state import RunState
 from agent.models import StubModel, AnthropicModel, ModelResponse, TextBlock, ToolUseBlock

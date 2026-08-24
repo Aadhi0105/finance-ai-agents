@@ -91,11 +91,11 @@ class AnthropicModel(ModelClient):
     and set ANTHROPIC_API_KEY, and this path lights up with zero loop changes.
     """
 
-    def __init__(self, model: str = "claude-sonnet-4-6", max_tokens: int = 1500):
-        self.model = model
+    def __init__(self, model: str | None = None, max_tokens: int = 1500):
+        self.model = model or os.environ.get("AGENT_MODEL", "claude-sonnet-5")
         self.max_tokens = max_tokens
         self._client = None
-
+        
     def _lazy_client(self):
         if self._client is None:
             import anthropic  # lazy: only needed on the live path
