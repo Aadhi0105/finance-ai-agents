@@ -1,0 +1,5 @@
+{
+  "note": "Illustrative peer fixture (BE Semiconductor). Placeholder figures for offline peer-outlier demo only.",
+  "financials": {"period": "2025-12-31", "revenue": 640000000, "gross_profit": 420000000, "operating_income": 270000000, "net_income": 250000000, "revenue_prior": 580000000},
+  "prices": {"current_price": 115.0, "market_cap": 9050000000, "shares_outstanding": 78700000}
+}

@@ -1,8 +1,8 @@
 # Offline skeleton (python run.py) needs NOTHING beyond the stdlib.
 # These are only for the live path (python run.py --live TICKER):
 anthropic>=0.40.0
-python-dotenv>=1.0.0
 yfinance>=0.2.40
+python-dotenv>=1.0.0
 
 # Arriving at later checkpoints (charts, factor model):
 # pandas>=2.0

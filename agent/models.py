@@ -92,10 +92,13 @@ class AnthropicModel(ModelClient):
     """
 
     def __init__(self, model: str | None = None, max_tokens: int = 1500):
+        # Model string is read from AGENT_MODEL so you never hardcode a value
+        # that goes stale on the next release. Confirm the exact string your key
+        # can call with:  curl https://api.anthropic.com/v1/models -H "x-api-key: $ANTHROPIC_API_KEY" -H "anthropic-version: 2023-06-01"
         self.model = model or os.environ.get("AGENT_MODEL", "claude-sonnet-5")
         self.max_tokens = max_tokens
         self._client = None
-        
+
     def _lazy_client(self):
         if self._client is None:
             import anthropic  # lazy: only needed on the live path

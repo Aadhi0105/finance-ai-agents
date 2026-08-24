@@ -1,0 +1,5 @@
+{
+  "note": "Illustrative peer fixture (Lam Research). Placeholder figures for offline peer-outlier demo only.",
+  "financials": {"period": "2025-06-30", "revenue": 16210000000, "gross_profit": 7800000000, "operating_income": 4700000000, "net_income": 4290000000, "revenue_prior": 14910000000},
+  "prices": {"current_price": 92.0, "market_cap": 109900000000, "shares_outstanding": 1195000000}
+}

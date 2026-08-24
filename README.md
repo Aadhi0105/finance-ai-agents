@@ -9,20 +9,34 @@ that calls deterministic Python tools, proven end-to-end.
 > result, and *writes* the view. This is the difference between a system whose
 > figures you can audit and a toy that invents them.
 
-## What runs today (skeleton)
+## What runs today
 
-The loop, wired end-to-end through **one** data tool and **one** analytical tool:
+The loop drives five tools across two families, exercising all three disciplines
+the build spec assigns Agent 1:
 
-- `get_financials` (fetcher) → `compute_ratios` (computation) → written note.
-- Runs **fully offline** with a scripted model and fixture data — no API key,
-  no network — so the loop's mechanics are proven independently of the model.
+| Tool | Family | Discipline it carries |
+|------|--------|-----------------------|
+| `get_financials` | data | — |
+| `get_prices` | data | — |
+| `compute_ratios` | analytical | econometrics-lite (margins, growth, P/E, EV/EBIT) |
+| `run_dcf` | analytical | **probability** — scenario-weighted (bear/base/bull) |
+| `peer_outlier_check` | analytical | **statistics** — z-score / IQR outlier test |
+
+Every number is computed in Python; the model chooses which tool to call and
+reads the result. Every DCF and peer assumption is returned in the tool output,
+so a reviewer can audit exactly what drove each figure.
 
 ```bash
 python run.py                # offline: scripted model + fixture data (prints the trace)
-python run.py --live ASML.AS # live: Claude Sonnet decides the sequence, data via yfinance
+python run.py --live ASML.AS # live: model decides the sequence, data via yfinance
 ```
 
-Live mode needs `pip install -r requirements.txt` and `ANTHROPIC_API_KEY`.
+Live mode needs `pip install -r requirements.txt` and `ANTHROPIC_API_KEY` (loaded
+from a gitignored `.env`).
+
+**Skeleton simplifications (deliberate, and logged in each run):** DCF proxies
+FCF by net income and approximates equity value by enterprise value (no net-debt
+bridge). Real FCF + a net-debt bridge are a data-layer follow-up, not a rewrite.
 
 ## Layout (flat, per spec §3.2)
 
@@ -52,8 +66,11 @@ deterministic, auditable computation. Full mapping in the build spec.
 
 ## Not here yet (deliberate)
 
-- `get_prices`, `run_dcf`, `estimate_factor_exposure`, `peer_outlier_check`
+- `get_consensus` + its null-fallback branch — the first real *decision* fork,
+  where the loop stops being a clean pipeline. Next checkpoint, built deliberately.
+- `estimate_factor_exposure` (factor regression)
 - the 5-chart visual layer + `report.html` / `model.json` / `charts/`
 - the validation/confidence gate
+- real FCF + net-debt bridge in the DCF (data-layer improvement)
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).
 - **No shorts / ownership tracking** — separate market-structure tool by design.

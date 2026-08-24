@@ -1,11 +1,17 @@
 {
   "note": "Illustrative fixture for offline/skeleton runs only. Figures are placeholder, not audited. Live runs use AGENT_DATA_SOURCE=yfinance.",
   "financials": {
-    "period": "2024-12-31",
-    "revenue": 28263000000,
-    "gross_profit": 14700000000,
-    "operating_income": 8800000000,
-    "net_income": 7570000000,
-    "revenue_prior": 27559000000
+    "period": "2025-12-31",
+    "revenue": 32667300000,
+    "gross_profit": 17258000000,
+    "operating_income": 11301400000,
+    "net_income": 9609400000,
+    "revenue_prior": 28262900000
+  },
+  "prices": {
+    "current_price": 650.0,
+    "market_cap": 255450000000,
+    "shares_outstanding": 393000000,
+    "history_note": "full price series is a live-only / charts-checkpoint concern; fixture carries scalars only"
   }
 }
