@@ -80,6 +80,26 @@ def build_offline_script(ticker: str):
     ]
 
 
+def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
+    """After the loop: fetch chart data, write the sidecar, build the report.
+    Charts are LOCKED output, not a model decision — so history is fetched here,
+    outside the reasoning loop."""
+    from datetime import datetime
+    from tools.data import get_price_history
+    import composer
+
+    price_history = get_price_history(ticker)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_dir = os.path.join("output", f"{ticker}_{stamp}")
+
+    sidecar_path = composer.write_sidecar(
+        ticker=ticker, mode=mode, note=note,
+        analysis=state.results, price_history=price_history, out_dir=out_dir,
+    )
+    report_path = composer.build_report(sidecar_path, out_dir)
+    print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts', 'price_ma.png')}")
+
+
 def run_offline(ticker: str = "ASML.AS") -> None:
     os.environ.setdefault("AGENT_DATA_SOURCE", "fixture")
     state = RunState(ticker=ticker)
@@ -89,6 +109,7 @@ def run_offline(ticker: str = "ASML.AS") -> None:
                       system=SYSTEM, goal=f"Produce a defensible fundamental view on {ticker}.")
     state.print_trace()
     print("FINAL ANSWER:\n" + final)
+    _emit_artifacts(ticker, "offline", final, state)
 
 
 def run_live(ticker: str) -> None:
@@ -102,11 +123,24 @@ def run_live(ticker: str) -> None:
                       system=SYSTEM, goal=f"Produce a defensible fundamental view on {ticker}.")
     state.print_trace()
     print("FINAL ANSWER:\n" + final)
+    _emit_artifacts(ticker, "live", final, state)
+
+
+def rebuild(model_json_path: str) -> None:
+    """Regenerate report.html from a saved model.json ALONE — no yfinance, no
+    model. The proof that the report is rebuildable from the sidecar."""
+    import composer
+    report_path = composer.build_report(model_json_path)
+    print(f"Rebuilt report from sidecar only:\n  {report_path}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "--live":
         tkr = sys.argv[2] if len(sys.argv) >= 3 else "ASML.AS"
         run_live(tkr)
+    elif len(sys.argv) >= 2 and sys.argv[1] == "--rebuild":
+        if len(sys.argv) < 3:
+            sys.exit("Usage: python run.py --rebuild output/<TICKER>_<stamp>/model.json")
+        rebuild(sys.argv[2])
     else:
         run_offline()

@@ -71,6 +71,7 @@ deterministic, auditable computation. Full mapping in the build spec.
 - `get_consensus` + its null-fallback branch — the first real *decision* fork,
   where the loop stops being a clean pipeline. Next checkpoint, built deliberately.
 - `estimate_factor_exposure` (factor regression)
-- the 5-chart visual layer + `report.html` / `model.json` / `charts/`
+- charts 2–5 of the visual layer (chart 1, price+MAs, is wired; football-field,
+  peer scatter, vol/drawdown, price-vs-index still to add)
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).
 - **No shorts / ownership tracking** — separate market-structure tool by design.

@@ -174,3 +174,69 @@ def _prices_yfinance(ticker: str) -> dict:
         "market_cap": market_cap,
         "shares_outstanding": shares,
     }
+
+# --- get_price_history ----------------------------------------------------
+#
+# Chart data, NOT an analysis tool. The agent loop never calls this — the model
+# reasons over financials/prices/ratios/DCF/peers, none of which need a price
+# series. History is fetched by the composer at report time (see composer.py)
+# and written into model.json, so the report is rebuildable from the sidecar.
+#
+# Live: real daily history via yfinance. Offline: a DETERMINISTIC synthetic
+# series (seeded, ending at the fixture's current_price) so the chart pipeline
+# is provable with no network. Both return the same schema.
+
+def get_price_history(ticker: str, period: str = "1y") -> dict:
+    ticker = ticker.upper()
+    if _source() == "yfinance":
+        return _history_yfinance(ticker, period)
+    return _history_synthetic(ticker)
+
+
+def _history_yfinance(ticker: str, period: str) -> dict:
+    import yfinance as yf
+    tk = yf.Ticker(ticker)
+    hist = tk.history(period=period, auto_adjust=True)
+    if hist is None or hist.empty:
+        return {"ticker": ticker, "source": "yfinance", "history": [], "error": "no history"}
+    rows = []
+    for idx, row in hist.iterrows():
+        d = idx.date().isoformat() if hasattr(idx, "date") else str(idx)
+        rows.append({
+            "date": d,
+            "close": round(float(row["Close"]), 4),
+            "volume": int(row["Volume"]) if row.get("Volume") == row.get("Volume") else None,
+        })
+    return {"ticker": ticker, "source": "yfinance", "period": period, "history": rows}
+
+
+def _history_synthetic(ticker: str) -> dict:
+    """Deterministic synthetic daily series for offline runs. Clearly labelled;
+    ends at the fixture's current_price so charts look plausible."""
+    import random
+    from datetime import date, timedelta
+
+    fx = _load_fixture(ticker)
+    end_price = (fx or {}).get("prices", {}).get("current_price") or 100.0
+    n = 252  # ~1 trading year
+
+    rng = random.Random(hash(ticker) & 0xFFFFFFFF)
+    # Build a gentle random walk, then scale so the final point == end_price.
+    steps = [1.0]
+    for _ in range(n - 1):
+        steps.append(steps[-1] * (1 + rng.gauss(0.0005, 0.015)))
+    scale = end_price / steps[-1]
+    closes = [round(s * scale, 4) for s in steps]
+
+    # Business-day dates ending at a fixed reference date.
+    ref = date(2025, 12, 31)
+    dates, d = [], ref
+    while len(dates) < n:
+        if d.weekday() < 5:
+            dates.append(d.isoformat())
+        d -= timedelta(days=1)
+    dates = list(reversed(dates))
+
+    rows = [{"date": dates[i], "close": closes[i],
+             "volume": int(rng.uniform(1_000_000, 5_000_000))} for i in range(n)]
+    return {"ticker": ticker, "source": "fixture-synthetic", "period": "1y", "history": rows}
