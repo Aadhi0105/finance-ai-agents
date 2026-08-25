@@ -222,6 +222,23 @@ def render_price_vs_index_png(price_hist: list[dict], index_hist: list[dict],
 
 # --- markdown -> html (lightweight, escape-first) -------------------------
 
+# --- markdown -> html (lightweight, escape-first) -------------------------
+
+def _validation_banner(v: dict | None) -> str:
+    """Render the confidence-gate result as a banner at the top of the report."""
+    if not v:
+        return ""
+    passed = v.get("verdict") == "pass"
+    cls = "pass" if passed else "review"
+    label = "Passed confidence gate" if passed else "Flagged for review"
+    head = (f"<strong>{label}</strong> — confidence {v.get('confidence')}, "
+            f"score {v.get('score')} ({v.get('n_pass')} pass / {v.get('n_warn')} warn / {v.get('n_fail')} fail)")
+    flags = [c for c in v.get("checks", []) if c["status"] != "pass"]
+    items = "".join(f"<li><em>{c['status']}</em> — {c['check']}: {c['detail']}</li>" for c in flags)
+    body = f"<ul>{items}</ul>" if items else ""
+    return f'<div class="banner {cls}">{head}{body}</div>'
+
+
 def _markdown_to_html(text: str) -> str:
     import re
     def esc(s):
@@ -256,7 +273,8 @@ def _markdown_to_html(text: str) -> str:
 # --- sidecar --------------------------------------------------------------
 
 def write_sidecar(*, ticker: str, mode: str, note: str, analysis: dict,
-                  price_history: dict, index_history: dict | None, out_dir: str) -> str:
+                  price_history: dict, index_history: dict | None,
+                  validation: dict | None = None, out_dir: str) -> str:
     """Write model.json — the complete, self-contained record of one run."""
     os.makedirs(out_dir, exist_ok=True)
     sidecar = {
@@ -266,6 +284,7 @@ def write_sidecar(*, ticker: str, mode: str, note: str, analysis: dict,
             "mode": mode,
             "generated_at": datetime.now(timezone.utc).isoformat(),
         },
+        "validation": validation,             # confidence gate result (may be None)
         "note": note,
         "analysis": analysis,                 # copy of the loop's tool results
         "chart_data": {
@@ -337,6 +356,7 @@ def build_report(model_json_path: str, out_dir: str | None = None) -> str:
                           f'src="data:image/png;base64,{b64}">')
 
     note_html = _markdown_to_html(sidecar.get("note") or "")
+    banner_html = _validation_banner(sidecar.get("validation"))
 
     html = f"""<!doctype html>
 <html><head><meta charset="utf-8"><title>{ticker} — equity research</title>
@@ -348,9 +368,14 @@ def build_report(model_json_path: str, out_dir: str | None = None) -> str:
  .src{{color:#888;font-size:.75rem;margin:.5rem 0 1.5rem}}
  .note{{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:.5rem 1.2rem;margin-top:.5rem}}
  .note li{{margin:.2rem 0}}
+ .banner{{border-radius:6px;padding:.7rem 1rem;margin:1rem 0;font-size:.9rem}}
+ .banner.pass{{background:#eef7ee;border:1px solid #cfe8cf}}
+ .banner.review{{background:#fdf2e9;border:1px solid #f5cba7}}
+ .banner ul{{margin:.4rem 0 0;padding-left:1.2rem}} .banner li{{margin:.15rem 0}}
 </style></head><body>
 <h1>{ticker} — Equity Research</h1>
 <div class="meta">agent: {sidecar['meta']['agent']} &middot; mode: {sidecar['meta']['mode']} &middot; generated: {sidecar['meta']['generated_at']}</div>
+{banner_html}
 {''.join(chart_html)}
 <div class="src">chart data source: {hist_src} &middot; all figures from model.json (rebuildable sidecar)</div>
 <h2>Analyst note</h2>

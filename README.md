@@ -45,7 +45,7 @@ still show a stock above or below its DCF intrinsic value.
 ```
 agent/       loop.py (orchestrator) · models.py (Stub/Anthropic) · state.py (working memory)
 tools/       registry.py · data.py (fetchers) · analytical.py (computations)
-validation/  (confidence gate — next checkpoint)
+validation/  gate.py — deterministic confidence gate (pass / flag-for-review)
 fixtures/    offline sample data
 output/      per-run artifacts (gitignored)
 run.py       entry point
@@ -71,7 +71,6 @@ deterministic, auditable computation. Full mapping in the build spec.
 - `get_consensus` + its null-fallback branch — the first real *decision* fork,
   where the loop stops being a clean pipeline. Next checkpoint, built deliberately.
 - `estimate_factor_exposure` (factor regression)
-- the validation/confidence gate
 - `get_consensus` decision-branch
 - `estimate_factor_exposure` (factor regression)
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).

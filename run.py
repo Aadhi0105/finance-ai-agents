@@ -81,12 +81,17 @@ def build_offline_script(ticker: str):
 
 
 def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
-    """After the loop: fetch chart data, write the sidecar, build the report.
+    """After the loop: validate, fetch chart data, write the sidecar, build the report.
     Charts are LOCKED output, not a model decision — so history is fetched here,
     outside the reasoning loop."""
     from datetime import datetime
     from tools.data import get_price_history, home_index_ticker
+    from validation import gate
     import composer
+
+    # Confidence gate: score the run's own logged outputs (deterministic).
+    validation = gate.assess(state.results)
+    _print_validation(validation)
 
     price_history = get_price_history(ticker)
     idx_ticker = home_index_ticker(ticker)
@@ -101,10 +106,24 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
 
     sidecar_path = composer.write_sidecar(
         ticker=ticker, mode=mode, note=note, analysis=state.results,
-        price_history=price_history, index_history=index_history, out_dir=out_dir,
+        price_history=price_history, index_history=index_history,
+        validation=validation, out_dir=out_dir,
     )
     report_path = composer.build_report(sidecar_path, out_dir)
     print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts')}/ (5 charts)")
+
+
+def _print_validation(v: dict) -> None:
+    banner = "PASS" if v["verdict"] == "pass" else "⚠ FLAGGED FOR REVIEW"
+    print(f"\n----- VALIDATION: {banner} "
+          f"(confidence={v['confidence']}, score={v['score']}, "
+          f"{v['n_pass']} pass / {v['n_warn']} warn / {v['n_fail']} fail) -----")
+    for c in v["checks"]:
+        if c["status"] != "pass":
+            print(f"  [{c['status'].upper()}] {c['check']}: {c['detail']}")
+    if v["verdict"] != "pass":
+        print("  -> not for emission as-is; route to human review.")
+    print("-----")
 
 
 def run_offline(ticker: str = "ASML.AS") -> None:
