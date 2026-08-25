@@ -91,7 +91,7 @@ class AnthropicModel(ModelClient):
     and set ANTHROPIC_API_KEY, and this path lights up with zero loop changes.
     """
 
-    def __init__(self, model: str | None = None, max_tokens: int = 2500):
+    def __init__(self, model: str | None = None, max_tokens: int = 4000):
         # Model string is read from AGENT_MODEL so you never hardcode a value
         # that goes stale on the next release. Confirm the exact string your key
         # can call with:  curl https://api.anthropic.com/v1/models -H "x-api-key: $ANTHROPIC_API_KEY" -H "anthropic-version: 2023-06-01"

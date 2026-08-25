@@ -264,14 +264,27 @@ def peer_outlier_check(tool_input: dict, state=None) -> dict:
     z = (target_pe - mean) / stdev if stdev else None
     mean_outlier = bool(z is not None and abs(z) > 2)
 
-    # --- Divergence: do robust and mean-based verdicts disagree? -------------
-    # Divergence usually means one peer is skewing the mean — itself a useful
-    # signal to inspect the peer set.
-    divergence = (robust_outlier is not None) and (robust_outlier != mean_outlier)
-    skew_note = None
-    if mean and median and abs(mean - median) / median > 0.15:
-        skew_note = (f"peer mean ({round(mean,2)}) and median ({round(median,2)}) diverge "
-                     f">15% — the mean is likely skewed by an extreme peer; trust the median.")
+    # --- Divergence: do the robust and mean-based readings tell different
+    # stories? Two ways they can: (1) the binary outlier verdicts flip, or
+    # (2) the mean and median diverge materially, meaning the mean is being
+    # skewed by an extreme peer even if both binaries happen to agree. Either
+    # is a signal to distrust the mean and inspect the peer set.
+    skew_present = bool(mean and median and abs(mean - median) / median > 0.15)
+    skew_note = (
+        f"peer mean ({round(mean,2)}) and median ({round(median,2)}) diverge "
+        f">15% — the mean is likely skewed by an extreme peer; trust the median."
+    ) if skew_present else None
+
+    binary_flip = (robust_outlier is not None) and (robust_outlier != mean_outlier)
+    divergence = bool(binary_flip or skew_present)
+    divergence_reason = None
+    if divergence:
+        reasons = []
+        if binary_flip:
+            reasons.append("robust vs mean-based outlier verdicts disagree")
+        if skew_present:
+            reasons.append("mean skewed vs median")
+        divergence_reason = "; ".join(reasons)
 
     # Primary verdict is the robust one; fall back to mean only if MAD was zero.
     is_outlier = robust_outlier if robust_outlier is not None else mean_outlier
@@ -294,6 +307,7 @@ def peer_outlier_check(tool_input: dict, state=None) -> dict:
         "mean_based_outlier": mean_outlier,
         # signals
         "verdict_divergence": divergence,
+        "divergence_reason": divergence_reason,
         "skew_note": skew_note,
         "caveat": "peer selection is an analyst input; robust stats still noisy below ~5 peers",
         "computed_by": "peer_outlier_check (python, median/MAD primary)",
