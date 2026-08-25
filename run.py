@@ -39,9 +39,17 @@ SYSTEM = (
     "Tools: get_financials (raw figures), get_prices (price/market cap/shares), "
     "compute_ratios (margins, growth, and — once prices are fetched — P/E and EV/EBIT), "
     "run_dcf (scenario-weighted valuation, needs financials + prices), "
-    "peer_outlier_check (is the P/E an outlier vs peers you supply).\n\n"
+    "peer_outlier_check (is the P/E an outlier vs peers you supply), "
+    "get_consensus (forward analyst estimates), get_historical_trend (the company's "
+    "own multi-year trajectory).\n\n"
+    "IMPORTANT — comparison basis: call get_consensus to anchor your growth/valuation "
+    "view against analyst expectations. Consensus is often unavailable (available=false). "
+    "When it is, DO NOT invent estimates — call get_historical_trend and assess the "
+    "company against its OWN multi-year trajectory instead. Always state explicitly which "
+    "basis you used (analyst consensus, or own-history fallback).\n\n"
     "A sensible order: fetch financials and prices, compute ratios, run a DCF, check "
-    "peers, then write a note stating a view, the evidence, and what would change it."
+    "peers, establish a comparison basis (consensus or history), then write a note "
+    "stating a view, the evidence, the basis used, and what would change it."
 )
 
 # For offline peer-outlier demo, these peers have fixtures in fixtures/.
@@ -50,8 +58,10 @@ _OFFLINE_PEERS = ["ASM.AS", "BESI.AS", "LRCX"]
 
 def build_offline_script(ticker: str):
     """
-    Scripted turns that exercise every tool through the loop, deterministically.
-    Stands in for what Claude decides on the live path.
+    Scripted turns that exercise every tool through the loop, deterministically —
+    INCLUDING the consensus-null branch: get_consensus returns available=false,
+    so the script then calls get_historical_trend (the fallback basis). This
+    stands in for the decision the live model makes.
     """
     def call(tool_id, name, inp):
         return lambda messages: ModelResponse(
@@ -65,8 +75,9 @@ def build_offline_script(ticker: str):
             content=[TextBlock(text=(
                 f"[stub note] View on {ticker}: financials, prices, ratios, a "
                 f"scenario-weighted DCF, and a peer-outlier check all computed "
-                f"deterministically (see trace). Live mode replaces this text with "
-                f"the model's written note over the same figures."
+                f"deterministically. Consensus was unavailable, so the comparison "
+                f"basis fell back to the company's own history (see trace). Live mode "
+                f"replaces this text with the model's written note over the same figures."
             ))],
         )
 
@@ -76,6 +87,8 @@ def build_offline_script(ticker: str):
         call("t2", "compute_ratios", {"ticker": ticker}),
         call("t3", "run_dcf", {"ticker": ticker}),
         call("t4", "peer_outlier_check", {"ticker": ticker, "peers": _OFFLINE_PEERS}),
+        call("t5", "get_consensus", {"ticker": ticker}),          # returns available=false
+        call("t6", "get_historical_trend", {"ticker": ticker}),   # <- the branch decision
         final,
     ]
 

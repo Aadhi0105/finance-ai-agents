@@ -121,6 +121,17 @@ def assess(analysis: dict, now: date | None = None) -> dict:
     elif ratios:
         add("ratio_sanity", "pass", "margins within plausible range")
 
+    # 8. Comparison basis — did the run anchor its view to consensus, or fall
+    # back to the company's own history? Neither is a real gap.
+    consensus = analysis.get("get_consensus") or {}
+    trend = analysis.get("get_historical_trend") or {}
+    if consensus.get("available"):
+        add("comparison_basis", "pass", "anchored to analyst consensus")
+    elif trend and not trend.get("error"):
+        add("comparison_basis", "pass", "consensus unavailable — fell back to company's own history")
+    elif consensus or trend:
+        add("comparison_basis", "warn", "no usable comparison basis (consensus null and no trend)")
+
     # --- aggregate ---
     fails = [c for c in checks if c["status"] == "fail"]
     warns = [c for c in checks if c["status"] == "warn"]

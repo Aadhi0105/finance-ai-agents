@@ -16,5 +16,19 @@
     "market_cap": 255450000000,
     "shares_outstanding": 393000000,
     "history_note": "full price series is a live-only / charts-checkpoint concern; fixture carries scalars only"
+  },
+  "trend": {
+    "revenue_by_year": {
+      "2022": 21173000000,
+      "2023": 27558500000,
+      "2024": 28262900000,
+      "2025": 32667300000
+    },
+    "net_income_by_year": {
+      "2022": 5624300000,
+      "2023": 7838700000,
+      "2024": 7570000000,
+      "2025": 9609400000
+    }
   }
 }

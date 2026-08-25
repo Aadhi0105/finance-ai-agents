@@ -267,3 +267,106 @@ def home_index_ticker(ticker: str) -> str | None:
     if "." not in t:            # US-listed
         return "^GSPC"          # S&P 500
     return None                 # unmapped exchange -> chart skipped gracefully
+
+# --- get_consensus --------------------------------------------------------
+#
+# THE branch point (spec §3.1). Consensus/analyst estimates are the one
+# genuinely hard input — mostly paywalled — so this tool is DESIGNED to often
+# return available=False. It does NOT silently fall back: it reports the null
+# honestly, and the *model* must decide to call get_historical_trend instead.
+# That decision is where the loop stops being a pipeline.
+
+def get_consensus(tool_input: dict, state=None) -> dict:
+    ticker = tool_input["ticker"].upper()
+    if _source() == "yfinance":
+        return _consensus_yfinance(ticker)
+    # Offline: no consensus fixture -> demonstrates the common null path.
+    fx = _load_fixture(ticker) or {}
+    if "consensus" in fx:
+        return {"ticker": ticker, "source": "fixture", "available": True, "consensus": fx["consensus"]}
+    return {"ticker": ticker, "source": "fixture", "available": False,
+            "reason": "no analyst consensus available (expected — it is the paywalled input)"}
+
+
+def _consensus_yfinance(ticker: str) -> dict:
+    import yfinance as yf
+    tk = yf.Ticker(ticker)
+    out = {}
+    # Analyst price targets (dict-like on recent yfinance).
+    try:
+        pt = tk.analyst_price_targets
+        if pt:
+            out["price_target"] = {k: float(pt[k]) for k in ("current", "low", "high", "mean", "median")
+                                   if pt.get(k) is not None}
+    except Exception:
+        pass
+    # Forward revenue / EPS estimates.
+    for attr, key in (("revenue_estimate", "revenue_estimate_avg"),
+                      ("earnings_estimate", "eps_estimate_avg")):
+        try:
+            df = getattr(tk, attr)
+            if df is not None and not df.empty and "avg" in df.columns:
+                out[key] = {str(idx): float(df.loc[idx, "avg"]) for idx in df.index
+                            if df.loc[idx, "avg"] == df.loc[idx, "avg"]}
+        except Exception:
+            pass
+    if out:
+        return {"ticker": ticker, "source": "yfinance", "available": True, "consensus": out}
+    return {"ticker": ticker, "source": "yfinance", "available": False,
+            "reason": "yfinance returned no analyst estimates for this ticker"}
+
+
+# --- get_historical_trend -------------------------------------------------
+#
+# The fallback basis the model reaches for when consensus is null: the
+# company's OWN multi-year trajectory (revenue, net income, margins, CAGR).
+# Always available from the same fundamentals source.
+
+def get_historical_trend(tool_input: dict, state=None) -> dict:
+    ticker = tool_input["ticker"].upper()
+    if _source() == "yfinance":
+        return _trend_yfinance(ticker)
+    fx = _load_fixture(ticker) or {}
+    if "trend" not in fx:
+        return {"ticker": ticker, "source": "fixture", "error": "no trend fixture"}
+    return _summarise_trend(ticker, "fixture", fx["trend"]["revenue_by_year"],
+                            fx["trend"]["net_income_by_year"])
+
+
+def _trend_yfinance(ticker: str) -> dict:
+    import yfinance as yf
+    tk = yf.Ticker(ticker)
+    fin = tk.financials
+    if fin is None or fin.empty:
+        return {"ticker": ticker, "source": "yfinance", "error": "no financials for trend"}
+    rev, ni = {}, {}
+    for col in list(fin.columns)[:4]:
+        y = str(col.date().year) if hasattr(col, "date") else str(col)
+        try:
+            rev[y] = float(fin.loc["Total Revenue", col])
+        except Exception:
+            pass
+        try:
+            ni[y] = float(fin.loc["Net Income", col])
+        except Exception:
+            pass
+    return _summarise_trend(ticker, "yfinance", rev, ni)
+
+
+def _summarise_trend(ticker: str, source: str, rev: dict, ni: dict) -> dict:
+    years = sorted(rev.keys())
+    net_margin_by_year = {y: round(ni[y] / rev[y], 4) for y in years
+                          if y in ni and rev.get(y)}
+    cagr = None
+    if len(years) >= 2 and rev.get(years[0]):
+        n = int(years[-1]) - int(years[0])
+        if n > 0:
+            cagr = round((rev[years[-1]] / rev[years[0]]) ** (1 / n) - 1, 4)
+    return {
+        "ticker": ticker, "source": source,
+        "revenue_by_year": {y: rev[y] for y in years},
+        "net_margin_by_year": net_margin_by_year,
+        "revenue_cagr": cagr,
+        "basis": "company_own_history",
+        "computed_by": "get_historical_trend (python)",
+    }

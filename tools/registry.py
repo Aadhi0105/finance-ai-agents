@@ -43,6 +43,35 @@ def _build_registry() -> dict:
             },
             data.get_prices,
         ),
+        "get_consensus": (
+            {
+                "name": "get_consensus",
+                "description": "Fetch forward analyst consensus (price target, revenue/EPS estimates). "
+                               "Consensus is often unavailable and returns available=false — when it "
+                               "does, DO NOT guess: call get_historical_trend and compare against the "
+                               "company's own trajectory instead.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {"ticker": {"type": "string"}},
+                    "required": ["ticker"],
+                },
+            },
+            data.get_consensus,
+        ),
+        "get_historical_trend": (
+            {
+                "name": "get_historical_trend",
+                "description": "Fetch the company's own multi-year revenue, net-margin trajectory and "
+                               "revenue CAGR — the fallback comparison basis when consensus is "
+                               "unavailable.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {"ticker": {"type": "string"}},
+                    "required": ["ticker"],
+                },
+            },
+            data.get_historical_trend,
+        ),
         "compute_ratios": (
             {
                 "name": "compute_ratios",
