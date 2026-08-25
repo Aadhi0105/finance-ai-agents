@@ -20,7 +20,7 @@ the build spec assigns Agent 1:
 | `get_prices` | data | — |
 | `compute_ratios` | analytical | econometrics-lite (margins, growth, P/E, EV/EBIT) |
 | `run_dcf` | analytical | **probability** — two-stage scenario-weighted (bear/base/bull) |
-| `peer_outlier_check` | analytical | **statistics** — z-score / IQR outlier test |
+| `peer_outlier_check` | analytical | **statistics** — median/MAD robust outlier test (mean/z alongside) |
 
 Every number is computed in Python; the model chooses which tool to call and
 reads the result. Every DCF and peer assumption is returned in the tool output,
@@ -71,7 +71,6 @@ deterministic, auditable computation. Full mapping in the build spec.
 - `get_consensus` + its null-fallback branch — the first real *decision* fork,
   where the loop stops being a clean pipeline. Next checkpoint, built deliberately.
 - `estimate_factor_exposure` (factor regression)
-- robust peer stats (median + MAD alongside mean/z) — next checkpoint
 - the 5-chart visual layer + `report.html` / `model.json` / `charts/`
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).
 - **No shorts / ownership tracking** — separate market-structure tool by design.

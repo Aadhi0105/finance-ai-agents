@@ -239,29 +239,62 @@ def peer_outlier_check(tool_input: dict, state=None) -> dict:
     if len(values) < 2:
         return {"error": "could not compute P/E for enough peers", "ticker": ticker, "peer_pes": peer_pes}
 
+    values = list(peer_pes.values())
+    if len(values) < 2:
+        return {"error": "could not compute P/E for enough peers", "ticker": ticker, "peer_pes": peer_pes}
+
+    # --- PRIMARY: robust stats (median + MAD) --------------------------------
+    # Median and MAD ignore a single extreme peer, so the verdict doesn't hinge
+    # on one inflated multiple (e.g. a peer at trough earnings). This is the
+    # headline outlier call.
+    median = statistics.median(values)
+    abs_devs = [abs(v - median) for v in values]
+    mad = statistics.median(abs_devs)
+    # Iglewicz-Hoaglin modified z-score; 0.6745 makes it comparable to a normal z.
+    if mad > 0:
+        modified_z = 0.6745 * (target_pe - median) / mad
+        robust_outlier = abs(modified_z) > 3.5   # standard modified-z threshold
+    else:
+        modified_z = None                        # MAD=0: peers too clustered to judge
+        robust_outlier = None
+
+    # --- SECONDARY: mean-based stats (kept for comparison) -------------------
     mean = statistics.mean(values)
     stdev = statistics.pstdev(values) if len(values) > 1 else 0.0
     z = (target_pe - mean) / stdev if stdev else None
+    mean_outlier = bool(z is not None and abs(z) > 2)
 
-    # IQR flag (crude at small n — flagged in output).
-    iqr_flag = None
-    if len(values) >= 4:
-        q1, _, q3 = statistics.quantiles(values, n=4)
-        iqr = q3 - q1
-        lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
-        iqr_flag = not (lo <= target_pe <= hi)
+    # --- Divergence: do robust and mean-based verdicts disagree? -------------
+    # Divergence usually means one peer is skewing the mean — itself a useful
+    # signal to inspect the peer set.
+    divergence = (robust_outlier is not None) and (robust_outlier != mean_outlier)
+    skew_note = None
+    if mean and median and abs(mean - median) / median > 0.15:
+        skew_note = (f"peer mean ({round(mean,2)}) and median ({round(median,2)}) diverge "
+                     f">15% — the mean is likely skewed by an extreme peer; trust the median.")
 
-    is_outlier = bool(z is not None and abs(z) > 2) or bool(iqr_flag)
+    # Primary verdict is the robust one; fall back to mean only if MAD was zero.
+    is_outlier = robust_outlier if robust_outlier is not None else mean_outlier
 
     return {
         "ticker": ticker,
         "metric": "pe",
         "target_pe": round(target_pe, 2),
         "peer_pes": peer_pes,
+        # primary (robust)
+        "peer_median": round(median, 2),
+        "peer_mad": round(mad, 2),
+        "modified_z": round(modified_z, 2) if modified_z is not None else None,
+        "is_outlier": is_outlier,
+        "verdict_basis": "median/MAD (robust)" if robust_outlier is not None else "mean/z (MAD was zero)",
+        # secondary (mean-based), for comparison
         "peer_mean": round(mean, 2),
         "peer_stdev": round(stdev, 2),
         "z_score": round(z, 2) if z is not None else None,
-        "is_outlier": is_outlier,
-        "caveat": "peer selection is an analyst input; IQR flag unreliable below 4 peers",
-        "computed_by": "peer_outlier_check (python)",
+        "mean_based_outlier": mean_outlier,
+        # signals
+        "verdict_divergence": divergence,
+        "skew_note": skew_note,
+        "caveat": "peer selection is an analyst input; robust stats still noisy below ~5 peers",
+        "computed_by": "peer_outlier_check (python, median/MAD primary)",
     }
