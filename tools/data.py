@@ -240,3 +240,30 @@ def _history_synthetic(ticker: str) -> dict:
     rows = [{"date": dates[i], "close": closes[i],
              "volume": int(rng.uniform(1_000_000, 5_000_000))} for i in range(n)]
     return {"ticker": ticker, "source": "fixture-synthetic", "period": "1y", "history": rows}
+
+# --- home index mapping (for the price-vs-index chart) --------------------
+# Maps an exchange suffix to its benchmark index ticker. Used only by the
+# composer for the price-vs-index chart; not an analysis input.
+
+_HOME_INDEX = {
+    ".AS": "^AEX",     # Amsterdam
+    ".DE": "^GDAXI",   # Frankfurt / Xetra (DAX)
+    ".PA": "^FCHI",    # Paris (CAC 40)
+    ".L":  "^FTSE",    # London (FTSE 100)
+    ".SW": "^SSMI",    # Switzerland (SMI)
+    ".MC": "^IBEX",    # Madrid (IBEX 35)
+    ".BR": "^BFX",     # Brussels (BEL 20)
+    ".MI": "FTSEMIB.MI",  # Milan (FTSE MIB)
+}
+
+
+def home_index_ticker(ticker: str) -> str | None:
+    """Return the benchmark index ticker for a listing, or None if unmapped.
+    US tickers (no dot suffix) default to the S&P 500."""
+    t = ticker.upper()
+    for suffix, index in _HOME_INDEX.items():
+        if t.endswith(suffix):
+            return index
+    if "." not in t:            # US-listed
+        return "^GSPC"          # S&P 500
+    return None                 # unmapped exchange -> chart skipped gracefully

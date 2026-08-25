@@ -85,19 +85,26 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     Charts are LOCKED output, not a model decision — so history is fetched here,
     outside the reasoning loop."""
     from datetime import datetime
-    from tools.data import get_price_history
+    from tools.data import get_price_history, home_index_ticker
     import composer
 
     price_history = get_price_history(ticker)
+    idx_ticker = home_index_ticker(ticker)
+    index_history = None
+    if idx_ticker:
+        ih = get_price_history(idx_ticker)
+        index_history = {"index_ticker": idx_ticker, "source": ih.get("source"),
+                         "history": ih.get("history", [])}
+
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = os.path.join("output", f"{ticker}_{stamp}")
 
     sidecar_path = composer.write_sidecar(
-        ticker=ticker, mode=mode, note=note,
-        analysis=state.results, price_history=price_history, out_dir=out_dir,
+        ticker=ticker, mode=mode, note=note, analysis=state.results,
+        price_history=price_history, index_history=index_history, out_dir=out_dir,
     )
     report_path = composer.build_report(sidecar_path, out_dir)
-    print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts', 'price_ma.png')}")
+    print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts')}/ (5 charts)")
 
 
 def run_offline(ticker: str = "ASML.AS") -> None:
