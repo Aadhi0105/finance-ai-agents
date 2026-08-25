@@ -59,16 +59,18 @@ def _build_registry() -> dict:
         "run_dcf": (
             {
                 "name": "run_dcf",
-                "description": "Run a scenario-weighted DCF (bear/base/bull) and return a "
-                               "probability-weighted per-share value plus implied upside vs current "
-                               "price. Needs get_financials and get_prices first. Optional overrides: "
-                               "discount_rate, base_growth, terminal_growth, horizon_years.",
+                "description": "Run a two-stage scenario-weighted DCF (bear/base/bull): growth fades "
+                               "from a high starting rate to terminal over the horizon, uses real free "
+                               "cash flow, and applies a net-debt bridge to return EQUITY value per share "
+                               "plus implied upside vs current price. Needs get_financials and get_prices "
+                               "first. Optional overrides: discount_rate, high_growth, terminal_growth, "
+                               "horizon_years.",
                 "input_schema": {
                     "type": "object",
                     "properties": {
                         "ticker": {"type": "string"},
                         "discount_rate": {"type": "number"},
-                        "base_growth": {"type": "number"},
+                        "high_growth": {"type": "number", "description": "year-1 growth; fades to terminal"},
                         "terminal_growth": {"type": "number"},
                         "horizon_years": {"type": "integer"},
                     },

@@ -73,6 +73,46 @@ def _financials_yfinance(ticker: str) -> dict:
             financials["revenue_prior"] = float(fin.loc["Total Revenue", prev])
         except Exception:
             financials["revenue_prior"] = None
+
+    # --- DCF v2 inputs: free cash flow (cash-flow statement) + net-debt items ---
+    # yfinance row labels drift across versions/filers, so each lookup tries a
+    # few known labels and returns None if absent (DCF v2 then falls back and logs it).
+    def _row(df, *labels):
+        if df is None or getattr(df, "empty", True):
+            return None
+        col = df.columns[0]
+        for lab in labels:
+            try:
+                v = df.loc[lab, col]
+                if v is not None:
+                    return float(v)
+            except Exception:
+                continue
+        return None
+
+    try:
+        cf = tk.cashflow
+    except Exception:
+        cf = None
+    try:
+        bs = tk.balance_sheet
+    except Exception:
+        bs = None
+
+    fcf = _row(cf, "Free Cash Flow")
+    if fcf is None:  # derive from OCF - capex if the explicit FCF row is missing
+        ocf = _row(cf, "Operating Cash Flow", "Total Cash From Operating Activities")
+        capex = _row(cf, "Capital Expenditure", "Capital Expenditures")
+        if ocf is not None and capex is not None:
+            fcf = ocf + capex  # capex is reported negative, so add
+
+    financials["free_cash_flow"] = fcf
+    financials["total_debt"] = _row(bs, "Total Debt")
+    financials["cash_and_equivalents"] = _row(
+        bs, "Cash And Cash Equivalents",
+        "Cash Cash Equivalents And Short Term Investments",
+        "Cash And Cash Equivalents And Short Term Investments",
+    )
     return {"ticker": ticker, "source": "yfinance", "financials": financials}
 
 

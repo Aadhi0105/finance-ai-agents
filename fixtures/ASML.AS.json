@@ -6,7 +6,10 @@
     "gross_profit": 17258000000,
     "operating_income": 11301400000,
     "net_income": 9609400000,
-    "revenue_prior": 28262900000
+    "revenue_prior": 28262900000,
+    "free_cash_flow": 9100000000,
+    "total_debt": 4500000000,
+    "cash_and_equivalents": 12000000000
   },
   "prices": {
     "current_price": 650.0,

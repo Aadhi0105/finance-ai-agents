@@ -19,7 +19,7 @@ the build spec assigns Agent 1:
 | `get_financials` | data | — |
 | `get_prices` | data | — |
 | `compute_ratios` | analytical | econometrics-lite (margins, growth, P/E, EV/EBIT) |
-| `run_dcf` | analytical | **probability** — scenario-weighted (bear/base/bull) |
+| `run_dcf` | analytical | **probability** — two-stage scenario-weighted (bear/base/bull) |
 | `peer_outlier_check` | analytical | **statistics** — z-score / IQR outlier test |
 
 Every number is computed in Python; the model chooses which tool to call and
@@ -34,9 +34,11 @@ python run.py --live ASML.AS # live: model decides the sequence, data via yfinan
 Live mode needs `pip install -r requirements.txt` and `ANTHROPIC_API_KEY` (loaded
 from a gitignored `.env`).
 
-**Skeleton simplifications (deliberate, and logged in each run):** DCF proxies
-FCF by net income and approximates equity value by enterprise value (no net-debt
-bridge). Real FCF + a net-debt bridge are a data-layer follow-up, not a rewrite.
+**DCF v2:** the DCF uses real free cash flow (net income only as a logged
+fallback), a two-stage model (growth fading linearly to terminal over a 10-year
+horizon), and a net-debt bridge to equity value. Every assumption is returned in
+the run output. It is not tuned to match market price — a defensible method can
+still show a stock above or below its DCF intrinsic value.
 
 ## Layout (flat, per spec §3.2)
 
@@ -69,8 +71,7 @@ deterministic, auditable computation. Full mapping in the build spec.
 - `get_consensus` + its null-fallback branch — the first real *decision* fork,
   where the loop stops being a clean pipeline. Next checkpoint, built deliberately.
 - `estimate_factor_exposure` (factor regression)
+- robust peer stats (median + MAD alongside mean/z) — next checkpoint
 - the 5-chart visual layer + `report.html` / `model.json` / `charts/`
-- the validation/confidence gate
-- real FCF + net-debt bridge in the DCF (data-layer improvement)
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).
 - **No shorts / ownership tracking** — separate market-structure tool by design.

@@ -74,27 +74,46 @@ def compute_ratios(tool_input: dict, state=None) -> dict:
 
 # --- run_dcf --------------------------------------------------------------
 
+# --- run_dcf (v2) ---------------------------------------------------------
+#
+# What changed from v1 (and why): v1 was a single-stage, 5-year DCF on
+# net-income-as-FCF with equity value approximated by EV. On a durable
+# compounder that shape prints an implausibly low value and reads as broken.
+# v2 fixes the three things that made it naive:
+#   1. FCF base = real free cash flow (from get_financials); net income only
+#      as a logged fallback when FCF is unavailable.
+#   2. Two-stage: growth fades LINEARLY from a high starting rate to the
+#      terminal rate across a 10-year explicit horizon, then Gordon terminal
+#      value — not flat growth then a cliff.
+#   3. Net-debt bridge: equity value = EV - net debt (net debt = total debt -
+#      cash). Net-cash companies get a value ABOVE EV.
+# The point is a defensible METHOD, not a number tuned to match the price.
+
 _DCF_DEFAULTS = {
-    "horizon_years": 5,
-    "discount_rate": 0.10,       # WACC proxy
+    "horizon_years": 10,          # explicit high-growth/fade phase
+    "discount_rate": 0.09,        # WACC proxy
     "terminal_growth": 0.025,
-    "base_growth": 0.08,
-    # scenario growth deltas applied to base_growth, and their probability weights
+    "high_growth": 0.12,          # year-1 growth; fades to terminal_growth by year N
+    # scenario shifts applied to the high_growth starting rate, + probability weights
     "bear_delta": -0.04, "base_delta": 0.0, "bull_delta": 0.04,
     "weights": {"bear": 0.25, "base": 0.50, "bull": 0.25},
-    "fcf_proxy": "net_income",   # SKELETON: FCF proxied by net income
 }
 
 
-def _one_dcf(fcf0, growth, r, tg, n):
-    """Deterministic single-scenario DCF -> enterprise value proxy."""
+def _two_stage_ev(fcf0, high_g, term_g, r, n):
+    """
+    Deterministic two-stage DCF -> enterprise value.
+    Growth in year t fades linearly from high_g (year 1) to term_g (year n).
+    Terminal value is Gordon growth at term_g on the final-year FCF.
+    """
     pv = 0.0
     fcf_t = fcf0
     for t in range(1, n + 1):
-        fcf_t = fcf0 * (1 + growth) ** t
+        # linear fade: year 1 -> high_g, year n -> term_g
+        g_t = high_g + (term_g - high_g) * (t - 1) / (n - 1) if n > 1 else term_g
+        fcf_t = fcf_t * (1 + g_t)
         pv += fcf_t / (1 + r) ** t
-    # Gordon-growth terminal value on the final projected FCF.
-    tv = fcf_t * (1 + tg) / (r - tg)
+    tv = fcf_t * (1 + term_g) / (r - term_g)
     pv_tv = tv / (1 + r) ** n
     return pv + pv_tv
 
@@ -106,53 +125,69 @@ def run_dcf(tool_input: dict, state=None) -> dict:
     prices = state.results.get("get_prices") if state is not None else None
     if not fin or "financials" not in fin:
         return {"error": "run_dcf needs get_financials first", "ticker": ticker}
+    f = fin["financials"]
 
-    net_income = fin["financials"].get("net_income")
-    if not net_income:
-        return {"error": "run_dcf: no net_income to proxy FCF from", "ticker": ticker}
+    # FCF base: real free cash flow, with net income as a logged fallback.
+    fcf0 = f.get("free_cash_flow")
+    fcf_source = "free_cash_flow (cash-flow statement)"
+    if not fcf0:
+        fcf0 = f.get("net_income")
+        fcf_source = "net_income (fallback — no FCF available)"
+    if not fcf0:
+        return {"error": "run_dcf: no FCF or net income to base the DCF on", "ticker": ticker}
 
-    # Merge caller overrides onto defaults; everything used is logged below.
+    # Merge caller overrides onto defaults. Accept high_growth or legacy base_growth.
     a = dict(_DCF_DEFAULTS)
-    for k in ("horizon_years", "discount_rate", "terminal_growth", "base_growth"):
-        if k in tool_input and tool_input[k] is not None:
+    if tool_input.get("base_growth") is not None and tool_input.get("high_growth") is None:
+        a["high_growth"] = tool_input["base_growth"]
+    for k in ("horizon_years", "discount_rate", "terminal_growth", "high_growth"):
+        if tool_input.get(k) is not None:
             a[k] = tool_input[k]
 
-    r, tg, n, g = a["discount_rate"], a["terminal_growth"], a["horizon_years"], a["base_growth"]
-    fcf0 = net_income  # proxy, per assumptions
+    r, tg, n, hg = a["discount_rate"], a["terminal_growth"], a["horizon_years"], a["high_growth"]
 
     ev = {
-        "bear": _one_dcf(fcf0, g + a["bear_delta"], r, tg, n),
-        "base": _one_dcf(fcf0, g + a["base_delta"], r, tg, n),
-        "bull": _one_dcf(fcf0, g + a["bull_delta"], r, tg, n),
+        "bear": _two_stage_ev(fcf0, hg + a["bear_delta"], tg, r, n),
+        "base": _two_stage_ev(fcf0, hg + a["base_delta"], tg, r, n),
+        "bull": _two_stage_ev(fcf0, hg + a["bull_delta"], tg, r, n),
     }
+
+    # Net-debt bridge: equity value = EV - net debt (negative net debt = net cash).
+    total_debt = f.get("total_debt") or 0.0
+    cash = f.get("cash_and_equivalents") or 0.0
+    net_debt = total_debt - cash
+    bridge_known = ("total_debt" in f and f.get("total_debt") is not None) or \
+                   ("cash_and_equivalents" in f and f.get("cash_and_equivalents") is not None)
+    equity = {k: v - net_debt for k, v in ev.items()}
 
     shares = prices.get("shares_outstanding") if prices else None
     current_price = prices.get("current_price") if prices else None
+    per_share = {k: (v / shares if shares else None) for k, v in equity.items()}
 
-    # EV -> per share. SKELETON: equity value approximated by EV (net debt ignored).
-    per_share = {k: (v / shares if shares else None) for k, v in ev.items()}
     w = a["weights"]
-    weighted_ev = sum(ev[k] * w[k] for k in ev)
-    weighted_ps = weighted_ev / shares if shares else None
-
-    upside = None
-    if weighted_ps and current_price:
-        upside = round(weighted_ps / current_price - 1, 4)
+    weighted_equity = sum(equity[k] * w[k] for k in equity)
+    weighted_ps = weighted_equity / shares if shares else None
+    upside = round(weighted_ps / current_price - 1, 4) if (weighted_ps and current_price) else None
 
     return {
         "ticker": ticker,
         "enterprise_value": {k: round(v, 0) for k, v in ev.items()},
+        "equity_value": {k: round(v, 0) for k, v in equity.items()},
         "value_per_share": {k: (round(v, 2) if v else None) for k, v in per_share.items()},
         "probability_weighted_per_share": round(weighted_ps, 2) if weighted_ps else None,
         "current_price": current_price,
         "implied_upside": upside,
         "assumptions": {
-            "fcf_base": fcf0, "fcf_proxy": a["fcf_proxy"],
-            "base_growth": g, "scenario_deltas": {"bear": a["bear_delta"], "base": a["base_delta"], "bull": a["bull_delta"]},
-            "weights": w, "discount_rate": r, "terminal_growth": tg, "horizon_years": n,
-            "simplifications": "equity value approximated by EV (net debt bridge omitted, skeleton)",
+            "fcf_base": fcf0, "fcf_source": fcf_source,
+            "model": "two-stage: linear growth fade over horizon, then Gordon terminal",
+            "high_growth": hg, "terminal_growth": tg, "horizon_years": n, "discount_rate": r,
+            "scenario_deltas": {"bear": a["bear_delta"], "base": a["base_delta"], "bull": a["bull_delta"]},
+            "weights": w,
+            "net_debt": net_debt if bridge_known else None,
+            "net_debt_note": ("equity = EV - net debt" if bridge_known
+                              else "net-debt items unavailable; equity approximated by EV"),
         },
-        "computed_by": "run_dcf (python)",
+        "computed_by": "run_dcf v2 (python)",
     }
 
 
