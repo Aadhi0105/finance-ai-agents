@@ -28,7 +28,8 @@ _DEFAULT_DB = os.path.join("state", "monitor.duckdb")
 
 _COLUMNS = ("item_id", "cycle", "data_ts", "entity", "covenant_type", "metric",
            "value", "threshold", "direction", "breached", "margin", "status",
-           "anomaly_significant", "anomaly_z", "drifting", "drift_slope", "drift_tstat")
+           "anomaly_significant", "anomaly_z", "drifting", "drift_slope", "drift_tstat",
+           "breach_prob", "breach_tail")
 
 
 class StateStore:
@@ -44,7 +45,8 @@ class StateStore:
             covenant_type VARCHAR, metric VARCHAR, value DOUBLE, threshold DOUBLE,
             direction VARCHAR, breached BOOLEAN, margin DOUBLE, status VARCHAR,
             anomaly_significant BOOLEAN, anomaly_z DOUBLE,
-            drifting BOOLEAN, drift_slope DOUBLE, drift_tstat DOUBLE
+            drifting BOOLEAN, drift_slope DOUBLE, drift_tstat DOUBLE,
+            breach_prob DOUBLE, breach_tail BOOLEAN
         """
         self.con.execute(f"CREATE TABLE IF NOT EXISTS history ({cols});")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")

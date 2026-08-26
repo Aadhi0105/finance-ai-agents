@@ -95,8 +95,11 @@ cycle's stored state, classifies what changed, and reports only the exceptions.
     latest value a significant outlier vs the item's own history? (**statistics**)
   - `drift_check` — OLS value~time with a t-test on the slope + prediction band
     and cycles-to-breach projection: is there a real trend? (**econometrics**)
-  - These catch a drift toward breach *before* the hard threshold is crossed;
-    they become the MCP spine (shared with Agent 3), local for now.
+  - `breach_probability` — first-passage (barrier-crossing) probability of
+    breaching within a horizon, from the item's drift + volatility (**probability**)
+  - Together they catch a drift toward breach *before* the hard threshold, and
+    only flag movement *toward* breach (not toward safety). These three become the
+    MCP spine (shared with Agent 3), local for now.
 
 ```bash
 python monitor.py --reset    # fresh start
@@ -105,7 +108,8 @@ python monitor.py --run 10   # demo: drift is flagged cycles before the hard bre
 python monitor.py --state    # on-demand full-state view
 ```
 
-**Next:** `breach_probability` (the third shared/MCP check — probability);
-model triage of accumulated flags; freshness gating + crash-safe transactional
-writes + skip-to-now catch-up; scheduler wrapper; then extract the three shared
-checks to a stdio MCP server.
+**Next:** model triage of accumulated flags (the model reasoning over real
+statistical signals — grouping, re-checks, commentary); freshness gating +
+crash-safe transactional writes + skip-to-now catch-up; scheduler wrapper; then
+extract the three shared checks (anomaly / drift / breach_probability) to a
+stdio MCP server.

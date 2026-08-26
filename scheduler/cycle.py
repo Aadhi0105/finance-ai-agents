@@ -20,7 +20,7 @@ from datetime import date, timedelta
 from state.store import StateStore
 from state.classify import classify, SURFACED
 from tools.covenant_checks import threshold_check
-from tools.statistical_checks import anomaly_significance_check, drift_check
+from tools.statistical_checks import anomaly_significance_check, drift_check, breach_probability
 
 _FIXTURE = os.path.join("fixtures", "covenants.json")
 
@@ -57,6 +57,7 @@ def run_cycle(db_path: str | None = None) -> dict:
             anom = anomaly_significance_check(series)
             drift = drift_check(times, series,
                                 threshold=cov["threshold"], direction=cov["direction"])
+            breach = breach_probability(series, cov["threshold"], cov["direction"])
 
             row = {
                 "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": data_ts,
@@ -69,7 +70,10 @@ def run_cycle(db_path: str | None = None) -> dict:
                 "drifting": drift.get("drifting"),
                 "drift_slope": drift.get("slope"),
                 "drift_tstat": drift.get("slope_tstat"),
-                "_drift_detail": drift,  # not persisted; used for report only
+                "breach_prob": breach.get("breach_probability"),
+                "breach_tail": breach.get("tail_flag"),
+                "_drift_detail": drift,   # not persisted; report only
+                "_breach_detail": breach, # not persisted; report only
             }
             store.write_history({k: v for k, v in row.items() if not k.startswith("_")})
             store.upsert_current({k: v for k, v in row.items() if not k.startswith("_")})
@@ -87,20 +91,30 @@ def _stat_tags(r) -> list[str]:
     tags = []
     if r.get("anomaly_significant"):
         tags.append(f"ANOMALY(z={r['anomaly_z']})")
-    if r.get("drifting"):
+    b = r.get("_breach_detail", {})
+    toward = bool(b.get("toward_breach"))
+    # Only annotate drift when it's heading toward breach — a trend toward safety
+    # is not a warning.
+    if r.get("drifting") and toward:
         d = r.get("_drift_detail", {})
         ctb = d.get("cycles_to_breach_at_current_drift")
         proj = f", ~{ctb} cycles to breach" if ctb is not None else ""
         tags.append(f"DRIFT(slope={r['drift_slope']}, t={r['drift_tstat']}{proj})")
+    if b.get("tail_flag") and toward:
+        tags.append(f"BREACH_PROB({r['breach_prob']} within {b.get('horizon_cycles')}c)")
     return tags
 
 
 def _surfaces(r) -> bool:
-    """Surface on a threshold change OR a significant statistical signal — so an
-    item that is threshold-OK but drifting toward breach still gets flagged."""
-    return (r["status"] in SURFACED
-            or bool(r.get("anomaly_significant"))
-            or bool(r.get("drifting")))
+    """Surface on a threshold change OR a significant anomaly OR a trend/tail that
+    is heading TOWARD breach. A metric drifting toward safety is not surfaced."""
+    if r["status"] in SURFACED:
+        return True
+    if r.get("anomaly_significant"):
+        return True
+    b = r.get("_breach_detail", {})
+    toward = bool(b.get("toward_breach"))
+    return toward and (bool(r.get("drifting")) or bool(b.get("tail_flag")))
 
 
 def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:

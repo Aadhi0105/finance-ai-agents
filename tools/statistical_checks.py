@@ -162,3 +162,75 @@ def drift_check(times: list[float], values: list[float], min_obs: int = 6,
         "caveat": "trend estimate; unreliable on short or non-stationary histories",
         "computed_by": "drift_check (python)",
     }
+
+
+# --- breach_probability (probability) -------------------------------------
+
+def _phi(x: float) -> float:
+    """Standard normal CDF."""
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+
+
+def _first_passage_prob(a: float, m: float, s: float, T: float) -> float:
+    """
+    Probability that a random walk with per-step drift `m` and per-step volatility
+    `s`, starting at 0, reaches barrier `a > 0` within `T` steps. Reflection-
+    principle (first-passage) formula for arithmetic Brownian motion — this is the
+    VaR-style barrier-crossing calc, not a terminal-value CDF.
+    """
+    if a <= 0:
+        return 1.0                      # already at/over the barrier
+    if s <= 0:
+        return 1.0 if m * T >= a else 0.0
+    sT = s * math.sqrt(T)
+    term1 = _phi((m * T - a) / sT)
+    expo = min(2.0 * m * a / (s * s), 700.0)   # guard overflow
+    term2 = math.exp(expo) * _phi((-m * T - a) / sT)
+    return max(0.0, min(1.0, term1 + term2))
+
+
+def breach_probability(values: list[float], threshold: float, direction: str,
+                       horizon: int = 6, min_obs: int = 6, tail_at: float = 0.25) -> dict:
+    """
+    Probability the metric BREACHES its covenant within `horizon` cycles, given
+    its own drift and volatility. Estimates per-step drift and vol from the
+    series' increments (random-walk-with-drift), then computes the first-passage
+    probability to the covenant barrier.
+    """
+    n = len(values)
+    if n < min_obs:
+        return {"breach_probability": None,
+                "reason": f"insufficient history (have {n}, need {min_obs})",
+                "computed_by": "breach_probability (python)"}
+
+    diffs = [values[i] - values[i - 1] for i in range(1, n)]
+    mu = statistics.mean(diffs)                       # per-cycle drift (raw units)
+    sigma = statistics.pstdev(diffs) if len(diffs) > 1 else 0.0
+    current = values[-1]
+
+    # Distance to the barrier, and drift *toward* it, in the covenant's direction.
+    if direction == "below":                          # breach when value > threshold
+        a = threshold - current
+        m = mu                                        # rising = toward barrier
+    elif direction == "above":                        # breach when value < threshold
+        a = current - threshold
+        m = -mu                                       # falling = toward barrier
+    else:
+        return {"breach_probability": None, "reason": f"unknown direction '{direction}'",
+                "computed_by": "breach_probability (python)"}
+
+    p = _first_passage_prob(a, m, sigma, horizon)
+    toward_breach = a > 0 and m > 0                    # not yet breached, heading in
+
+    return {
+        "breach_probability": round(p, 4),
+        "horizon_cycles": horizon,
+        "toward_breach": bool(a <= 0 or toward_breach),
+        "tail_flag": bool(p >= tail_at),
+        "distance_to_breach": round(a, 4),
+        "drift_per_cycle": round(mu, 5),
+        "volatility_per_cycle": round(sigma, 5),
+        "method": "first-passage (reflection principle) for RW-with-drift",
+        "caveat": "assumes a random-walk-with-drift; probabilities sharpen as volatility falls",
+        "computed_by": "breach_probability (python)",
+    }
