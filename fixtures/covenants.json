@@ -1,42 +1,26 @@
 {
-  "note": "Fixture covenant watchlist for the offline two-cycle proof. Metric VALUES are driven by the fixture (cycle_values) so change-classification is demonstrated deterministically. The live path would instead compute each metric from yfinance fundamentals via get_kpis. Per-cycle values are chosen so cycle 2 exercises every classification outcome: NEW_BREACH, WIDENING, RESOLVED, and a suppressed OK.",
+  "note": "Fixture covenant watchlist. Metric VALUES are driven by cycle_values so the deterministic spine AND the statistical checks are demonstrable offline. Series are crafted so: acme_leverage DRIFTS up and drift_check flags it BEFORE the hard threshold breach; acme_int_cover has a stable history then a sharp ANOMALY dip; beta_leverage is a quiet control (no drift, no anomaly); gamma_liquidity resolves. Live path would compute values from yfinance fundamentals via get_kpis.",
   "base_date": "2026-01-01",
   "covenants": [
     {
-      "item_id": "acme_leverage",
-      "entity": "Acme Corp",
-      "covenant_type": "leverage",
-      "metric": "net_debt_to_ebitda",
-      "threshold": 3.5,
-      "direction": "below",
-      "cycle_values": {"1": 3.0, "2": 3.8}
+      "item_id": "acme_leverage", "entity": "Acme Corp", "covenant_type": "leverage",
+      "metric": "net_debt_to_ebitda", "threshold": 3.5, "direction": "below",
+      "cycle_values": {"1":2.80,"2":2.86,"3":2.93,"4":3.00,"5":3.08,"6":3.17,"7":3.26,"8":3.36,"9":3.47,"10":3.62}
     },
     {
-      "item_id": "acme_int_cover",
-      "entity": "Acme Corp",
-      "covenant_type": "coverage",
-      "metric": "interest_coverage",
-      "threshold": 3.0,
-      "direction": "above",
-      "cycle_values": {"1": 2.5, "2": 2.4}
+      "item_id": "acme_int_cover", "entity": "Acme Corp", "covenant_type": "coverage",
+      "metric": "interest_coverage", "threshold": 3.0, "direction": "above",
+      "cycle_values": {"1":3.50,"2":3.52,"3":3.48,"4":3.51,"5":3.49,"6":3.50,"7":3.53,"8":3.47,"9":2.10,"10":3.50}
     },
     {
-      "item_id": "beta_leverage",
-      "entity": "Beta Ltd",
-      "covenant_type": "leverage",
-      "metric": "net_debt_to_ebitda",
-      "threshold": 4.0,
-      "direction": "below",
-      "cycle_values": {"1": 3.5, "2": 3.6}
+      "item_id": "beta_leverage", "entity": "Beta Ltd", "covenant_type": "leverage",
+      "metric": "net_debt_to_ebitda", "threshold": 4.0, "direction": "below",
+      "cycle_values": {"1":3.50,"2":3.48,"3":3.52,"4":3.49,"5":3.51,"6":3.50,"7":3.49,"8":3.52,"9":3.50,"10":3.51}
     },
     {
-      "item_id": "gamma_liquidity",
-      "entity": "Gamma SA",
-      "covenant_type": "liquidity",
-      "metric": "current_ratio",
-      "threshold": 1.2,
-      "direction": "above",
-      "cycle_values": {"1": 1.1, "2": 1.3}
+      "item_id": "gamma_liquidity", "entity": "Gamma SA", "covenant_type": "liquidity",
+      "metric": "current_ratio", "threshold": 1.2, "direction": "above",
+      "cycle_values": {"1":1.10,"2":1.12,"3":1.15,"4":1.18,"5":1.22,"6":1.25,"7":1.28,"8":1.30,"9":1.32,"10":1.35}
     }
   ]
 }

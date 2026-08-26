@@ -27,7 +27,8 @@ import duckdb
 _DEFAULT_DB = os.path.join("state", "monitor.duckdb")
 
 _COLUMNS = ("item_id", "cycle", "data_ts", "entity", "covenant_type", "metric",
-           "value", "threshold", "direction", "breached", "margin", "status")
+           "value", "threshold", "direction", "breached", "margin", "status",
+           "anomaly_significant", "anomaly_z", "drifting", "drift_slope", "drift_tstat")
 
 
 class StateStore:
@@ -41,7 +42,9 @@ class StateStore:
         cols = """
             item_id VARCHAR, cycle INTEGER, data_ts DATE, entity VARCHAR,
             covenant_type VARCHAR, metric VARCHAR, value DOUBLE, threshold DOUBLE,
-            direction VARCHAR, breached BOOLEAN, margin DOUBLE, status VARCHAR
+            direction VARCHAR, breached BOOLEAN, margin DOUBLE, status VARCHAR,
+            anomaly_significant BOOLEAN, anomaly_z DOUBLE,
+            drifting BOOLEAN, drift_slope DOUBLE, drift_tstat DOUBLE
         """
         self.con.execute(f"CREATE TABLE IF NOT EXISTS history ({cols});")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")
@@ -58,6 +61,14 @@ class StateStore:
             return None
         cols = [d[0] for d in self.con.description]
         return dict(zip(cols, row))
+
+    def get_history_series(self, item_id: str) -> list[dict]:
+        """The item's prior observations, oldest first — the input to the
+        statistical checks (drift regression, anomaly baseline)."""
+        rows = self.con.execute(
+            "SELECT cycle, value FROM history WHERE item_id = ? ORDER BY cycle", [item_id]
+        ).fetchall()
+        return [{"cycle": r[0], "value": r[1]} for r in rows]
 
     def write_history(self, r: dict) -> None:
         self.con.execute(

@@ -20,6 +20,7 @@ from datetime import date, timedelta
 from state.store import StateStore
 from state.classify import classify, SURFACED
 from tools.covenant_checks import threshold_check
+from tools.statistical_checks import anomaly_significance_check, drift_check
 
 _FIXTURE = os.path.join("fixtures", "covenants.json")
 
@@ -49,15 +50,29 @@ def run_cycle(db_path: str | None = None) -> dict:
             last = store.get_current(cov["item_id"])
             status = classify(last, chk["breached"], chk["margin"], is_baseline)
 
+            # Statistical checks over the item's accumulated history + this value.
+            prior = [r["value"] for r in store.get_history_series(cov["item_id"])]
+            series = prior + [val]
+            times = list(range(1, len(series) + 1))
+            anom = anomaly_significance_check(series)
+            drift = drift_check(times, series,
+                                threshold=cov["threshold"], direction=cov["direction"])
+
             row = {
                 "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": data_ts,
                 "entity": cov["entity"], "covenant_type": cov["covenant_type"],
                 "metric": cov["metric"], "value": val, "threshold": cov["threshold"],
                 "direction": cov["direction"], "breached": chk["breached"],
                 "margin": chk["margin"], "status": status,
+                "anomaly_significant": anom.get("significant"),
+                "anomaly_z": anom.get("modified_z"),
+                "drifting": drift.get("drifting"),
+                "drift_slope": drift.get("slope"),
+                "drift_tstat": drift.get("slope_tstat"),
+                "_drift_detail": drift,  # not persisted; used for report only
             }
-            store.write_history(row)
-            store.upsert_current(row)
+            store.write_history({k: v for k, v in row.items() if not k.startswith("_")})
+            store.upsert_current({k: v for k, v in row.items() if not k.startswith("_")})
             rows.append(row)
 
         report = _build_report(cycle_n, data_ts, is_baseline, rows)
@@ -67,8 +82,29 @@ def run_cycle(db_path: str | None = None) -> dict:
         store.close()
 
 
+def _stat_tags(r) -> list[str]:
+    """Statistical annotations for an item this cycle."""
+    tags = []
+    if r.get("anomaly_significant"):
+        tags.append(f"ANOMALY(z={r['anomaly_z']})")
+    if r.get("drifting"):
+        d = r.get("_drift_detail", {})
+        ctb = d.get("cycles_to_breach_at_current_drift")
+        proj = f", ~{ctb} cycles to breach" if ctb is not None else ""
+        tags.append(f"DRIFT(slope={r['drift_slope']}, t={r['drift_tstat']}{proj})")
+    return tags
+
+
+def _surfaces(r) -> bool:
+    """Surface on a threshold change OR a significant statistical signal — so an
+    item that is threshold-OK but drifting toward breach still gets flagged."""
+    return (r["status"] in SURFACED
+            or bool(r.get("anomaly_significant"))
+            or bool(r.get("drifting")))
+
+
 def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:
-    """Exception-based report: surface only what changed; count the rest."""
+    """Exception-based report: threshold changes AND statistical signals."""
     lines = [f"===== MONITORING CYCLE {cycle_n}  (data {data_ts}) ====="]
 
     if is_baseline:
@@ -80,19 +116,24 @@ def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:
                          f"{r['value']} vs {r['threshold']} [{state}]")
         return "\n".join(lines)
 
-    surfaced = [r for r in rows if r["status"] in SURFACED]
-    suppressed = [r for r in rows if r["status"] not in SURFACED]
+    surfaced = [r for r in rows if _surfaces(r)]
+    suppressed = [r for r in rows if not _surfaces(r)]
 
     if not surfaced:
-        lines.append("No exceptions this cycle — nothing changed, breached, or resolved.")
+        lines.append("No exceptions this cycle — nothing changed, breached, drifted, or resolved.")
     else:
         lines.append(f"EXCEPTIONS ({len(surfaced)}):")
-        # Order by rough severity for readability.
         order = {"NEW_BREACH": 0, "WIDENING": 1, "RESOLVED": 2, "IMPROVING": 3}
-        for r in sorted(surfaced, key=lambda x: order.get(x["status"], 9)):
-            lines.append(f"  [{r['status']}] {r['item_id']} ({r['entity']}): "
+        # threshold-OK-but-flagged items sort after real status changes
+        for r in sorted(surfaced, key=lambda x: order.get(x["status"], 8)):
+            tags = _stat_tags(r)
+            tagstr = ("  " + " ".join(tags)) if tags else ""
+            label = r["status"]
+            if label not in SURFACED and tags:
+                label = "EARLY_WARNING"  # threshold OK, but statistics flag it
+            lines.append(f"  [{label}] {r['item_id']} ({r['entity']}): "
                          f"{r['metric']} = {r['value']} vs {r['threshold']} "
-                         f"({r['direction']}), margin {r['margin']:+.3f}")
+                         f"({r['direction']}), margin {r['margin']:+.3f}{tagstr}")
 
-    lines.append(f"Suppressed (unchanged / known-stable): {len(suppressed)}")
+    lines.append(f"Suppressed (quiet: no change, no drift, no anomaly): {len(suppressed)}")
     return "\n".join(lines)

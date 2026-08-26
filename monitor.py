@@ -54,5 +54,12 @@ if __name__ == "__main__":
     elif arg == "--once":
         result = run_cycle()
         print(result["report"])
+    elif arg == "--run":
+        # Convenience for demos: run N cycles in sequence (each still one cycle
+        # of the atom). --once remains the primary/spec path.
+        n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+        for _ in range(n):
+            print(run_cycle()["report"])
+            print()
     else:
-        sys.exit("Usage: python monitor.py [--once | --reset | --state]")
+        sys.exit("Usage: python monitor.py [--once | --run N | --reset | --state]")

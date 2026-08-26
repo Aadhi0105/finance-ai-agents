@@ -90,14 +90,22 @@ cycle's stored state, classifies what changed, and reports only the exceptions.
 - Change classification — NEW_BREACH / WIDENING / IMPROVING / RESOLVED / KNOWN_STABLE,
   with cold-start baseline suppression (`state/classify.py`).
 - `run_cycle()` — the atom (`scheduler/cycle.py`), exception-based reporting.
+- **Statistical checks** (`tools/statistical_checks.py`) — the discipline-carrying set:
+  - `anomaly_significance_check` — robust modified z-score (median/MAD): is the
+    latest value a significant outlier vs the item's own history? (**statistics**)
+  - `drift_check` — OLS value~time with a t-test on the slope + prediction band
+    and cycles-to-breach projection: is there a real trend? (**econometrics**)
+  - These catch a drift toward breach *before* the hard threshold is crossed;
+    they become the MCP spine (shared with Agent 3), local for now.
 
 ```bash
 python monitor.py --reset    # fresh start
-python monitor.py --once     # cycle 1 = baseline; run again for cycle 2 = change-detect
+python monitor.py --once     # one cycle (the atom); cycle 1 = baseline
+python monitor.py --run 10   # demo: drift is flagged cycles before the hard breach
 python monitor.py --state    # on-demand full-state view
 ```
 
-**Next:** model triage of flags; the three statistical check tools
-(anomaly_significance / drift / breach_probability — these become the MCP spine);
-freshness gating + crash-safe transactional writes + skip-to-now catch-up;
-scheduler wrapper; then extract the shared checks to a stdio MCP server.
+**Next:** `breach_probability` (the third shared/MCP check — probability);
+model triage of accumulated flags; freshness gating + crash-safe transactional
+writes + skip-to-now catch-up; scheduler wrapper; then extract the three shared
+checks to a stdio MCP server.
