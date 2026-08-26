@@ -17,3 +17,11 @@ output/*
 .DS_Store
 .vscode/
 .idea/
+
+# Agent 2 state store (regenerated per run)
+*.duckdb
+*.duckdb.wal
+
+# Agent 2 state store (regenerated per run)
+*.duckdb
+*.duckdb.wal

@@ -1,0 +1,42 @@
+{
+  "note": "Fixture covenant watchlist for the offline two-cycle proof. Metric VALUES are driven by the fixture (cycle_values) so change-classification is demonstrated deterministically. The live path would instead compute each metric from yfinance fundamentals via get_kpis. Per-cycle values are chosen so cycle 2 exercises every classification outcome: NEW_BREACH, WIDENING, RESOLVED, and a suppressed OK.",
+  "base_date": "2026-01-01",
+  "covenants": [
+    {
+      "item_id": "acme_leverage",
+      "entity": "Acme Corp",
+      "covenant_type": "leverage",
+      "metric": "net_debt_to_ebitda",
+      "threshold": 3.5,
+      "direction": "below",
+      "cycle_values": {"1": 3.0, "2": 3.8}
+    },
+    {
+      "item_id": "acme_int_cover",
+      "entity": "Acme Corp",
+      "covenant_type": "coverage",
+      "metric": "interest_coverage",
+      "threshold": 3.0,
+      "direction": "above",
+      "cycle_values": {"1": 2.5, "2": 2.4}
+    },
+    {
+      "item_id": "beta_leverage",
+      "entity": "Beta Ltd",
+      "covenant_type": "leverage",
+      "metric": "net_debt_to_ebitda",
+      "threshold": 4.0,
+      "direction": "below",
+      "cycle_values": {"1": 3.5, "2": 3.6}
+    },
+    {
+      "item_id": "gamma_liquidity",
+      "entity": "Gamma SA",
+      "covenant_type": "liquidity",
+      "metric": "current_ratio",
+      "threshold": 1.2,
+      "direction": "above",
+      "cycle_values": {"1": 1.1, "2": 1.3}
+    }
+  ]
+}

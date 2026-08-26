@@ -72,3 +72,32 @@ deterministic, auditable computation. Full mapping in the build spec.
 - `estimate_factor_exposure` (factor regression)
 - **No MCP** — correct for Agent 1 (MCP enters at the spine, after Agent 1).
 - **No shorts / ownership tracking** — separate market-structure tool by design.
+
+---
+
+## Agent 2 — Monitoring / surveillance (in progress)
+
+Agent 1 analysed one thing, once (stateless). **Agent 2 watches many things,
+repeatedly, and its job is detecting *change*.** It loops over a configured
+watchlist on a cadence, checks each item against its rules, compares to last
+cycle's stored state, classifies what changed, and reports only the exceptions.
+
+**Built so far (deterministic spine):**
+- Fixture covenant watchlist with per-item thresholds (`fixtures/covenants.json`).
+- `threshold_check` — deterministic breach test (`tools/covenant_checks.py`); stays local.
+- Persistent DuckDB state store — current-state + append-only history, long/tidy
+  panel shape (`state/store.py`).
+- Change classification — NEW_BREACH / WIDENING / IMPROVING / RESOLVED / KNOWN_STABLE,
+  with cold-start baseline suppression (`state/classify.py`).
+- `run_cycle()` — the atom (`scheduler/cycle.py`), exception-based reporting.
+
+```bash
+python monitor.py --reset    # fresh start
+python monitor.py --once     # cycle 1 = baseline; run again for cycle 2 = change-detect
+python monitor.py --state    # on-demand full-state view
+```
+
+**Next:** model triage of flags; the three statistical check tools
+(anomaly_significance / drift / breach_probability — these become the MCP spine);
+freshness gating + crash-safe transactional writes + skip-to-now catch-up;
+scheduler wrapper; then extract the shared checks to a stdio MCP server.
