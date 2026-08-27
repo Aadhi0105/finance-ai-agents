@@ -20,7 +20,18 @@ from datetime import date, timedelta
 from state.store import StateStore
 from state.classify import classify, SURFACED
 from tools.covenant_checks import threshold_check
-from tools.statistical_checks import anomaly_significance_check, drift_check, breach_probability
+
+# The three shared statistical checks: local by default, or over the MCP stdio
+# server when AGENT_STATS_VIA_MCP=1. Same functions, same results, two transports
+# (proven identical). Mirrors the fixture/live and stub/model switches.
+if os.environ.get("AGENT_STATS_VIA_MCP") == "1":
+    from mcp_server.client import (
+        anomaly_significance_check, drift_check, breach_probability,
+    )
+else:
+    from tools.statistical_checks import (
+        anomaly_significance_check, drift_check, breach_probability,
+    )
 
 _FIXTURE = os.path.join("fixtures", "covenants.json")
 

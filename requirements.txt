@@ -11,3 +11,4 @@ matplotlib>=3.7
 # matplotlib>=3.8
 # statsmodels>=0.14
 duckdb>=1.0
+mcp>=1.0
