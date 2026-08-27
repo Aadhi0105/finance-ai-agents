@@ -87,5 +87,21 @@ if __name__ == "__main__":
         for _ in range(n):
             print(run_cycle()["report"])
             print()
+    elif arg == "--loop":
+        # Thin scheduler: fire run_cycle() on a cadence. INTERVAL seconds
+        # (default 2 for demos; 86400 = daily in production), optional --max N.
+        from scheduler.trigger import run_forever
+        interval = float(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else 2.0
+        max_cycles = None
+        if "--max" in sys.argv:
+            max_cycles = int(sys.argv[sys.argv.index("--max") + 1])
+        run_forever(interval_seconds=interval, max_cycles=max_cycles)
+    elif arg == "--cron":
+        from scheduler.trigger import cron_line
+        sched = sys.argv[2] if len(sys.argv) > 2 else "0 6 * * 1-5"
+        print("# Add to your crontab (crontab -e) to run one cycle on a cadence:")
+        print(cron_line(sched))
     else:
-        sys.exit("Usage: python monitor.py [--once [--live] | --catchup N | --run N | --reset | --state]")
+        sys.exit("Usage: python monitor.py "
+                 "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "
+                 "--cron [SCHEDULE] | --run N | --reset | --state]")
