@@ -21,6 +21,13 @@
       "item_id": "gamma_liquidity", "entity": "Gamma SA", "covenant_type": "liquidity",
       "metric": "current_ratio", "threshold": 1.2, "direction": "above",
       "cycle_values": {"1":1.10,"2":1.12,"3":1.15,"4":1.18,"5":1.22,"6":1.25,"7":1.28,"8":1.30,"9":1.32,"10":1.35}
+    },
+    {
+      "item_id": "delta_leverage", "entity": "Delta GmbH", "covenant_type": "leverage",
+      "metric": "net_debt_to_ebitda", "threshold": 4.5, "direction": "below",
+      "note": "Quarterly-updating covenant re-checked on a daily cadence — demonstrates freshness gating. Data updates only in Jan/Apr/Jul; intervening daily cycles are skipped (no new data).",
+      "cycle_values": {"1":4.0,"2":4.0,"3":4.0,"4":4.3,"5":4.3,"6":4.3,"7":4.6,"8":4.6,"9":4.6,"10":4.6},
+      "data_ts_by_cycle": {"1":"2026-01-01","2":"2026-01-01","3":"2026-01-01","4":"2026-04-01","5":"2026-04-01","6":"2026-04-01","7":"2026-07-01","8":"2026-07-01","9":"2026-07-01","10":"2026-07-01"}
     }
   ]
 }

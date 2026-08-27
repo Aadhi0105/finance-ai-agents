@@ -72,6 +72,14 @@ if __name__ == "__main__":
         result = run_cycle()
         print(result["report"])
         _triage_if_needed(result, live)
+    elif arg == "--catchup":
+        # Simulate the monitor coming back online after downtime: data has
+        # advanced to cycle ASOF; skip-to-now and surface the gap.
+        if len(sys.argv) < 3:
+            sys.exit("Usage: python monitor.py --catchup ASOF_CYCLE")
+        result = run_cycle(asof_cycle=int(sys.argv[2]))
+        print(result["report"])
+        _triage_if_needed(result, "--live" in sys.argv)
     elif arg == "--run":
         # Convenience for demos: run N cycles in sequence (each still one cycle
         # of the atom). No triage — use --once to triage a cycle's exceptions.
@@ -80,4 +88,4 @@ if __name__ == "__main__":
             print(run_cycle()["report"])
             print()
     else:
-        sys.exit("Usage: python monitor.py [--once [--live] | --run N | --reset | --state]")
+        sys.exit("Usage: python monitor.py [--once [--live] | --catchup N | --run N | --reset | --state]")

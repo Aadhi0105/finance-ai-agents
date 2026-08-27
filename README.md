@@ -120,6 +120,22 @@ python monitor.py --once          # cycle + stub triage of any exceptions
 python monitor.py --once --live   # cycle + real-model triage (needs ANTHROPIC_API_KEY)
 ```
 
-**Next:** freshness gating + crash-safe transactional writes + skip-to-now
-catch-up; scheduler wrapper; then extract the three shared checks
-(anomaly / drift / breach_probability) to a stdio MCP server.
+**Robustness** (`state/store.py`, `scheduler/cycle.py`):
+- **Transactional writes** — a cycle computes everything first (read-before),
+  then writes history + current-state in ONE transaction (write-after); a
+  mid-cycle crash rolls back and leaves last-good state intact.
+- **Idempotency** — `UNIQUE(item_id, data_ts)` + `ON CONFLICT DO NOTHING`; the
+  same observation is never double-recorded (safe re-runs / catch-up).
+- **Freshness gating** — an item is skipped when its data hasn't advanced (a
+  quarterly covenant re-checked daily is skipped on stale days — cadence stays
+  coherent with the data's true update frequency).
+- **Skip-to-now catch-up** — after downtime, `--catchup ASOF` processes the
+  latest directly (missed cycles not replayed) and surfaces the gap so a breach
+  isn't misread as fresh.
+
+```bash
+python monitor.py --catchup 9   # data jumped to cycle 9 after downtime
+```
+
+**Next:** thin scheduler wrapper (cron over `--once`); then extract the three
+shared checks (anomaly / drift / breach_probability) to a stdio MCP server.

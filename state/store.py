@@ -20,6 +20,7 @@ this checkpoint keeps writes straightforward to prove the state machine first.
 from __future__ import annotations
 
 import os
+from contextlib import contextmanager
 from datetime import date
 
 import duckdb
@@ -48,8 +49,23 @@ class StateStore:
             drifting BOOLEAN, drift_slope DOUBLE, drift_tstat DOUBLE,
             breach_prob DOUBLE, breach_tail BOOLEAN
         """
-        self.con.execute(f"CREATE TABLE IF NOT EXISTS history ({cols});")
+        # UNIQUE(item_id, data_ts): a given observation is recorded at most once,
+        # so re-running a cycle / catch-up cannot double-append (idempotency).
+        self.con.execute(
+            f"CREATE TABLE IF NOT EXISTS history ({cols}, UNIQUE(item_id, data_ts));")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")
+
+    @contextmanager
+    def transaction(self):
+        """Wrap a cycle's writes in one transaction: all-or-nothing, so a
+        mid-cycle crash rolls back and leaves last-good state intact."""
+        self.con.execute("BEGIN TRANSACTION")
+        try:
+            yield
+            self.con.execute("COMMIT")
+        except Exception:
+            self.con.execute("ROLLBACK")
+            raise
 
     def next_cycle(self) -> int:
         row = self.con.execute("SELECT max(cycle) FROM history").fetchone()
@@ -73,8 +89,10 @@ class StateStore:
         return [{"cycle": r[0], "value": r[1]} for r in rows]
 
     def write_history(self, r: dict) -> None:
+        # ON CONFLICT DO NOTHING: idempotent on (item_id, data_ts).
         self.con.execute(
-            f"INSERT INTO history ({', '.join(_COLUMNS)}) VALUES ({', '.join(['?']*len(_COLUMNS))})",
+            f"INSERT INTO history ({', '.join(_COLUMNS)}) "
+            f"VALUES ({', '.join(['?']*len(_COLUMNS))}) ON CONFLICT DO NOTHING",
             [r[c] for c in _COLUMNS],
         )
 

@@ -32,25 +32,50 @@ def _load_watchlist():
     return fx["covenants"], base
 
 
-def run_cycle(db_path: str | None = None) -> dict:
+def _item_data_ts(cov, cycle_n, base_date):
+    """This item's data timestamp for the cycle. An item may carry an explicit
+    per-cycle map (e.g. a quarterly covenant re-checked daily); otherwise its data
+    advances every cycle."""
+    m = cov.get("data_ts_by_cycle")
+    if m and str(cycle_n) in m:
+        return date.fromisoformat(m[str(cycle_n)])
+    return base_date + timedelta(days=cycle_n - 1)
+
+
+def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict:
     store = StateStore(db_path) if db_path else StateStore()
     try:
-        cycle_n = store.next_cycle()
+        next_c = store.next_cycle()
+        # Catch-up (skip-to-now): if data has advanced past the next cycle, process
+        # the latest directly and record the gap rather than replaying every missed
+        # cycle.
+        cycle_n = asof_cycle if (asof_cycle and asof_cycle > next_c) else next_c
+        gap = max(0, cycle_n - next_c)
         is_baseline = cycle_n == 1
         covenants, base_date = _load_watchlist()
-        data_ts = base_date + timedelta(days=cycle_n - 1)
+        cycle_ts = base_date + timedelta(days=cycle_n - 1)
 
-        rows = []
+        # --- COMPUTE phase: read prior state, classify, run stats. No writes yet,
+        # so a crash here leaves last-good state untouched. ---
+        rows, skipped = [], []
         for cov in covenants:
             val = cov.get("cycle_values", {}).get(str(cycle_n))
             if val is None:
-                continue  # no data this cycle for this item (freshness handled later)
+                continue  # no value defined this cycle
+
+            item_ts = _item_data_ts(cov, cycle_n, base_date)
+            last = store.get_current(cov["item_id"])
+
+            # Freshness gate: skip if this item's data has not advanced since last
+            # processed (e.g. quarterly data on a daily cadence).
+            if last is not None and last.get("data_ts") is not None and item_ts <= last["data_ts"]:
+                skipped.append({"item_id": cov["item_id"], "entity": cov["entity"],
+                                "reason": f"no new data (still {item_ts})"})
+                continue
 
             chk = threshold_check(val, cov["threshold"], cov["direction"])
-            last = store.get_current(cov["item_id"])
             status = classify(last, chk["breached"], chk["margin"], is_baseline)
 
-            # Statistical checks over the item's accumulated history + this value.
             prior = [r["value"] for r in store.get_history_series(cov["item_id"])]
             series = prior + [val]
             times = list(range(1, len(series) + 1))
@@ -59,8 +84,8 @@ def run_cycle(db_path: str | None = None) -> dict:
                                 threshold=cov["threshold"], direction=cov["direction"])
             breach = breach_probability(series, cov["threshold"], cov["direction"])
 
-            row = {
-                "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": data_ts,
+            rows.append({
+                "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": item_ts,
                 "entity": cov["entity"], "covenant_type": cov["covenant_type"],
                 "metric": cov["metric"], "value": val, "threshold": cov["threshold"],
                 "direction": cov["direction"], "breached": chk["breached"],
@@ -72,17 +97,22 @@ def run_cycle(db_path: str | None = None) -> dict:
                 "drift_tstat": drift.get("slope_tstat"),
                 "breach_prob": breach.get("breach_probability"),
                 "breach_tail": breach.get("tail_flag"),
-                "_drift_detail": drift,   # not persisted; report only
-                "_breach_detail": breach, # not persisted; report only
-            }
-            store.write_history({k: v for k, v in row.items() if not k.startswith("_")})
-            store.upsert_current({k: v for k, v in row.items() if not k.startswith("_")})
-            rows.append(row)
+                "_drift_detail": drift,
+                "_breach_detail": breach,
+            })
 
-        report = _build_report(cycle_n, data_ts, is_baseline, rows)
+        # --- WRITE phase: one transaction, all-or-nothing. ---
+        with store.transaction():
+            for row in rows:
+                clean = {k: v for k, v in row.items() if not k.startswith("_")}
+                store.write_history(clean)
+                store.upsert_current(clean)
+
+        report = _build_report(cycle_n, cycle_ts, is_baseline, rows, skipped, gap)
         surfaced = [] if is_baseline else [r for r in rows if _surfaces(r)]
-        return {"cycle": cycle_n, "data_ts": str(data_ts), "baseline": is_baseline,
-                "rows": rows, "surfaced": surfaced, "report": report}
+        return {"cycle": cycle_n, "data_ts": str(cycle_ts), "baseline": is_baseline,
+                "gap": gap, "skipped": skipped, "rows": rows, "surfaced": surfaced,
+                "report": report}
     finally:
         store.close()
 
@@ -118,9 +148,15 @@ def _surfaces(r) -> bool:
     return toward and (bool(r.get("drifting")) or bool(b.get("tail_flag")))
 
 
-def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:
-    """Exception-based report: threshold changes AND statistical signals."""
+def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> str:
+    """Exception-based report: threshold changes AND statistical signals, plus
+    freshness-skip and catch-up-gap notices."""
+    skipped = skipped or []
     lines = [f"===== MONITORING CYCLE {cycle_n}  (data {data_ts}) ====="]
+
+    if gap > 0:
+        lines.append(f"CATCH-UP: {gap} cycle(s) missed before this run — flagged "
+                     f"changes may have originated during the gap, not just now.")
 
     if is_baseline:
         lines.append(f"BASELINE CYCLE — established state for {len(rows)} item(s). "
@@ -129,6 +165,8 @@ def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:
             state = "breached" if r["breached"] else "ok"
             lines.append(f"  · {r['item_id']} ({r['entity']}): {r['metric']} "
                          f"{r['value']} vs {r['threshold']} [{state}]")
+        if skipped:
+            lines.append(f"Freshness: skipped {len(skipped)} item(s) with no new data.")
         return "\n".join(lines)
 
     surfaced = [r for r in rows if _surfaces(r)]
@@ -151,4 +189,7 @@ def _build_report(cycle_n, data_ts, is_baseline, rows) -> str:
                          f"({r['direction']}), margin {r['margin']:+.3f}{tagstr}")
 
     lines.append(f"Suppressed (quiet: no change, no drift, no anomaly): {len(suppressed)}")
+    if skipped:
+        lines.append(f"Freshness: skipped {len(skipped)} item(s) with no new data "
+                     f"({', '.join(s['item_id'] for s in skipped)}).")
     return "\n".join(lines)
