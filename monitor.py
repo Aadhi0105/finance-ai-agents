@@ -17,8 +17,24 @@ import sys
 
 from scheduler.cycle import run_cycle
 from state.store import StateStore
+from monitoring.triage import run_triage
 
 _DB = os.path.join("state", "monitor.duckdb")
+
+
+def _triage_if_needed(result, live: bool) -> None:
+    surfaced = result.get("surfaced", [])
+    if not surfaced:
+        return
+    store = StateStore()
+    try:
+        commentary = run_triage(store, surfaced, live=live)
+    finally:
+        store.close()
+    if commentary:
+        print("\n----- MODEL TRIAGE -----")
+        print(commentary)
+        print("------------------------")
 
 
 def _reset():
@@ -52,14 +68,16 @@ if __name__ == "__main__":
     elif arg == "--state":
         _print_state()
     elif arg == "--once":
+        live = "--live" in sys.argv
         result = run_cycle()
         print(result["report"])
+        _triage_if_needed(result, live)
     elif arg == "--run":
         # Convenience for demos: run N cycles in sequence (each still one cycle
-        # of the atom). --once remains the primary/spec path.
+        # of the atom). No triage — use --once to triage a cycle's exceptions.
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
         for _ in range(n):
             print(run_cycle()["report"])
             print()
     else:
-        sys.exit("Usage: python monitor.py [--once | --run N | --reset | --state]")
+        sys.exit("Usage: python monitor.py [--once [--live] | --run N | --reset | --state]")

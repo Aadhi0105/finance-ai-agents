@@ -80,8 +80,9 @@ def run_cycle(db_path: str | None = None) -> dict:
             rows.append(row)
 
         report = _build_report(cycle_n, data_ts, is_baseline, rows)
+        surfaced = [] if is_baseline else [r for r in rows if _surfaces(r)]
         return {"cycle": cycle_n, "data_ts": str(data_ts), "baseline": is_baseline,
-                "rows": rows, "report": report}
+                "rows": rows, "surfaced": surfaced, "report": report}
     finally:
         store.close()
 

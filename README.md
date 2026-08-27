@@ -108,8 +108,18 @@ python monitor.py --run 10   # demo: drift is flagged cycles before the hard bre
 python monitor.py --state    # on-demand full-state view
 ```
 
-**Next:** model triage of accumulated flags (the model reasoning over real
-statistical signals — grouping, re-checks, commentary); freshness gating +
-crash-safe transactional writes + skip-to-now catch-up; scheduler wrapper; then
-extract the three shared checks (anomaly / drift / breach_probability) to a
-stdio MCP server.
+**Model triage** (`monitoring/triage.py`) — after the deterministic cycle detects,
+the model triages the flags: groups by entity, and DECIDES whether to re-check
+ambiguous ones (`recheck_flag`) before escalating. The re-check verdict is
+computed deterministically (corroborated / corroborated_but_verify / isolated /
+weak) — the model decides *whether* to call it, never computes it. Reuses the
+Agent 1 tool-use loop (`agent/loop.py`, `agent/models.py`) — the shared spine.
+
+```bash
+python monitor.py --once          # cycle + stub triage of any exceptions
+python monitor.py --once --live   # cycle + real-model triage (needs ANTHROPIC_API_KEY)
+```
+
+**Next:** freshness gating + crash-safe transactional writes + skip-to-now
+catch-up; scheduler wrapper; then extract the three shared checks
+(anomaly / drift / breach_probability) to a stdio MCP server.
