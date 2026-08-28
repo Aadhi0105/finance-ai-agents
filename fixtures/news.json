@@ -1,0 +1,102 @@
+{
+ "note": "Track B news fixture exercising dedup, relevance, dispersion, and timestamp integrity.",
+ "items": [
+  {
+   "id": "n1",
+   "published_at": "2026-01-28T12:01:00Z",
+   "entities": [
+    "ASML.AS"
+   ],
+   "source": "Reuters",
+   "headline": "ASML beats Q4 estimates on strong EUV demand",
+   "stub_score": 0.7,
+   "stub_confidence": 0.9
+  },
+  {
+   "id": "n2",
+   "published_at": "2026-01-28T12:05:00Z",
+   "entities": [
+    "ASML.AS"
+   ],
+   "source": "Bloomberg",
+   "headline": "ASML has beaten Q4 estimates on strong EUV demand",
+   "stub_score": 0.7,
+   "stub_confidence": 0.9
+  },
+  {
+   "id": "n3",
+   "published_at": "2026-01-28T12:40:00Z",
+   "entities": [
+    "ASML.AS"
+   ],
+   "source": "FT",
+   "headline": "ASML beats Q4 estimates on EUV demand",
+   "stub_score": 0.7,
+   "stub_confidence": 0.9
+  },
+  {
+   "id": "n4",
+   "published_at": "2026-01-28T15:00:00Z",
+   "entities": [
+    "ASML.AS"
+   ],
+   "source": "WSJ",
+   "headline": "ASML bookings guidance disappoints, shares wobble",
+   "stub_score": -0.4,
+   "stub_confidence": 0.85
+  },
+  {
+   "id": "n5",
+   "published_at": "2026-01-28T09:00:00Z",
+   "entities": [
+    "BESI.AS"
+   ],
+   "source": "Reuters",
+   "headline": "BESI lifts outlook on hybrid bonding orders",
+   "stub_score": 0.6,
+   "stub_confidence": 0.8
+  },
+  {
+   "id": "n6",
+   "published_at": "2026-01-28T10:30:00Z",
+   "entities": [
+    "BESI.AS"
+   ],
+   "source": "Bloomberg",
+   "headline": "BESI raises guidance as advanced packaging demand climbs",
+   "stub_score": 0.5,
+   "stub_confidence": 0.8
+  },
+  {
+   "id": "n7",
+   "published_at": "2026-01-28T11:00:00Z",
+   "entities": [],
+   "source": "Reuters",
+   "headline": "European markets mixed in morning trade",
+   "stub_score": 0.0,
+   "stub_confidence": 0.5
+  },
+  {
+   "id": "n8",
+   "published_at": null,
+   "entities": [
+    "ASML.AS"
+   ],
+   "source": "Blog",
+   "headline": "Some undated ASML take",
+   "stub_score": 0.9,
+   "stub_confidence": 0.3
+  },
+  {
+   "id": "n9",
+   "published_at": "2026-01-28T13:00:00Z",
+   "entities": [
+    "TSLA"
+   ],
+   "source": "Reuters",
+   "headline": "Tesla unrelated news",
+   "stub_score": 0.2,
+   "stub_confidence": 0.7
+  }
+ ]
+}
