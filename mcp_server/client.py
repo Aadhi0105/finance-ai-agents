@@ -112,3 +112,13 @@ def breach_probability(values, threshold, direction, horizon: int = 6,
         "breach_probability",
         {"values": list(values), "threshold": threshold, "direction": direction,
          "horizon": horizon, "min_obs": min_obs, "tail_at": tail_at})
+
+
+# Agent 3's tool, served by the SAME server over the SAME session — the literal
+# proof that this is one shared spine, not per-agent plumbing.
+def run_event_study(events, event_type: str = "unspecified",
+                    placebo_events=None) -> dict:
+    args = {"events": events, "event_type": event_type}
+    if placebo_events is not None:
+        args["placebo_events"] = placebo_events
+    return _McpStatsClient.get().call("run_event_study", args)
