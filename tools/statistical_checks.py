@@ -32,23 +32,10 @@ from __future__ import annotations
 import math
 import statistics
 
-
-# 95% two-sided t critical values by degrees of freedom (small-sample honesty:
-# use t, not z). Falls back to the normal approximation for large dof.
-_T_CRIT_95 = {1: 12.71, 2: 4.30, 3: 3.18, 4: 2.78, 5: 2.57, 6: 2.45, 7: 2.36,
-              8: 2.31, 9: 2.26, 10: 2.23, 12: 2.18, 15: 2.13, 20: 2.09, 30: 2.04}
-
-
-def _t_crit(dof: int) -> float:
-    if dof <= 0:
-        return float("inf")
-    if dof in _T_CRIT_95:
-        return _T_CRIT_95[dof]
-    keys = sorted(_T_CRIT_95)
-    for k in keys:
-        if dof <= k:
-            return _T_CRIT_95[k]
-    return 1.96  # large-sample normal approximation
+# Shared significance machinery — the single source of truth reused by
+# run_event_study (Agent 3). _t_crit is kept as a local alias so drift_check's
+# body is untouched and its output is provably identical after the refactor.
+from tools.significance import t_critical as _t_crit
 
 
 # --- anomaly_significance_check (statistics) ------------------------------
