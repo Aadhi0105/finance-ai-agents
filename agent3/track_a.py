@@ -75,15 +75,17 @@ def assemble_event(ticker: str, event_date: str,
             "evt_stock": evt_s, "evt_market": evt_m}
 
 
-def load_event_set(event_type: str, source: str | None = None) -> dict:
+def load_event_set(event_type: str, source: str | None = None,
+                   ticker: str | None = None, peers: list[str] | None = None,
+                   live_propose: bool = False) -> dict:
     """
-    Assemble a cross-ticker, same-event-type set (and its placebo) ready for
-    run_event_study. Offline reads fixtures/events.json; live (later) pulls prices
-    via yfinance. Returns {event_type, events, placebo_events, tickers, n_requested}.
+    Assemble a cross-ticker, same-event-type set ready for run_event_study.
+    Offline reads fixtures/events.json; live pulls earnings dates + prices via
+    yfinance for a ticker's pinned peer set. Returns the event set + reports.
     """
     src = source or os.environ.get("AGENT_DATA_SOURCE", "fixture")
     if src == "yfinance":
-        return _load_live(event_type)   # implemented in a later checkpoint
+        return _load_live(event_type, ticker=ticker, peers=peers, live_propose=live_propose)
     return _load_fixture(event_type)
 
 
@@ -115,8 +117,20 @@ def _load_fixture(event_type: str) -> dict:
             "tickers": tickers, "n_requested": len(grp["members"])}
 
 
-def _load_live(event_type: str) -> dict:
-    # Wired in a later checkpoint: yfinance prices + earnings dates per ticker.
-    return {"event_type": event_type, "source": "yfinance",
-            "events": [], "placebo_events": [],
-            "error": "live Track-A assembly not yet wired (fixture-first)"}
+def _load_live(event_type: str, ticker: str | None = None,
+               peers: list[str] | None = None, live_propose: bool = False) -> dict:
+    """
+    Live Track-A assembly. Needs a ticker; peers come from an override or a
+    model proposal (pinned for reproducibility). Delegates fetching + assembly to
+    agent3.track_a_live and the proposal to agent3.peers.
+    """
+    if not ticker:
+        return {"event_type": event_type, "source": "yfinance", "events": [],
+                "error": "live Track-A needs a ticker (load_event_set(..., ticker=...))"}
+    from agent3.peers import propose_peers
+    from agent3.track_a_live import load_live_event_set
+
+    pinned = propose_peers(ticker, override=peers, live=live_propose)
+    res = load_live_event_set(ticker, pinned["peers"], event_type)
+    res["pinned_peer_set"] = pinned          # the full pinned proposal (sector, rationale, source)
+    return res
