@@ -79,17 +79,48 @@ def _fetch_earnings_dates(ticker: str, limit: int = 24) -> list:
 
 # --- pure assembly around the seam (fully testable offline) ----------------
 
-def _align_index(dates: list, target) -> int | None:
-    """Index of the trading day on/just before `target` in an ascending date list."""
-    lo, hi, ans = 0, len(dates) - 1, None
+def _to_date(x):
+    """Normalise anything date-like (date, datetime, pandas Timestamp, tz-aware or
+    naive) to a plain datetime.date. This is the fix for exchange-suffix names
+    (e.g. .PA) whose yfinance timestamps arrive tz-aware and otherwise raise
+    'Cannot compare Timestamp with datetime.date', silently dropping every event."""
+    import datetime as _dt
+    if isinstance(x, _dt.date) and not isinstance(x, _dt.datetime):
+        return x                       # already a plain date
+    if hasattr(x, "date"):             # pandas Timestamp / datetime -> calendar date
+        try:
+            return x.date()
+        except Exception:
+            pass
+    return x
+
+
+def _align_index(dates: list, target, tol_days: int = 4) -> int | None:
+    """Index of the trading day on/just before `target`. If `target` falls before
+    the series or between gaps, snap to the NEAREST trading day within `tol_days`
+    (a public holiday or a tz-shifted timestamp shouldn't discard an event). Dates
+    are normalised so tz-aware vs naive never silently fails."""
+    if not dates:
+        return None
+    target = _to_date(target)
+    ds = [_to_date(d) for d in dates]
+
+    lo, hi, ans = 0, len(ds) - 1, None
     while lo <= hi:
         mid = (lo + hi) // 2
-        if dates[mid] <= target:
+        if ds[mid] <= target:
             ans = mid
             lo = mid + 1
         else:
             hi = mid - 1
-    return ans
+
+    if ans is not None:
+        return ans
+    # target is before the whole series: snap forward if the first date is within tol
+    first_gap = (ds[0] - target).days
+    if 0 <= first_gap <= tol_days:
+        return 0
+    return None
 
 
 def assemble_peer_events(ticker: str, stock_px: list[tuple], mkt_px: list[tuple],
@@ -110,8 +141,16 @@ def assemble_peer_events(ticker: str, stock_px: list[tuple], mkt_px: list[tuple]
     m_dates = [d for d, _ in mkt_px]
     m_close = [c for _, c in mkt_px]
 
+    # Diagnostic: the span of price history actually returned, vs the earnings
+    # dates we're trying to place in it. Surfaces the real cause when events drop.
+    if s_dates:
+        report["price_span"] = f"{_to_date(s_dates[0])}..{_to_date(s_dates[-1])} ({len(s_dates)} bars)"
+    ed_norm = sorted((_to_date(e) for e in earnings_dates), reverse=True)
+    if ed_norm:
+        report["earnings_span"] = f"{ed_norm[-1]}..{ed_norm[0]}"
+
     events = []
-    for ed in sorted(earnings_dates, reverse=True)[:max_events]:
+    for ed in ed_norm[:max_events]:
         si = _align_index(s_dates, ed)
         mi = _align_index(m_dates, ed)
         if si is None or mi is None:
@@ -123,12 +162,7 @@ def assemble_peer_events(ticker: str, stock_px: list[tuple], mkt_px: list[tuple]
                 or si + EVT_POST >= len(s_close) or mi + EVT_POST >= len(m_close):
             report["skipped_short_history"] += 1
             continue
-        # market index must align to the same calendar day window; use its own idx
         ev = assemble_event(ticker, str(ed), s_close, m_close, si)
-        # NOTE: assemble_event uses one index for both series; when stock/index
-        # trading calendars differ, mi is tracked for diagnostics but si drives
-        # the slice (both are daily closes; a 1-day calendar mismatch is absorbed
-        # by the [-1,+1] window). Flagged as a live-refinement point.
         if ev is not None:
             events.append(ev)
             report["assembled"] += 1
