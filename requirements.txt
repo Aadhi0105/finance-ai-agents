@@ -12,3 +12,7 @@ matplotlib>=3.7
 # statsmodels>=0.14
 duckdb>=1.0
 mcp>=1.0
+
+# Track B live sentiment (FinBERT) — optional, heavy (~400MB weights on first use)
+# transformers>=4.30
+# torch>=2.0
