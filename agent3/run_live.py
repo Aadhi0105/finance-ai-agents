@@ -51,6 +51,8 @@ def main(argv):
     for r in es.get("per_peer_report", []):
         if "error" in r:
             print(f"  {r['ticker']:<8} ERROR: {r['error']}")
+        elif r.get("excluded"):
+            print(f"  {r['ticker']:<8} EXCLUDED — {r.get('reason')}")
         else:
             print(f"  {r['ticker']:<8} earnings_dates={r.get('earnings_dates')} "
                   f"assembled={r.get('assembled')} "

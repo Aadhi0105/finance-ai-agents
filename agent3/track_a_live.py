@@ -149,6 +149,20 @@ def assemble_peer_events(ticker: str, stock_px: list[tuple], mkt_px: list[tuple]
     if ed_norm:
         report["earnings_span"] = f"{ed_norm[-1]}..{ed_norm[0]}"
 
+    # STALE-DATA GUARD: some names (observed: certain Euronext .PA tickers) return
+    # earnings dates from a source that only has ancient history — e.g. ALO.PA came
+    # back as 2008-2018 while its price history starts 2020. Those events can never
+    # align to prices that don't exist. Detect the case where the NEWEST earnings
+    # date pre-dates the price window and report an explicit, labeled exclusion
+    # rather than an opaque skipped_align. This is drop-and-report working honestly.
+    px_start = _to_date(s_dates[0])
+    if ed_norm and ed_norm[0] < px_start:
+        report["excluded"] = True
+        report["reason"] = (f"stale earnings data: all {len(ed_norm)} dates "
+                            f"({ed_norm[-1]}..{ed_norm[0]}) predate price history "
+                            f"(from {px_start}) — source unusable for this name")
+        return [], report
+
     events = []
     for ed in ed_norm[:max_events]:
         si = _align_index(s_dates, ed)
@@ -198,9 +212,15 @@ def load_live_event_set(ticker: str, peers: list[str], event_type: str) -> dict:
         # (kept minimal here; the validation gate owns richer placebo construction)
 
     n = len(events)
+    excluded = [r["ticker"] for r in reports if r.get("excluded")]
+    errored = [r["ticker"] for r in reports if r.get("error")]
+    contributing = [r["ticker"] for r in reports if r.get("assembled", 0) > 0]
     result = {
         "event_type": event_type, "source": "yfinance",
         "pinned_peers": all_peers,          # reproducibility: the exact set used
+        "contributing_peers": contributing, # names that actually supplied events
+        "excluded_peers": excluded,         # names dropped for stale/unusable data
+        "errored_peers": errored,
         "events": events, "placebo_events": placebo_events,
         "n_events": n, "per_peer_report": reports,
     }
