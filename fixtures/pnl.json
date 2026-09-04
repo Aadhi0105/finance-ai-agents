@@ -1,0 +1,135 @@
+{
+ "name": "Operating Profit",
+ "children": [
+  {
+   "name": "Revenue",
+   "sign": "add",
+   "children": [
+    {
+     "name": "Product Premium",
+     "sign": "add",
+     "leaf": {
+      "name": "Product Premium",
+      "type": "revenue",
+      "budget": {
+       "price": 100.0,
+       "volume": 5000
+      },
+      "actual": {
+       "price": 104.0,
+       "volume": 5200
+      }
+     },
+     "history": [
+      180000,
+      220000,
+      150000,
+      210000,
+      190000,
+      205000,
+      175000,
+      195000
+     ]
+    },
+    {
+     "name": "Product Standard",
+     "sign": "add",
+     "leaf": {
+      "name": "Product Standard",
+      "type": "revenue",
+      "budget": {
+       "price": 40.0,
+       "volume": 12000
+      },
+      "actual": {
+       "price": 39.5,
+       "volume": 11500
+      }
+     },
+     "history": [
+      90000,
+      -80000,
+      100000,
+      -70000,
+      85000,
+      -90000,
+      95000,
+      -75000
+     ]
+    }
+   ]
+  },
+  {
+   "name": "COGS",
+   "sign": "subtract",
+   "children": [
+    {
+     "name": "Materials",
+     "sign": "add",
+     "leaf": {
+      "name": "Materials",
+      "type": "variable_cost",
+      "budget": {
+       "rate": 22.0,
+       "volume": 17000
+      },
+      "actual": {
+       "rate": 23.5,
+       "volume": 16700
+      }
+     }
+    },
+    {
+     "name": "Direct Labour",
+     "sign": "add",
+     "leaf": {
+      "name": "Direct Labour",
+      "type": "variable_cost",
+      "budget": {
+       "rate": 15.0,
+       "volume": 17000
+      },
+      "actual": {
+       "rate": 15.2,
+       "volume": 16700
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Opex",
+   "sign": "subtract",
+   "children": [
+    {
+     "name": "Marketing",
+     "sign": "add",
+     "leaf": {
+      "name": "Marketing",
+      "type": "fixed_cost",
+      "budget": {
+       "amount": 120000.0
+      },
+      "actual": {
+       "amount": 135000.0
+      }
+     }
+    },
+    {
+     "name": "Rent",
+     "sign": "add",
+     "leaf": {
+      "name": "Rent",
+      "type": "fixed_cost",
+      "budget": {
+       "amount": 80000.0
+      },
+      "actual": {
+       "amount": 80000.0
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
