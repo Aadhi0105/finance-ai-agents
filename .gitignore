@@ -25,3 +25,5 @@ output/*
 # Agent 2 state store (regenerated per run)
 *.duckdb
 *.duckdb.wal
+waterfall_demo.svg
+*.svg
