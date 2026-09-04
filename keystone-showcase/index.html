@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone — multi-agent finance &amp; markets platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#edf0f1; --panel:#fbfcfc; --ink:#14202b; --soft:#4a5a66;
+    --line:#d5dcdf; --brand:#0d5b66; --brand-tint:#e3edee;
+    --pos:#1f7a4d; --neg:#a83240; --warn:#b5791a; --info:#3d6a8a;
+    --pos-bg:#e6f1ea; --neg-bg:#f5e5e6; --warn-bg:#f6eeda;
+    --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  a{color:var(--brand);text-underline-offset:3px}
+  h1,h2,h3{line-height:1.15;margin:0;font-weight:600;letter-spacing:-0.01em}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+
+  /* header */
+  header.top{border-bottom:1px solid var(--line);background:var(--panel)}
+  .top .wrap{display:flex;align-items:baseline;justify-content:space-between;padding-top:18px;padding-bottom:18px}
+  .brandmark{font-weight:700;font-size:20px;letter-spacing:0.14em}
+  .brandmark b{color:var(--brand)}
+  .tagline{color:var(--soft);font-size:13.5px}
+
+  /* hero */
+  .hero{padding:56px 0 40px}
+  .hero h1{font-size:clamp(30px,5vw,46px);max-width:16ch;letter-spacing:-0.02em}
+  .hero .lede{color:var(--soft);max-width:60ch;margin-top:18px;font-size:17px}
+  .principle{margin-top:22px;padding:14px 18px;border-left:3px solid var(--brand);
+    background:var(--brand-tint);border-radius:0 6px 6px 0;max-width:64ch;font-size:15px}
+  .principle strong{color:var(--brand)}
+  .status-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .pill{font-size:12.5px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;
+    background:var(--panel);color:var(--soft);display:inline-flex;gap:7px;align-items:center}
+  .pill .dot{width:7px;height:7px;border-radius:50%}
+  .dot.built{background:var(--pos)} .dot.designed{background:var(--warn)}
+
+  /* spine diagram */
+  .spine{margin-top:40px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px}
+  .spine .cap{font-size:13px;color:var(--soft);margin-bottom:6px}
+  .spine .caph{font-size:18px;font-weight:600;margin-bottom:18px}
+  .spine .caph em{font-style:normal;color:var(--brand)}
+  .spine svg{width:100%;height:auto;display:block}
+
+  /* controls */
+  .controls{margin:52px 0 0}
+  .segmented{display:flex;flex-wrap:wrap;gap:2px;background:var(--panel);border:1px solid var(--line);
+    border-radius:9px;padding:4px}
+  .seg{flex:1 1 auto;border:0;background:transparent;font-family:var(--sans);font-size:14.5px;
+    font-weight:500;color:var(--soft);padding:11px 14px;border-radius:6px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:150px;text-align:left}
+  .seg .n{font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;opacity:.7}
+  .seg[aria-selected="true"]{background:var(--ink);color:#fff}
+  .seg[aria-selected="true"] .n{opacity:.85}
+  .seg[disabled]{cursor:default;opacity:.55}
+  .seg:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+  .subselect{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
+  .subselect label{font-size:13.5px;color:var(--soft)}
+  select{font-family:var(--sans);font-size:14.5px;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:7px;padding:9px 34px 9px 12px;appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%234a5a66' fill='none' stroke-width='1.5'/></svg>");
+    background-repeat:no-repeat;background-position:right 12px center}
+  select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+  /* panel */
+  .panel{margin:22px 0 40px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:26px;min-height:200px}
+  .agent-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .agent-head .who h2{font-size:22px}
+  .agent-head .who .sub{color:var(--soft);font-size:14px;margin-top:4px;max-width:58ch}
+  .agent-head .ticker{font-family:var(--mono);font-size:14px;color:var(--soft)}
+
+  .badge{font-size:13px;font-weight:600;padding:6px 12px;border-radius:7px;white-space:nowrap}
+  .b-pos{background:var(--pos-bg);color:var(--pos)} .b-neg{background:var(--neg-bg);color:var(--neg)}
+  .b-warn{background:var(--warn-bg);color:var(--warn)} .b-info{background:var(--brand-tint);color:var(--brand)}
+
+  .snap{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:22px}
+  .snap .cell{background:var(--panel);padding:13px 15px}
+  .snap .k{font-size:12px;color:var(--soft)}
+  .snap .v{font-family:var(--mono);font-size:18px;font-weight:500;margin-top:3px}
+
+  .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:22px}
+  .chart{border:1px solid var(--line);border-radius:8px;padding:14px}
+  .chart .ct{font-size:13px;color:var(--ink);font-weight:500;margin-bottom:2px}
+  .chart .cs{font-size:12px;color:var(--soft);margin-bottom:10px}
+
+  .note h3{font-size:14px;color:var(--brand);margin:16px 0 6px}
+  .note p{margin:0 0 8px;font-size:15px;max-width:70ch}
+  .callout{margin-top:20px;border:1px dashed var(--line);border-radius:8px;padding:14px 16px;
+    display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--soft)}
+  .callout .lab{color:var(--ink);font-weight:600}
+
+  /* agent 2 timeline */
+  .classstrip{display:flex;gap:3px;margin:14px 0;flex-wrap:wrap}
+  .cs-cell{flex:1 1 40px;min-width:40px;text-align:center;padding:8px 4px;border-radius:5px;font-size:11px;
+    font-family:var(--mono);color:#fff}
+  .st-stable{background:#8aa0ab} .st-widen{background:var(--warn)} .st-breach{background:var(--neg)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--soft);margin-top:4px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  .exc{margin-top:18px;border:1px solid var(--line);border-left:3px solid var(--neg);border-radius:0 8px 8px 0;
+    padding:14px 16px;background:#fdf8f8}
+  .exc .eh{font-size:13px;font-weight:600;color:var(--neg);margin-bottom:6px}
+  .exc p{margin:0;font-size:14px}
+
+  /* agent 3 */
+  .peers{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 18px}
+  .peer{font-family:var(--mono);font-size:12.5px;padding:4px 9px;border:1px solid var(--line);
+    border-radius:6px;background:var(--paper)}
+  .peer.dropped{opacity:.5;text-decoration:line-through}
+  .verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:18px 0}
+  .verdict .cell{background:var(--panel);padding:12px 14px}
+  .verdict .k{font-size:12px;color:var(--soft)} .verdict .v{font-family:var(--mono);font-size:16px;margin-top:3px}
+  .gate{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .gate .g{font-size:12.5px;padding:6px 11px;border-radius:7px;display:inline-flex;gap:7px;align-items:center;border:1px solid var(--line)}
+  .g .gi{width:8px;height:8px;border-radius:50%}
+  .g.pass .gi{background:var(--pos)} .g.flag .gi{background:var(--neg)} .g.na .gi{background:#b9c4c9}
+
+  .scen{margin-top:18px;border:1px solid var(--line);border-radius:8px;padding:16px}
+  .scen .sh{font-size:14px;font-weight:600;margin-bottom:4px}
+  .scen .snull{color:var(--warn);font-size:14px}
+
+  footer{border-top:1px solid var(--line);background:var(--panel);margin-top:40px}
+  footer .wrap{padding:26px 24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    font-size:13.5px;color:var(--soft)}
+  footer .scope{max-width:62ch}
+  .hairline{height:1px;background:var(--line);border:0;margin:0}
+
+  @media (max-width:640px){
+    .hero{padding:36px 0 28px}
+    .seg{min-width:120px}
+    .agent-head{flex-direction:column}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .connector{stroke-dasharray:6 6;animation:flow 1.4s linear .3s 1 forwards}
+    @keyframes flow{from{stroke-dashoffset:120;opacity:.2}to{stroke-dashoffset:0;opacity:1}}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandmark">KEY<b>STONE</b></div>
+    <div class="tagline">Multi-agent finance &amp; markets analytics</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1>One platform. Four agents. One analytical spine.</h1>
+    <p class="lede">Keystone is a set of finance agents that share one foundation — the same
+      data access, the same agent loop, the same statistical tools. Each agent solves a different
+      problem; the shared spine is what makes them one system rather than four scripts.</p>
+    <div class="principle"><strong>The LLM never does the math.</strong> Every figure — every DCF,
+      regression, z-score, CAAR and probability — comes from deterministic Python. The model chooses
+      which tool to call, reads the result, and writes the narrative. It never computes in its head,
+      so every number is auditable.</div>
+    <div class="status-row">
+      <span class="pill"><span class="dot built"></span>Agent 1 · Equity research — built</span>
+      <span class="pill"><span class="dot built"></span>Agent 2 · Covenant monitoring — built</span>
+      <span class="pill"><span class="dot built"></span>Agent 3 · Market/news intelligence — built</span>
+      <span class="pill"><span class="dot designed"></span>Agent 4 · FP&amp;A / variance — designed</span>
+    </div>
+
+    <div class="spine" id="spine">
+      <div class="cap">Why it's a platform, not three scripts</div>
+      <div class="caph">One significance library, called by <em>three unrelated agents</em></div>
+      <!-- SVG injected by JS -->
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Choose an agent">
+    <div class="segmented" role="tablist" id="agentTabs"></div>
+    <div class="subselect" id="subselect"></div>
+  </section>
+
+  <section class="panel" id="panel" aria-live="polite"></section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="scope">
+      <strong style="color:var(--ink)">Honest scope.</strong> A research and surveillance platform that
+      <em>tests</em> relationships and flags what it can't support — not an alpha-prediction engine.
+      Runs shown here are precomputed on a curated set of large-cap names; results include honest nulls
+      and excluded data where the evidence doesn't hold.
+    </div>
+    <div>
+      <div class="mono" style="color:var(--ink)">github.com/Aadhi0105/finance-ai-agents</div>
+      <div style="margin-top:6px">Python · Anthropic API · yfinance · DuckDB · MCP</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================================
+   MANIFEST — the single source the showcase renders from.
+   In the prototype it is embedded so the file opens and runs offline.
+   To wire in real runs: move this object to manifest.json, and replace the line
+   marked below with:  MANIFEST = await fetch('manifest.json').then(r=>r.json());
+   A small Python "collector" runs each agent on your curated names and writes
+   the entries here (see README).
+   All numbers below are ILLUSTRATIVE placeholders.
+   ========================================================================== */
+const EMBEDDED_MANIFEST = {
+  agent1:{
+    label:"Company",
+    runs:[
+      {id:"ASML.AS", company:"ASML Holding", exchange:"Euronext Amsterdam",
+       verdict:"Constructive", vclass:"b-pos",
+       snapshot:[["Price","€612.40"],["Mkt cap","€242B"],["P/E","31.2x"],["EV/EBIT","26.4x"],["Rev growth","+18%"],["FCF margin","28%"]],
+       // normalized price vs index (base 100)
+       px:[100,103,101,107,112,109,116,121,118,124,129,127,133],
+       idx:[100,101,100,102,104,103,105,107,106,108,110,109,111],
+       peers:{axis:"EV/EBIT",self:26.4,others:[14.1,17.8,19.2,22.0,15.5,20.3]},
+       dcf:[{lab:"Bear",lo:470,hi:540},{lab:"Base",lo:560,hi:660},{lab:"Bull",lo:680,hi:790}],
+       price:612,
+       note:{view:"Quality compounder trading at a premium the growth and returns still arguably justify; base-case DCF brackets the current price.",
+             evidence:"Margins and FCF conversion sit at the top of the peer set (see scatter); factor read is a clear growth/quality tilt; consensus available, so the view is anchored to estimates rather than history.",
+             triggers:"A cut to the long-run lithography-demand outlook, or margin compression toward peers, would move the view to Neutral."},
+       consensus:"available"},
+
+      {id:"SIE.DE", company:"Siemens AG", exchange:"XETRA",
+       verdict:"Neutral", vclass:"b-info",
+       snapshot:[["Price","€218.90"],["Mkt cap","€175B"],["P/E","18.6x"],["EV/EBIT","15.1x"],["Rev growth","+6%"],["FCF margin","11%"]],
+       px:[100,99,101,100,103,102,104,103,105,104,106,105,107],
+       idx:[100,100,101,101,102,102,103,103,104,104,105,105,106],
+       peers:{axis:"EV/EBIT",self:15.1,others:[13.9,16.2,14.4,17.1,12.8,15.6]},
+       dcf:[{lab:"Bear",lo:180,hi:205},{lab:"Base",lo:205,hi:238},{lab:"Bull",lo:238,hi:270}],
+       price:219,
+       note:{view:"Fairly valued conglomerate; the sum-of-parts is the real question and a single-multiple read understates that.",
+             evidence:"Trades roughly in line with its peer distribution; growth and FCF conversion are mid-pack. Conglomerate structure makes the peer set debatable (industrials vs. automation vs. mobility).",
+             triggers:"A portfolio simplification or a clear re-rating of the digital-industries segment would justify moving off Neutral."},
+       consensus:"available"},
+
+      {id:"ALO.PA", company:"Alstom", exchange:"Euronext Paris",
+       verdict:"Cautious", vclass:"b-neg",
+       snapshot:[["Price","€21.15"],["Mkt cap","€8.0B"],["P/E","n/m"],["EV/EBIT","19.8x"],["Rev growth","+4%"],["FCF margin","3%"]],
+       px:[100,97,99,94,96,92,95,90,93,89,91,88,90],
+       idx:[100,100,101,101,102,102,103,103,104,104,105,105,106],
+       peers:{axis:"EV/EBIT",self:19.8,others:[11.2,13.5,10.9,14.8,12.1]},
+       dcf:[{lab:"Bear",lo:14,hi:18},{lab:"Base",lo:18,hi:24},{lab:"Bull",lo:24,hi:31}],
+       price:21,
+       note:{view:"Turnaround with real backlog but thin cash conversion; consensus estimates returned null, so the view is anchored to the company's own multi-year trajectory instead.",
+             evidence:"FCF margin is the weak point and the multiple sits above rail peers on the scatter. This run shows the consensus-null branch: the model fell back to historical trend rather than guessing estimates.",
+             triggers:"A sustained turn in free-cash-flow conversion would be the single thing to lift the view."},
+       consensus:"null → history fallback"}
+    ]
+  },
+  agent2:{
+    label:"Monitoring scenario",
+    runs:[
+      {id:"lev-ind", name:"Leveraged industrials — Net Debt / EBITDA covenant",
+       metric:"Net Debt / EBITDA", threshold:3.50, unit:"x",
+       series:[3.02,3.05,3.08,3.11,3.16,3.19,3.27,3.34,3.43,3.55],
+       flaggedCycle:6, breachCycle:9,
+       classes:["BASE","STABLE","STABLE","STABLE","STABLE","WIDEN","WIDEN","WIDEN","WIDEN","BREACH"],
+       lead:3,
+       exception:"Cycle 10 — hard breach: Net Debt/EBITDA 3.55x vs 3.50x covenant. Drift was flagged as significant (modified z + OLS slope, p<0.01) from cycle 6, three cycles before the crossing. Cycles-to-breach projection at cycle 7 estimated breach at cycle 9–10."},
+      {id:"icr", name:"Mid-cap credits — Interest Coverage covenant",
+       metric:"EBIT / Interest", threshold:2.00, unit:"x",
+       series:[3.4,3.3,3.35,3.2,3.25,3.1,3.15,3.05,3.1,3.0],
+       flaggedCycle:null, breachCycle:null,
+       classes:["BASE","STABLE","STABLE","STABLE","STABLE","STABLE","STABLE","STABLE","STABLE","STABLE"],
+       lead:null,
+       exception:null}
+    ]
+  },
+  agent3:{
+    label:"Event-study group",
+    runs:[
+      {id:"european_rail", group:"European rail — earnings events",
+       peers:[["ALO.PA",1],["SIE.DE",1],["3436.T",1],["KNEBV.HE",1],["CAF.MC",0]],
+       window:[-5,-4,-3,-2,-1,0,1,2,3,4,5],
+       caar:[0.0,0.1,0.0,0.3,0.4,0.9,1.6,1.8,1.7,1.9,1.8],
+       placebo:[0.0,0.1,-0.1,0.0,0.1,0.0,-0.1,0.1,0.0,-0.1,0.0],
+       n:41,
+       sig:{t:"2.31",p:"0.026",sign:"pass (12/16 +)",verdict:"Significant at 5%"},
+       sverdict:"b-pos",
+       gate:[["Confound","pass"],["Thin data","pass"],["Multiple testing","flag"]],
+       scenario:{p25:"+0.4%",median:"+1.5%",p75:"+2.7%",pPos:"71%",ci:"[+0.2%, +2.8%]",null:false}},
+
+      {id:"semicap_earnings", group:"Semiconductor capital equipment — earnings events",
+       peers:[["ASML.AS",1],["ASM.AS",1],["BESI.AS",1],["AMAT",1],["LRCX",1]],
+       window:[-5,-4,-3,-2,-1,0,1,2,3,4,5],
+       caar:[0.0,-0.1,0.1,0.0,0.2,0.3,0.1,0.4,0.2,0.3,0.2],
+       placebo:[0.0,0.1,0.0,-0.1,0.0,0.1,0.0,0.0,-0.1,0.1,0.0],
+       n:58,
+       sig:{t:"0.74",p:"0.463",sign:"n/s (9/17 +)",verdict:"Not significant — honest null"},
+       sverdict:"b-warn",
+       gate:[["Confound","na"],["Thin data","pass"],["Multiple testing","na"]],
+       scenario:{null:true,msg:"No projection issued. The pooled earnings effect isn't significant, so the scenario engine reports a null rather than dressing noise up as a forecast."}}
+    ]
+  }
+};
+
+/* ---- render helpers ------------------------------------------------------ */
+const $ = (s,el=document)=>el.querySelector(s);
+const el = (t,c,txt)=>{const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;};
+
+function spineSVG(){
+  // one core node -> three agent nodes; the platform proof
+  return `
+  <svg viewBox="0 0 920 220" role="img" aria-label="The shared significance library is called by three agents: covenant drift, event-study CAAR, and variance materiality.">
+    <defs>
+      <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#0d5b66"/></marker>
+    </defs>
+    <!-- core -->
+    <rect x="330" y="86" width="260" height="48" rx="9" fill="#0d5b66"/>
+    <text x="460" y="108" text-anchor="middle" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="14">tools/significance.py</text>
+    <text x="460" y="125" text-anchor="middle" fill="#cfe2e4" font-family="IBM Plex Sans, sans-serif" font-size="11">one shared statistical library</text>
+    <!-- connectors -->
+    <path class="connector" d="M330 110 C 210 110, 200 40, 150 46" fill="none" stroke="#0d5b66" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path class="connector" d="M460 86 C 460 60, 460 56, 460 50" fill="none" stroke="#0d5b66" stroke-width="1.6" marker-end="url(#arw)"/>
+    <path class="connector" d="M590 110 C 710 110, 720 40, 770 46" fill="none" stroke="#0d5b66" stroke-width="1.6" marker-end="url(#arw)"/>
+    <!-- agent nodes -->
+    <g font-family="IBM Plex Sans, sans-serif">
+      <rect x="40" y="16" width="220" height="30" rx="7" fill="#fff" stroke="#d5dcdf"/>
+      <text x="150" y="35" text-anchor="middle" font-size="12.5" fill="#14202b">Agent 2 · covenant drift test</text>
+      <rect x="350" y="16" width="220" height="30" rx="7" fill="#fff" stroke="#d5dcdf"/>
+      <text x="460" y="35" text-anchor="middle" font-size="12.5" fill="#14202b">Agent 3 · event-study CAAR</text>
+      <rect x="660" y="16" width="220" height="30" rx="7" fill="#fff" stroke="#d5dcdf"/>
+      <text x="770" y="35" text-anchor="middle" font-size="12.5" fill="#14202b">Agent 4 · variance materiality</text>
+    </g>
+    <text x="460" y="176" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#4a5a66">Two consumers make a shared tool. Three unrelated consumers make a platform.</text>
+    <text x="460" y="196" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#8aa0ab">Served once over MCP · covenant runs are byte-identical in-process vs. over the server</text>
+  </svg>`;
+}
+
+// generic line chart (multiple series) -> svg
+function lineChart(series, opts={}){
+  const w=opts.w||300,h=opts.h||120,pad=opts.pad||{t:8,r:8,b:18,l:26};
+  const all=series.flatMap(s=>s.data);
+  let mn=opts.min!=null?opts.min:Math.min(...all), mx=opts.max!=null?opts.max:Math.max(...all);
+  if(mn===mx){mn-=1;mx+=1;}
+  const n=series[0].data.length;
+  const x=i=>pad.l+(i/(n-1))*(w-pad.l-pad.r);
+  const y=v=>pad.t+(1-(v-mn)/(mx-mn))*(h-pad.t-pad.b);
+  let out=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="${opts.aria||'line chart'}">`;
+  // baseline/threshold
+  if(opts.threshold!=null){const ty=y(opts.threshold);
+    out+=`<line x1="${pad.l}" y1="${ty}" x2="${w-pad.r}" y2="${ty}" stroke="#a83240" stroke-width="1" stroke-dasharray="4 3"/>`;
+    out+=`<text x="${w-pad.r}" y="${ty-4}" text-anchor="end" font-size="9" fill="#a83240" font-family="IBM Plex Mono,monospace">${opts.thresholdLabel||opts.threshold}</text>`;}
+  if(opts.zero){const zy=y(0);out+=`<line x1="${pad.l}" y1="${zy}" x2="${w-pad.r}" y2="${zy}" stroke="#d5dcdf" stroke-width="1"/>`;}
+  series.forEach(s=>{
+    const d=s.data.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+    out+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w||1.8}" ${s.dash?`stroke-dasharray="4 3"`:''}/>`;
+  });
+  // mark points
+  if(opts.mark){opts.mark.forEach(m=>{out+=`<circle cx="${x(m.i)}" cy="${y(series[m.s||0].data[m.i])}" r="3.4" fill="${m.color}"/>`;});}
+  out+=`<text x="${pad.l}" y="${h-4}" font-size="9" fill="#8aa0ab" font-family="IBM Plex Mono,monospace">${mn.toFixed(opts.dp??0)}</text>`;
+  out+=`</svg>`;
+  return out;
+}
+
+function scatter(peers){
+  const w=300,h=120,pad={t:10,r:10,b:20,l:10};
+  const vals=[...peers.others,peers.self];
+  let mn=Math.min(...vals),mx=Math.max(...vals);const sp=(mx-mn)*0.12||1;mn-=sp;mx+=sp;
+  const x=v=>pad.l+((v-mn)/(mx-mn))*(w-pad.l-pad.r);
+  const cy=h/2;
+  let out=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="peer ${peers.axis} scatter, target highlighted">`;
+  out+=`<line x1="${pad.l}" y1="${cy}" x2="${w-pad.r}" y2="${cy}" stroke="#d5dcdf"/>`;
+  peers.others.forEach(v=>{out+=`<circle cx="${x(v)}" cy="${cy}" r="4" fill="#8aa0ab"/>`;});
+  out+=`<circle cx="${x(peers.self)}" cy="${cy}" r="6" fill="#0d5b66"/>`;
+  out+=`<text x="${x(peers.self)}" y="${cy-12}" text-anchor="middle" font-size="10" fill="#0d5b66" font-family="IBM Plex Mono,monospace">${peers.self}${peers.axis.includes('EV')?'x':''}</text>`;
+  out+=`<text x="${pad.l}" y="${h-5}" font-size="9" fill="#8aa0ab">${peers.axis} · peers grey, target teal</text>`;
+  out+=`</svg>`;return out;
+}
+
+function football(dcf,price){
+  const w=300,h=120,pad={t:14,r:14,b:24,l:14};
+  const all=dcf.flatMap(d=>[d.lo,d.hi]).concat(price);
+  let mn=Math.min(...all),mx=Math.max(...all);const sp=(mx-mn)*0.08||1;mn-=sp;mx+=sp;
+  const x=v=>pad.l+((v-mn)/(mx-mn))*(w-pad.l-pad.r);
+  const rowH=(h-pad.t-pad.b)/dcf.length;
+  let out=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="DCF valuation ranges vs current price">`;
+  dcf.forEach((d,i)=>{const yy=pad.t+i*rowH+rowH/2;
+    out+=`<line x1="${x(d.lo)}" y1="${yy}" x2="${x(d.hi)}" y2="${yy}" stroke="#0d5b66" stroke-width="7" stroke-linecap="round" opacity="0.75"/>`;
+    out+=`<text x="${pad.l}" y="${yy-7}" font-size="9" fill="#4a5a66">${d.lab}</text>`;});
+  const px=x(price);
+  out+=`<line x1="${px}" y1="${pad.t-4}" x2="${px}" y2="${h-pad.b+2}" stroke="#a83240" stroke-width="1.5"/>`;
+  out+=`<text x="${px}" y="${h-6}" text-anchor="middle" font-size="9" fill="#a83240" font-family="IBM Plex Mono,monospace">price ${price}</text>`;
+  out+=`</svg>`;return out;
+}
+
+function chartCard(title,sub,svg){
+  const c=el('div','chart');
+  c.innerHTML=`<div class="ct">${title}</div><div class="cs">${sub}</div>${svg}`;
+  return c;
+}
+
+/* ---- per-agent renderers ------------------------------------------------- */
+function renderAgent1(run){
+  const p=el('div');
+  const head=el('div','agent-head');
+  head.innerHTML=`<div class="who"><h2>${run.company}</h2>
+    <div class="ticker">${run.id} · ${run.exchange}</div>
+    <div class="sub">Equity research — a single ticker to an auditable fundamental view. The least agentic agent by design: constrained loop, reliability over flash.</div></div>
+    <div class="badge ${run.vclass}">${run.verdict}</div>`;
+  p.appendChild(head);
+
+  const snap=el('div','snap');
+  run.snapshot.forEach(([k,v])=>{const c=el('div','cell');c.innerHTML=`<div class="k">${k}</div><div class="v">${v}</div>`;snap.appendChild(c);});
+  p.appendChild(snap);
+
+  const charts=el('div','charts');
+  charts.appendChild(chartCard("Price vs. home index","rebased to 100",
+    lineChart([{data:run.px,color:"#0d5b66"},{data:run.idx,color:"#8aa0ab",w:1.4}],{aria:"price vs index"})));
+  charts.appendChild(chartCard("Price &amp; moving average","trailing window",
+    lineChart([{data:run.px,color:"#0d5b66"},{data:run.px.map((v,i,a)=>{const s=a.slice(Math.max(0,i-3),i+1);return s.reduce((x,y)=>x+y,0)/s.length;}),color:"#b5791a",w:1.4}],{aria:"price and moving average"})));
+  charts.appendChild(chartCard("Volatility &amp; drawdown","from peak",
+    lineChart([{data:run.px.map((v,i,a)=>{const pk=Math.max(...a.slice(0,i+1));return (v/pk-1)*100;}),color:"#a83240"}],{zero:true,aria:"drawdown"})));
+  charts.appendChild(chartCard("Peer-multiple scatter","the statistics check, drawn",scatter(run.peers)));
+  charts.appendChild(chartCard("DCF football-field","scenario-weighted vs. price",football(run.dcf,run.price)));
+  p.appendChild(charts);
+
+  const note=el('div','note');
+  note.innerHTML=`<h3>View</h3><p>${run.note.view}</p>
+    <h3>Evidence</h3><p>${run.note.evidence}</p>
+    <h3>What would change it</h3><p>${run.note.triggers}</p>`;
+  p.appendChild(note);
+
+  const co=el('div','callout');
+  co.innerHTML=`<div><span class="lab">model.json</span> — every figure traces to a deterministic tool;
+    the report rebuilds byte-identically from it. Consensus for this run: <span class="mono">${run.consensus}</span>.</div>`;
+  p.appendChild(co);
+  return p;
+}
+
+function renderAgent2(run){
+  const p=el('div');
+  const head=el('div','agent-head');
+  head.innerHTML=`<div class="who"><h2>${run.name}</h2>
+    <div class="sub">Covenant monitoring — watches many items over cycles and detects change. It reports only exceptions, and its job is to flag drift <em>before</em> a hard breach.</div></div>
+    <div class="badge ${run.breachCycle?'b-neg':'b-pos'}">${run.breachCycle?'Breach detected':'Within limits'}</div>`;
+  p.appendChild(head);
+
+  const chart=el('div','chart');
+  chart.innerHTML=`<div class="ct">${run.metric} across monitoring cycles</div>
+    <div class="cs">covenant threshold in red${run.flaggedCycle!=null?`; drift flagged at cycle ${run.flaggedCycle+1}`:''}</div>`+
+    lineChart([{data:run.series,color:"#0d5b66"}],{
+      threshold:run.threshold,thresholdLabel:run.threshold+run.unit,dp:2,
+      mark:run.flaggedCycle!=null?[{i:run.flaggedCycle,color:"#b5791a"},{i:run.breachCycle,color:"#a83240"}]:[],
+      aria:"covenant metric over cycles with threshold"});
+  p.appendChild(chart);
+
+  const strip=el('div','classstrip');
+  const map={BASE:'st-stable',STABLE:'st-stable',WIDEN:'st-widen',BREACH:'st-breach'};
+  run.classes.forEach((c,i)=>{const d=el('div','cs-cell '+map[c]);d.textContent=(i+1);d.title=c;strip.appendChild(d);});
+  p.appendChild(strip);
+  const leg=el('div','legend');
+  leg.innerHTML=`<span><i class="st-stable"></i>known-stable</span><span><i class="st-widen"></i>widening (flagged)</span><span><i class="st-breach"></i>new breach</span>`;
+  p.appendChild(leg);
+
+  if(run.exception){
+    const exc=el('div','exc');
+    exc.innerHTML=`<div class="eh">Exception report — flagged ${run.lead} cycles before the breach</div><p>${run.exception}</p>`;
+    p.appendChild(exc);
+  }
+  const co=el('div','callout');
+  co.innerHTML=`<div><span class="lab">One spine, verified.</span> The drift and significance checks run over the shared MCP server — a full run is byte-identical whether the checks run in-process or over MCP.</div>`;
+  p.appendChild(co);
+  return p;
+}
+
+function renderAgent3(run){
+  const p=el('div');
+  const head=el('div','agent-head');
+  head.innerHTML=`<div class="who"><h2>${run.group}</h2>
+    <div class="sub">Market/news intelligence — tests whether events move a stock and projects the next one. Cross-ticker by design: an event study needs a peer group, not one name.</div></div>
+    <div class="badge ${run.sverdict}">${run.sig.verdict}</div>`;
+  p.appendChild(head);
+
+  const pk=el('div','peers');
+  run.peers.forEach(([t,ok])=>{const c=el('span','peer'+(ok?'':' dropped'));c.textContent=t;
+    if(!ok)c.title="excluded — earnings dates predate usable price history";pk.appendChild(c);});
+  p.appendChild(pk);
+
+  const chart=el('div','chart');
+  chart.innerHTML=`<div class="ct">Cumulative abnormal return (CAAR) around the event</div>
+    <div class="cs">event study in teal · placebo on non-event dates in grey (must stay flat)</div>`+
+    lineChart([
+      {data:run.caar,color:"#0d5b66"},
+      {data:run.placebo,color:"#8aa0ab",w:1.4,dash:true}
+    ],{zero:true,dp:1,aria:"CAAR and placebo"});
+  p.appendChild(chart);
+
+  const v=el('div','verdict');
+  v.innerHTML=`
+    <div class="cell"><div class="k">Events (N)</div><div class="v">${run.n}</div></div>
+    <div class="cell"><div class="k">t-stat</div><div class="v">${run.sig.t}</div></div>
+    <div class="cell"><div class="k">p-value</div><div class="v">${run.sig.p}</div></div>
+    <div class="cell"><div class="k">Sign test</div><div class="v" style="font-size:13px">${run.sig.sign}</div></div>`;
+  p.appendChild(v);
+
+  const gate=el('div','gate');
+  run.gate.forEach(([k,st])=>{const g=el('div','g '+st);g.innerHTML=`<span class="gi"></span>${k}: ${st==='na'?'n/a':st}`;gate.appendChild(g);});
+  p.appendChild(gate);
+
+  const sc=el('div','scen');
+  if(run.scenario.null){
+    sc.innerHTML=`<div class="sh">Forward scenario</div><div class="snull">${run.scenario.msg}</div>`;
+  }else{
+    sc.innerHTML=`<div class="sh">Forward scenario — next comparable catalyst</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:14px;margin-top:8px">
+      <div><div class="k" style="font-size:12px;color:var(--soft)">p25</div><div class="num">${run.scenario.p25}</div></div>
+      <div><div class="k" style="font-size:12px;color:var(--soft)">median</div><div class="num">${run.scenario.median}</div></div>
+      <div><div class="k" style="font-size:12px;color:var(--soft)">p75</div><div class="num">${run.scenario.p75}</div></div>
+      <div><div class="k" style="font-size:12px;color:var(--soft)">P(positive)</div><div class="num">${run.scenario.pPos}</div></div>
+      <div><div class="k" style="font-size:12px;color:var(--soft)">95% CI on mean</div><div class="num">${run.scenario.ci}</div></div>
+      </div>
+      <div style="font-size:12.5px;color:var(--soft);margin-top:10px">Calibration, not prediction: a re-expression of what comparable events did, with a regime caveat. Never a point forecast.</div>`;
+  }
+  p.appendChild(sc);
+  return p;
+}
+
+/* ---- app shell ----------------------------------------------------------- */
+const AGENTS=[
+  {key:"agent1",num:"Agent 1",name:"Equity research",render:renderAgent1},
+  {key:"agent2",num:"Agent 2",name:"Covenant monitoring",render:renderAgent2},
+  {key:"agent3",num:"Agent 3",name:"Market / news intelligence",render:renderAgent3},
+  {key:"agent4",num:"Agent 4",name:"FP&A / variance",render:null}
+];
+let MANIFEST, current="agent1", subIndex=0;
+
+function buildTabs(){
+  const t=$('#agentTabs');t.innerHTML='';
+  AGENTS.forEach(a=>{
+    const b=el('button','seg');b.setAttribute('role','tab');
+    b.setAttribute('aria-selected',a.key===current);
+    b.innerHTML=`<span class="n">${a.num}</span><span>${a.name}</span>`;
+    if(!a.render){b.disabled=true;b.title="Designed, not yet built";
+      b.innerHTML=`<span class="n">${a.num} · planned</span><span>${a.name}</span>`;}
+    else b.onclick=()=>{current=a.key;subIndex=0;draw();};
+    t.appendChild(b);
+  });
+}
+function buildSub(){
+  const s=$('#subselect');s.innerHTML='';
+  const cfg=MANIFEST[current];if(!cfg){return;}
+  const lab=el('label',null,cfg.label+':');lab.htmlFor='subsel';
+  const sel=el('select');sel.id='subsel';
+  cfg.runs.forEach((r,i)=>{const o=el('option',null,r.company||r.name||r.group||r.id);o.value=i;sel.appendChild(o);});
+  sel.value=subIndex;sel.onchange=e=>{subIndex=+e.target.value;drawPanel();};
+  s.appendChild(lab);s.appendChild(sel);
+}
+function drawPanel(){
+  const a=AGENTS.find(x=>x.key===current);
+  const panel=$('#panel');panel.innerHTML='';
+  const run=MANIFEST[current].runs[subIndex];
+  panel.appendChild(a.render(run));
+}
+function draw(){buildTabs();buildSub();drawPanel();}
+
+async function init(){
+  $('#spine').insertAdjacentHTML('beforeend',spineSVG());
+  // PROTOTYPE: embedded. To wire real runs, replace next line with:
+  // MANIFEST = await fetch('manifest.json').then(r=>r.json());
+  MANIFEST = EMBEDDED_MANIFEST;
+  draw();
+}
+init();
+</script>
+</body>
+</html>
