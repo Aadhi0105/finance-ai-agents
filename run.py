@@ -100,10 +100,26 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     from datetime import datetime
     from tools.data import get_price_history, home_index_ticker
     from validation import gate
+    from validation import note_grounding
     import composer
 
     # Confidence gate: score the run's own logged outputs (deterministic).
     validation = gate.assess(state.results)
+
+    # Note grounding: the model's note cannot state a figure no tool computed.
+    # This makes "the LLM never does the math" a mechanical property of the
+    # PUBLISHED note, not just of the tools. An ungrounded figure flags the run.
+    grounding = note_grounding.ground_note(note, state.results)
+    validation["note_grounding"] = grounding
+    if not grounding["passed"]:
+        validation["checks"].append({
+            "check": "note_grounding", "status": "fail",
+            "detail": f"note states figure(s) not computed by any tool: "
+                      f"{[u['figure'] for u in grounding['unmatched']]}"})
+        validation["n_fail"] = validation.get("n_fail", 0) + 1
+        validation["verdict"] = "flag_for_review"
+        validation["confidence"] = "low"
+
     _print_validation(validation)
 
     price_history = get_price_history(ticker)
@@ -130,12 +146,13 @@ def _print_validation(v: dict) -> None:
     banner = "PASS" if v["verdict"] == "pass" else "⚠ FLAGGED FOR REVIEW"
     print(f"\n----- VALIDATION: {banner} "
           f"(confidence={v['confidence']}, score={v['score']}, "
-          f"{v['n_pass']} pass / {v['n_warn']} warn / {v['n_fail']} fail) -----")
+          f"{v['n_pass']} pass / {v.get('n_info_finding',0)} finding / "
+          f"{v.get('n_quality_warn',0)} quality-warn / {v['n_fail']} fail) -----")
     for c in v["checks"]:
         if c["status"] != "pass":
             print(f"  [{c['status'].upper()}] {c['check']}: {c['detail']}")
     if v["verdict"] != "pass":
-        print("  -> not for emission as-is; route to human review.")
+        print("  -> flagged: emitted as report_REVIEW.html, not approved output.")
     print("-----")
 
 

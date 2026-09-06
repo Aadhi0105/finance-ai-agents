@@ -63,11 +63,24 @@ def _rolling_vol(closes: list[float], window: int = 30) -> list:
 
 def _drawdown(closes: list[float]) -> list:
     """Drawdown series vs running peak (0 at a new high, negative below)."""
+    if not closes:
+        return []
     out, peak = [], closes[0]
     for c in closes:
         peak = max(peak, c)
         out.append(c / peak - 1)
     return out
+
+
+def _placeholder_png(ticker: str, title: str, msg: str = "insufficient data") -> bytes:
+    """A labelled placeholder chart when a series is empty/too short, so report
+    generation never crashes on missing history."""
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    ax.text(0.5, 0.5, f"{title}\n({msg})", ha="center", va="center",
+            fontsize=12, color="#888", transform=ax.transAxes)
+    ax.set_title(f"{ticker} — {title}")
+    ax.axis("off")
+    return _finish(fig)
 
 
 def _align_on_dates(a: list[dict], b: list[dict]):
@@ -97,6 +110,8 @@ def _thin_xticks(ax, dates):
 
 def render_price_ma_png(history: list[dict], ticker: str) -> bytes:
     """Chart 2 (price action, simplified): close price + 50/200-day SMAs."""
+    if not history:
+        return _placeholder_png(ticker, "price and moving averages", "no price history")
     dates = [row["date"] for row in history]
     closes = [row["close"] for row in history]
     ma50 = _sma(closes, 50)
@@ -117,7 +132,7 @@ def render_dcf_footballfield_png(dcf: dict, ticker: str) -> bytes:
     """Chart 5: DCF bear/base/bull range vs current price (the valuation gap)."""
     vps = dcf.get("value_per_share", {})
     bear, base, bull = vps.get("bear"), vps.get("base"), vps.get("bull")
-    weighted = dcf.get("probability_weighted_per_share")
+    weighted = dcf.get("scenario_weighted_per_share") or dcf.get("probability_weighted_per_share")
     price = dcf.get("current_price")
 
     fig, ax = plt.subplots(figsize=(9, 2.8))
@@ -174,6 +189,8 @@ def render_peer_scatter_png(peer: dict, ticker: str) -> bytes:
 
 def render_vol_drawdown_png(history: list[dict], ticker: str) -> bytes:
     """Chart 3: rolling annualised volatility (top) and drawdown (bottom)."""
+    if not history:
+        return _placeholder_png(ticker, "volatility & drawdown", "no price history")
     dates = [row["date"] for row in history]
     closes = [row["close"] for row in history]
     vol = _rolling_vol(closes, 30)
@@ -230,9 +247,14 @@ def _validation_banner(v: dict | None) -> str:
         return ""
     passed = v.get("verdict") == "pass"
     cls = "pass" if passed else "review"
-    label = "Passed confidence gate" if passed else "Flagged for review"
+    if passed:
+        label = "Passed confidence gate"
+    else:
+        label = "&#9888; REVIEW DRAFT — flagged by the confidence gate, NOT approved output"
+    counts = (f"{v.get('n_pass', 0)} pass / {v.get('n_info_finding', 0)} finding / "
+              f"{v.get('n_quality_warn', 0)} quality-warn / {v.get('n_fail', 0)} fail")
     head = (f"<strong>{label}</strong> — confidence {v.get('confidence')}, "
-            f"score {v.get('score')} ({v.get('n_pass')} pass / {v.get('n_warn')} warn / {v.get('n_fail')} fail)")
+            f"score {v.get('score')} ({counts})")
     flags = [c for c in v.get("checks", []) if c["status"] != "pass"]
     items = "".join(f"<li><em>{c['status']}</em> — {c['check']}: {c['detail']}</li>" for c in flags)
     body = f"<ul>{items}</ul>" if items else ""
@@ -382,7 +404,12 @@ def build_report(model_json_path: str, out_dir: str | None = None) -> str:
 <div class="note">{note_html}</div>
 </body></html>"""
 
-    path = os.path.join(out_dir, "report.html")
+    # The gate GATES, not just labels: a flagged run is written as a REVIEW draft
+    # that cannot be mistaken for approved output. Verdict comes from the sidecar
+    # (so --rebuild also names the file correctly).
+    verdict = (sidecar.get("validation") or {}).get("verdict", "pass")
+    fname = "report.html" if verdict == "pass" else "report_REVIEW.html"
+    path = os.path.join(out_dir, fname)
     with open(path, "w") as f:
         f.write(html)
     return path
