@@ -133,10 +133,15 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = os.path.join("output", f"{ticker}_{stamp}")
 
+    model_id = os.environ.get("AGENT_MODEL", "claude-sonnet-5") if mode == "live" else "StubModel"
+    fin = (state.results.get("get_financials") or {}).get("financials", {}) or {}
+    currency = fin.get("currency") or (state.results.get("get_prices") or {}).get("currency")
+
     sidecar_path = composer.write_sidecar(
         ticker=ticker, mode=mode, note=note, analysis=state.results,
         price_history=price_history, index_history=index_history,
         validation=validation, out_dir=out_dir,
+        calls=state.calls, model_id=model_id, currency=currency,
     )
     report_path = composer.build_report(sidecar_path, out_dir)
     print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts')}/ (5 charts)")

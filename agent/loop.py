@@ -53,8 +53,11 @@ def run_agent(
         for block in resp.content:
             if block.type != "tool_use":
                 continue
+            import time as _t
+            _start = _t.perf_counter()
             output = registry.dispatch(block.name, block.input)
-            state.record_tool(block.name, block.input, output)
+            _elapsed_ms = round((_t.perf_counter() - _start) * 1000, 2)
+            state.record_tool(block.name, block.input, output, duration_ms=_elapsed_ms)
             tool_results.append({
                 "type": "tool_result",
                 "tool_use_id": block.id,

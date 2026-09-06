@@ -294,24 +294,50 @@ def _markdown_to_html(text: str) -> str:
 
 # --- sidecar --------------------------------------------------------------
 
+def _git_commit() -> str | None:
+    """Best-effort short commit SHA, so a report can be traced to exact code."""
+    import subprocess
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            stderr=subprocess.DEVNULL, timeout=3).decode().strip()
+    except Exception:
+        return None
+
+
 def write_sidecar(*, ticker: str, mode: str, note: str, analysis: dict,
                   price_history: dict, index_history: dict | None,
-                  validation: dict | None = None, out_dir: str) -> str:
-    """Write model.json — the complete, self-contained record of one run."""
+                  validation: dict | None = None, out_dir: str,
+                  calls: list | None = None, model_id: str | None = None,
+                  currency: str | None = None) -> str:
+    """Write model.json — the complete, self-contained record of one run.
+
+    Provenance answers 'what code, model, data snapshot and assumptions produced
+    this report?' — the substance of the auditability claim. `calls` is the
+    append-only tool-call history (nothing lost to last-write-wins)."""
     os.makedirs(out_dir, exist_ok=True)
+
+    fin = (analysis.get("get_financials") or {}).get("financials", {}) or {}
     sidecar = {
         "meta": {
             "ticker": ticker,
             "agent": "equity-research-v1",
             "mode": mode,
             "generated_at": datetime.now(timezone.utc).isoformat(),
+            "model_id": model_id,
+            "git_commit": _git_commit(),
+            "data_source": os.environ.get("AGENT_DATA_SOURCE", "fixture"),
+            "statement_period": fin.get("period"),
+            "currency": currency,
         },
         "validation": validation,             # confidence gate result (may be None)
         "note": note,
-        "analysis": analysis,                 # copy of the loop's tool results
+        "analysis": analysis,                 # latest result per tool
+        "call_history": calls or [],          # append-only: EVERY tool call, in order
         "chart_data": {
             "price_history": price_history,
-            "index_history": index_history,   # for the price-vs-index chart (may be None)
+            "index_history": index_history,
         },
     }
     path = os.path.join(out_dir, "model.json")

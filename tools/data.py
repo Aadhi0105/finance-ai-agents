@@ -22,6 +22,15 @@ from pathlib import Path
 _FIXTURE_DIR = Path(__file__).resolve().parent.parent / "fixtures"
 
 
+def _stable_seed(text: str) -> int:
+    """A seed that is reproducible ACROSS PROCESSES. Python's built-in str hash()
+    is randomized per interpreter (PYTHONHASHSEED), so seeding an RNG with it makes
+    'deterministic' offline runs differ between invocations — which quietly breaks
+    the auditability claim. A sha256 digest is stable everywhere."""
+    import hashlib
+    return int.from_bytes(hashlib.sha256(text.encode()).digest()[:8], "big")
+
+
 def _source() -> str:
     return os.environ.get("AGENT_DATA_SOURCE", "fixture").lower()
 
@@ -220,7 +229,7 @@ def _history_synthetic(ticker: str) -> dict:
     end_price = (fx or {}).get("prices", {}).get("current_price") or 100.0
     n = 252  # ~1 trading year
 
-    rng = random.Random(hash(ticker) & 0xFFFFFFFF)
+    rng = random.Random(_stable_seed(ticker))
     # Build a gentle random walk, then scale so the final point == end_price.
     steps = [1.0]
     for _ in range(n - 1):
