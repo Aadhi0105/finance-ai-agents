@@ -128,30 +128,45 @@ def render_price_ma_png(history: list[dict], ticker: str) -> bytes:
     return _finish(fig)
 
 
-def render_dcf_footballfield_png(dcf: dict, ticker: str) -> bytes:
+_CCY_SYMBOL = {"EUR": "\u20ac", "USD": "$", "GBP": "\u00a3", "JPY": "\u00a5",
+               "CHF": "CHF ", "SEK": "kr ", "DKK": "kr ", "NOK": "kr "}
+
+
+def _ccy(currency: str | None) -> str:
+    return _CCY_SYMBOL.get((currency or "EUR").upper(), (currency or "EUR") + " ")
+
+
+def render_dcf_footballfield_png(dcf: dict, ticker: str, currency: str | None = None) -> bytes:
     """Chart 5: DCF bear/base/bull range vs current price (the valuation gap)."""
-    vps = dcf.get("value_per_share", {})
+    sym = _ccy(currency)
+    vps = dcf.get("value_per_share") or {}
     bear, base, bull = vps.get("bear"), vps.get("base"), vps.get("bull")
-    weighted = dcf.get("scenario_weighted_per_share") or dcf.get("probability_weighted_per_share")
+    weighted = dcf.get("scenario_weighted_per_share")
     price = dcf.get("current_price")
+
+    # With an incomplete net-debt bridge there is no equity per-share to plot —
+    # show an honest placeholder rather than a misleading EV-per-share chart.
+    if bear is None or base is None or bull is None:
+        return _placeholder_png(ticker, "DCF football field",
+                                "enterprise value only — no equity per-share "
+                                "(net-debt bridge incomplete)")
 
     fig, ax = plt.subplots(figsize=(9, 2.8))
     y = 0
-    # DCF range bar (bear -> bull)
     ax.plot([bear, bull], [y, y], linewidth=10, alpha=0.35, solid_capstyle="round",
             color="#4c78a8", zorder=1)
     for val, lab in [(bear, "Bear"), (base, "Base"), (bull, "Bull")]:
         ax.scatter([val], [y], s=40, color="#4c78a8", zorder=3)
-        ax.annotate(f"{lab}\n€{val:,.0f}", (val, y), textcoords="offset points",
+        ax.annotate(f"{lab}\n{sym}{val:,.0f}", (val, y), textcoords="offset points",
                     xytext=(0, 10), ha="center", fontsize=7)
     if weighted:
         ax.scatter([weighted], [y], marker="D", s=70, color="#2a2a2a", zorder=4,
-                   label=f"Prob-weighted €{weighted:,.0f}")
+                   label=f"Scenario-weighted {sym}{weighted:,.0f}")
     if price:
         ax.axvline(price, color="#d1495b", linestyle="--", linewidth=1.5,
-                   label=f"Current price €{price:,.0f}")
+                   label=f"Current price {sym}{price:,.0f}")
     ax.set_yticks([])
-    ax.set_xlabel("Value per share (€)")
+    ax.set_xlabel(f"Value per share ({sym.strip()})")
     ax.set_title(f"{ticker} — DCF football field vs current price")
     ax.legend(loc="lower right", fontsize=7)
     ax.margins(x=0.12, y=0.6)
@@ -384,15 +399,16 @@ def build_report(model_json_path: str, out_dir: str | None = None) -> str:
 
     # 4. Peer-multiple scatter (from the sidecar's peer analysis)
     peer = analysis.get("peer_outlier_check")
-    if peer and "peer_pes" in peer:
+    if peer and not peer.get("error") and peer.get("peer_pes") and peer.get("target_pe") is not None:
         sections.append(("Peer-multiple check", "peer_scatter",
                          render_peer_scatter_png(peer, ticker)))
 
     # 5. DCF football field (from the sidecar's DCF analysis)
+    currency = (sidecar.get("meta") or {}).get("currency")
     dcf = analysis.get("run_dcf")
-    if dcf and "value_per_share" in dcf:
+    if dcf and not dcf.get("error"):
         sections.append(("DCF football field", "dcf_footballfield",
-                         render_dcf_footballfield_png(dcf, ticker)))
+                         render_dcf_footballfield_png(dcf, ticker, currency)))
 
     # Save standalone PNGs and build embedded <img> blocks.
     chart_html = []

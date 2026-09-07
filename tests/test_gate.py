@@ -71,3 +71,15 @@ def test_small_peer_set_quality_warns():
     v = gate.assess(a, now=__import__("datetime").date(2026, 3, 1))
     ps = [c for c in v["checks"] if c["check"] == "peer_sample_size"][0]
     assert ps["status"] == "quality_warn"
+
+
+def test_aggregate_checks_consistent_after_added_fail():
+    """§7: adding a fail and re-aggregating keeps score/verdict/confidence
+    mutually consistent (no 'score 1.0 but 1 fail' contradiction)."""
+    checks = [{"check": "x", "status": "pass", "detail": ""},
+              {"check": "note_grounding", "status": "fail", "detail": "fabricated figure"}]
+    agg = gate.aggregate_checks(checks)
+    assert agg["n_fail"] == 1
+    assert agg["verdict"] == "flag_for_review"
+    assert agg["confidence"] == "low"
+    assert agg["score"] < 0.7          # score reflects the fail, not left at 1.0

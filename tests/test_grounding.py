@@ -39,3 +39,14 @@ def test_registry_includes_scaled_forms():
 def test_wrong_percentage_caught():
     r = ground_note("Operating margin was 99.9%.", _RESULTS)
     assert r["passed"] is False
+
+
+def test_grounds_against_earlier_call_output():
+    """§6: a note may cite an EARLIER tool call (not just the latest result). When
+    grounding against the full successful-call history, that figure is valid."""
+    # two DCF calls: latest result is 220, but 205 was produced earlier
+    grounded_from_calls = {"call_0": {"scenario_weighted_per_share": 205.0},
+                           "call_1": {"scenario_weighted_per_share": 220.0}}
+    note = "The initial spec yielded EUR205.00; revised assumptions gave EUR220.00."
+    r = ground_note(note, grounded_from_calls)
+    assert r["passed"] is True

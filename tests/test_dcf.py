@@ -47,6 +47,13 @@ def test_partial_bridge_reports_ev_only():
     assert r["value_basis"] == "enterprise_value_only"
     assert r["equity_value"] is None
     assert r["assumptions"]["net_debt_bridge_status"] == "incomplete"
+    # §4: NO equity-derived per-share/upside figures when the bridge is incomplete
+    # (an EV-per-share compared to the equity share price is meaningless).
+    assert r["value_per_share"] is None
+    assert r["scenario_weighted_per_share"] is None
+    assert r["implied_upside"] is None
+    # enterprise value is still reported
+    assert r["enterprise_value"]["base"] is not None
 
 
 def test_zero_fcf_is_not_treated_as_missing():

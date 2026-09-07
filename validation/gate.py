@@ -149,7 +149,14 @@ def assess(analysis: dict, now: date | None = None) -> dict:
     elif consensus or trend:
         add("comparison_basis", "quality_warn", "no usable comparison basis")
 
-    # --- aggregate: ONLY quality_warn and fail move the score ---
+    return aggregate_checks(checks)
+
+
+def aggregate_checks(checks: list[dict]) -> dict:
+    """Score a checks list -> verdict/confidence/counts. Exposed so a later stage
+    (e.g. note grounding) can add a check and RE-AGGREGATE, keeping score, verdict,
+    and confidence mutually consistent (no 'score 1.0 but 1 fail' contradictions).
+    Only quality_warn and fail move the score; info_finding never does."""
     fails = [c for c in checks if c["status"] == "fail"]
     quality_warns = [c for c in checks if c["status"] == "quality_warn"]
     findings = [c for c in checks if c["status"] == "info_finding"]

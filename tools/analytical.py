@@ -243,21 +243,33 @@ def run_dcf(tool_input: dict, state=None) -> dict:
 
     shares = prices.get("shares_outstanding") if prices else None
     current_price = prices.get("current_price") if prices else None
-    per_share = {k: (v / shares if shares else None) for k, v in equity.items()}
-
     w = a["weights"]
-    weighted_equity = sum(equity[k] * w[k] for k in equity)
-    weighted_ps = weighted_equity / shares if shares else None
-    upside = round(weighted_ps / current_price - 1, 4) if (weighted_ps and current_price) else None
+
+    # EQUITY-DERIVED figures are only meaningful when the bridge is COMPLETE.
+    # With an incomplete bridge we have enterprise value only — computing an
+    # "EV per share" and comparing it to the equity share price is economically
+    # meaningless (it ignores net debt), so those fields are None. We report
+    # enterprise value only.
+    if bridge_complete:
+        per_share = {k: (v / shares if shares else None) for k, v in equity.items()}
+        weighted_equity = sum(equity[k] * w[k] for k in equity)
+        weighted_ps = weighted_equity / shares if shares else None
+        upside = round(weighted_ps / current_price - 1, 4) if (weighted_ps and current_price) else None
+        value_per_share = {k: (round(v, 2) if v else None) for k, v in per_share.items()}
+        scenario_weighted_ps = round(weighted_ps, 2) if weighted_ps else None
+    else:
+        value_per_share = None
+        scenario_weighted_ps = None
+        upside = None
 
     return {
         "ticker": ticker,
         "value_basis": value_basis,
         "enterprise_value": {k: round(v, 0) for k, v in ev.items()},
         "equity_value": ({k: round(v, 0) for k, v in equity.items()} if bridge_complete else None),
-        "value_per_share": {k: (round(v, 2) if v else None) for k, v in per_share.items()},
+        "value_per_share": value_per_share,
         # scenario weights are analyst-assigned, NOT empirically estimated probabilities
-        "scenario_weighted_per_share": round(weighted_ps, 2) if weighted_ps else None,
+        "scenario_weighted_per_share": scenario_weighted_ps,
         "current_price": current_price,
         "implied_upside": upside,
         "terminal_value_concentration": tvc,

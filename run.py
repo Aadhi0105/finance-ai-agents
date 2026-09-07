@@ -107,18 +107,24 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     validation = gate.assess(state.results)
 
     # Note grounding: the model's note cannot state a figure no tool computed.
-    # This makes "the LLM never does the math" a mechanical property of the
-    # PUBLISHED note, not just of the tools. An ungrounded figure flags the run.
-    grounding = note_grounding.ground_note(note, state.results)
+    # Ground against EVERY successful tool call (the append-only history), not just
+    # the latest result per tool — so a note that legitimately cites an earlier
+    # DCF (e.g. "the initial spec gave X, the revised Y") isn't falsely flagged.
+    grounded_outputs = {f"call_{c['call_index']}": c["output"]
+                        for c in state.calls if c.get("status") == "success"}
+    grounding = note_grounding.ground_note(note, grounded_outputs)
     validation["note_grounding"] = grounding
     if not grounding["passed"]:
         validation["checks"].append({
             "check": "note_grounding", "status": "fail",
             "detail": f"note states figure(s) not computed by any tool: "
                       f"{[u['figure'] for u in grounding['unmatched']]}"})
-        validation["n_fail"] = validation.get("n_fail", 0) + 1
-        validation["verdict"] = "flag_for_review"
-        validation["confidence"] = "low"
+        # Re-aggregate so score/verdict/confidence stay mutually consistent
+        # (no 'score 1.0 but 1 fail' contradiction).
+        reagg = gate.aggregate_checks(validation["checks"])
+        for k in ("verdict", "confidence", "score", "n_pass", "n_info_finding",
+                  "n_quality_warn", "n_fail"):
+            validation[k] = reagg[k]
 
     _print_validation(validation)
 
