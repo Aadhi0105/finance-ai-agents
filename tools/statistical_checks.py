@@ -2,8 +2,8 @@
 Statistical check tools for Agent 2 (spec §3.3). THE discipline-carrying set —
 the difference between a monitoring *system* and a cron job full of if-statements.
 
-Two tools here, both destined for the shared MCP server (they are reused by
-Agent 3); for now they are plain local Python called by run_cycle:
+Three tools here, all reused across the platform via the shared MCP server
+(Agents 2, 3, and 4 consume the significance machinery):
 
   anomaly_significance_check  -> STATISTICS (Agent 2's PRIMARY discipline):
       is the latest value a significant outlier vs the item's OWN history, or
@@ -114,9 +114,21 @@ def drift_check(times: list[float], values: list[float], min_obs: int = 6,
     dof = n - 2
     rse = math.sqrt(rss / dof) if dof > 0 else 0.0
     se_slope = rse / math.sqrt(s_tt) if s_tt > 0 else float("inf")
-    t_slope = slope / se_slope if se_slope > 0 else 0.0
     tcrit = _t_crit(dof)
-    slope_significant = abs(t_slope) > tcrit
+    # A ZERO standard error means a PERFECT fit (all residuals zero) — a flawless
+    # deterministic trend. That is maximally significant drift, not zero drift.
+    # The old `else 0.0` reported a perfect straight line toward breach as "no
+    # drift", the single most important case a covenant monitor must catch.
+    if se_slope == 0:
+        if abs(slope) > 1e-12:
+            t_slope = float("inf")
+            slope_significant = True
+        else:
+            t_slope = 0.0                 # perfectly flat: genuinely no drift
+            slope_significant = False
+    else:
+        t_slope = slope / se_slope
+        slope_significant = abs(t_slope) > tcrit
 
     # Prediction band for the latest point.
     t0 = times[-1]

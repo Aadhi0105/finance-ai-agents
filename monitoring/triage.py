@@ -64,17 +64,27 @@ def inspect_item(store, flags: dict, item_id: str) -> dict:
 
 def recheck_flag(store, flags: dict, item_id: str) -> dict:
     """
-    Deterministic corroboration analysis. Counts how many INDEPENDENT signals flag
+    Deterministic corroboration analysis. Counts how many DISTINCT DIAGNOSTICS flag
     this item, and whether an anomaly (if present) is an isolated single-cycle
     deviation. Verdict guides escalate-vs-verify. The model calls this; it does
     not compute it.
+
+    Note on terminology: these diagnostics (threshold / anomaly / drift / breach
+    probability) are computed from the SAME scalar covenant series, so they are
+    distinct *diagnostics*, not independent *evidence sources*. Genuine
+    corroboration (a second metric on the same entity, or a second data source)
+    would be stronger; that is a documented entity-level extension.
     """
     f = flags.get(item_id)
     if not f:
         return {"error": f"{item_id} not flagged this cycle"}
 
     signals = []
-    if f["breached"] and f["status"] in SURFACED and "BREACH" in f["status"]:
+    # ANY active threshold breach counts — a still-breached covenant that is
+    # WIDENING or IMPROVING is breached, not just NEW_BREACH. The old
+    # `"BREACH" in status` test only matched NEW_BREACH and silently dropped a
+    # widening breach from the diagnostic count.
+    if f.get("breached"):
         signals.append("threshold_breach")
     if f.get("anomaly_significant"):
         signals.append("anomaly")
@@ -108,7 +118,7 @@ def recheck_flag(store, flags: dict, item_id: str) -> dict:
                           "before trusting its magnitude — single-cycle deviation")
     elif corroborated:
         verdict = "corroborated"
-        recommendation = "escalate — multiple independent signals agree"
+        recommendation = "escalate — multiple distinct diagnostics agree"
     elif isolated_anomaly:
         verdict = "isolated"
         recommendation = "verify before escalation — single-cycle deviation, possible data glitch"

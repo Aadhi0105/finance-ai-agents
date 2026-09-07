@@ -36,9 +36,12 @@ class _McpStatsClient:
         self._thread.start()
         self._session = None
         self._ready = threading.Event()
-        # Open the session on the background loop.
-        asyncio.run_coroutine_threadsafe(self._open(), self._loop)
-        self._ready.wait(timeout=30)
+        # Open the session on the background loop. Keep the future so that a server
+        # startup failure surfaces IMMEDIATELY (with the real traceback) rather than
+        # hanging for the timeout and then failing later with an opaque
+        # "_session is None" error on the first tool call.
+        fut = asyncio.run_coroutine_threadsafe(self._open(), self._loop)
+        fut.result(timeout=30)
         atexit.register(self.close)
 
     @classmethod

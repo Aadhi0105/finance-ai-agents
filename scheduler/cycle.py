@@ -5,10 +5,11 @@ One pass over the watchlist: for each covenant item, resolve this cycle's value,
 run threshold_check, compare to last state, classify, and write both layers of
 state. Then produce an exception-based report (surface only what changed).
 
-This checkpoint proves the DETERMINISTIC spine: state read/write + classification
-+ cold-start baseline + a two-cycle baseline->change-detect via `monitor.py
---once`. The model triage, statistical checks, freshness/robustness, scheduler,
-and MCP are later checkpoints and are intentionally absent here.
+This is the DETERMINISTIC spine: state read/write + classification + cold-start
+baseline + two-cycle baseline->change-detect via `monitor.py --once`. Statistical
+checks (anomaly / drift / breach probability), freshness gating, transactional
+robustness, the thin scheduler, model triage, and the MCP boundary are all built
+and wired around this atom.
 """
 
 from __future__ import annotations
