@@ -1,5 +1,7 @@
 # finance-ai-agents
 
+[![tests](https://github.com/Aadhi0105/finance-ai-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/Aadhi0105/finance-ai-agents/actions/workflows/ci.yml)
+
 A multi-agent platform for finance & markets analysis, built on one shared
 analytical spine. Four agents run today — an **equity-research** agent that turns a
 ticker into an auditable fundamental view, a **covenant-monitoring** agent that
@@ -148,9 +150,37 @@ drawdown, the peer-multiple scatter, and the DCF football-field), `model.json`
 from it via `python run.py --rebuild <model.json>`), and `charts/`.
 
 A **validation gate** (`validation/gate.py`) scores each run on deterministic
-checks (is FCF real or a fallback? is the filing stale? is a margin implausible?)
-and either passes it or flags it for review — distinguishing a *data-quality
-problem* (flag) from a *dramatic but legitimate finding* (pass with a note).
+checks and gates it: a data-quality problem or an implausible ratio flags the run,
+while a dramatic-but-legitimate finding (a big DCF-vs-price gap) is surfaced
+without penalty. A flagged run is emitted as `report_REVIEW.html` with a
+watermark, never as an approved `report.html` — the gate gates, it doesn't just
+label.
+
+**Integrity — the numbers are hard to break, and the note can't outrun them.**
+Agent 1 was the first agent built and was later hardened under a detailed code
+review; the fixes are what make its auditability claim mechanical rather than
+aspirational:
+
+- **EV/EBIT uses real enterprise value** (market cap + debt − cash), never
+  approximated by market cap; a multiple with a non-positive denominator returns
+  `None` with a status, not a meaningless negative.
+- **The DCF refuses nonsensical parameters** (discount rate ≤ terminal growth,
+  out-of-range inputs) rather than printing a broken number, and reports its
+  terminal-value concentration.
+- **The net-debt bridge is complete only when both debt and cash are known** — a
+  missing side reports enterprise value only, never silently assuming zero (which
+  would overstate equity).
+- **Ticker integrity:** a dependent tool refuses to compute on another ticker's
+  stored data.
+- **Note grounding** (`validation/note_grounding.py`, reusing Agent 4's
+  reconciliation philosophy): every figure in the model's written note is checked
+  against a registry of what the tools actually computed. A note claiming a fair
+  value no tool produced is caught and flags the run — so "the LLM never does the
+  math" holds at the published-note boundary, not just in the prompt.
+- **Auditable + reproducible:** `model.json` carries full provenance (model id, git
+  commit, data source, statement period, currency) and the complete append-only
+  tool-call history; offline runs are reproducible across processes (stable
+  hashing).
 
 ---
 
@@ -439,11 +469,33 @@ agent4/      decomposition.py                (variance bridge, integer cents)
 
 mcp_server/  server.py (stdio MCP server) . client.py (persistent client shim)
 fixtures/    offline sample data (equities, covenants, events, news, P&L)
+tests/       50 deterministic tests (ratios, DCF, gate, grounding, determinism, smoke)
+.github/     workflows/ci.yml — runs pytest on every push
 ```
 
 Every layer follows one offline/live pattern: a scripted `StubModel` + fixture data
 for deterministic offline runs, the real model + `yfinance` + FinBERT when live, and
 local functions vs. the MCP server for the shared checks.
+
+---
+
+## Testing
+
+A deterministic test suite runs on every push (GitHub Actions):
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+50 tests, no API calls or network, covering the invariants that matter — the
+finance math (real EV/EBIT, negative-multiple nulling, None-vs-zero, margins), the
+DCF guards (r ≤ g refused, complete-vs-partial bridge, net-cash equity > EV),
+ticker integrity, the gate verdicts (findings vs quality-warns vs fails), note
+grounding (a fabricated figure is caught), offline determinism (a real
+cross-process reproducibility check), and a cross-agent smoke layer that runs all
+four agents and asserts the shared significance library imports into each. The
+suite exists so the integrity fixes above can't silently regress.
 
 ---
 
@@ -495,5 +547,6 @@ All four sibling agents on the shared spine are built. Possible extensions:
 ## Stack
 
 Python 3.11+ · Anthropic API (hand-rolled tool-use loop) · yfinance · DuckDB ·
-matplotlib · MCP (stdio) · transformers/torch + FinBERT (optional, Track B live).
-Offline runs need no API key, no network, and no heavy ML dependencies.
+matplotlib · MCP (stdio) · transformers/torch + FinBERT (optional, Track B live) ·
+pytest + GitHub Actions CI. Offline runs and the full test suite need no API key,
+no network, and no heavy ML dependencies.
