@@ -16,3 +16,4 @@ mcp>=2.0,<3
 # Track B live sentiment (FinBERT) — optional, heavy (~400MB weights on first use)
 # transformers>=4.30
 # torch>=2.0
+scipy>=1.10

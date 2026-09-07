@@ -125,13 +125,21 @@ def relevance_filter(items: list[dict], universe: set[str] | None = None) -> lis
 # --- 4. score --------------------------------------------------------------
 
 def score_items(items: list[dict], scorer=None) -> list[dict]:
-    """Attach a sentiment score to each clustered item via the pluggable scorer."""
+    """Attach a sentiment score to each clustered item via the pluggable scorer.
+    Preserves scorer DIAGNOSTICS (divergence, flag_review, reason) so downstream
+    consumers — and a Track-B review gate — can act on scorer disagreement instead
+    of the run script having to re-score items just to recover the flags."""
     scorer = scorer or get_scorer()
     out = []
     for it in items:
         sc = scorer.score(it)
-        out.append({**it, "sentiment": sc["score"], "sentiment_confidence": sc["confidence"],
-                    "scorer": sc["scorer"]})
+        enriched = {**it, "sentiment": sc["score"],
+                    "sentiment_confidence": sc["confidence"], "scorer": sc["scorer"]}
+        # carry through any optional diagnostics the scorer emitted
+        for k in ("divergence", "flag_review", "reason", "primary_score", "secondary_score"):
+            if k in sc:
+                enriched[k] = sc[k]
+        out.append(enriched)
     return out
 
 

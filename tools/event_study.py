@@ -84,11 +84,12 @@ def _sign_test(cars: list[float]) -> dict:
     n = pos + neg
     if n == 0:
         return {"n_nonzero": 0, "positive": 0, "significant": None}
-    # Normal approximation to the binomial (p=0.5).
-    import math
-    z = (pos - n / 2) / math.sqrt(n / 4) if n > 0 else 0.0
+    # Exact binomial test (p=0.5) -- correct at the small N (5-20) Agent 3 works
+    # in, where the normal approximation is unreliable.
+    from scipy import stats as _sps
+    p_value = float(_sps.binomtest(pos, n, 0.5, alternative="two-sided").pvalue)
     return {"n_nonzero": n, "positive": pos, "negative": neg,
-            "z": round(z, 3), "significant": bool(abs(z) > 1.96)}
+            "p_value": round(p_value, 6), "significant": bool(p_value < 0.05)}
 
 
 def run_event_study(events: list[dict], event_type: str = "unspecified",

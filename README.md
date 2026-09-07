@@ -248,11 +248,14 @@ It runs on **two tracks that never contaminate each other:**
 
 ### Track A — the event study (the flagship)
 
-`run_event_study` (`tools/event_study.py`) is a market-model event study, and it
-is the owner's master's-thesis difference-in-differences relabelled: the abnormal
-return is the treatment effect, the market model is the counterfactual, the
-estimation window is the parallel-trend pre-period, and a placebo on non-event
-dates is the falsification test. Deterministic Python throughout:
+`run_event_study` (`tools/event_study.py`) is a standard market-model event study
+that transfers the counterfactual-and-falsification discipline from the owner's
+causal-inference (difference-in-differences) work into an event-study framework:
+the abnormal return is the effect, the market model is the counterfactual, the
+estimation window is the pre-event baseline, and a placebo on non-event dates is
+the falsification test. (It is not literally a DiD — there is no treated-vs-control
+panel with a parallel-trends assumption; the shared discipline is the
+counterfactual and the placebo.) Deterministic Python throughout:
 
 1. Fit a market model `R = a + b*R_market` by OLS on an event-free estimation
    window (`[-250,-30]`), per event.
@@ -383,9 +386,11 @@ a server would be decoration.
 - **Agent 2 is the second consumer** of the shared statistical checks, so they are
   lifted to an MCP server (`mcp_server/server.py`) and Agent 2 calls them as a
   client.
-- **Agent 3 is born a client** — it reuses those same checks, and adds one tool
-  (`run_event_study`) to the server, which *internally calls* the shared
-  significance family rather than reimplementing it.
+- **Agent 3 consumes the event study over MCP** — it reuses those same checks and
+  adds one tool (`run_event_study`) to the server, which *internally calls* the
+  shared significance family rather than reimplementing it. It can run that engine
+  through the MCP boundary (`AGENT_STATS_VIA_MCP=1`) or locally; local execution is
+  the default for development and the deterministic tests.
 - **Agent 4 adds nothing to the server** — it is the *fourth consumer* of the
   significance library (calling it at two sites: variance materiality and variance
   persistence). Its decomposition and reforecast are Agent-4-specific and stay
@@ -518,6 +523,13 @@ Stated plainly, because knowing a tool's limits is part of building it:
   across a diversified peer set), and the scenario engine reports it as a null
   rather than manufacturing a signal. Finding a significant event-driven effect
   needs a sharper event type (e.g. filtered surprises), a documented extension.
+- **Agent 3's CAAR inference treats per-firm quarterly events as independent.**
+  Pooling several quarters from each peer overstates the effective sample size,
+  because a firm's successive earnings CARs are correlated. A firm-clustered /
+  block bootstrap is the correct next step and a documented extension; at the
+  small peer counts here (5–10) cluster-robust standard errors are themselves
+  fragile, so the honest current stance is to report N and the peer set plainly
+  rather than assert an over-precise significance.
 - **Track B is current-news only** on free sources — a daily sentiment brief, not
   historical sentiment-return analysis (which the two-track firewall keeps out of
   the rigorous lane by design). Some names return sparse earnings-date history from

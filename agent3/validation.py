@@ -105,11 +105,28 @@ def assess(study: dict, *, contributing_peers: int | None = None,
             "single event type tested — no multiplicity inflation" if significant
             else "result not significant — multiplicity not at issue")
 
+    # --- placebo (§13): the design's falsification test MUST be checked ---
+    # A clean event study finds NO effect on non-event ("placebo") dates. If the
+    # placebo itself comes up significant, the whole design is confounded and the
+    # real result cannot be trusted — a heavy hold, not a silent pass.
+    placebo = study.get("placebo")
+    if placebo:
+        if placebo.get("caar_significant"):
+            add("placebo", "fail",
+                f"placebo CAAR is SIGNIFICANT (t={placebo.get('t_stat')}) — the design "
+                f"finds an 'effect' on non-event dates; result not trustworthy")
+        else:
+            add("placebo", "pass", "placebo clean — no effect on non-event dates")
+    elif significant:
+        # a significant real result with NO placebo run is itself a gap worth flagging
+        add("placebo", "warn",
+            "significant result but no placebo/falsification test was run")
+
     # --- score & verdict ----------------------------------------------------
     # Not all warns are equal: a confound or multiple-testing warn on a
     # significant result means "this finding may be illusory" — heavier than a
     # generic thin-data note. Those are exactly the cases a human should see.
-    _HEAVY = {"confound", "multiple_testing"}
+    _HEAVY = {"confound", "multiple_testing", "placebo"}
     penalty = 0.0
     for c in checks:
         if c["status"] == "warn":

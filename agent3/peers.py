@@ -45,9 +45,12 @@ _STUB_PEERS = {
 
 
 def _pin(ticker: str, proposal: dict, source: str) -> dict:
-    peers = [p for p in proposal.get("peers", []) if p and p != ticker]
+    tkr = ticker.upper()
+    # normalize: uppercase, drop the target (case-insensitively), dedup preserving order
+    peers = list(dict.fromkeys(
+        p.upper() for p in proposal.get("peers", []) if p and p.upper() != tkr))
     return {
-        "ticker": ticker,
+        "ticker": tkr,
         "sector": proposal.get("sector", "unspecified"),
         "peers": peers,                       # PINNED — the exact set used
         "rationale": proposal.get("rationale", ""),

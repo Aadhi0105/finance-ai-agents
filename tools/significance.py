@@ -63,23 +63,28 @@ def one_sample_t(values: list[float], mu0: float = 0.0) -> dict:
     tcrit = t_critical(dof)
 
     if se == 0:
-        # No dispersion: mean is exactly mu0 or not, with no sampling variability.
-        significant = mean != mu0
+        # Zero dispersion (all values identical) is far more likely a data problem
+        # -- duplicated observations, a fixture artefact -- than genuine infinite
+        # certainty. Flag it degenerate so the validation gate reviews it rather
+        # than treating it as a rock-solid result.
         return {"n": n, "mean": round(mean, 6), "se": 0.0, "t_stat": None,
-                "dof": dof, "t_crit_95": tcrit, "significant": significant,
-                "p_value": (0.0 if significant else 1.0),
-                "note": "zero dispersion", "computed_by": "one_sample_t (python)"}
+                "dof": dof, "t_crit_95": tcrit, "significant": None,
+                "inference_status": "degenerate_zero_dispersion", "p_value": None,
+                "note": "all observations identical -- check for duplicated/degenerate data",
+                "computed_by": "one_sample_t (python)"}
 
     t_stat = (mean - mu0) / se
-    # Two-sided p-value via a normal approximation to the t-distribution
-    # (adequate given we ship t-critical values for the accept/reject decision).
-    p_value = 2.0 * (1.0 - _normal_cdf(abs(t_stat)))
+    # Exact two-sided Student-t p-value (scipy). Previously a normal approximation,
+    # which disagreed with the Student-t accept/reject decision at small N -- and
+    # that p-value feeds Agent 3's Bonferroni gate, so the two must be consistent.
+    from scipy import stats as _sps
+    p_value = float(2.0 * _sps.t.sf(abs(t_stat), dof))
     return {
         "n": n, "mean": round(mean, 6), "se": round(se, 6),
         "t_stat": round(t_stat, 4), "dof": dof, "t_crit_95": tcrit,
         "significant": bool(abs(t_stat) > tcrit),
-        "p_value": round(p_value, 5),
-        "computed_by": "one_sample_t (python)",
+        "p_value": round(p_value, 6),
+        "computed_by": "one_sample_t (python, scipy Student-t p-value)",
     }
 
 

@@ -41,18 +41,24 @@ def _event_study_fn():
 
 def analyze_event_type(event_type: str, *, source: str = "fixture",
                        ticker: str | None = None, peers: list[str] | None = None,
-                       n_event_types_tested: int = 1, store=None) -> dict:
+                       n_event_types_tested: int = 1, store=None,
+                       live_propose: bool = False) -> dict:
     """
     Run the full Track-A chain for one event type and return a structured result:
     study + scenario + gate verdict + peer accounting. Records the outcome to the
-    catalyst store when one is supplied.
+    catalyst store when one is supplied. This is the ONE rigorous path — the live
+    CLI routes through it so a live run gets validation, placebo, gate-aware
+    scenario, and persistence (not a lighter parallel path).
     """
-    es = load_event_set(event_type, source=source, ticker=ticker, peers=peers)
+    es = load_event_set(event_type, source=source, ticker=ticker, peers=peers,
+                        live_propose=live_propose)
     if es.get("verdict") == "REFUSED":
         return {"event_type": event_type, "stage": "assembly",
                 "verdict": "REFUSED", "reason": es.get("reason"),
                 "contributing_peers": es.get("contributing_peers", []),
-                "excluded_peers": es.get("excluded_peers", [])}
+                "excluded_peers": es.get("excluded_peers", []),
+                "per_peer_report": es.get("per_peer_report", []),
+                "pinned_peer_set": es.get("pinned_peer_set", {})}
 
     run_event_study = _event_study_fn()
     study = run_event_study(es["events"], event_type, es.get("placebo_events"))
@@ -63,6 +69,16 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
                   n_event_types_tested=n_event_types_tested)
     scen = scenario_from_event_study(study)
 
+    # §23: a scenario must not publish as CALIBRATED when the validation gate held
+    # the study for review (significant placebo, confound, multiple-testing, etc.).
+    # The distribution is still computed for diagnostics, but its PUBLICATION STATE
+    # inherits the gate verdict.
+    if gate.get("verdict") == "HOLD_FOR_REVIEW" and scen.get("verdict") == "CALIBRATED":
+        scen["publication_state"] = "HELD_FOR_REVIEW"
+        scen["held_reason"] = "validation gate held the underlying study for review"
+    else:
+        scen["publication_state"] = scen.get("verdict")
+
     result = {
         "event_type": event_type,
         "study": study,
@@ -71,10 +87,23 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
         "contributing_peers": contributing or [],
         "excluded_peers": es.get("excluded_peers", []),
         "pinned_peers": es.get("pinned_peers", []),
+        "pinned_peer_set": es.get("pinned_peer_set", {}),
+        "per_peer_report": es.get("per_peer_report", []),
     }
 
     if store is not None:
-        run_id = f"{event_type}:{es.get('source','fixture')}:{study.get('n_events')}"
+        # §28: content-addressed run_id so a rerun with the same N doesn't collide
+        # and get silently dropped by ON CONFLICT DO NOTHING.
+        import hashlib, json as _json, datetime as _dt
+        payload = _json.dumps({
+            "event_type": event_type,
+            "source": es.get("source", "fixture"),
+            "pinned_peers": es.get("pinned_peers"),
+            "event_dates": sorted(e.get("event_date") for e in es.get("events", [])),
+            "n_events": study.get("n_events"),
+            "run_ts": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+        }, sort_keys=True, default=str)
+        run_id = f"{event_type}:{hashlib.sha256(payload.encode()).hexdigest()[:16]}"
         store.record_outcome(run_id, study, gate, es.get("pinned_peers"))
 
     return result

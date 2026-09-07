@@ -115,7 +115,16 @@ def _align_index(dates: list, target, tol_days: int = 4) -> int | None:
             hi = mid - 1
 
     if ans is not None:
-        return ans
+        # §3: honour tol_days. The nearest trading day at/before the target must be
+        # within tolerance — otherwise a long gap (missing data around the event)
+        # would silently anchor the event to a far-away stale observation.
+        gap = (target - ds[ans]).days
+        if gap <= tol_days:
+            return ans
+        # too far before; if the NEXT trading day is within tolerance, snap forward
+        if ans + 1 < len(ds) and (ds[ans + 1] - target).days <= tol_days:
+            return ans + 1
+        return None
     # target is before the whole series: snap forward if the first date is within tol
     first_gap = (ds[0] - target).days
     if 0 <= first_gap <= tol_days:
@@ -124,65 +133,113 @@ def _align_index(dates: list, target, tol_days: int = 4) -> int | None:
 
 
 def assemble_peer_events(ticker: str, stock_px: list[tuple], mkt_px: list[tuple],
-                         earnings_dates: list, max_events: int = 12) -> tuple[list, dict]:
+                         earnings_dates: list, max_events: int = 12) -> tuple[list, list, dict]:
     """
-    Turn one peer's raw (date, close) series + earnings dates into event dicts.
-    Returns (events, report) where report explains what was used/dropped — pure,
-    no network, so this is unit-tested offline.
+    Turn one peer's raw (date, close) series + earnings dates into event dicts,
+    PLUS deterministic placebo (pseudo-event) dicts. Returns (events, placebos,
+    report). Pure, no network — unit-tested offline.
+
+    §2 fix: stock and market are intersected onto a COMMON trading calendar first,
+    so a single event index refers to the SAME date in both series. Previously the
+    stock index was used to slice both arrays, silently misaligning returns by a
+    day whenever the two calendars differed.
     """
     report = {"ticker": ticker, "earnings_dates": len(earnings_dates),
-              "assembled": 0, "skipped_short_history": 0, "skipped_align": 0}
+              "assembled": 0, "skipped_short_history": 0, "skipped_align": 0,
+              "placebos": 0}
     if not stock_px or not mkt_px or not earnings_dates:
         report["reason"] = "missing prices or earnings dates"
-        return [], report
+        return [], [], report
 
-    s_dates = [d for d, _ in stock_px]
-    s_close = [c for _, c in stock_px]
-    m_dates = [d for d, _ in mkt_px]
-    m_close = [c for _, c in mkt_px]
+    # --- §2: build a date-aligned panel on the intersection of trading dates ---
+    mkt_by_date = {_to_date(d): c for d, c in mkt_px}
+    dates, s_close, m_close = [], [], []
+    for d, c in stock_px:
+        dd = _to_date(d)
+        if dd in mkt_by_date:
+            dates.append(dd)
+            s_close.append(c)
+            m_close.append(mkt_by_date[dd])
+    if len(dates) < EST_LEN + EST_GAP + 5:
+        report["reason"] = "insufficient overlapping stock/market history"
+        report["price_span"] = (f"{dates[0]}..{dates[-1]} ({len(dates)} common bars)"
+                                if dates else "no overlap")
+        return [], [], report
 
-    # Diagnostic: the span of price history actually returned, vs the earnings
-    # dates we're trying to place in it. Surfaces the real cause when events drop.
-    if s_dates:
-        report["price_span"] = f"{_to_date(s_dates[0])}..{_to_date(s_dates[-1])} ({len(s_dates)} bars)"
-    ed_norm = sorted((_to_date(e) for e in earnings_dates), reverse=True)
+    report["price_span"] = f"{dates[0]}..{dates[-1]} ({len(dates)} common bars)"
+    ed_norm = sorted({_to_date(e) for e in earnings_dates}, reverse=True)
     if ed_norm:
         report["earnings_span"] = f"{ed_norm[-1]}..{ed_norm[0]}"
 
-    # STALE-DATA GUARD: some names (observed: certain Euronext .PA tickers) return
-    # earnings dates from a source that only has ancient history — e.g. ALO.PA came
-    # back as 2008-2018 while its price history starts 2020. Those events can never
-    # align to prices that don't exist. Detect the case where the NEWEST earnings
-    # date pre-dates the price window and report an explicit, labeled exclusion
-    # rather than an opaque skipped_align. This is drop-and-report working honestly.
-    px_start = _to_date(s_dates[0])
+    # STALE-DATA GUARD: some names return earnings dates that predate their price
+    # history entirely (observed on certain Euronext .PA tickers). Report an
+    # explicit labeled exclusion rather than an opaque skipped_align.
+    px_start = dates[0]
     if ed_norm and ed_norm[0] < px_start:
         report["excluded"] = True
         report["reason"] = (f"stale earnings data: all {len(ed_norm)} dates "
                             f"({ed_norm[-1]}..{ed_norm[0]}) predate price history "
                             f"(from {px_start}) — source unusable for this name")
-        return [], report
+        return [], [], report
+
+    need_before = EST_GAP + EST_LEN
+
+    def _try_build(event_date):
+        """Build one event dict at event_date on the common calendar, or None."""
+        i = _align_index(dates, event_date)
+        if i is None:
+            return None, "align"
+        if i - need_before < 1 or i + EVT_POST >= len(s_close):
+            return None, "short_history"
+        ev = assemble_event(ticker, str(event_date), s_close, m_close, i)
+        return (ev, None) if ev is not None else (None, "short_history")
 
     events = []
+    used_idx = []
     for ed in ed_norm[:max_events]:
-        si = _align_index(s_dates, ed)
-        mi = _align_index(m_dates, ed)
-        if si is None or mi is None:
-            report["skipped_align"] += 1
+        ev, why = _try_build(ed)
+        if ev is None:
+            report["skipped_align" if why == "align" else "skipped_short_history"] += 1
             continue
-        # need EST_LEN+EST_GAP history before, and EVT_POST ahead, in BOTH series
-        need_before = EST_GAP + EST_LEN
-        if si - need_before < 1 or mi - need_before < 1 \
-                or si + EVT_POST >= len(s_close) or mi + EVT_POST >= len(m_close):
-            report["skipped_short_history"] += 1
-            continue
-        ev = assemble_event(ticker, str(ed), s_close, m_close, si)
-        if ev is not None:
-            events.append(ev)
-            report["assembled"] += 1
-        else:
-            report["skipped_short_history"] += 1
-    return events, report
+        events.append(ev)
+        used_idx.append(_align_index(dates, ed))
+        report["assembled"] += 1
+
+    # --- §12: deterministic PLACEBO pseudo-events ---
+    # For each real event, pick a pseudo-event date >= 30 days from ANY real
+    # earnings date (and with enough history), by stepping back through the
+    # calendar. Same estimator runs on these; a clean study finds nothing here.
+    placebos = _build_placebos(ticker, dates, s_close, m_close, ed_norm,
+                               need_before, len(events))
+    report["placebos"] = len(placebos)
+    return events, placebos, report
+
+
+def _build_placebos(ticker, dates, s_close, m_close, ed_norm, need_before, want):
+    """Deterministic pseudo-events: dates far from any real earnings date, with
+    enough history, sampled evenly across the usable window."""
+    import datetime as _dt
+    ed_set = list(ed_norm)
+
+    def _far_from_earnings(d):
+        return all(abs((d - e).days) >= 30 for e in ed_set)
+
+    lo = need_before + 1
+    hi = len(dates) - EVT_POST - 1
+    if hi <= lo or want == 0:
+        return []
+    placebos = []
+    # step evenly through the usable index range, keep dates far from earnings
+    step = max(1, (hi - lo) // (want + 1))
+    i = lo
+    while i <= hi and len(placebos) < want:
+        d = dates[i]
+        if _far_from_earnings(d):
+            ev = assemble_event(ticker, f"{d}~placebo", s_close, m_close, i)
+            if ev is not None:
+                placebos.append(ev)
+        i += step
+    return placebos
 
 
 def load_live_event_set(ticker: str, peers: list[str], event_type: str) -> dict:
@@ -204,12 +261,10 @@ def load_live_event_set(ticker: str, peers: list[str], event_type: str) -> dict:
         except Exception as e:
             reports.append({"ticker": pk, "error": f"{type(e).__name__}: {e}"})
             continue
-        evs, rep = assemble_peer_events(pk, px, idx_px, eds)
+        evs, placebos, rep = assemble_peer_events(pk, px, idx_px, eds)
         reports.append(rep)
         events.extend(evs)
-        # placebo: use mid-history non-event points (built later in the gate step;
-        # for now a simple placebo from each series' midpoint index)
-        # (kept minimal here; the validation gate owns richer placebo construction)
+        placebo_events.extend(placebos)
 
     n = len(events)
     excluded = [r["ticker"] for r in reports if r.get("excluded")]

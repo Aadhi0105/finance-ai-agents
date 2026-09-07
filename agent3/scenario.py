@@ -120,6 +120,13 @@ def scenario_from_event_study(event_study: dict, seed: int = _SEED,
         headline = ("The historical effect is not statistically distinguishable "
                     "from zero — this is the distribution of noise. Treat as no "
                     "reliable edge, not as a forecast.")
+    elif significant is None:
+        # §24: undetermined significance (e.g. degenerate zero-dispersion) must NOT
+        # fall through to CALIBRATED. It is unresolved, not confirmed.
+        verdict = "UNDETERMINED"
+        headline = ("Significance of the historical effect could not be determined "
+                    "(degenerate or insufficient inference) — no calibrated forward "
+                    "scenario is published.")
     else:
         verdict = "CALIBRATED"
         headline = (f"Across {n} comparable {event_type} events the abnormal-return "
@@ -136,7 +143,7 @@ def scenario_from_event_study(event_study: dict, seed: int = _SEED,
         "headline": headline,
         "caveats": [
             "Calibration of past comparable events, not a point prediction.",
-            "Assumes the next catalyst is drawn from the same regime; prefers recent comparables.",
+            "Assumes the next catalyst is drawn from the same regime as the pooled history.",
             f"Confidence scales with N (N={n}).",
         ],
         "method": "empirical bootstrap of realized per-event CARs",

@@ -119,7 +119,12 @@ class DivergenceScorer:
         ps, qs = p["score"], q["score"]
         divergence = abs(ps - qs) / 2.0                 # in [0, 1]
         opposite_signs = (ps > 0.05 and qs < -0.05) or (ps < -0.05 and qs > 0.05)
-        flag = opposite_signs or divergence >= self.diverge_threshold
+        # strong-vs-flat: one scorer confident, the other essentially neutral — a
+        # real disagreement the docstring promised to flag but the magnitude test
+        # alone missed (0.8 vs 0.0 gives divergence 0.4, below the 0.5 threshold).
+        strong_vs_flat = (abs(ps) >= 0.6 and abs(qs) <= 0.1) or \
+                         (abs(qs) >= 0.6 and abs(ps) <= 0.1)
+        flag = opposite_signs or strong_vs_flat or divergence >= self.diverge_threshold
         # confidence: primary's own confidence, discounted by divergence
         conf = round(max(0.1, p.get("confidence", 0.6) * (1.0 - divergence)), 3)
         return {
@@ -154,5 +159,10 @@ def get_scorer(source: str | None = None):
     if src == "finbert":
         return FinbertScorer()
     if src == "divergence":
-        return DivergenceScorer()
+        # Explicitly FinBERT primary + LM cross-check. Previously DivergenceScorer()
+        # fell back to _default_primary(), which — seeing the env var "divergence"
+        # rather than "finbert" — returned the STUB, so the advertised
+        # "FinBERT + Loughran-McDonald divergence" silently ran stub + LM.
+        return DivergenceScorer(primary=FinbertScorer(),
+                                secondary=LoughranMcDonaldScorer())
     return StubScorer()
