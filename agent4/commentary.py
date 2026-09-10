@@ -30,7 +30,7 @@ import re
 
 from agent4.decomposition import euros
 
-_EURO = re.compile(r"-?\u20ac[\d,]+\.\d{2}")
+_EURO = re.compile(r"[+-]?\u20ac[\d,]+\.\d{2}")
 
 
 def _euro_to_cents(s: str) -> int:
@@ -220,10 +220,15 @@ def reconcile(claims: list[dict], registry: dict) -> dict:
 
         for m in _EURO.findall(text):
             cents = _euro_to_cents(m)
-            # accept exact signed match, or magnitude match when the claim's ref
-            # set legitimately contains that magnitude (sign carried by wording)
-            if cents not in allowed_here and -cents not in allowed_here \
-                    and abs(cents) not in {abs(x) for x in allowed_here}:
+            explicit_sign = m.strip().startswith(("+", "-"))
+            if explicit_sign:
+                # an explicit +/- in the prose must match the referenced sign exactly
+                ok = cents in allowed_here
+            else:
+                # unsigned figure: accept either sign of the same magnitude (the
+                # sign is carried by words like 'adverse'/'favourable')
+                ok = abs(cents) in {abs(x) for x in allowed_here}
+            if not ok:
                 violations.append({"claim": i, "tier": cl["tier"], "figure": m,
                                    "issue": "euro figure not in this claim's references",
                                    "text": text})
