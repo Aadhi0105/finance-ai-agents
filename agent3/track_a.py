@@ -17,7 +17,7 @@ For each (ticker, event_date) it:
   5. returns the dict shape run_event_study expects.
 
 Fixture-first: offline it reads bars from a fixture; live (later) will pull from
-yfinance. Track A is the RIGOR track — events are scheduled and precisely dated,
+yfinance. Track A is the RIGOR track — events are scheduled and dated (day resolution),
 so the "when did it happen" question that wrecks event studies is answered
 exactly. Cross-ticker, same-event-type sets are assembled here to give CAAR its N.
 """

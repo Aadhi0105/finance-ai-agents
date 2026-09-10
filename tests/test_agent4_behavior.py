@@ -81,3 +81,17 @@ def test_zero_dispersion_with_horizon_not_certain():
                    budget_phasing_cents=_PHASING,
                    variance_history_cents=[0, 0, 0, 0, 0, 0, 0, 0])
     assert r["prob_hit_target"] is None
+
+
+# --- §26 refinement: ONE_OFF without phasing must still not extrapolate --
+
+def test_one_off_without_phasing_still_normalizes():
+    """A ONE_OFF with NO phasing must NOT silently carry the spike; it normalizes
+    to a flat pro-rata budget with the assumption flagged."""
+    elevated = reforecast(6_500_000_00, 11_000_000_00, 2, 4,
+                          variance_history_cents=_HIST, persistence="ONE_OFF")
+    structural = reforecast(6_500_000_00, 11_000_000_00, 2, 4,
+                            variance_history_cents=_HIST, persistence="STRUCTURAL")
+    assert elevated["persistence_effect"] is not None
+    assert "flat pro-rata" in elevated["persistence_effect"]["adjustment"]
+    assert elevated["projected_landing_cents"] < structural["projected_landing_cents"]

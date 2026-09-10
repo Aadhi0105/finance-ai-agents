@@ -31,9 +31,19 @@ def test_multiple_matches():
 
 
 def test_registry_includes_scaled_forms():
-    reg = build_number_registry({"x": 8_400_000_000})
-    # 8.4bn should be present as 8.4 (bn), 8400 (m), etc.
-    assert 8.4 in reg
+    signed, allowed = build_number_registry({"x": 8_400_000_000})
+    # 8.4bn should be present as 8.4 (bn) in both sets
+    assert 8.4 in allowed
+    assert 8.4 in signed
+
+
+def test_grounding_is_sign_aware():
+    results = {"run_dcf": {"implied_upside": 0.184}}
+    # computed +18.4% -> a stated -18.4% (wrong sign) must be caught
+    assert ground_note("Downside of -18.4%.", results)["passed"] is False
+    # matching sign passes; unsigned passes (prose carries direction)
+    assert ground_note("Upside of +18.4%.", results)["passed"] is True
+    assert ground_note("A gap of 18.4%.", results)["passed"] is True
 
 
 def test_wrong_percentage_caught():

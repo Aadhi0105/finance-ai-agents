@@ -91,3 +91,21 @@ def test_valid_tree_reconciles_every_node():
     assert r["reconciles"] is True
     # OP variance = +100 (rev) - 20 (cost) = +80
     assert r["total_variance_cents"] == 8000
+
+
+# --- #4: multi-product variable-cost uses 'rate' not 'price' -------------
+
+def test_multiproduct_variable_cost_uses_rate():
+    prods = [{"name": "Steel", "budget": {"rate": 8.0, "volume": 1000},
+              "actual": {"rate": 8.5, "volume": 1100}}]
+    r = decompose_multiproduct("Materials", "variable_cost", prods)
+    driver_names = {d["driver"] for d in r["drivers"]}
+    assert "rate" in driver_names and "price" not in driver_names
+    drivers = sum(d["cents"] for d in r["drivers"])
+    assert drivers + r["residual_cents"] == r["total_variance_cents"]
+
+
+def test_multiproduct_rejects_unknown_type():
+    prods = [{"name": "X", "budget": {"price": 1.0, "volume": 1}, "actual": {"price": 1.0, "volume": 1}}]
+    with pytest.raises(ValueError):
+        decompose_multiproduct("X", "fixed_cost", prods)

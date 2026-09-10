@@ -1,9 +1,15 @@
-"""run_dcf — parameter guards, net-debt bridge, None-vs-zero (§5, §8, §9)."""
+
+
+
+"""run_dcf — FCFF base, parameter guards, net-debt bridge, refusal paths."""
 
 from tools.analytical import run_dcf
 from tests.conftest import make_state
 
-_FIN = {"free_cash_flow": 1000, "net_income": 800,
+# FCFF lines: EBIT*(1-T) + D&A - CapEx - dNWC = 1000*(1-0.25)+200-100-0 = 850.
+_FIN = {"ebit": 1000, "depreciation_amortization": 200, "capex": -100,
+        "tax_provision": 250, "pretax_income": 1000,
+        "change_in_working_capital": 0,
         "total_debt": 300, "cash_and_equivalents": 100}
 _PRICES = {"shares_outstanding": 10, "current_price": 500}
 
@@ -56,11 +62,28 @@ def test_partial_bridge_reports_ev_only():
     assert r["enterprise_value"]["base"] is not None
 
 
-def test_zero_fcf_is_not_treated_as_missing():
-    # None vs 0: a genuine 0.0 FCF must be USED, not replaced by net income.
-    fin = {**_FIN, "free_cash_flow": 0.0}
+def test_refuses_when_fcff_lines_missing():
+    # the old net-income fallback is gone: an enterprise DCF must have EBIT/D&A/CapEx
+    fin = {"net_income": 800, "operating_income": 1000,
+           "total_debt": 300, "cash_and_equivalents": 100}
     r = run_dcf({"ticker": "TST"}, _state(fin))
-    assert r["assumptions"]["fcf_source"].startswith("free_cash_flow")
+    assert "error" in r
+    assert r["value_basis"] == "not_computable"
+
+
+def test_refuses_negative_fcff():
+    # a firm with non-positive unlevered FCF is not suitable for a two-stage DCF
+    fin = {**_FIN, "ebit": -5000}
+    r = run_dcf({"ticker": "TST"}, _state(fin))
+    assert "error" in r
+    assert r["value_basis"] == "not_applicable_negative_fcff"
+
+
+def test_fcff_base_is_unlevered():
+    r = run_dcf({"ticker": "TST"}, _state())
+    # 1000*(1-0.25) + 200 - 100 - 0 = 850
+    assert r["assumptions"]["fcf_base"] == 850
+    assert "FCFF" in r["assumptions"]["fcf_source"]
 
 
 def test_terminal_value_concentration_reported():

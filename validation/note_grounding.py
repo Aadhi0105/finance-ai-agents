@@ -47,61 +47,68 @@ def _walk_numbers(obj):
             yield from _walk_numbers(v)
 
 
-def build_number_registry(results: dict) -> set:
-    """All computed numbers, plus common presentations of them (a ratio 0.3462 is
-    allowed to appear as 34.62 for a percentage; a raw 8.4e9 as 8.4 for '€8.4bn').
-    Returns a set of allowed absolute magnitudes."""
-    allowed = set()
+def build_number_registry(results: dict):
+    """All computed numbers in signed and common presentational forms. Returns
+    (signed_set, abs_set): a note figure with an explicit sign must match the
+    SIGNED set; an unsigned figure may match the ABS set (prose often carries
+    direction in words). This makes grounding sign-aware — a computed -20% no
+    longer validates a stated +20%."""
+    signed, allowed = set(), set()
     for v in _walk_numbers(results):
+        for scale in (1, 100):                     # raw + ratio->percent
+            signed.add(round(v * scale, 4)); allowed.add(round(abs(v) * scale, 4))
         av = abs(v)
-        allowed.add(round(av, 4))
-        allowed.add(round(av * 100, 4))      # ratio -> percent
         if av >= 1e3:
-            allowed.add(round(av / 1e3, 4))  # -> k
+            signed.add(round(v / 1e3, 4)); allowed.add(round(av / 1e3, 4))
         if av >= 1e6:
-            allowed.add(round(av / 1e6, 4))  # -> m
+            signed.add(round(v / 1e6, 4)); allowed.add(round(av / 1e6, 4))
         if av >= 1e9:
-            allowed.add(round(av / 1e9, 4))  # -> bn
-    return allowed
+            signed.add(round(v / 1e9, 4)); allowed.add(round(av / 1e9, 4))
+    return signed, allowed
 
 
-def _matches(value: float, allowed: set) -> bool:
-    v = abs(value)
-    for a in allowed:
+def _matches(value: float, has_sign: bool, signed: set, allowed: set) -> bool:
+    """An explicitly-signed figure must match the SIGNED registry; an unsigned one
+    may match the ABS registry (direction carried by prose wording)."""
+    target = signed if has_sign else allowed
+    v = value if has_sign else abs(value)
+    for a in target:
         if a == 0:
             if v == 0:
                 return True
             continue
-        if abs(v - a) / a <= _TOL:
+        if abs(v - a) / abs(a) <= _TOL:
             return True
     return False
 
 
 def _extract_figures(note: str):
-    """Yield (text, normalised_value) for each financial figure in the note."""
+    """Yield (text, value, has_explicit_sign) for each financial figure."""
     for m in _PCT.finditer(note):
-        yield m.group(0), float(m.group(1))
+        raw = m.group(1)
+        yield m.group(0), float(raw), raw.strip().startswith(("+", "-"))
     for m in _MULT.finditer(note):
-        yield m.group(0), float(m.group(1))
+        raw = m.group(1)
+        yield m.group(0), float(raw), raw.strip().startswith(("+", "-"))
     for m in _CUR.finditer(note):
-        val = float(m.group(1).replace(",", ""))
-        suf = (m.group(2) or "").lower()
-        # keep the AS-WRITTEN magnitude (registry also stores scaled forms)
-        yield m.group(0), val
-    # bare numbers are noisy (years, counts); only check those that look financial
-    # is left out by default to avoid false positives — currency/pct/multiples cover
-    # the figures that matter for the "never fabricate a number" claim.
+        raw = m.group(1).replace(",", "")
+        # currency sign may sit before the symbol; check the whole match text
+        has_sign = m.group(0).strip().startswith(("+", "-"))
+        val = float(raw)
+        if has_sign and m.group(0).strip().startswith("-"):
+            val = -val
+        yield m.group(0), val, has_sign
 
 
 def ground_note(note: str, results: dict) -> dict:
-    """Check every financial figure in the note against the computed registry.
-    Returns pass/fail + the unmatched figures (which the gate flags)."""
-    allowed = build_number_registry(results)
+    """Check every financial figure in the note against the computed registry,
+    sign-aware. Returns pass/fail + the unmatched figures (which the gate flags)."""
+    signed, allowed = build_number_registry(results)
     unmatched = []
     checked = 0
-    for text, value in _extract_figures(note or ""):
+    for text, value, has_sign in _extract_figures(note or ""):
         checked += 1
-        if not _matches(value, allowed):
+        if not _matches(value, has_sign, signed, allowed):
             unmatched.append({"figure": text, "value": value})
     return {
         "passed": len(unmatched) == 0,
@@ -110,5 +117,5 @@ def ground_note(note: str, results: dict) -> dict:
         "note": ("every figure in the note reconciles to a computed value"
                  if not unmatched
                  else "UNGROUNDED FIGURE(S) IN NOTE — the model stated a number no tool computed"),
-        "checked_by": "note_grounding (python; Agent-4 reconciliation philosophy)",
+        "checked_by": "note_grounding (python; sign-aware, Agent-4 reconciliation philosophy)",
     }

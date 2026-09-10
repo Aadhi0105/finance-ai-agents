@@ -1,5 +1,6 @@
 """
-MCP client shim for Agent 2.
+MCP client shim for the shared stats server (used by Agent 2's covenant
+checks and Agent 3's event study).
 
 Exposes anomaly_significance_check / drift_check / breach_probability with the
 SAME signatures as tools/statistical_checks.py — but each call goes over the MCP

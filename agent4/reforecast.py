@@ -122,18 +122,25 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
 
     # --- §26: persistence adjustment ---------------------------------------
     persistence_effect = None
-    if persistence == "ONE_OFF" and remaining > 0 and budget_phasing_cents \
-            and len(budget_phasing_cents) == total_periods:
-        # Do not extrapolate a one-off: the YTD stands, but remaining periods are
-        # assumed on-plan (the phased budget), rather than scaled by the (spike-
-        # distorted) YTD performance ratio.
-        remaining_budget = sum(budget_phasing_cents[elapsed_periods:])
-        one_off_landing = ytd_cents + remaining_budget
-        persistence_effect = {"classification": "ONE_OFF",
-                              "raw_landing_cents": landing,
-                              "adjustment": "remaining periods assumed on-plan (spike not carried)"}
-        landing = one_off_landing
-        method = f"{method} + one-off normalization (§26)"
+    if persistence == "ONE_OFF" and remaining > 0:
+        if budget_phasing_cents and len(budget_phasing_cents) == total_periods:
+            # Preferred: remaining periods assumed on the phased plan.
+            remaining_budget = sum(budget_phasing_cents[elapsed_periods:])
+            landing = ytd_cents + remaining_budget
+            persistence_effect = {"classification": "ONE_OFF",
+                                  "adjustment": "remaining periods assumed on phased plan (spike not carried)"}
+            method = f"{method} + one-off normalization (phased) (§26)"
+        else:
+            # No phasing available: still MUST NOT extrapolate the spike. Assume
+            # remaining periods run at the flat pro-rata full-year budget. The
+            # assumption is flagged, rather than silently carrying a known one-off.
+            remaining_budget = int(round(full_year_budget_cents * remaining / total_periods))
+            landing = ytd_cents + remaining_budget
+            persistence_effect = {"classification": "ONE_OFF",
+                                  "adjustment": "no phasing — remaining periods assumed at "
+                                                "flat pro-rata budget (spike not carried); "
+                                                "phased budget would refine this"}
+            method = f"{method} + one-off normalization (flat pro-rata, no phasing) (§26)"
 
     result = {
         "name": name, "method": method, "method_note": note,

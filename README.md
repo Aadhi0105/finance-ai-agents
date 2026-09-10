@@ -98,24 +98,28 @@ Fully offline, no network or ML dependencies.
 
 ## The shared spine
 
-Four things are reused across every agent — this is what makes it one platform
-rather than three scripts that happen to rhyme:
+A shared architectural spine — reused where each agent needs it, not four
+identical copies. It's what makes this one platform rather than scripts that
+happen to rhyme:
 
 - **Data access** — prices, fundamentals, and earnings dates via `yfinance` (EU
-  *and* US tickers: `ASML.AS`, `SAP.DE`, `AAPL`, ...). Analysing a European name
-  is a ticker choice, not a plumbing project.
+  *and* US tickers: `ASML.AS`, `SAP.DE`, `AAPL`, ...). Used by the market-facing
+  agents (1 and 3); Agents 2 and 4 run on their own domain data (covenant feeds,
+  internal budgets).
 - **Agent loop** — one *plan -> call tool -> observe -> decide -> repeat*
   controller, hand-rolled on the raw Anthropic tool-use API (no framework).
-  Written once in `agent/loop.py`; Agent 2's triage and Agent 3's orchestration
-  reuse it.
+  Written once in `agent/loop.py`; Agent 1 uses it directly and Agent 2's triage
+  reuses it. (Agent 3 has its own orchestrator; Agent 4's engine is deterministic
+  and needs no model loop.)
 - **Analytical tools** — the computations (DCF, robust peer stats, anomaly
   significance, drift, breach probability, event study). Built as local Python,
   and the shared ones are lifted to an MCP server once a second agent consumes
-  them. A single significance library (`tools/significance.py`) underlies both the
-  covenant drift test and the event study.
-- **Validation / confidence layer** — scores outputs and gates low-confidence or
-  untrustworthy results to human review, rather than emitting them blindly. Each
-  agent has its own gate; the discipline is shared.
+  them. The significance/anomaly primitives in `tools/significance.py` and the
+  robust anomaly check are reused across covenant drift, event studies, and
+  variance materiality/persistence.
+- **Validation / confidence layer** — every agent scores its outputs and gates
+  low-confidence or untrustworthy results rather than emitting them blindly. The
+  gates differ per agent; the discipline is the shared thread.
 
 ---
 
@@ -240,7 +244,7 @@ probability-weighted range. It is the only agent with two primary disciplines
 
 It runs on **two tracks that never contaminate each other:**
 
-- **Track A — the rigor lane.** Scheduled, precisely-dated events (earnings). The
+- **Track A — the rigor lane.** Scheduled, dated events (earnings) — dated at day resolution (time-of-day/session not yet modelled). The
   home of the event study, because exact timing is what makes a clean measurement
   possible.
 - **Track B — the breadth lane.** Unstructured news, sentiment-scored. Messier and
@@ -258,7 +262,7 @@ the falsification test. (It is not literally a DiD — there is no treated-vs-co
 panel with a parallel-trends assumption; the shared discipline is the
 counterfactual and the placebo.) Deterministic Python throughout:
 
-1. Fit a market model `R = a + b*R_market` by OLS on an event-free estimation
+1. Fit a market model `R = a + b*R_market` by OLS on a pre-event estimation
    window (`[-250,-30]`), per event.
 2. Abnormal return over the event window (`[-1,+1]`), cumulated to CAR.
 3. Average across N comparable, cross-ticker events -> **CAAR** (the step that

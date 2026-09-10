@@ -188,17 +188,48 @@ def run_dcf(tool_input: dict, state=None) -> dict:
     prices, _ = _upstream(state, "get_prices", ticker)
     f = fin["financials"]
 
-    # FCF base: real free cash flow, net income as a logged fallback.
-    # None (missing) is NOT the same as a genuine 0.
-    fcf0 = f.get("free_cash_flow")
-    fcf_source = "free_cash_flow (cash-flow statement)"
-    if fcf0 is None:
-        fcf0 = f.get("net_income")
-        fcf_source = "net_income (fallback — no FCF available)"
-    if fcf0 is None:
-        return {"error": "run_dcf: no FCF or net income to base the DCF on", "ticker": ticker}
+    # FCFF (unlevered free cash flow to the firm) — the correct base for an
+    # ENTERPRISE DCF: FCFF = EBIT*(1-T) + D&A - CapEx - dNWC, discounted at WACC,
+    # then the net-debt bridge to equity. We REFUSE if the core lines are missing
+    # rather than falling back to net income (an equity measure) or CFO-capex (a
+    # levered figure) — either would make "enterprise value" methodologically wrong.
+    ebit = f.get("ebit")
+    dna = f.get("depreciation_amortization")
+    capex = f.get("capex")
+    missing = [n for n, v in (("EBIT", ebit), ("D&A", dna), ("CapEx", capex)) if v is None]
+    if missing:
+        return {"error": (f"DCF not computable from available statements — missing "
+                          f"FCFF component(s): {', '.join(missing)}. An enterprise DCF "
+                          f"needs EBIT, D&A and CapEx; net income is not a valid "
+                          f"substitute."),
+                "ticker": ticker, "value_basis": "not_computable"}
+
+    tax_prov = f.get("tax_provision")
+    pretax = f.get("pretax_income")
+    if tax_prov is not None and pretax not in (None, 0):
+        tax_rate = max(0.0, min(0.5, tax_prov / pretax))
+        tax_basis = "effective (tax provision / pretax income)"
+    else:
+        tax_rate = 0.25
+        tax_basis = "default 25% (tax provision/pretax income unavailable)"
+
+    dnwc = f.get("change_in_working_capital")
+    dnwc_flag = None
+    if dnwc is None:
+        dnwc = 0.0
+        dnwc_flag = "change in working capital unavailable — assumed 0"
+
+    capex_outflow = abs(capex)          # capex is reported negative; use outflow magnitude
+    fcf0 = ebit * (1 - tax_rate) + dna - capex_outflow - dnwc
+    fcf_source = "FCFF = EBIT*(1-T) + D&A - CapEx - dNWC (unlevered, python)"
+    if fcf0 <= 0:
+        return {"error": (f"DCF not computable — FCFF base is non-positive "
+                          f"({round(fcf0)}); a two-stage growth DCF is not a suitable "
+                          f"model for a firm not generating positive unlevered cash flow."),
+                "ticker": ticker, "value_basis": "not_applicable_negative_fcff"}
 
     a = dict(_DCF_DEFAULTS)
+
     if tool_input.get("base_growth") is not None and tool_input.get("high_growth") is None:
         a["high_growth"] = tool_input["base_growth"]
     for k in ("horizon_years", "discount_rate", "terminal_growth", "high_growth"):
@@ -274,7 +305,11 @@ def run_dcf(tool_input: dict, state=None) -> dict:
         "implied_upside": upside,
         "terminal_value_concentration": tvc,
         "assumptions": {
-            "fcf_base": fcf0, "fcf_source": fcf_source,
+            "fcf_base": round(fcf0), "fcf_source": fcf_source,
+            "fcff_inputs": {"ebit": ebit, "tax_rate": round(tax_rate, 4),
+                            "tax_basis": tax_basis, "d_and_a": dna,
+                            "capex": capex_outflow, "change_in_nwc": dnwc,
+                            "dnwc_note": dnwc_flag},
             "model": "two-stage: linear growth fade over horizon, then Gordon terminal",
             "high_growth": hg, "terminal_growth": tg, "horizon_years": n, "discount_rate": r,
             "scenario_deltas": {"bear": a["bear_delta"], "base": a["base_delta"], "bull": a["bull_delta"]},

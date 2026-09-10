@@ -115,14 +115,7 @@ def _financials_yfinance(ticker: str) -> dict:
         if ocf is not None and capex is not None:
             fcf = ocf + capex  # capex is reported negative, so add
 
-    financials["free_cash_flow"] = fcf
-    financials["total_debt"] = _row(bs, "Total Debt")
-    financials["cash_and_equivalents"] = _row(
-        bs, "Cash And Cash Equivalents",
-        "Cash Cash Equivalents And Short Term Investments",
-        "Cash And Cash Equivalents And Short Term Investments",
-    )
-    return {"ticker": ticker, "source": "yfinance", "financials": financials}
+
 
 
 # --- get_prices -----------------------------------------------------------

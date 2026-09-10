@@ -13,7 +13,7 @@ Three governing properties (all mechanical, all demoable):
      explicit, labelled residual absorbs only genuine unexplained remainder.
 
   2. DISPATCH BY LINE TYPE. revenue -> price x volume x mix; variable cost ->
-     rate x efficiency; fixed cost -> spending x volume. One engine routes by the
+     rate x efficiency; fixed cost -> spending (amount-only). One engine routes by the
      line's declared type.
 
   3. CONVENTION NAMED, JOINT TERM SURFACED. Decompositions are convention-
@@ -203,15 +203,23 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
     Reconciles to the penny across all products: sum of (price + volume + mix) over
     products + residual == total variance.
     """
-    # §8: the multi-product engine only implements the sequential convention.
-    # Silently ignoring convention='symmetric' would return a different method than
-    # asked. Reject it explicitly instead.
     if convention != "sequential":
         raise NotImplementedError(
             f"convention {convention!r} not supported for multi-product lines — "
             f"symmetric is single-product only")
-    total_b = sum(_c(p["budget"]["price"] * p["budget"]["volume"]) for p in products)
-    total_a = sum(_c(p["actual"]["price"] * p["actual"]["volume"]) for p in products)
+    # #4: the per-unit factor is 'price' for revenue and 'rate' for a variable cost.
+    # Previously this was hardcoded to 'price', so a variable-cost basket with 'rate'
+    # data was not actually supported despite the line_type argument.
+    if line_type == "revenue":
+        fkey = "price"
+    elif line_type == "variable_cost":
+        fkey = "rate"
+    else:
+        raise ValueError(
+            f"decompose_multiproduct supports revenue / variable_cost, got {line_type!r}")
+
+    total_b = sum(_c(p["budget"][fkey] * p["budget"]["volume"]) for p in products)
+    total_a = sum(_c(p["actual"][fkey] * p["actual"]["volume"]) for p in products)
     total = total_a - total_b
 
     bud_total_vol = sum(p["budget"]["volume"] for p in products)
@@ -220,28 +228,25 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
     price_sum = vol_sum = mix_sum = 0
     per_product = []
     for p in products:
-        bp, bv = p["budget"]["price"], p["budget"]["volume"]
-        ap, av = p["actual"]["price"], p["actual"]["volume"]
+        bp, bv = p["budget"][fkey], p["budget"]["volume"]
+        ap, av = p["actual"][fkey], p["actual"]["volume"]
         bud_mix = (bv / bud_total_vol) if bud_total_vol else 0.0
 
-        # price @ actual volume (sequential)
         price_eff = _c((ap - bp) * av)
-        # pure volume: total volume change, this product's budget share, at budget price
         vol_eff = _c((act_total_vol - bud_total_vol) * bud_mix * bp)
-        # mix: (actual volume - what budget-mix would have given at actual total) at budget price
         expected_vol_at_bud_mix = act_total_vol * bud_mix
         mix_eff = _c((av - expected_vol_at_bud_mix) * bp)
 
         price_sum += price_eff
         vol_sum += vol_eff
         mix_sum += mix_eff
-        per_product.append({"product": p["name"], "price_cents": price_eff,
+        per_product.append({"product": p["name"], f"{fkey}_cents": price_eff,
                             "volume_cents": vol_eff, "mix_cents": mix_eff})
 
     explained = price_sum + vol_sum + mix_sum
     residual = total - explained
     drivers = [
-        {"driver": "price", "cents": price_sum},
+        {"driver": fkey, "cents": price_sum},
         {"driver": "volume", "cents": vol_sum},
         {"driver": "mix", "cents": mix_sum},
     ]
