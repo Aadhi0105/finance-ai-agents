@@ -22,9 +22,10 @@ foundation, not stages in a chain. They have different triggers and cadences —
 runs on-demand per ticker, one is scheduled over a watchlist, one reads an event
 universe, one runs at month-end close — and they share tools and conventions
 rather than feeding one another. The clearest proof they are one platform: a single
-significance library is called by all four (covenant drift, event-study CAAR,
-variance materiality, variance persistence), byte-identical whether in-process or
-over the MCP server.
+significance/anomaly tooling is shared across all four — covenant drift and
+event-study CAAR go through the t-test primitives in `tools/significance.py`, while
+variance materiality and persistence reuse the same robust `anomaly_significance_check`
+that Agent 2 uses — byte-identical whether in-process or over the MCP server.
 
 ---
 
@@ -404,9 +405,10 @@ every state store stay local — they don't cross a boundary, and putting them o
 server would be the exact "MCP as decoration" mistake this design avoids. The server
 *wraps* the existing functions rather than reimplementing them, which is what makes
 the two transports provably identical — a full 10-cycle covenant run is
-byte-identical in-process vs. over MCP (`AGENT_STATS_VIA_MCP=1`). **One significance
-library, four unrelated consumers** — covenant drift, event-study CAAR, variance
-materiality, and variance persistence — is the tangible proof that this is one
+byte-identical in-process vs. over MCP (`AGENT_STATS_VIA_MCP=1`). **Shared
+statistical tooling, four unrelated consumers** — covenant drift and event-study
+CAAR share the t-test primitives; variance materiality and persistence reuse the
+same robust anomaly checker Agent 2 uses — is the tangible proof that this is one
 platform, not four scripts.
 
 ---

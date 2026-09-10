@@ -64,8 +64,22 @@ def anomaly_significance_check(values: list[float], min_obs: int = 6,
     else:
         std = statistics.pstdev(history)
         if std == 0:
-            return {"significant": False, "modified_z": 0.0, "median": median,
-                    "reason": "no variation in history", "n_history": len(history),
+            # §19: the history is perfectly flat. If the current value MATCHES that
+            # constant level it is genuinely not anomalous; but if it DIFFERS, it is
+            # a deterministic break from a stable baseline — the most important
+            # controller case (e.g. a €0,€0,€0 line jumping to €500k). Reporting
+            # "not significant" there is exactly backwards.
+            if current == median:
+                return {"significant": False, "modified_z": 0.0, "median": median,
+                        "reason": "current matches a perfectly flat history",
+                        "n_history": len(history), "method": "flat history, no change",
+                        "computed_by": "anomaly_significance_check (python)"}
+            return {"significant": True, "modified_z": None, "median": median,
+                    "current": current,
+                    "inference_status": "zero_dispersion_break",
+                    "reason": "deterministic break from a perfectly flat baseline",
+                    "n_history": len(history),
+                    "method": "flat history, current differs",
                     "computed_by": "anomaly_significance_check (python)"}
         z = (current - median) / std
         method = "z (MAD=0 fallback to std)"

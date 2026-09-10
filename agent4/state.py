@@ -23,7 +23,7 @@ All money in integer cents.
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import duckdb
 
@@ -33,7 +33,7 @@ _DEFAULT_DB = os.path.join("state", "variance.duckdb")
 class VarianceStore:
     def __init__(self, path: str = _DEFAULT_DB):
         self.path = path
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         self.con = duckdb.connect(path)
         self._init_schema()
 
@@ -70,7 +70,7 @@ class VarianceStore:
         if exists:
             raise ValueError(f"budget version '{version}' already exists — "
                              f"re-budgets must use a new version label (nothing overwritten)")
-        ts = datetime.now()
+        ts = datetime.now(timezone.utc)
         self.con.executemany(
             "INSERT INTO budget VALUES (?, ?, ?, ?, ?)",
             [[version, ts, r["line"], r["period"], int(r["amount_cents"])] for r in rows])
@@ -85,7 +85,7 @@ class VarianceStore:
     # --- actuals (append-only; new version on restatement) ------------------
 
     def append_actuals(self, version: str, rows: list[dict]) -> None:
-        ts = datetime.now()
+        ts = datetime.now(timezone.utc)
         self.con.executemany(
             "INSERT INTO actuals VALUES (?, ?, ?, ?, ?)",
             [[version, ts, r["line"], r["period"], int(r["amount_cents"])] for r in rows])
@@ -101,8 +101,13 @@ class VarianceStore:
 
     def record_reforecast(self, close_period: str, rows: list[dict],
                           version: str | None = None) -> str:
-        version = version or f"rf_{close_period}_{datetime.now():%Y%m%d%H%M%S}"
-        ts = datetime.now()
+        ts = datetime.now(timezone.utc)
+        if version is None:
+            import hashlib, json as _json
+            digest = hashlib.sha256(
+                _json.dumps([close_period, ts.isoformat(), rows], sort_keys=True,
+                            default=str).encode()).hexdigest()[:12]
+            version = f"rf_{close_period}_{digest}"
         self.con.executemany(
             "INSERT INTO reforecast VALUES (?, ?, ?, ?, ?, ?)",
             [[version, ts, close_period, r["line"], int(r["landing_cents"]),

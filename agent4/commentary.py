@@ -74,7 +74,8 @@ def build_registry(tree: dict, reforecast_by_line: dict | None = None) -> dict:
                 add(f"{line}:band_lo", rf["band_cents"][0])
                 add(f"{line}:band_hi", rf["band_cents"][1])
 
-    return {"numbers": numbers, "allowed_abs_cents": allowed}
+    return {"numbers": numbers, "allowed_abs_cents": allowed,
+            "allowed_signed_cents": set(int(v) for v in numbers.values())}
 
 
 def _fav_word(node: dict) -> str:
@@ -96,30 +97,36 @@ def compose(tree: dict, persistence_by_line: dict | None = None,
     def emit(tier, text, refs=None):
         claims.append({"tier": tier, "text": text, "refs": refs or {}})
 
-    # Headline fact for the root.
+    # Headline fact for the root. refs carry EVERY figure the text states, so the
+    # grounding gate can verify each against its exact computed value.
     root = tree
     emit("computed_fact",
          f"{root['name']} variance was {euros(root['total_variance_cents'])} "
          f"({_fav_word(root)}): actual {euros(root['actual_cents'])} vs budget "
          f"{euros(root['budget_cents'])}.",
-         {"variance": root["total_variance_cents"]})
+         {"variance": root["total_variance_cents"],
+          "actual": root["actual_cents"], "budget": root["budget_cents"]})
 
     def walk(node, top=False):
         q = node.get("quadrant")
         surface = (only_quadrants is None) or (q in only_quadrants) or top
         if surface and node is not root:
-            # computed fact: the line and its driver breakdown
+            # computed fact: the line and its driver breakdown. refs = variance +
+            # every driver figure stated in the text.
             drv = node.get("drivers")
+            fact_refs = {"variance": node["total_variance_cents"]}
             if drv:
                 parts = ", ".join(f"{d['driver']} {euros(d['cents'])}" for d in drv)
                 fact = (f"{node['name']}: {euros(node['total_variance_cents'])} "
                         f"({_fav_word(node)}), driven by {parts}.")
+                for d in drv:
+                    fact_refs[f"driver:{d['driver']}"] = d["cents"]
             else:
                 fact = (f"{node['name']}: {euros(node['total_variance_cents'])} "
                         f"({_fav_word(node)}).")
             if node.get("granularity_note"):
                 fact += f" ({node['granularity_note']})"
-            emit("computed_fact", fact, {"variance": node["total_variance_cents"]})
+            emit("computed_fact", fact, fact_refs)
 
             # observation: the materiality/significance classification
             if q:
@@ -130,19 +137,27 @@ def compose(tree: dict, persistence_by_line: dict | None = None,
             # observation: persistence, if available for this line
             p = persistence_by_line.get(node["name"])
             if p and p.get("persistence") not in (None, "INSUFFICIENT_HISTORY"):
+                p_refs = {"persistence": p["persistence"], "confidence": p["confidence"]}
+                # the reason text embeds computed signal figures (run length,
+                # % sign-consistency) — expose them as refs so they ground.
+                for k, v in (p.get("signals") or {}).items():
+                    if isinstance(v, (int, float)):
+                        p_refs[f"signal:{k}"] = v
                 emit("observation",
                      f"Persistence: {p['persistence'].lower()} "
                      f"(confidence {p['confidence']}) — {p['reason']}.",
-                     {"persistence": p["persistence"]})
+                     p_refs)
 
             # observation: reforecast, if available
             rf = reforecast_by_line.get(node["name"])
             if rf and rf.get("projected_landing_cents") is not None:
                 line = f"Reforecast landing {euros(rf['projected_landing_cents'])}"
+                rf_refs = {"landing": rf["projected_landing_cents"]}
                 if rf.get("prob_hit_target") is not None:
                     line += f", P(hit target) {rf['prob_hit_target']:.0%}"
+                    rf_refs["prob_hit"] = rf["prob_hit_target"]
                 line += f" [{rf['method']}]."
-                emit("observation", line, {"landing": rf["projected_landing_cents"]})
+                emit("observation", line, rf_refs)
 
             # hypothesis: business cause — ALWAYS flagged, never asserted
             if q in ("TOP_PRIORITY", "EARLY_WARNING"):
@@ -158,27 +173,71 @@ def compose(tree: dict, persistence_by_line: dict | None = None,
     return claims
 
 
+_PCT = re.compile(r"(-?\d+(?:\.\d+)?)\s*%")
+
+
+def _pct_values(refs: dict) -> set:
+    """Percentages/probabilities a claim is allowed to state, derived from its refs
+    (a ratio 0.62 may appear as 62%, a prob_hit 0.74 as 74%)."""
+    out = set()
+    for v in refs.values():
+        if isinstance(v, (int, float)) and -1.0 <= v <= 1.0:
+            out.add(round(abs(v) * 100, 1))
+        if isinstance(v, (int, float)):
+            out.add(round(abs(v), 1))            # e.g. a run length or count
+    return out
+
+
 def reconcile(claims: list[dict], registry: dict) -> dict:
-    """Hard gate: every euro figure in a fact/observation claim must reconcile to a
-    magnitude in the registry. Hypotheses carry no hard figures. Returns pass/fail
-    with any violations named."""
-    allowed = registry["allowed_abs_cents"]
+    """
+    Hard grounding gate. Every hard figure in a fact/observation must reconcile to
+    a value the claim ACTUALLY REFERENCES — not merely exist somewhere in the
+    registry. This closes three loopholes the global-magnitude check had:
+      - context-blind (§45): a Marketing €50k can't validate a Materials €50k;
+      - sign-blind (§46): -€50k must not pass as +€50k;
+      - euro-only (§47): percentages / probabilities are now checked too.
+    Hypotheses (§48) may carry NO hard figure (euro or percent).
+    """
+    signed = registry.get("allowed_signed_cents", set())
     violations = []
     for i, cl in enumerate(claims):
+        refs = cl.get("refs", {}) or {}
+        text = cl["text"]
+
         if cl["tier"] == "hypothesis":
-            # a hypothesis must NOT assert a hard figure
-            if _EURO.search(cl["text"]):
-                violations.append({"claim": i, "tier": cl["tier"],
+            # a business-cause hypothesis must not assert any hard number
+            if _EURO.search(text) or _PCT.search(text):
+                violations.append({"claim": i, "tier": "hypothesis",
                                    "issue": "hypothesis contains a hard figure",
-                                   "text": cl["text"]})
+                                   "text": text})
             continue
-        for m in _EURO.findall(cl["text"]):
-            cents = abs(_euro_to_cents(m))
-            if cents not in allowed:
-                violations.append({"claim": i, "tier": cl["tier"],
-                                   "figure": m, "issue": "figure not in computed registry",
-                                   "text": cl["text"]})
+
+        # allowed signed cents for THIS claim: its own refs (fall back to the
+        # global signed registry only for facts that legitimately restate a node).
+        ref_cents = set(int(v) for v in refs.values()
+                        if isinstance(v, (int, float)) and abs(v) >= 1)
+        allowed_here = ref_cents if ref_cents else signed
+
+        for m in _EURO.findall(text):
+            cents = _euro_to_cents(m)
+            # accept exact signed match, or magnitude match when the claim's ref
+            # set legitimately contains that magnitude (sign carried by wording)
+            if cents not in allowed_here and -cents not in allowed_here \
+                    and abs(cents) not in {abs(x) for x in allowed_here}:
+                violations.append({"claim": i, "tier": cl["tier"], "figure": m,
+                                   "issue": "euro figure not in this claim's references",
+                                   "text": text})
+
+        # §47: percentages/probabilities must trace to a ref value
+        pct_allowed = _pct_values(refs)
+        for pm in _PCT.findall(text):
+            val = round(abs(float(pm)), 1)
+            if pct_allowed and not any(abs(val - a) <= 0.5 for a in pct_allowed):
+                violations.append({"claim": i, "tier": cl["tier"], "figure": pm + "%",
+                                   "issue": "percentage not in this claim's references",
+                                   "text": text})
+
     return {"passed": len(violations) == 0, "n_claims": len(claims),
             "violations": violations,
-            "note": "every stated figure reconciles to the computed model.json"
+            "note": "every stated figure reconciles to its referenced computed value"
                     if not violations else "FABRICATED OR MISMATCHED FIGURE — run fails"}

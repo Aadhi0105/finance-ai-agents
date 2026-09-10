@@ -38,8 +38,18 @@ class ReconciliationError(Exception):
     """Raised when a node's drivers/children do not sum to its total variance."""
 
 
-def _sign_mult(node: dict) -> int:
-    return -1 if node.get("sign") == "subtract" else 1
+def _sign_mult(node: dict, is_root: bool = False) -> int:
+    """§13: signs must be explicit. A typo like 'substract' or a missing sign used
+    to silently become 'add', which could turn Revenue - COGS into Revenue + COGS
+    and still reconcile against the (wrong) tree. Fail closed instead."""
+    s = node.get("sign")
+    if is_root:
+        return 1
+    if s not in ("add", "subtract"):
+        raise ReconciliationError(
+            f"node '{node.get('name','?')}' has invalid or missing sign {s!r} — "
+            f"every non-root node must declare 'add' or 'subtract'")
+    return -1 if s == "subtract" else 1
 
 
 def _rollup(node: dict, sign_toward_profit: int, materiality_base_cents: int,
@@ -117,7 +127,7 @@ def _attach_classification(result: dict, node: dict, base_cents: int,
     cls = classify_variance(
         {"name": result["name"], "total_variance_cents": result["total_variance_cents"],
          "favourable": result["favourable"]},
-        line_budget_cents=result["budget_cents"] or 1,
+        line_budget_cents=result["budget_cents"],
         total_budget_cents=base_cents,
         variance_history_cents=node.get("history"),
         period=node.get("period"), period_history=node.get("period_history"),

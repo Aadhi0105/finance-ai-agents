@@ -18,6 +18,13 @@ from __future__ import annotations
 from agent4.decomposition import euros
 from agent4.commentary import build_registry, compose, reconcile
 
+from xml.sax.saxutils import escape as _xml_escape
+
+
+def _xml(s) -> str:
+    """XML-escape a label for safe injection into SVG text (& < > and quotes)."""
+    return _xml_escape(str(s), {'"': "&quot;", "'": "&apos;"})
+
 _FAV = "#2e7d32"      # favourable (green)
 _ADV = "#c62828"      # adverse (red)
 _ANCHOR = "#455a64"   # budget/actual anchor bars
@@ -96,15 +103,15 @@ def variance_waterfall_svg(tree: dict, width: int = 720, height: int = 360) -> s
                        f'x2="{x:.1f}" y2="{y(start):.1f}" stroke="#bbbbbb" '
                        f'stroke-dasharray="2,2"/>')
             cum = end
-        # label + value
+        # label + value (§53: XML-escape names — e.g. 'R&D' contains '&')
         cx = x + bw / 2
         svg.append(f'<text x="{cx:.1f}" y="{height-pad_b+16:.1f}" text-anchor="middle" '
-                   f'fill="#444">{label}</text>')
+                   f'fill="#444">{_xml(label)}</text>')
         svg.append(f'<text x="{cx:.1f}" y="{height-pad_b+30:.1f}" text-anchor="middle" '
                    f'fill="#777" font-size="9">{euros(val)}</text>')
 
     svg.append(f'<text x="{pad_l}" y="18" fill="#333" font-size="13" '
-               f'font-weight="600">{tree["name"]} variance bridge</text>')
+               f'font-weight="600">{_xml(tree["name"])} variance bridge</text>')
     svg.append('</svg>')
     return "\n".join(svg)
 
@@ -145,6 +152,9 @@ def exception_view(tree: dict, persistence_by_line=None, reforecast_by_line=None
         raise ValueError(f"commentary failed reconciliation: {gate['violations']}")
     rows = []
     _flatten(tree, rows)
-    exceptions = [r for r in rows if r["quadrant"] in ("TOP_PRIORITY", "EARLY_WARNING")]
+    # §54: the exception TABLE now matches the commentary FILTER — a materially
+    # large variance whose significance is not computable (MATERIAL_SIG_NC) also
+    # deserves controller attention, so it appears in both, not just the prose.
+    exceptions = [r for r in rows if r["quadrant"] in _EXCEPTION_QUADRANTS]
     return {"mode": "exception_view", "exceptions": exceptions,
             "commentary": claims, "reconciliation": gate}

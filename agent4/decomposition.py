@@ -71,30 +71,45 @@ def decompose_line(line: dict, convention: str = "sequential") -> dict:
     Returns total variance and the driver breakdown, all in cents, with the
     convention named and the drivers reconciling to the total exactly.
     """
-    lt = line["type"]
+    lt = line.get("type")
+    # §4: validate the line type FIRST — a malformed type carrying amount data must
+    # be rejected, not silently routed into the amount path and treated as a cost.
+    if lt not in ("revenue", "variable_cost", "fixed_cost"):
+        raise ValueError(
+            f"invalid line type {lt!r} for '{line.get('name','?')}' — "
+            f"must be one of revenue / variable_cost / fixed_cost")
+    if convention not in ("sequential", "symmetric"):
+        raise ValueError(f"invalid convention {convention!r} — sequential or symmetric")
     b, a = line["budget"], line["actual"]
 
     # --- lines without unit data: total variance only (granularity-aware) -------
     if "amount" in b or "amount" in a or lt == "fixed_cost":
-        # fixed cost decomposes as spending (rate) x volume only if volume given;
-        # otherwise it's a pure spending variance on the amount.
         return _decompose_amount_line(line)
 
     if lt == "revenue":
         return _decompose_pv(line, price_key="price", convention=convention)
     if lt == "variable_cost":
         return _decompose_pv(line, price_key="rate", convention=convention)
-    raise ValueError(f"unknown line type: {lt}")
+
+
+def _amount_of(side: dict, which: str, name: str) -> int:
+    """Resolve a side's amount, distinguishing MISSING from zero (§5). Uses an
+    explicit amount, else price*volume, else raises — never defaults to 0."""
+    if "amount" in side:
+        return _c(side["amount"])
+    if "price" in side and "volume" in side:
+        return _c(side["price"] * side["volume"])
+    if "rate" in side and "volume" in side:
+        return _c(side["rate"] * side["volume"])
+    raise ValueError(f"missing {which} amount for '{name}' — data error, not zero")
 
 
 def _decompose_amount_line(line: dict) -> dict:
     """A line given only as amounts (fixed cost, or any line lacking unit data):
     report total variance, label the split as not computable — never fabricate."""
     lt = line["type"]
-    b_amt = _c(line["budget"].get("amount",
-               line["budget"].get("price", 0) * line["budget"].get("volume", 0)))
-    a_amt = _c(line["actual"].get("amount",
-               line["actual"].get("price", 0) * line["actual"].get("volume", 0)))
+    b_amt = _amount_of(line["budget"], "budget", line["name"])
+    a_amt = _amount_of(line["actual"], "actual", line["name"])
     total = a_amt - b_amt
     return {
         "name": line["name"], "type": lt, "convention": "none (amount only)",
@@ -188,6 +203,13 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
     Reconciles to the penny across all products: sum of (price + volume + mix) over
     products + residual == total variance.
     """
+    # §8: the multi-product engine only implements the sequential convention.
+    # Silently ignoring convention='symmetric' would return a different method than
+    # asked. Reject it explicitly instead.
+    if convention != "sequential":
+        raise NotImplementedError(
+            f"convention {convention!r} not supported for multi-product lines — "
+            f"symmetric is single-product only")
     total_b = sum(_c(p["budget"]["price"] * p["budget"]["volume"]) for p in products)
     total_a = sum(_c(p["actual"]["price"] * p["actual"]["volume"]) for p in products)
     total = total_a - total_b

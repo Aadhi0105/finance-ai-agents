@@ -91,17 +91,49 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
                total_periods: int, *, budget_phasing_cents=None,
                variance_history_cents=None, actual_history_cents=None,
                direction: str = "higher_is_better", target_cents: int | None = None,
-               name: str = "line") -> dict:
+               name: str = "line", persistence: str | None = None) -> dict:
     """
     Project the full-year landing and P(hit target). direction is
     'higher_is_better' (revenue) or 'lower_is_better' (cost). target defaults to
     the full-year budget.
+
+    §26 — persistence-aware: the one-off/structural classification MECHANICALLY
+    shapes the landing, so the README claim "a one-off spike isn't extrapolated"
+    is actually true:
+      - ONE_OFF     -> the YTD variance is NOT carried forward; remaining periods
+                       are assumed to revert to the phased plan.
+      - STRUCTURAL  -> the shift IS carried (the default projection already does).
+      - AMBIGUOUS   -> landing kept, but the uncertainty band is widened.
     """
+    # input validation (§31): reject nonsensical period/direction inputs early.
+    if total_periods <= 0 or elapsed_periods < 0 or elapsed_periods > total_periods:
+        return {"name": name, "error": (
+            f"invalid periods: elapsed={elapsed_periods}, total={total_periods}"),
+            "computed_by": "reforecast (python)"}
+    if direction not in ("higher_is_better", "lower_is_better"):
+        return {"name": name, "error": f"invalid direction: {direction!r}",
+                "computed_by": "reforecast (python)"}
+
     target = target_cents if target_cents is not None else full_year_budget_cents
     remaining = total_periods - elapsed_periods
     method, landing, note = _project(ytd_cents, full_year_budget_cents,
                                      elapsed_periods, total_periods,
                                      budget_phasing_cents, actual_history_cents)
+
+    # --- §26: persistence adjustment ---------------------------------------
+    persistence_effect = None
+    if persistence == "ONE_OFF" and remaining > 0 and budget_phasing_cents \
+            and len(budget_phasing_cents) == total_periods:
+        # Do not extrapolate a one-off: the YTD stands, but remaining periods are
+        # assumed on-plan (the phased budget), rather than scaled by the (spike-
+        # distorted) YTD performance ratio.
+        remaining_budget = sum(budget_phasing_cents[elapsed_periods:])
+        one_off_landing = ytd_cents + remaining_budget
+        persistence_effect = {"classification": "ONE_OFF",
+                              "raw_landing_cents": landing,
+                              "adjustment": "remaining periods assumed on-plan (spike not carried)"}
+        landing = one_off_landing
+        method = f"{method} + one-off normalization (§26)"
 
     result = {
         "name": name, "method": method, "method_note": note,
@@ -109,6 +141,8 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
         "total_periods": total_periods, "remaining_periods": remaining,
         "projected_landing_cents": landing,
         "target_cents": target, "direction": direction,
+        "persistence": persistence,
+        "persistence_effect": persistence_effect,
         "computed_by": "reforecast (python, integer cents)",
     }
 
@@ -125,14 +159,28 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
 
     sigma_period = statistics.pstdev(hist) if len(hist) > 1 else 0.0
     sigma_landing = sigma_period * math.sqrt(remaining) if remaining > 0 else 0.0
+    # §26: an AMBIGUOUS persistence classification means we're unsure whether the
+    # variance carries — widen the band to reflect that model uncertainty.
+    if persistence == "AMBIGUOUS":
+        sigma_landing *= 1.5
 
-    if sigma_landing == 0:
-        # year complete (or zero dispersion): deterministic
+    if remaining == 0:
+        # §30: genuinely deterministic — no horizon left.
         hit = (landing >= target) if direction == "higher_is_better" else (landing <= target)
         result.update({
             "band_cents": [landing, landing], "sigma_landing_cents": 0,
             "prob_hit_target": 1.0 if hit else 0.0,
-            "confidence": "deterministic (no remaining horizon / zero dispersion)",
+            "confidence": "deterministic (no remaining horizon)",
+        })
+        return result
+    if sigma_landing == 0:
+        # §30: remaining periods exist but historical dispersion is zero (often a
+        # flat/degenerate fixture). This is NOT certainty about the future — report
+        # a point landing with no probability rather than a false 0%/100%.
+        result.update({
+            "band_cents": None, "sigma_landing_cents": 0,
+            "prob_hit_target": None,
+            "confidence": "not computable (zero historical dispersion, horizon remaining)",
         })
         return result
 
