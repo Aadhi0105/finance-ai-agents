@@ -115,6 +115,26 @@ def _financials_yfinance(ticker: str) -> dict:
         if ocf is not None and capex is not None:
             fcf = ocf + capex  # capex is reported negative, so add
 
+    financials["free_cash_flow"] = fcf
+    financials["total_debt"] = _row(bs, "Total Debt")
+    financials["cash_and_equivalents"] = _row(
+        bs, "Cash And Cash Equivalents",
+        "Cash Cash Equivalents And Short Term Investments",
+        "Cash And Cash Equivalents And Short Term Investments",
+    )
+
+    # --- FCFF (unlevered) inputs: EBIT(1-T) + D&A - CapEx - dNWC ---
+    # Row labels verified against live yfinance income/cash-flow statements.
+    financials["ebit"] = _row(fin, "EBIT") or financials.get("operating_income")
+    financials["depreciation_amortization"] = (
+        _row(cf, "Depreciation And Amortization", "Depreciation Amortization Depletion")
+        or _row(fin, "Reconciled Depreciation"))
+    financials["capex"] = _row(cf, "Capital Expenditure", "Capital Expenditures")
+    financials["tax_provision"] = _row(fin, "Tax Provision", "Income Tax Expense")
+    financials["pretax_income"] = _row(fin, "Pretax Income", "Income Before Tax")
+    financials["change_in_working_capital"] = _row(cf, "Change In Working Capital")
+    return {"ticker": ticker, "source": "yfinance", "financials": financials}
+
 
 
 

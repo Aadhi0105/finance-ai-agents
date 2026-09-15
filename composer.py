@@ -47,7 +47,18 @@ def _sma(values: list[float], window: int) -> list:
 
 
 def _daily_returns(closes: list[float]) -> list:
-    return [None] + [(closes[i] / closes[i - 1] - 1) for i in range(1, len(closes))]
+    import math
+    out = [None]
+    for i in range(1, len(closes)):
+        prev, cur = closes[i - 1], closes[i]
+        if prev in (None, 0) or cur is None:
+            out.append(None); continue
+        try:
+            r = cur / prev - 1
+            out.append(r if math.isfinite(r) else None)
+        except (ZeroDivisionError, TypeError):
+            out.append(None)
+    return out
 
 
 def _rolling_vol(closes: list[float], window: int = 30) -> list:
@@ -56,8 +67,15 @@ def _rolling_vol(closes: list[float], window: int = 30) -> list:
     rets = _daily_returns(closes)
     out = []
     for i in range(len(rets)):
-        w = [r for r in rets[max(0, i - window + 1): i + 1] if r is not None]
-        out.append(statistics.pstdev(w) * math.sqrt(252) if len(w) >= window else None)
+        w = [r for r in rets[max(0, i - window + 1): i + 1]
+             if r is not None and math.isfinite(r)]
+        if len(w) >= window:
+            try:
+                out.append(statistics.pstdev(w) * math.sqrt(252))
+            except statistics.StatisticsError:
+                out.append(None)
+        else:
+            out.append(None)
     return out
 
 
@@ -204,10 +222,15 @@ def render_peer_scatter_png(peer: dict, ticker: str) -> bytes:
 
 def render_vol_drawdown_png(history: list[dict], ticker: str) -> bytes:
     """Chart 3: rolling annualised volatility (top) and drawdown (bottom)."""
+    import math as _m
     if not history:
         return _placeholder_png(ticker, "volatility & drawdown", "no price history")
-    dates = [row["date"] for row in history]
-    closes = [row["close"] for row in history]
+    clean = [r for r in history if r.get("close") is not None
+             and isinstance(r["close"], (int, float)) and _m.isfinite(r["close"]) and r["close"] > 0]
+    if len(clean) < 2:
+        return _placeholder_png(ticker, "volatility & drawdown", "insufficient clean price data")
+    dates = [r["date"] for r in clean]
+    closes = [r["close"] for r in clean]
     vol = _rolling_vol(closes, 30)
     dd = _drawdown(closes)
 

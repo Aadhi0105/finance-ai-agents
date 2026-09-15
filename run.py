@@ -50,6 +50,18 @@ SYSTEM = (
     "A sensible order: fetch financials and prices, compute ratios, run a DCF, check "
     "peers, establish a comparison basis (consensus or history), then write a note "
     "stating a view, the evidence, the basis used, and what would change it."
+    "\n\n"
+    "CRITICAL — grounding the written note: state ONLY numeric figures that appear "
+    "verbatim in a tool result, and cite them precisely — same digits AND same "
+    "SIGN (a terminal growth of +2.5% is +2.5%, never -2.5%; do not flip the sign "
+    "of any rate when describing a fade path). Do "
+    "NOT compute, derive, or estimate any new number in the note — not growth rates, "
+    "not implied multiples, not margin projections. If you want a quantitative "
+    "comparison the tools did not compute (e.g. consensus-implied growth vs the "
+    "historical CAGR), express it QUALITATIVELY ('consensus implies materially faster "
+    "growth than the company's own ~15.6% historical CAGR') rather than inventing a "
+    "second percentage. Every number in the note is checked against the tool outputs "
+    "and the note is rejected if any figure was not computed by a tool."
 )
 
 # For offline peer-outlier demo, these peers have fixtures in fixtures/.
