@@ -127,6 +127,24 @@ def _build_registry() -> dict:
             },
             analytical.peer_outlier_check,
         ),
+        "compute_derived": (
+            {
+                "name": "compute_derived",
+                "description": "Compute named derived comparison figures "
+                               "deterministically so you can CITE them instead of "
+                               "computing them yourself: consensus-implied revenue "
+                               "growth, the DCF valuation gap, and consensus-implied "
+                               "growth vs the historical CAGR. Call this for ANY "
+                               "quantitative comparison. Needs get_consensus / run_dcf "
+                               "/ get_historical_trend to have run first.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {"ticker": {"type": "string"}},
+                    "required": ["ticker"],
+                },
+            },
+            analytical.compute_derived,
+        ),
     }
 
 

@@ -438,3 +438,74 @@ def peer_outlier_check(tool_input: dict, state=None) -> dict:
         "caveat": "peer selection is an analyst input; robust stats still noisy below ~5 peers",
         "computed_by": "peer_outlier_check (python, median/MAD primary)",
     }
+
+
+# --- compute_derived ------------------------------------------------------
+
+def compute_derived(tool_input: dict, state=None) -> dict:
+    """
+    Compute a FIXED MENU of named derived comparison figures — deterministically —
+    so the written note can CITE them (grounded) instead of computing them in the
+    model's head. Narrow by design: every metric is a named, hand-verified formula,
+    not a general "compute any ratio" interface (which would ground an arbitrary,
+    possibly-wrong, model-chosen formula and defeat the auditability guarantee).
+
+    Metrics (each returned only when its inputs are available):
+      - consensus_implied_revenue_growth : (+1y / 0y - 1) from consensus revenue
+        estimates — what analysts imply for next-year growth.
+      - valuation_gap : the DCF's implied upside/downside vs price (surfaces
+        run_dcf's own implied_upside so the note cites it, not a re-derivation).
+      - growth_vs_history : consensus-implied growth MINUS the company's historical
+        revenue CAGR — the exact comparison the model reaches for.
+
+    The LLM decides WHICH comparison to make; Python computes the number. Every
+    output lands in the run record and grounds against the note.
+    """
+    ticker = tool_input["ticker"].upper()
+    if state is not None and state.ticker and ticker != state.ticker.upper():
+        return {"error": f"ticker mismatch: run is for '{state.ticker}', "
+                         f"compute_derived requested '{ticker}'", "ticker": ticker}
+
+    out = {"ticker": ticker, "computed_by": "compute_derived (python)"}
+    metrics = {}
+
+    # consensus-implied next-year revenue growth
+    cons, _ = _upstream(state, "get_consensus", ticker)
+    implied_growth = None
+    if cons and cons.get("available") and cons.get("consensus"):
+        rev = cons["consensus"].get("revenue_estimate_avg", {}) or {}
+        y0, y1 = rev.get("0y"), rev.get("+1y")
+        if y0 not in (None, 0) and y1 is not None:
+            implied_growth = round(y1 / y0 - 1, 4)
+            metrics["consensus_implied_revenue_growth"] = {
+                "value": implied_growth, "as_pct": round(implied_growth * 100, 1),
+                "basis": "consensus revenue_estimate_avg: (+1y / 0y) - 1",
+                "inputs": {"revenue_0y": y0, "revenue_1y": y1}}
+
+    # valuation gap (surface the DCF's implied_upside for citation)
+    dcf, _ = _upstream(state, "run_dcf", ticker)
+    if dcf and dcf.get("implied_upside") is not None:
+        up = dcf["implied_upside"]
+        metrics["valuation_gap"] = {
+            "value": up, "as_pct": round(up * 100, 1),
+            "basis": "run_dcf scenario-weighted value vs current price",
+            "direction": "upside" if up > 0 else "downside"}
+
+    # consensus-implied growth vs the company's own historical CAGR
+    trend, _ = _upstream(state, "get_historical_trend", ticker)
+    hist_cagr = trend.get("revenue_cagr") if trend else None
+    if implied_growth is not None and hist_cagr is not None:
+        delta = round(implied_growth - hist_cagr, 4)
+        metrics["growth_vs_history"] = {
+            "value": delta, "as_pct": round(delta * 100, 1),
+            "consensus_implied_growth": implied_growth,
+            "historical_cagr": hist_cagr,
+            "basis": "consensus-implied next-year growth MINUS historical revenue CAGR",
+            "reading": ("consensus implies faster growth than history" if delta > 0
+                        else "consensus implies slower growth than history")}
+
+    if not metrics:
+        return {**out, "metrics": {}, "note": "no derived metrics computable "
+                "(need consensus and/or a completed DCF / historical trend first)"}
+    out["metrics"] = metrics
+    return out
