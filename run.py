@@ -40,10 +40,6 @@ SYSTEM = (
     "compute_ratios (margins, growth, and — once prices are fetched — P/E and EV/EBIT), "
     "run_dcf (scenario-weighted valuation, needs financials + prices), "
     "peer_outlier_check (is the P/E an outlier vs peers you supply), "
-    "compute_derived (named comparison figures — implied growth, valuation gap, "
-    "growth-vs-history — computed for you to cite), "
-    "compute_derived (named comparison figures — implied growth, valuation gap, "
-    "growth-vs-history — computed for you so you can cite them), "
     "get_consensus (forward analyst estimates), get_historical_trend (the company's "
     "own multi-year trajectory).\n\n"
     "IMPORTANT — comparison basis: call get_consensus to anchor your growth/valuation "
@@ -56,17 +52,14 @@ SYSTEM = (
     "stating a view, the evidence, the basis used, and what would change it."
     "\n\n"
     "CRITICAL — grounding the written note: state ONLY numeric figures that appear "
-    "verbatim in a tool result, and cite them precisely — same digits AND same "
-    "SIGN (a terminal growth of +2.5% is +2.5%, never -2.5%; do not flip the sign "
-    "of any rate when describing a fade path). Do "
+    "verbatim in a tool result, and cite them precisely (write 15.6%, not ~16%). Do "
     "NOT compute, derive, or estimate any new number in the note — not growth rates, "
     "not implied multiples, not margin projections. If you want a quantitative "
-    "comparison — consensus-implied growth, the valuation gap, growth vs the historical "
-    "CAGR — call compute_derived and cite ITS output. Do NOT compute the comparison "
-    "in your head. If a figure you want is neither in a tool output nor obtainable "
-    "from compute_derived, state it QUALITATIVELY rather than inventing a number. "
-    "Every number in the note is checked against the tool outputs and the note is "
-    "rejected if any figure was not computed by a tool."
+    "comparison the tools did not compute (e.g. consensus-implied growth vs the "
+    "historical CAGR), express it QUALITATIVELY ('consensus implies materially faster "
+    "growth than the company's own ~15.6% historical CAGR') rather than inventing a "
+    "second percentage. Every number in the note is checked against the tool outputs "
+    "and the note is rejected if any figure was not computed by a tool."
 )
 
 # For offline peer-outlier demo, these peers have fixtures in fixtures/.
@@ -106,7 +99,6 @@ def build_offline_script(ticker: str):
         call("t4", "peer_outlier_check", {"ticker": ticker, "peers": _OFFLINE_PEERS}),
         call("t5", "get_consensus", {"ticker": ticker}),          # returns available=false
         call("t6", "get_historical_trend", {"ticker": ticker}),   # <- the branch decision
-        call("t7", "compute_derived", {"ticker": ticker}),
         final,
     ]
 
@@ -157,7 +149,7 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = os.path.join("output", f"{ticker}_{stamp}")
 
-    model_id = os.environ.get("AGENT_MODEL", "claude-sonnet-5") if mode == "live" else "StubModel"
+    model_id = os.environ.get("AGENT_MODEL", "claude-sonnet-4-5-20250929") if mode == "live" else "StubModel"
     fin = (state.results.get("get_financials") or {}).get("financials", {}) or {}
     currency = fin.get("currency") or (state.results.get("get_prices") or {}).get("currency")
 

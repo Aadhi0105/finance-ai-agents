@@ -95,14 +95,20 @@ class AnthropicModel(ModelClient):
         # Model string is read from AGENT_MODEL so you never hardcode a value
         # that goes stale on the next release. Confirm the exact string your key
         # can call with:  curl https://api.anthropic.com/v1/models -H "x-api-key: $ANTHROPIC_API_KEY" -H "anthropic-version: 2023-06-01"
-        self.model = model or os.environ.get("AGENT_MODEL", "claude-sonnet-5")
+        # Default to a proven non-thinking model. A thinking/reasoning model returns
+        # ThinkingBlocks this loop is not built to carry across turns, which stalls
+        # the tool cycle. Override AGENT_MODEL only for a text+tool_use model.
+        self.model = model or os.environ.get("AGENT_MODEL", "claude-sonnet-4-5-20250929")
         self.max_tokens = max_tokens
         self._client = None
 
     def _lazy_client(self):
         if self._client is None:
             import anthropic  # lazy: only needed on the live path
-            self._client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+            # 60s timeout: a bad model / network stall FAILS FAST with a clear error
+            # instead of hanging silently.
+            self._client = anthropic.Anthropic(
+                api_key=os.environ["ANTHROPIC_API_KEY"], timeout=60.0)
         return self._client
 
     def respond(self, system: str, messages: list, tools: list) -> ModelResponse:
@@ -123,4 +129,11 @@ class AnthropicModel(ModelClient):
                 blocks.append(ToolUseBlock(id=b.id, name=b.name, input=dict(b.input)))
             elif b.type == "text":
                 blocks.append(TextBlock(text=b.text))
+            # other block types (e.g. 'thinking') are intentionally skipped; this
+            # loop is designed for a text+tool_use model (see AGENT_MODEL note).
+        if not blocks and resp.content:
+            kinds = sorted({getattr(b, "type", "?") for b in resp.content})
+            raise RuntimeError(
+                f"model returned only unsupported block types {kinds} (a thinking "
+                f"model?); set AGENT_MODEL to a text+tool_use model.")
         return ModelResponse(stop_reason=resp.stop_reason, content=blocks)

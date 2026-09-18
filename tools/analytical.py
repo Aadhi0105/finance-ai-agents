@@ -242,7 +242,7 @@ def run_dcf(tool_input: dict, state=None) -> dict:
     if param_error:
         return {"error": f"run_dcf invalid parameters: {param_error}", "ticker": ticker}
 
-    ev, tvc = {}, {}
+    ev, tvc, scen_growth = {}, {}, {}
     for scen, delta in (("bear", a["bear_delta"]), ("base", a["base_delta"]), ("bull", a["bull_delta"])):
         scen_hg = hg + delta
         # each scenario's high_growth must also stay sane
@@ -250,6 +250,7 @@ def run_dcf(tool_input: dict, state=None) -> dict:
             return {"error": f"run_dcf: {scen} high_growth {scen_hg} <= -1", "ticker": ticker}
         e, c = _two_stage_ev(fcf0, scen_hg, tg, r, n)
         ev[scen], tvc[scen] = e, c
+        scen_growth[scen] = round(scen_hg, 4)
 
     # Net-debt bridge: COMPLETE only when BOTH sides are known. A missing side is
     # NOT treated as zero (that would silently overstate/understate equity).
@@ -313,6 +314,9 @@ def run_dcf(tool_input: dict, state=None) -> dict:
             "model": "two-stage: linear growth fade over horizon, then Gordon terminal",
             "high_growth": hg, "terminal_growth": tg, "horizon_years": n, "discount_rate": r,
             "scenario_deltas": {"bear": a["bear_delta"], "base": a["base_delta"], "bull": a["bull_delta"]},
+            # per-scenario high-growth rates (base + delta) — first-class so a note
+            # citing "16% bull-case growth" grounds against a genuinely computed value.
+            "scenario_high_growth": scen_growth,
             "weights": w,
             "weight_basis": "analyst-assigned scenario weights; not empirically estimated probabilities",
             "net_debt": net_debt,
