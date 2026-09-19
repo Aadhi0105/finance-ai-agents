@@ -53,7 +53,7 @@ def test_grounding_catches_flipped_sign():
     claims = compose(tree, persistence_by_line=persistence)
     tampered = [dict(c) for c in claims]
     tampered[0] = dict(tampered[0])
-    tampered[0]["text"] = tampered[0]["text"].replace("-€17,240.00", "+€17,240.00")
+    tampered[0]["text"] = tampered[0]["text"].replace("-€17,840.00", "+€17,840.00")
     assert reconcile(tampered, reg)["passed"] is False
 
 
