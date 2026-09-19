@@ -60,3 +60,14 @@ def test_grounds_against_earlier_call_output():
     note = "The initial spec yielded EUR205.00; revised assumptions gave EUR220.00."
     r = ground_note(note, grounded_from_calls)
     assert r["passed"] is True
+
+
+def test_percentage_rounding_grounds_but_fabrication_fails():
+    """Option A: a note may round a real % (15% for a computed 15.55%) and ground,
+    but a genuinely fabricated % (>5% off any real value) still fails."""
+    results = {"get_historical_trend": {"revenue_cagr": 0.1555}}
+    # legitimate rounding grounds
+    assert ground_note("Historical CAGR ~15%.", results)["passed"] is True
+    assert ground_note("CAGR around 16%.", results)["passed"] is True
+    # fabrication still caught
+    assert ground_note("Growth of 25%.", results)["passed"] is False

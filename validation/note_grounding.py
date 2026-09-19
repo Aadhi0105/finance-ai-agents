@@ -30,7 +30,10 @@ _CUR = re.compile(r"[\u20ac$\u00a3]\s*(-?\d[\d,]*(?:\.\d+)?)\s*(bn|billion|m|mil
 _BARE = re.compile(r"(?<![\w.$\u20ac\u00a3])(-?\d[\d,]*(?:\.\d+)?)(?![%x\u00d7\w])")
 
 _MULT_SUFFIX = {"bn": 1e9, "billion": 1e9, "m": 1e6, "million": 1e6, "k": 1e3}
-_TOL = 0.02   # 2% relative tolerance (note rounding vs full-precision compute)
+_TOL = 0.02       # relative tolerance for currency / multiples (kept tight)
+_PCT_TOL = 0.05   # wider for PERCENTAGES: a note may write "15%" for a computed
+                  # 15.55% (human rounding). Still catches real fabrication, which
+                  # in every observed case was >5% off the true value.
 
 
 def _walk_numbers(obj):
@@ -67,9 +70,11 @@ def build_number_registry(results: dict):
     return signed, allowed
 
 
-def _matches(value: float, has_sign: bool, signed: set, allowed: set) -> bool:
+def _matches(value: float, has_sign: bool, signed: set, allowed: set,
+             tol: float = _TOL) -> bool:
     """An explicitly-signed figure must match the SIGNED registry; an unsigned one
-    may match the ABS registry (direction carried by prose wording)."""
+    may match the ABS registry (direction carried by prose wording). `tol` is the
+    relative tolerance — wider for percentages (see _PCT_TOL)."""
     target = signed if has_sign else allowed
     v = value if has_sign else abs(value)
     for a in target:
@@ -77,27 +82,27 @@ def _matches(value: float, has_sign: bool, signed: set, allowed: set) -> bool:
             if v == 0:
                 return True
             continue
-        if abs(v - a) / abs(a) <= _TOL:
+        if abs(v - a) / abs(a) <= tol:
             return True
     return False
 
 
 def _extract_figures(note: str):
-    """Yield (text, value, has_explicit_sign) for each financial figure."""
+    """Yield (text, value, has_explicit_sign, kind) for each financial figure.
+    kind is "pct" for percentages (wider tolerance) or "other" (tight)."""
     for m in _PCT.finditer(note):
         raw = m.group(1)
-        yield m.group(0), float(raw), raw.strip().startswith(("+", "-"))
+        yield m.group(0), float(raw), raw.strip().startswith(("+", "-")), "pct"
     for m in _MULT.finditer(note):
         raw = m.group(1)
-        yield m.group(0), float(raw), raw.strip().startswith(("+", "-"))
+        yield m.group(0), float(raw), raw.strip().startswith(("+", "-")), "other"
     for m in _CUR.finditer(note):
         raw = m.group(1).replace(",", "")
-        # currency sign may sit before the symbol; check the whole match text
         has_sign = m.group(0).strip().startswith(("+", "-"))
         val = float(raw)
         if has_sign and m.group(0).strip().startswith("-"):
             val = -val
-        yield m.group(0), val, has_sign
+        yield m.group(0), val, has_sign, "other"
 
 
 def ground_note(note: str, results: dict) -> dict:
@@ -106,9 +111,10 @@ def ground_note(note: str, results: dict) -> dict:
     signed, allowed = build_number_registry(results)
     unmatched = []
     checked = 0
-    for text, value, has_sign in _extract_figures(note or ""):
+    for text, value, has_sign, kind in _extract_figures(note or ""):
         checked += 1
-        if not _matches(value, has_sign, signed, allowed):
+        tol = _PCT_TOL if kind == "pct" else _TOL
+        if not _matches(value, has_sign, signed, allowed, tol):
             unmatched.append({"figure": text, "value": value})
     return {
         "passed": len(unmatched) == 0,
