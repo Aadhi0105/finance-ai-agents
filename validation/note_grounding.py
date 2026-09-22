@@ -98,11 +98,20 @@ def _extract_figures(note: str):
         yield m.group(0), float(raw), raw.strip().startswith(("+", "-")), "other"
     for m in _CUR.finditer(note):
         raw = m.group(1).replace(",", "")
+        suffix = (m.group(2) or "").lower()
         has_sign = m.group(0).strip().startswith(("+", "-"))
         val = float(raw)
+        # apply bn/m/k scaling: "€1.3 billion" -> 1.3e9 (was previously read as 1.3)
+        if suffix in _MULT_SUFFIX:
+            val *= _MULT_SUFFIX[suffix]
         if has_sign and m.group(0).strip().startswith("-"):
             val = -val
-        yield m.group(0), val, has_sign, "other"
+        # A WORD-FORM currency figure ("€1.3 billion") is expected to be rounded, so
+        # it gets the wider rounding tolerance — same principle as percentages.
+        # An EXACT amount ("€1,258,000,000" / "€501.36") stays tight: precision is
+        # expected there and loose rounding would be suspicious.
+        kind = "round" if suffix in _MULT_SUFFIX else "other"
+        yield m.group(0), val, has_sign, kind
 
 
 def ground_note(note: str, results: dict) -> dict:
@@ -113,7 +122,7 @@ def ground_note(note: str, results: dict) -> dict:
     checked = 0
     for text, value, has_sign, kind in _extract_figures(note or ""):
         checked += 1
-        tol = _PCT_TOL if kind == "pct" else _TOL
+        tol = _PCT_TOL if kind in ("pct", "round") else _TOL
         if not _matches(value, has_sign, signed, allowed, tol):
             unmatched.append({"figure": text, "value": value})
     return {

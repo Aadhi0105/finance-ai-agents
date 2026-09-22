@@ -71,3 +71,11 @@ def test_percentage_rounding_grounds_but_fabrication_fails():
     assert ground_note("CAGR around 16%.", results)["passed"] is True
     # fabrication still caught
     assert ground_note("Growth of 25%.", results)["passed"] is False
+
+
+def test_word_form_currency_rounding_grounds():
+    """Word-form currency ('€1.3 billion' for a computed €1.258bn) grounds — it's
+    normal analyst rounding — but exact amounts stay tight and fabrication fails."""
+    results = {"run_dcf": {"assumptions": {"net_debt": 1258000000}}}
+    assert ground_note("Net debt of €1.3 billion.", results)["passed"] is True
+    assert ground_note("Net debt €2.5 billion.", results)["passed"] is False
