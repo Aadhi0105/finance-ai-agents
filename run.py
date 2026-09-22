@@ -189,15 +189,22 @@ def run_offline(ticker: str = "ASML.AS") -> None:
     _emit_artifacts(ticker, "offline", final, state)
 
 
-def run_live(ticker: str) -> None:
+def run_live(ticker: str, peers: list[str] | None = None) -> None:
     os.environ["AGENT_DATA_SOURCE"] = "yfinance"
     if "ANTHROPIC_API_KEY" not in os.environ:
         sys.exit("Set ANTHROPIC_API_KEY (e.g. in .env) for --live mode.")
     state = RunState(ticker=ticker)
     registry = ToolRegistry(state)
     model = AnthropicModel()
+    goal = f"Produce a defensible fundamental view on {ticker}."
+    if peers:
+        # Pinned peer set: the model MUST use exactly these for peer_outlier_check
+        # (curated comparables) rather than proposing its own, which can be
+        # economically mismatched (e.g. carmakers for a rail manufacturer).
+        goal += (f" For peer_outlier_check, you MUST use exactly this peer set and "
+                 f"propose no others: {', '.join(peers)}.")
     final = run_agent(model=model, registry=registry, state=state,
-                      system=SYSTEM, goal=f"Produce a defensible fundamental view on {ticker}.")
+                      system=SYSTEM, goal=goal)
     state.print_trace()
     print("FINAL ANSWER:\n" + final)
     _emit_artifacts(ticker, "live", final, state)
@@ -214,7 +221,10 @@ def rebuild(model_json_path: str) -> None:
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "--live":
         tkr = sys.argv[2] if len(sys.argv) >= 3 else "ASML.AS"
-        run_live(tkr)
+        peers = None
+        if "--peers" in sys.argv:
+            peers = sys.argv[sys.argv.index("--peers") + 1:]
+        run_live(tkr, peers=peers)
     elif len(sys.argv) >= 2 and sys.argv[1] == "--rebuild":
         if len(sys.argv) < 3:
             sys.exit("Usage: python run.py --rebuild output/<TICKER>_<stamp>/model.json")
