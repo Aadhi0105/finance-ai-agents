@@ -1,51 +1,90 @@
-"""
-Working memory for one agent run.
-
-Component #4 in the spec (§3.1): accumulates fetched data + intermediate
-computations across loop iterations so later steps can see earlier ones. It is
-deliberately dumb — a keyed store plus an append-only trace — because the
-intelligence lives in the model and the determinism lives in the tools. State
-just remembers.
-"""
-
+"""Run state with detached audit snapshots and dependency invalidation."""
 from __future__ import annotations
 
-import time
-from dataclasses import dataclass, field
+from copy import deepcopy
+from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
 from typing import Any
+
+DEPENDENCIES = {
+    'compute_ratios': ('get_financials', 'get_prices'),
+    'run_dcf': ('get_financials', 'get_prices'),
+    'peer_outlier_check': ('get_financials', 'get_prices'),
+    'compute_derived': ('get_consensus', 'run_dcf', 'get_historical_trend'),
+}
+
+
+def utc_now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+@dataclass(frozen=True)
+class RunOutcome:
+    status: str  # completed, incomplete, failed
+    text: str = ''
+    reason: str = ''
+    iterations: int = 0
 
 
 @dataclass
 class RunState:
     ticker: str
-    # Latest result per tool name — for easy dependency lookup (last write wins here,
-    # deliberately: a dependent tool wants the most recent inputs).
     results: dict[str, Any] = field(default_factory=dict)
-    # Append-only record of EVERY tool call, so the audit trail loses nothing even
-    # when a tool is called twice (e.g. run_dcf at two discount rates). This is what
-    # makes the "model.json contains every computed number" claim actually true.
-    calls: list[dict] = field(default_factory=list)
-    # Human-readable, append-only narrative, in order.
+    _calls: list[dict] = field(default_factory=list, repr=False)
     trace: list[str] = field(default_factory=list)
+    configuration: dict = field(default_factory=dict)
+    conversation: list = field(default_factory=list)
+    model_turns: list = field(default_factory=list)
+    in_flight: dict | None = None
+    started_at: str = field(default_factory=utc_now)
+    finished_at: str | None = None
+    outcome: RunOutcome | None = None
+    invalidations: list = field(default_factory=list)
 
-    def record_tool(self, name: str, tool_input: dict, output: Any,
-                    duration_ms: float | None = None) -> None:
-        self.results[name] = output
-        self.calls.append({
-            "call_index": len(self.calls),
-            "tool": name,
-            "input": tool_input,
-            "output": output,
-            "duration_ms": duration_ms,
-            "status": "error" if isinstance(output, dict) and output.get("error") else "success",
-        })
-        self.trace.append(f"TOOL  {name}({tool_input}) -> {output!r}")
+    @property
+    def calls(self):
+        # Consumers may inspect/serialize, but cannot mutate the stored audit trail.
+        return deepcopy(self._calls)
 
-    def record_note(self, text: str) -> None:
-        self.trace.append(f"NOTE  {text}")
+    def record_tool(self, name: str, tool_input: Any, output: Any,
+                    duration_ms: float | None = None, tool_use_id: str | None = None):
+        changed = {name}
+        while True:
+            affected = {tool for tool, deps in DEPENDENCIES.items() if changed.intersection(deps)}
+            if affected <= changed:
+                break
+            changed |= affected
+        removed = sorted(k for k in changed - {name} if k in self.results)
+        for key in removed:
+            del self.results[key]
+        if removed:
+            self.invalidations.append({'after_call': len(self._calls), 'trigger': name, 'removed': removed})
+        self.results[name] = deepcopy(output)
+        status = 'error' if isinstance(output, dict) and output.get('error') else 'success'
+        self._calls.append({'call_index': len(self._calls), 'tool': name,
+                            'input': deepcopy(tool_input), 'output': deepcopy(output),
+                            'duration_ms': duration_ms, 'tool_use_id': tool_use_id,
+                            'recorded_at': utc_now(), 'status': status})
+        self.record_note(f'tool {name}: {status}')
 
-    def print_trace(self) -> None:
-        print("\n----- RUN TRACE -----")
-        for line in self.trace:
-            print(line)
-        print("----- END TRACE -----\n")
+    def finish(self, status, text='', reason='', iterations=0):
+        self.outcome = RunOutcome(status, text, reason, iterations)
+        self.finished_at = utc_now()
+        self.in_flight = None
+        return self.outcome
+
+    def execution_record(self):
+        return deepcopy({'status': self.outcome.status if self.outcome else 'running',
+                         'outcome': asdict(self.outcome) if self.outcome else None,
+                         'started_at': self.started_at, 'finished_at': self.finished_at,
+                         'configuration': self.configuration, 'conversation': self.conversation,
+                         'model_turns': self.model_turns, 'in_flight': self.in_flight,
+                         'invalidations': self.invalidations, 'trace': self.trace})
+
+    def record_note(self, text):
+        self.trace.append(f'NOTE  {text}')
+
+    def print_trace(self):
+        print('\n----- RUN TRACE -----')
+        print('\n'.join(self.trace))
+        print('----- END TRACE -----\n')

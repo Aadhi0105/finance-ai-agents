@@ -15,12 +15,7 @@ from tools.analytical import compute_ratios, run_dcf, compute_derived
 
 _REQUIRED = ('get_financials', 'get_prices', 'compute_ratios', 'run_dcf',
              'peer_outlier_check', 'get_consensus')
-_DEPENDENCIES = {
-    'compute_ratios': ('get_financials', 'get_prices'),
-    'run_dcf': ('get_financials', 'get_prices'),
-    'peer_outlier_check': ('get_financials', 'get_prices'),
-    'compute_derived': ('get_consensus', 'run_dcf', 'get_historical_trend'),
-}
+from agent.state import DEPENDENCIES as _DEPENDENCIES
 
 
 def _nonfinite(obj):

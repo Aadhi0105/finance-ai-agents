@@ -20,12 +20,6 @@ from __future__ import annotations
 import os
 import sys
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()  # loads ANTHROPIC_API_KEY from .env on the live path
-except ImportError:
-    pass  # offline path needs no key, so dotenv is optional
-
 from agent.loop import run_agent
 from agent.state import RunState
 from agent.models import StubModel, AnthropicModel, ModelResponse, TextBlock, ToolUseBlock
@@ -110,117 +104,212 @@ def build_offline_script(ticker: str):
     ]
 
 
-def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
-    """After the loop: validate, fetch chart data, write the sidecar, build the report.
-    Charts are LOCKED output, not a model decision — so history is fetched here,
-    outside the reasoning loop."""
-    from datetime import datetime
+def _new_output(ticker, output_root="output"):
+    import re
+    import uuid
+    from pathlib import Path
+    from agent.state import utc_now
+    from tools.registry import TICKER_PATTERN
+    if not re.fullmatch(TICKER_PATTERN, ticker):
+        raise ValueError("invalid ticker")
+    run_id = utc_now().replace(":", "").replace("-", "") + "_" + uuid.uuid4().hex[:12]
+    out = Path(output_root) / (ticker + "_" + run_id)
+    out.mkdir(parents=True, exist_ok=False)
+    return str(out), run_id
+
+
+def _snapshot(ticker, mode, note, state, out_dir, run_id=None, provenance=None):
+    import composer
+    if not note and state.outcome:
+        note = state.outcome.text
+    fin = (state.results.get('get_financials') or {}).get('financials') or {}
+    return composer.write_sidecar(
+        ticker=ticker, mode=mode, note=note, note_template=note, analysis=state.results,
+        calls=state.calls, execution=state.execution_record(), out_dir=out_dir,
+        run_id=run_id, model_id=state.configuration.get('model_id'),
+        currency=fin.get('currency'), provenance=provenance)
+
+
+def _emit_artifacts(ticker, mode, note, state, out_dir=None, run_id=None, provenance=None):
+    """Save analysis first; acquisition/render failures cannot erase that record."""
+    import json
+    from pathlib import Path
+    import composer
     from tools.data import get_price_history, home_index_ticker
-    from validation import gate
-    from validation import note_grounding
+    from validation.publication import assess_record
+    if out_dir is None:
+        out_dir, run_id = _new_output(ticker)
+    sidecar = _snapshot(ticker, mode, note, state, out_dir, run_id, provenance)
+    print("Saved analysis: " + sidecar)
+    with open(sidecar) as stream:
+        record = json.load(stream)
+    record['validation'], record['note'] = assess_record(record)
+    composer.save_record(sidecar, record)
+    index = home_index_ticker(ticker)
+    for stage, symbol, key in [('fetch_price_history', ticker, 'price_history'),
+                               ('fetch_index_history', index, 'index_history')]:
+        if symbol is None:
+            continue
+        try:
+            data = get_price_history(symbol)
+            if not isinstance(data, dict) or data.get('error') or not data.get('history'):
+                raise ValueError('history unavailable')
+            if key == 'index_history':
+                data['index_ticker'] = symbol
+            record['chart_data'][key] = data
+        except KeyboardInterrupt:
+            record['artifacts']['status'] = 'failed'
+            record['artifacts']['errors'].append({'stage': stage, 'error_type': 'KeyboardInterrupt'})
+            composer.save_record(sidecar, record)
+            return 130
+        except Exception as exc:
+            record['artifacts']['errors'].append({'stage': stage, 'error_type': type(exc).__name__})
+        # Preserve each acquisition independently; no charts run before this.
+        composer.save_record(sidecar, record)
+    try:
+        report = composer.build_report(sidecar)
+    except KeyboardInterrupt:
+        print('Report interrupted; saved analysis remains at ' + sidecar, file=sys.stderr)
+        return 130
+    except Exception as exc:
+        print('Report failed (' + type(exc).__name__ + '); saved analysis remains at ' + sidecar, file=sys.stderr)
+        return 1
+    with open(sidecar) as stream:
+        record = json.load(stream)
+    _print_validation(record['validation'])
+    print('NOTE (' + record['validation']['verdict'] + '):\n' + record['note'])
+    print('Report: ' + report)
+    print('Charts saved: ' + str(len(record['artifacts'].get('charts', []))))
+    return _exit_code(record)
+
+
+def _exit_code(record):
+    execution = record.get('execution') or {}
+    outcome = execution.get('outcome') or {}
+    if outcome.get('reason') == 'interrupted':
+        return 130
+    if execution.get('status') == 'failed' or (record.get('artifacts') or {}).get('status') in ('failed', 'degraded'):
+        return 1
+    if execution.get('status') != 'completed':
+        return 4
+    return 0 if (record.get('validation') or {}).get('verdict') == 'pass' else 3
+
+
+def _print_validation(v):
+    print('Validation: ' + v['verdict'] + ' (evidence confidence: ' + v['confidence'] + ')')
+    for check in v['checks']:
+        if check['status'] != 'pass':
+            print('  [' + check['status'] + '] ' + check['check'] + ': ' + check['detail'])
+
+
+def _execute(ticker, mode, peers=None, output_root='output', trace=False):
     import composer
-
-    validation = gate.assess(state.results, calls=state.calls)
-    grounding = note_grounding.ground_note(note, state.results)
-    checks = validation["checks"] + [{
-        "check": "note_grounding", "status": "pass" if grounding["passed"] else "fail",
-        "detail": grounding["note"] if grounding["passed"] else str(grounding["unmatched"]),
-    }]
-    validation = gate.aggregate_checks(checks)
-    validation["note_grounding"] = grounding
-    note = grounding["rendered_note"]
-    print("NOTE (" + validation["verdict"] + "):\n" + note)
-
-    _print_validation(validation)
-
-    price_history = get_price_history(ticker)
-    idx_ticker = home_index_ticker(ticker)
-    index_history = None
-    if idx_ticker:
-        ih = get_price_history(idx_ticker)
-        index_history = {"index_ticker": idx_ticker, "source": ih.get("source"),
-                         "history": ih.get("history", [])}
-
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = os.path.join("output", f"{ticker}_{stamp}")
-
-    model_id = os.environ.get("AGENT_MODEL", "claude-sonnet-4-5-20250929") if mode == "live" else "StubModel"
-    fin = (state.results.get("get_financials") or {}).get("financials", {}) or {}
-    currency = fin.get("currency") or (state.results.get("get_prices") or {}).get("currency")
-
-    sidecar_path = composer.write_sidecar(
-        ticker=ticker, mode=mode, note=note, analysis=state.results,
-        price_history=price_history, index_history=index_history,
-        validation=validation, out_dir=out_dir,
-        calls=state.calls, model_id=model_id, currency=currency,
-    )
-    report_path = composer.build_report(sidecar_path, out_dir)
-    print(f"\nARTIFACTS:\n  {sidecar_path}\n  {report_path}\n  {os.path.join(out_dir, 'charts')}/ (5 charts)")
-
-
-def _print_validation(v: dict) -> None:
-    banner = "PASS" if v["verdict"] == "pass" else "⚠ FLAGGED FOR REVIEW"
-    print(f"\n----- VALIDATION: {banner} "
-          f"(confidence={v['confidence']}, score={v['score']}, "
-          f"{v['n_pass']} pass / {v.get('n_info_finding',0)} finding / "
-          f"{v.get('n_quality_warn',0)} quality-warn / {v['n_fail']} fail) -----")
-    for c in v["checks"]:
-        if c["status"] != "pass":
-            print(f"  [{c['status'].upper()}] {c['check']}: {c['detail']}")
-    if v["verdict"] != "pass":
-        print("  -> flagged: emitted as report_REVIEW.html, not approved output.")
-    print("-----")
-
-
-def run_offline(ticker: str = "ASML.AS") -> None:
-    os.environ.setdefault("AGENT_DATA_SOURCE", "fixture")
+    # Set explicitly: ambient environment and .env cannot select a live source
+    # for an offline run. Restore the caller's environment when used as a library.
+    previous = os.environ.get('AGENT_DATA_SOURCE')
     state = RunState(ticker=ticker)
-    registry = ToolRegistry(state)
-    model = StubModel(script=build_offline_script(ticker))
-    final = run_agent(model=model, registry=registry, state=state,
-                      system=SYSTEM, goal=f"Produce a defensible fundamental view on {ticker}.")
-    state.print_trace()
-    _emit_artifacts(ticker, "offline", final, state)
-
-
-def run_live(ticker: str, peers: list[str] | None = None) -> None:
-    os.environ["AGENT_DATA_SOURCE"] = "yfinance"
-    if "ANTHROPIC_API_KEY" not in os.environ:
-        sys.exit("Set ANTHROPIC_API_KEY (e.g. in .env) for --live mode.")
-    state = RunState(ticker=ticker)
-    registry = ToolRegistry(state)
-    model = AnthropicModel()
-    goal = f"Produce a defensible fundamental view on {ticker}."
+    out_dir, run_id = _new_output(ticker, output_root)
+    provenance = composer._git_provenance()
+    os.environ['AGENT_DATA_SOURCE'] = 'fixture' if mode == 'offline' else 'yfinance'
+    state.configuration.update(mode=mode, data_source=os.environ['AGENT_DATA_SOURCE'], peers=peers or [])
+    goal = f'Produce a defensible fundamental view on {ticker}.'
     if peers:
-        # Pinned peer set: the model MUST use exactly these for peer_outlier_check
-        # (curated comparables) rather than proposing its own, which can be
-        # economically mismatched (e.g. carmakers for a rail manufacturer).
-        goal += (f" For peer_outlier_check, you MUST use exactly this peer set and "
-                 f"propose no others: {', '.join(peers)}.")
-    final = run_agent(model=model, registry=registry, state=state,
-                      system=SYSTEM, goal=goal)
-    state.print_trace()
-    _emit_artifacts(ticker, "live", final, state)
+        goal += ' For peer_outlier_check, use exactly this peer set: ' + ', '.join(peers) + '.'
+    note = ''
+    try:
+        _snapshot(ticker, mode, note, state, out_dir, run_id, provenance)
+        try:
+            if mode == 'live':
+                from dotenv import load_dotenv
+                load_dotenv()
+                os.environ['AGENT_DATA_SOURCE'] = 'yfinance'
+                if not os.environ.get('ANTHROPIC_API_KEY'):
+                    state.finish('failed', reason='missing_api_key')
+                    _snapshot(ticker, mode, note, state, out_dir, run_id, provenance)
+                    print('Live mode requires ANTHROPIC_API_KEY. Saved run: ' + out_dir, file=sys.stderr)
+                    return 1
+                model = AnthropicModel()
+            else:
+                model = StubModel(script=build_offline_script(ticker))
+            registry = ToolRegistry(state)
+            result = run_agent(model=model, registry=registry, state=state, system=SYSTEM, goal=goal,
+                checkpoint=lambda current: _snapshot(ticker, mode, '', current, out_dir, run_id, provenance))
+            note = result.text
+        except KeyboardInterrupt:
+            state.finish('incomplete', note, 'interrupted')
+        except Exception as exc:
+            # Includes persistence errors: stop execution instead of continuing
+            # unrecorded model calls. Attempt a final snapshot, then let I/O fail
+            # clearly if the storage itself is unavailable.
+            note = state.outcome.text if state.outcome else note
+            state.finish('failed', note, 'execution_error_' + type(exc).__name__)
+        _snapshot(ticker, mode, note, state, out_dir, run_id, provenance)
+        if trace:
+            state.print_trace()
+        if state.outcome and state.outcome.reason == 'interrupted':
+            print('Interrupted; saved run: ' + out_dir)
+            return 130
+        return _emit_artifacts(ticker, mode, note, state, out_dir, run_id, provenance)
+    finally:
+        if previous is None:
+            os.environ.pop('AGENT_DATA_SOURCE', None)
+        else:
+            os.environ['AGENT_DATA_SOURCE'] = previous
 
 
-def rebuild(model_json_path: str) -> None:
-    """Regenerate report.html from a saved model.json ALONE — no yfinance, no
-    model. The proof that the report is rebuildable from the sidecar."""
+def run_offline(ticker='ASML.AS', *, output_root='output', trace=False):
+    return _execute(ticker.upper(), 'offline', output_root=output_root, trace=trace)
+
+
+def run_live(ticker, peers=None, *, output_root='output', trace=False):
+    return _execute(ticker.upper(), 'live', peers=peers, output_root=output_root, trace=trace)
+
+
+def rebuild(model_json_path):
+    import json
     import composer
-    report_path = composer.build_report(model_json_path)
-    print(f"Rebuilt report from sidecar only:\n  {report_path}")
+    path = composer.build_report(model_json_path)
+    with open(model_json_path) as stream:
+        record = json.load(stream)
+    print('Rebuilt and revalidated report: ' + path)
+    return _exit_code(record)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) >= 2 and sys.argv[1] == "--live":
-        tkr = sys.argv[2] if len(sys.argv) >= 3 else "ASML.AS"
-        peers = None
-        if "--peers" in sys.argv:
-            peers = sys.argv[sys.argv.index("--peers") + 1:]
-        run_live(tkr, peers=peers)
-    elif len(sys.argv) >= 2 and sys.argv[1] == "--rebuild":
-        if len(sys.argv) < 3:
-            sys.exit("Usage: python run.py --rebuild output/<TICKER>_<stamp>/model.json")
-        rebuild(sys.argv[2])
-    else:
-        run_offline()
+def main(argv=None):
+    import argparse
+    import re
+    from tools.registry import TICKER_PATTERN
+
+    def ticker(value):
+        if not re.fullmatch(TICKER_PATTERN, value):
+            raise argparse.ArgumentTypeError('invalid ticker')
+        return value.upper()
+
+    parser = argparse.ArgumentParser(description='Agent 1 equity research. Exit: 0 approved, 1 failure, 2 usage, 3 review, 4 incomplete, 130 interrupted.')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--live', metavar='TICKER', type=ticker)
+    modes.add_argument('--offline', metavar='TICKER', type=ticker, help='explicit offline ticker (default ASML.AS)')
+    modes.add_argument('--rebuild', metavar='MODEL_JSON')
+    parser.add_argument('--peers', nargs='+', type=ticker)
+    parser.add_argument('--output', default='output', help='root directory for new runs')
+    parser.add_argument('--trace', action='store_true')
+    args = parser.parse_args(argv)
+    if args.peers and not args.live:
+        parser.error('--peers requires --live')
+    if args.rebuild and (args.trace or args.output != 'output'):
+        parser.error('--rebuild does not accept --trace or --output')
+    try:
+        if args.rebuild:
+            return rebuild(args.rebuild)
+        if args.live:
+            return run_live(args.live, args.peers, output_root=args.output, trace=args.trace)
+        return run_offline(args.offline or 'ASML.AS', output_root=args.output, trace=args.trace)
+    except KeyboardInterrupt:
+        return 130
+    except Exception as exc:
+        print('Run failed: ' + type(exc).__name__, file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

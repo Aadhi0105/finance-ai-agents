@@ -20,8 +20,8 @@ When the runtime supplies the call log, each result must match its latest
 successful call. A refresh of any dependency after a calculation requires that
 calculation to be rerun, even if the new numbers happen to be unchanged.
 Numerical reconciliation also detects changed financial/price inputs when no
-call log is supplied. Batch 3 will address state invalidation and immutable call
-snapshots; this gate does not redesign shared RunState.
+call log is supplied. Batch 3 additionally invalidates dependent working results
+and detaches audit snapshots; see [execution and reporting](agent1-execution-reporting.md).
 
 ## Assumptions and dates
 
@@ -94,10 +94,9 @@ produce `report_REVIEW.html`, appropriately reflecting illustrative data and
 unreviewed model defaults.
 
 This changes the note-authoring contract: existing free-text numeric notes must
-be rewritten with evidence markers. Legacy sidecar rebuilds do not acquire new
-validation automatically. Atomic writing, failed chart recovery, stale approved
-report cleanup, CLI exit codes and explicit model-completion states remain
-Batch 3 work.
+be rewritten with evidence markers. Batch 3 adds revalidation on rebuild, atomic
+writes, chart failure recovery, stale report cleanup, CLI exit codes, and explicit
+completion states; legacy records without completion evidence require review.
 
 Tests cover complete and incomplete evidence, errors, malformed schemas,
 non-finite values, stale dependencies, default assumptions, date policy, peer

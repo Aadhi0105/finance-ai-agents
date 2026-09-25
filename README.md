@@ -38,12 +38,15 @@ pip install -r requirements.txt
 **Agent 1 — equity research** (single ticker -> report):
 
 ```bash
-python run.py                 # offline: scripted model + fixture data, prints the full trace
+python run.py                 # offline: scripted model + fixture data (normally exits 3)
 python run.py --live ASML.AS  # live: the model decides the tool sequence, data via yfinance
 ```
 
 Live mode needs `ANTHROPIC_API_KEY` (loaded from a gitignored `.env`). A run
-writes `report.html`, `model.json`, and `charts/` to a per-run `output/` folder.
+saves `model.json` first, then charts and either `report.html` or
+`report_REVIEW.html` in a unique per-run `output/` folder. Add `--trace` for the
+execution trace. See [execution and reporting](docs/agent1-execution-reporting.md)
+for checkpoints, rebuild behavior, and exit codes.
 
 **Agent 2 — covenant monitoring** (watchlist -> change detection over cycles):
 
@@ -158,16 +161,18 @@ instead — a real branch, visible in the trace, not a hidden fallback.
 **Output — three artifacts per run:** `report.html` (the prose note with five
 embedded charts: price vs. home index, price + moving averages, volatility &
 drawdown, the peer-multiple scatter, and the DCF football-field), `model.json`
-(every computed number behind the prose — the report rebuilds byte-identically
-from it via `python run.py --rebuild <model.json>`), and `charts/`.
+(the evidence, conversation, configuration, and execution audit trail), and
+`charts/`. Rebuild with `python run.py --rebuild <model.json>`; this revalidates
+saved evidence without model or provider calls. Failed charts are explicitly
+labelled and preserve a review report plus the saved analysis.
 
 A **validation gate** (`validation/gate.py`) requires complete evidence and
 reconciled calculations. Any quality warning or failure requires review,
 while a dramatic-but-legitimate finding (a big DCF-vs-price gap) is surfaced
 without penalty. A flagged run is emitted as `report_REVIEW.html` with a
 watermark, never as an approved `report.html` — the gate gates, it doesn't just
-label. Illustrative offline runs also require review. Legacy sidecar rebuilds
-are not revalidated; report lifecycle hardening is separate work.
+label. Illustrative offline runs also require review. Rebuilds rerun validation;
+legacy records without explicit completion evidence require review.
 
 **Integrity — the numbers are hard to break, and the note can't outrun them.**
 Agent 1 was the first agent built and was later hardened under a detailed code
