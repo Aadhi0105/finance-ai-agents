@@ -7,7 +7,7 @@ from tools.analytical import run_dcf
 from tests.conftest import make_state
 
 # FCFF lines: EBIT*(1-T) + D&A - CapEx - dNWC = 1000*(1-0.25)+200-100-0 = 850.
-_FIN = {"ebit": 1000, "depreciation_amortization": 200, "capex": -100,
+_FIN = {"ebit": 1000, "depreciation_amortization": 200, "capex": 100,
         "tax_provision": 250, "pretax_income": 1000,
         "change_in_working_capital": 0,
         "total_debt": 300, "cash_and_equivalents": 100}

@@ -93,7 +93,7 @@ def _build_registry() -> dict:
                                "cash flow, and applies a net-debt bridge to return EQUITY value per share "
                                "plus implied upside vs current price. Needs get_financials and get_prices "
                                "first. Optional overrides: discount_rate, high_growth, terminal_growth, "
-                               "horizon_years.",
+                               "horizon_years, tax_rate, weights. Currency and period compatibility are required.",
                 "input_schema": {
                     "type": "object",
                     "properties": {
@@ -101,7 +101,12 @@ def _build_registry() -> dict:
                         "discount_rate": {"type": "number"},
                         "high_growth": {"type": "number", "description": "year-1 growth; fades to terminal"},
                         "terminal_growth": {"type": "number"},
-                        "horizon_years": {"type": "integer"},
+                        "horizon_years": {"type": "integer", "minimum": 1, "maximum": 30},
+                        "tax_rate": {"type": "number", "minimum": 0, "maximum": 1},
+                        "weights": {"type": "object", "properties": {
+                            k: {"type": "number", "minimum": 0, "maximum": 1}
+                            for k in ("bear", "base", "bull")},
+                            "required": ["bear", "base", "bull"], "additionalProperties": False},
                     },
                     "required": ["ticker"],
                 },
@@ -112,7 +117,7 @@ def _build_registry() -> dict:
             {
                 "name": "peer_outlier_check",
                 "description": "Given an explicit list of peer tickers, check whether the target's "
-                               "P/E is a statistical outlier vs the peer distribution (z-score + IQR). "
+                               "P/E is a statistical outlier vs the peer distribution (median/MAD, with mean/z fallback). "
                                "You must supply the peers — peer selection is an analyst judgment.",
                 "input_schema": {
                     "type": "object",

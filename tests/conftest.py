@@ -14,7 +14,16 @@ from agent.state import RunState
 def make_state(ticker="TST", financials=None, prices=None, extra=None):
     """A RunState pre-loaded with tool results, for unit-testing the analytical
     tools without running the whole loop."""
+    # Explicit synthetic contract for hand-authored calculation inputs.
     s = RunState(ticker=ticker)
+    if financials is not None:
+        financials = {"currency": "EUR", "monetary_unit": "base", "period_type": "annual",
+                      "period": "2025-12-31", "prior_period": "2024-12-31",
+                      "working_capital_convention": "balance_change", "capex_convention": "outflow_magnitude",
+                      "statement_periods": {"income": financials.get("period", "2025-12-31")}, **financials}
+    if prices is not None:
+        prices = {"currency": (financials or {}).get("currency", "EUR"),
+                  "monetary_unit": "base", **prices}
     if financials is not None:
         s.results["get_financials"] = {"ticker": ticker, "financials": financials}
     if prices is not None:
