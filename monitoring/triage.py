@@ -212,8 +212,11 @@ def run_triage(store, surfaced_rows: list[dict], live: bool = False) -> str:
         model = StubModel(script=_build_triage_stub(surfaced_rows))
 
     goal = "Triage these monitoring flags:\n" + _format_flags(surfaced_rows)
-    return run_agent(model=model, registry=registry, state=state,
-                     system=TRIAGE_SYSTEM, goal=goal)
+    outcome = run_agent(model=model, registry=registry, state=state,
+                        system=TRIAGE_SYSTEM, goal=goal)
+    if outcome.status != 'completed':
+        return f"[triage {outcome.status}: {outcome.reason}] " + outcome.text
+    return outcome.text
 
 
 def _format_flags(rows) -> str:

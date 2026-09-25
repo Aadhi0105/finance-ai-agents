@@ -12,6 +12,9 @@ Two families:
 from __future__ import annotations
 
 from tools import data, analytical
+from tools.input_validation import validate_input
+
+TICKER_PATTERN = r"^[A-Za-z0-9^][A-Za-z0-9.^=_-]{0,31}$"
 
 
 def _build_registry() -> dict:
@@ -157,6 +160,12 @@ class ToolRegistry:
     def __init__(self, state):
         self.state = state
         self._reg = _build_registry()
+        for schema, _impl in self._reg.values():
+            spec = schema['input_schema']
+            spec['additionalProperties'] = False
+            spec['properties']['ticker'].update(pattern=TICKER_PATTERN, minLength=1)
+            if 'peers' in spec['properties']:
+                spec['properties']['peers']['items'].update(pattern=TICKER_PATTERN, minLength=1)
 
     def schemas(self) -> list:
         return [schema for (schema, _impl) in self._reg.values()]
@@ -164,5 +173,10 @@ class ToolRegistry:
     def dispatch(self, name: str, tool_input: dict):
         if name not in self._reg:
             return {"error": f"unknown tool: {name}"}
-        _schema, impl = self._reg[name]
+        schema, impl = self._reg[name]
+        error = validate_input(schema['input_schema'], tool_input)
+        if error:
+            return {"error": error, "error_type": "invalid_arguments"}
+        if self.state.ticker and tool_input['ticker'].upper() != self.state.ticker.upper():
+            return {"error": "ticker differs from run subject", "error_type": "ticker_mismatch"}
         return impl(tool_input, self.state)

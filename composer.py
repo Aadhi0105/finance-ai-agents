@@ -9,12 +9,9 @@ SIDECAR ALONE:
                          of one run.
   build_report(path)  -> reads model.json and NOTHING ELSE (no yfinance, no
                          model call), renders the chart(s), and writes a
-                         self-contained report.html. Because it only reads the
+                         self-contained approved or review HTML. Because it reads the
                          sidecar, it structurally proves every chart is driven
                          by a logged number.
-
-This checkpoint wires ONE chart end-to-end (price + 50/200-day moving averages).
-The other four charts plug into render step the same way, next checkpoint.
 
 Moving averages are computed here in plain Python — the "LLM never does the
 math" rule extends to chart data too.
@@ -28,9 +25,22 @@ import json
 import os
 from datetime import datetime, timezone
 
-import matplotlib
-matplotlib.use("Agg")  # headless; no display needed
-import matplotlib.pyplot as plt
+from html import escape
+from pathlib import Path
+import tempfile
+from filelock import FileLock
+
+
+class _LazyPlot:
+    """Saving an analysis must not depend on the chart library importing."""
+    def __getattr__(self, name):
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as pyplot
+        return getattr(pyplot, name)
+
+
+plt = _LazyPlot()
 
 
 # --- deterministic helpers ------------------------------------------------
@@ -151,7 +161,7 @@ _CCY_SYMBOL = {"EUR": "\u20ac", "USD": "$", "GBP": "\u00a3", "JPY": "\u00a5",
 
 
 def _ccy(currency: str | None) -> str:
-    return _CCY_SYMBOL.get((currency or "EUR").upper(), (currency or "EUR") + " ")
+    return _CCY_SYMBOL.get((currency or "").upper(), (currency or "currency unknown") + " ")
 
 
 def render_dcf_footballfield_png(dcf: dict, ticker: str, currency: str | None = None) -> bytes:
@@ -167,7 +177,7 @@ def render_dcf_footballfield_png(dcf: dict, ticker: str, currency: str | None = 
     if bear is None or base is None or bull is None:
         return _placeholder_png(ticker, "DCF football field",
                                 "enterprise value only — no equity per-share "
-                                "(net-debt bridge incomplete)")
+                                "(equity valuation unavailable)")
 
     fig, ax = plt.subplots(figsize=(9, 2.8))
     y = 0
@@ -177,7 +187,7 @@ def render_dcf_footballfield_png(dcf: dict, ticker: str, currency: str | None = 
         ax.scatter([val], [y], s=40, color="#4c78a8", zorder=3)
         ax.annotate(f"{lab}\n{sym}{val:,.0f}", (val, y), textcoords="offset points",
                     xytext=(0, 10), ha="center", fontsize=7)
-    if weighted:
+    if weighted is not None:
         ax.scatter([weighted], [y], marker="D", s=70, color="#2a2a2a", zorder=4,
                    label=f"Scenario-weighted {sym}{weighted:,.0f}")
     if price:
@@ -214,7 +224,7 @@ def render_peer_scatter_png(peer: dict, ticker: str) -> bytes:
     ax.set_xticks(range(len(names)))
     ax.set_xticklabels(names, rotation=30, ha="right", fontsize=8)
     ax.set_ylabel("P/E")
-    verdict = "outlier" if peer.get("is_outlier") else "not an outlier"
+    verdict = "indeterminate" if peer.get("is_outlier") is None else "outlier" if peer["is_outlier"] else "not an outlier"
     ax.set_title(f"{ticker} P/E vs peers — {verdict} (robust median/MAD)")
     ax.legend(loc="best", fontsize=7)
     return _finish(fig)
@@ -280,23 +290,13 @@ def render_price_vs_index_png(price_hist: list[dict], index_hist: list[dict],
 # --- markdown -> html (lightweight, escape-first) -------------------------
 
 def _validation_banner(v: dict | None) -> str:
-    """Render the confidence-gate result as a banner at the top of the report."""
     if not v:
-        return ""
-    passed = v.get("verdict") == "pass"
-    cls = "pass" if passed else "review"
-    if passed:
-        label = "Passed confidence gate"
-    else:
-        label = "&#9888; REVIEW DRAFT — flagged by the confidence gate, NOT approved output"
-    counts = (f"{v.get('n_pass', 0)} pass / {v.get('n_info_finding', 0)} finding / "
-              f"{v.get('n_quality_warn', 0)} quality-warn / {v.get('n_fail', 0)} fail")
-    head = (f"<strong>{label}</strong> — confidence {v.get('confidence')}, "
-            f"score {v.get('score')} ({counts})")
-    flags = [c for c in v.get("checks", []) if c["status"] != "pass"]
-    items = "".join(f"<li><em>{c['status']}</em> — {c['check']}: {c['detail']}</li>" for c in flags)
-    body = f"<ul>{items}</ul>" if items else ""
-    return f'<div class="banner {cls}">{head}{body}</div>'
+        return '<div class="banner review">REVIEW DRAFT — validation unavailable</div>'
+    passed = v.get('verdict') == 'pass'
+    label = 'Passed evidence gate' if passed else 'REVIEW DRAFT — not approved output'
+    flags = ''.join('<li>' + escape(str(c.get('check'))) + ': ' + escape(str(c.get('detail'))) + '</li>'
+                    for c in v.get('checks', []) if c.get('status') != 'pass')
+    return f'<div class="banner {"pass" if passed else "review"}"><strong>{label}</strong> — confidence {escape(str(v.get("confidence")))}<ul>{flags}</ul></div>'
 
 
 def _markdown_to_html(text: str) -> str:
@@ -332,149 +332,167 @@ def _markdown_to_html(text: str) -> str:
 
 # --- sidecar --------------------------------------------------------------
 
-def _git_commit() -> str | None:
-    """Best-effort short commit SHA, so a report can be traced to exact code."""
+def _git_provenance():
     import subprocess
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            stderr=subprocess.DEVNULL, timeout=3).decode().strip()
+        root = Path(__file__).resolve().parent
+        commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, stderr=subprocess.DEVNULL, timeout=3).decode().strip()
+        dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=root, stderr=subprocess.DEVNULL, timeout=3).strip())
+        return {'git_commit': commit, 'git_dirty': dirty}
     except Exception:
-        return None
+        return {'git_commit': None, 'git_dirty': None}
 
 
-def write_sidecar(*, ticker: str, mode: str, note: str, analysis: dict,
-                  price_history: dict, index_history: dict | None,
-                  validation: dict | None = None, out_dir: str,
-                  calls: list | None = None, model_id: str | None = None,
-                  currency: str | None = None) -> str:
-    """Write model.json — the complete, self-contained record of one run.
+def atomic_write(path, content):
+    """Same-directory replace: readers see either the previous or complete file."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.' + path.name + '.', delete=False) as stream:
+            temporary = stream.name
+            stream.write(content if isinstance(content, bytes) else content.encode('utf-8'))
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.unlink(temporary)
 
-    Provenance answers 'what code, model, data snapshot and assumptions produced
-    this report?' — the substance of the auditability claim. `calls` is the
-    append-only tool-call history (nothing lost to last-write-wins)."""
-    os.makedirs(out_dir, exist_ok=True)
 
-    fin = (analysis.get("get_financials") or {}).get("financials", {}) or {}
-    sidecar = {
-        "meta": {
-            "ticker": ticker,
-            "agent": "equity-research-v1",
-            "mode": mode,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-            "model_id": model_id,
-            "git_commit": _git_commit(),
-            "data_source": os.environ.get("AGENT_DATA_SOURCE", "fixture"),
-            "statement_period": fin.get("period"),
-            "currency": currency,
-        },
-        "validation": validation,             # confidence gate result (may be None)
-        "note": note,
-        "analysis": analysis,                 # latest result per tool
-        "call_history": calls or [],          # append-only: EVERY tool call, in order
-        "chart_data": {
-            "price_history": price_history,
-            "index_history": index_history,
-        },
+def save_record(path, record):
+    atomic_write(path, json.dumps(record, indent=2, allow_nan=False))
+
+
+def write_sidecar(*, ticker, mode, note, analysis, price_history=None, index_history=None,
+                  validation=None, out_dir, calls=None, model_id=None, currency=None,
+                  execution=None, artifacts=None, note_template=None, run_id=None,
+                  provenance=None):
+    fin = (analysis.get('get_financials') or {}).get('financials', {}) or {}
+    record = {
+        'schema_version': 2,
+        'meta': {'ticker': ticker, 'agent': 'equity-research-v1', 'mode': mode,
+                 'run_id': run_id, 'generated_at': datetime.now(timezone.utc).isoformat(),
+                 'model_id': model_id, **(provenance if provenance is not None else _git_provenance()),
+                 'data_source': 'fixture' if mode == 'offline' else 'yfinance',
+                 'statement_period': fin.get('period'), 'currency': currency},
+        'execution': execution or {'status': 'unknown'},
+        'artifacts': artifacts or {'status': 'pending', 'errors': []},
+        'validation': validation, 'note': note,
+        'note_template': note_template if note_template is not None else note,
+        'analysis': analysis, 'call_history': calls or [],
+        'chart_data': {'price_history': price_history or {'history': [], 'source': 'not_fetched'},
+                       'index_history': index_history},
     }
-    path = os.path.join(out_dir, "model.json")
-    with open(path, "w") as f:
-        json.dump(sidecar, f, indent=2)
+    path = str(Path(out_dir) / 'model.json')
+    save_record(path, record)
     return path
 
 
-# --- report (rebuildable from the sidecar alone) --------------------------
+def _valid_history(history):
+    """Refuse a damaged series rather than quietly bridging missing observations."""
+    from datetime import date
+    from tools.financial_contract import finite
+    if not history:
+        raise ValueError('price history unavailable')
+    previous = None
+    for row in history:
+        current = date.fromisoformat(row['date'])
+        if (previous is not None and current <= previous) or not finite(row.get('close')) or row['close'] <= 0:
+            raise ValueError('invalid price history')
+        previous = current
+    return history
+
 
 def build_report(model_json_path: str, out_dir: str | None = None) -> str:
-    """Read model.json ONLY, render all charts, write a self-contained report.html."""
-    with open(model_json_path) as f:
-        sidecar = json.load(f)
+    """Revalidate, render independently, and atomically publish a self-contained report.
 
-    if out_dir is None:
-        out_dir = os.path.dirname(os.path.abspath(model_json_path))
-    charts_dir = os.path.join(out_dir, "charts")
-    os.makedirs(charts_dir, exist_ok=True)
-
-    ticker = sidecar["meta"]["ticker"]
-    analysis = sidecar.get("analysis", {})
-    cd = sidecar["chart_data"]
-    price_hist = cd["price_history"]["history"]
-    hist_src = cd["price_history"].get("source", "?")
-    index_block = cd.get("index_history")
-
-    # Build the five charts. Each entry: (heading, png-bytes-or-None).
-    sections = []
-
-    # 1. Price vs home index (needs index history)
-    if index_block and index_block.get("history"):
-        png = render_price_vs_index_png(price_hist, index_block["history"], ticker,
-                                        index_block.get("index_ticker", "index"))
-        sections.append(("Price vs. home index (rebased to 100)", "price_vs_index", png))
-
-    # 2. Price + moving averages
-    sections.append(("Price & moving averages", "price_ma",
-                     render_price_ma_png(price_hist, ticker)))
-
-    # 3. Volatility & drawdown
-    sections.append(("Volatility & drawdown", "vol_drawdown",
-                     render_vol_drawdown_png(price_hist, ticker)))
-
-    # 4. Peer-multiple scatter (from the sidecar's peer analysis)
-    peer = analysis.get("peer_outlier_check")
-    if peer and not peer.get("error") and peer.get("peer_pes") and peer.get("target_pe") is not None:
-        sections.append(("Peer-multiple check", "peer_scatter",
-                         render_peer_scatter_png(peer, ticker)))
-
-    # 5. DCF football field (from the sidecar's DCF analysis)
-    currency = (sidecar.get("meta") or {}).get("currency")
-    dcf = analysis.get("run_dcf")
-    if dcf and not dcf.get("error"):
-        sections.append(("DCF football field", "dcf_footballfield",
-                         render_dcf_footballfield_png(dcf, ticker, currency)))
-
-    # Save standalone PNGs and build embedded <img> blocks.
-    chart_html = []
-    for heading, name, png in sections:
-        with open(os.path.join(charts_dir, f"{name}.png"), "wb") as f:
-            f.write(png)
-        b64 = base64.b64encode(png).decode("ascii")
-        chart_html.append(f'<h2>{heading}</h2>\n<img alt="{heading}" '
-                          f'src="data:image/png;base64,{b64}">')
-
-    note_html = _markdown_to_html(sidecar.get("note") or "")
-    banner_html = _validation_banner(sidecar.get("validation"))
-
-    html = f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>{ticker} — equity research</title>
-<style>
- body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem;color:#1a1a1a;line-height:1.5}}
- h1{{font-size:1.5rem}} h2{{font-size:1.1rem;margin-top:2rem;border-bottom:1px solid #eee;padding-bottom:.3rem}}
- h3{{font-size:1rem}} .meta{{color:#666;font-size:.85rem;margin-bottom:1rem}}
- img{{max-width:100%;border:1px solid #eee;border-radius:6px;margin:.5rem 0}}
- .src{{color:#888;font-size:.75rem;margin:.5rem 0 1.5rem}}
- .note{{background:#fafafa;border:1px solid #eee;border-radius:6px;padding:.5rem 1.2rem;margin-top:.5rem}}
- .note li{{margin:.2rem 0}}
- .banner{{border-radius:6px;padding:.7rem 1rem;margin:1rem 0;font-size:.9rem}}
- .banner.pass{{background:#eef7ee;border:1px solid #cfe8cf}}
- .banner.review{{background:#fdf2e9;border:1px solid #f5cba7}}
- .banner ul{{margin:.4rem 0 0;padding-left:1.2rem}} .banner li{{margin:.15rem 0}}
-</style></head><body>
-<h1>{ticker} — Equity Research</h1>
-<div class="meta">agent: {sidecar['meta']['agent']} &middot; mode: {sidecar['meta']['mode']} &middot; generated: {sidecar['meta']['generated_at']}</div>
-{banner_html}
+    A lock serializes rebuilds. Prior reports are invalidated BEFORE reading or
+    rendering, so a failure cannot leave an old approved report as current.
+    Chart failures produce labelled omissions and a review report; analysis is
+    already saved. Rebuilding never fetches external data or calls a model.
+    """
+    from validation.publication import assess_record
+    from agent.state import utc_now
+    out = Path(out_dir) if out_dir is not None else Path(model_json_path).parent
+    out.mkdir(parents=True, exist_ok=True)
+    with FileLock(str(out / '.report.lock'), timeout=0):
+        for name in ('report.html', 'report_REVIEW.html'):
+            (out / name).unlink(missing_ok=True)
+        record = None
+        try:
+            with open(model_json_path) as stream:
+                record = json.load(stream)
+            meta = record['meta']
+            ticker = meta['ticker']
+            analysis = record.get('analysis', {})
+            cd = record.get('chart_data') or {}
+            history = (cd.get('price_history') or {}).get('history', [])
+            index = cd.get('index_history') or {}
+            artifacts = record.setdefault('artifacts', {})
+            # Retry rendering errors; acquisition failures remain until a new
+            # recorded data acquisition succeeds. Rebuild never fakes recovery.
+            errors = [e for e in artifacts.get('errors', []) if e.get('stage', '').startswith('fetch_')]
+            artifacts.update(status='building', errors=errors, charts=[], rebuilt_at=utc_now())
+            record['validation'], record['note'] = assess_record(record)
+            save_record(model_json_path, record)
+            charts = out / 'charts'
+            charts.mkdir(exist_ok=True)
+            tasks = [
+                ('Price vs. home index', 'price_vs_index', lambda: render_price_vs_index_png(_valid_history(history), _valid_history(index.get('history', [])), ticker, index.get('index_ticker', 'index'))),
+                ('Price & moving averages', 'price_ma', lambda: render_price_ma_png(_valid_history(history), ticker)),
+                ('Volatility & drawdown', 'vol_drawdown', lambda: render_vol_drawdown_png(_valid_history(history), ticker)),
+                ('Peer multiples', 'peer_scatter', lambda: render_peer_scatter_png(analysis.get('peer_outlier_check') or {}, ticker)),
+                ('DCF valuation', 'dcf_footballfield', lambda: render_dcf_footballfield_png(analysis.get('run_dcf') or {}, ticker, meta.get('currency'))),
+            ]
+            chart_html = []
+            for heading, name, render in tasks:
+                path = charts / (name + '.png')
+                path.unlink(missing_ok=True)
+                try:
+                    png = render()
+                    atomic_write(path, png)
+                    chart_html.append(f'<h2>{escape(heading)}</h2><img alt="{escape(heading)}" src="data:image/png;base64,{base64.b64encode(png).decode("ascii")}">')
+                    artifacts['charts'].append(name)
+                except Exception as exc:
+                    errors.append({'stage': 'chart_' + name, 'error_type': type(exc).__name__})
+                    chart_html.append(f'<h2>{escape(heading)}</h2><p>Chart unavailable; see saved artifact diagnostics.</p>')
+                    # Close incomplete figures without making failure recovery
+                    # itself depend on matplotlib being installed.
+                    try:
+                        plt.close('all')
+                    except Exception:
+                        pass
+            artifacts.update(errors=errors)
+            record['validation'], record['note'] = assess_record(record)
+            approved = record['validation']['verdict'] == 'pass'
+            filename = 'report.html' if approved else 'report_REVIEW.html'
+            artifacts['report'] = filename
+            save_record(model_json_path, record)
+            html = f"""<!doctype html>
+<html><head><meta charset="utf-8"><title>{escape(ticker)} — equity research</title>
+<style>body{{font-family:system-ui;max-width:900px;margin:2rem auto;padding:0 1rem;line-height:1.5}}img{{max-width:100%}}.banner{{padding:1rem;border:1px solid #bbb}}.review{{background:#fff0e4}}.pass{{background:#eef7ee}}.meta{{color:#666}}</style>
+</head><body><h1>{escape(ticker)} — Equity Research</h1>
+<p class="meta">Mode: {escape(str(meta.get('mode')))} · Run: {escape(str(meta.get('run_id')))} · Execution: {escape(str(record.get('execution', {}).get('status', 'unknown')))}</p>
+{_validation_banner(record['validation'])}
+<h2>Analyst note</h2>{_markdown_to_html(record['note'])}
 {''.join(chart_html)}
-<div class="src">chart data source: {hist_src} &middot; all figures from model.json (rebuildable sidecar)</div>
-<h2>Analyst note</h2>
-<div class="note">{note_html}</div>
+<p>Chart data and numerical evidence are preserved in model.json. Rebuilt {escape(artifacts['rebuilt_at'])}.</p>
 </body></html>"""
-
-    # The gate GATES, not just labels: a flagged run is written as a REVIEW draft
-    # that cannot be mistaken for approved output. Verdict comes from the sidecar
-    # (so --rebuild also names the file correctly).
-    verdict = (sidecar.get("validation") or {}).get("verdict", "pass")
-    fname = "report.html" if verdict == "pass" else "report_REVIEW.html"
-    path = os.path.join(out_dir, fname)
-    with open(path, "w") as f:
-        f.write(html)
-    return path
+            path = str(out / filename)
+            atomic_write(path, html)
+            artifacts['status'] = 'degraded' if errors else 'complete'
+            save_record(model_json_path, record)
+            return path
+        except BaseException as exc:
+            for name in ('report.html', 'report_REVIEW.html'):
+                (out / name).unlink(missing_ok=True)
+            if isinstance(record, dict):
+                artifacts = record.setdefault('artifacts', {})
+                artifacts.update(status='failed', report=None)
+                artifacts.setdefault('errors', []).append({'stage': 'report', 'error_type': type(exc).__name__})
+                try:
+                    save_record(model_json_path, record)
+                except Exception:
+                    pass  # Prior atomic checkpoint remains intact.
+            raise

@@ -41,6 +41,8 @@ class ToolUseBlock:
 class ModelResponse:
     stop_reason: str          # "tool_use" or "end_turn"
     content: list             # list[TextBlock | ToolUseBlock]
+    usage: dict = field(default_factory=dict)
+    request_id: str | None = None
 
 
 # --- interface ------------------------------------------------------------
@@ -71,10 +73,10 @@ class StubModel(ModelClient):
 
     def respond(self, system: str, messages: list, tools: list) -> ModelResponse:
         if self._i >= len(self._script):
-            # Safety net: if the script is exhausted, end cleanly.
+            # Exhaustion is an explicit incomplete run, never a fabricated answer.
             return ModelResponse(
-                stop_reason="end_turn",
-                content=[TextBlock(text="[stub] script exhausted; ending.")],
+                stop_reason="script_exhausted",
+                content=[],
             )
         step = self._script[self._i]
         self._i += 1
@@ -129,11 +131,12 @@ class AnthropicModel(ModelClient):
                 blocks.append(ToolUseBlock(id=b.id, name=b.name, input=dict(b.input)))
             elif b.type == "text":
                 blocks.append(TextBlock(text=b.text))
-            # other block types (e.g. 'thinking') are intentionally skipped; this
-            # loop is designed for a text+tool_use model (see AGENT_MODEL note).
-        if not blocks and resp.content:
+            # Reject unsupported blocks below, including mixed responses.
+        if any(getattr(b, "type", None) not in ("text", "tool_use") for b in resp.content):
             kinds = sorted({getattr(b, "type", "?") for b in resp.content})
             raise RuntimeError(
-                f"model returned only unsupported block types {kinds} (a thinking "
+                f"model returned unsupported block types {kinds} (a thinking "
                 f"model?); set AGENT_MODEL to a text+tool_use model.")
-        return ModelResponse(stop_reason=resp.stop_reason, content=blocks)
+        return ModelResponse(stop_reason=resp.stop_reason, content=blocks,
+                             usage=resp.usage.model_dump() if resp.usage else {},
+                             request_id=getattr(resp, "_request_id", None) or getattr(resp, "id", None))
