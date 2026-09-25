@@ -51,15 +51,21 @@ SYSTEM = (
     "peers, establish a comparison basis (consensus or history), then write a note "
     "stating a view, the evidence, the basis used, and what would change it."
     "\n\n"
-    "CRITICAL — grounding the written note: state ONLY numeric figures that appear "
-    "verbatim in a tool result, and cite them precisely (write 15.6%, not ~16%). Do "
-    "NOT compute, derive, or estimate any new number in the note — not growth rates, "
-    "not implied multiples, not margin projections. If you want a quantitative "
-    "comparison the tools did not compute (e.g. consensus-implied growth vs the "
-    "historical CAGR), express it QUALITATIVELY ('consensus implies materially faster "
-    "growth than the company's own ~15.6% historical CAGR') rather than inventing a "
-    "second percentage. Every number in the note is checked against the tool outputs "
-    "and the note is rejected if any figure was not computed by a tool."
+    "CRITICAL — numerical evidence: never type numbers, numeric words, percentages, "
+    "currency amounts or multiples in your own prose. Put a named evidence marker "
+    "on its OWN LINE, e.g. [[claim:operating_margin]] or [[claim:dcf_value]]. Python "
+    "renders the complete sentence with company, metric, period, unit and source. "
+    "Do not add your own label beside a marker. Use only available current results. "
+    "Available IDs: revenue, net_income, ebit, current_price, market_cap, shares, "
+    "gross_margin, operating_margin, net_margin, revenue_growth, pe, ev_ebit, "
+    "dcf_value, dcf_gap, fcff, net_debt, discount_rate, initial_growth, terminal_growth, "
+    "horizon, tax_rate, historical_growth, peer_median, peer_count, "
+    "bear_value, base_value, bull_value, bear_ev, base_ev, bull_ev, "
+    "consensus_revenue_current_year, consensus_revenue_next_year, consensus_target. "
+    "For consensus_growth or growth_vs_history, call compute_derived first. "
+    "Include at least one valid marker. Explain interpretation and limitations "
+    "qualitatively in separate paragraphs. Unknown figures must be left out."
+
 )
 
 # For offline peer-outlier demo, these peers have fixtures in fixtures/.
@@ -87,7 +93,8 @@ def build_offline_script(ticker: str):
                 f"scenario-weighted DCF, and a peer-outlier check all computed "
                 f"deterministically. Consensus was unavailable, so the comparison "
                 f"basis fell back to the company's own history (see trace). Live mode "
-                f"replaces this text with the model's written note over the same figures."
+                f"replaces this text with the model's written note over the same figures.\n"
+                "[[claim:operating_margin]]\n[[claim:dcf_value]]\n[[claim:historical_growth]]"
             ))],
         )
 
@@ -113,28 +120,16 @@ def _emit_artifacts(ticker: str, mode: str, note: str, state) -> None:
     from validation import note_grounding
     import composer
 
-    # Confidence gate: score the run's own logged outputs (deterministic).
-    validation = gate.assess(state.results)
-
-    # Note grounding: the model's note cannot state a figure no tool computed.
-    # Ground against EVERY successful tool call (the append-only history), not just
-    # the latest result per tool — so a note that legitimately cites an earlier
-    # DCF (e.g. "the initial spec gave X, the revised Y") isn't falsely flagged.
-    grounded_outputs = {f"call_{c['call_index']}": c["output"]
-                        for c in state.calls if c.get("status") == "success"}
-    grounding = note_grounding.ground_note(note, grounded_outputs)
+    validation = gate.assess(state.results, calls=state.calls)
+    grounding = note_grounding.ground_note(note, state.results)
+    checks = validation["checks"] + [{
+        "check": "note_grounding", "status": "pass" if grounding["passed"] else "fail",
+        "detail": grounding["note"] if grounding["passed"] else str(grounding["unmatched"]),
+    }]
+    validation = gate.aggregate_checks(checks)
     validation["note_grounding"] = grounding
-    if not grounding["passed"]:
-        validation["checks"].append({
-            "check": "note_grounding", "status": "fail",
-            "detail": f"note states figure(s) not computed by any tool: "
-                      f"{[u['figure'] for u in grounding['unmatched']]}"})
-        # Re-aggregate so score/verdict/confidence stay mutually consistent
-        # (no 'score 1.0 but 1 fail' contradiction).
-        reagg = gate.aggregate_checks(validation["checks"])
-        for k in ("verdict", "confidence", "score", "n_pass", "n_info_finding",
-                  "n_quality_warn", "n_fail"):
-            validation[k] = reagg[k]
+    note = grounding["rendered_note"]
+    print("NOTE (" + validation["verdict"] + "):\n" + note)
 
     _print_validation(validation)
 
@@ -185,7 +180,6 @@ def run_offline(ticker: str = "ASML.AS") -> None:
     final = run_agent(model=model, registry=registry, state=state,
                       system=SYSTEM, goal=f"Produce a defensible fundamental view on {ticker}.")
     state.print_trace()
-    print("FINAL ANSWER:\n" + final)
     _emit_artifacts(ticker, "offline", final, state)
 
 
@@ -206,7 +200,6 @@ def run_live(ticker: str, peers: list[str] | None = None) -> None:
     final = run_agent(model=model, registry=registry, state=state,
                       system=SYSTEM, goal=goal)
     state.print_trace()
-    print("FINAL ANSWER:\n" + final)
     _emit_artifacts(ticker, "live", final, state)
 
 

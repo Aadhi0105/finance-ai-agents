@@ -26,7 +26,7 @@ def test_agent1_offline_run_emits_grounded_sidecar(tmp_path):
     assert v["verdict"] in ("pass", "flag_for_review")
     # a note using only computed numbers must ground cleanly
     dcf = s.results["run_dcf"]
-    note = f"Scenario-weighted value {dcf['scenario_weighted_per_share']}."
+    note = "[[claim:dcf_value]]"
     assert note_grounding.ground_note(note, s.results)["passed"] is True
 
 

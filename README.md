@@ -129,9 +129,8 @@ Batch 1 financial hardening adds explicit currency/unit/period contracts,
 provider working-capital normalization, finite-input checks, and tested DCF,
 peer, consensus, and trend edge cases. See the
 [financial contract and model limitations](docs/agent1-financial-contract.md).
-Validation-gate, narrative-grounding, and execution/reporting hardening remain
-separate work; this batch does not establish end-to-end publication safety.
-
+Batch 2 adds [evidence validation and named numerical claims](docs/agent1-evidence-validation.md).
+Execution and report lifecycle hardening remain separate work.
 
 Give it a ticker; it produces a defensible, auditable fundamental view — the draft
 a junior analyst would produce, numerically grounded and self-flagging, not an
@@ -162,12 +161,13 @@ drawdown, the peer-multiple scatter, and the DCF football-field), `model.json`
 (every computed number behind the prose — the report rebuilds byte-identically
 from it via `python run.py --rebuild <model.json>`), and `charts/`.
 
-A **validation gate** (`validation/gate.py`) scores each run on deterministic
-checks and gates it: a data-quality problem or an implausible ratio flags the run,
+A **validation gate** (`validation/gate.py`) requires complete evidence and
+reconciled calculations. Any quality warning or failure requires review,
 while a dramatic-but-legitimate finding (a big DCF-vs-price gap) is surfaced
 without penalty. A flagged run is emitted as `report_REVIEW.html` with a
 watermark, never as an approved `report.html` — the gate gates, it doesn't just
-label.
+label. Illustrative offline runs also require review. Legacy sidecar rebuilds
+are not revalidated; report lifecycle hardening is separate work.
 
 **Integrity — the numbers are hard to break, and the note can't outrun them.**
 Agent 1 was the first agent built and was later hardened under a detailed code
@@ -185,11 +185,11 @@ aspirational:
   would overstate equity).
 - **Ticker integrity:** a dependent tool refuses to compute on another ticker's
   stored data.
-- **Note grounding** (`validation/note_grounding.py`, reusing Agent 4's
-  reconciliation philosophy): every figure in the model's written note is checked
-  against a registry of what the tools actually computed. A note claiming a fair
-  value no tool produced is caught and flags the run — so "the LLM never does the
-  math" holds at the published-note boundary, not just in the prompt.
+- **Named numerical evidence** (`validation/note_grounding.py`): the model selects
+  standalone evidence markers; Python supplies complete statements with metric,
+  company, period, value and unit. Unbound numerical prose requires review.
+  Qualitative interpretation is not mechanically verified. Original text,
+  rendered statements and evidence references are preserved in the sidecar.
 - **Auditable + reproducible:** `model.json` carries full provenance (model id, git
   commit, data source, statement period, currency) and the complete append-only
   tool-call history; offline runs are reproducible across processes (stable
