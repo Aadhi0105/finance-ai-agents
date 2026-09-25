@@ -1,8 +1,9 @@
 # Agent 1: financial correctness contract
 
 Batch 1 covers ingestion, ratios, scenario DCF, annual trends, peer screening,
-and consensus. Publication gates, narrative grounding, CLI completion states,
-and report lifecycle hardening remain separate batches.
+and consensus. Publication gates and narrative grounding are covered by
+[Batch 2](agent1-evidence-validation.md). CLI completion states and report
+lifecycle hardening remain separate work.
 
 ## Data and provenance
 

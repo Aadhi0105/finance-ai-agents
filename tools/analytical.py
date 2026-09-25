@@ -372,13 +372,17 @@ def run_dcf(tool_input: dict, state=None) -> dict:
         "terminal_value_concentration": tvc,
         "assumptions": {
             "fcf_base": fcf0, "ebit_basis": f.get("ebit_basis", "reported EBIT"), "fcf_source": fcf_source,
-            "fcff_inputs": {"ebit": ebit, "tax_rate": round(tax_rate, 4),
+            "fcff_inputs": {"ebit": ebit, "tax_rate": tax_rate,
                             "tax_basis": tax_basis, "d_and_a": dna,
                             "capex": capex_outflow, "change_in_nwc": dnwc,
                             "dnwc_note": dnwc_flag},
             "model": "two-stage: linear growth fade over horizon, then Gordon terminal",
             "high_growth": hg, "terminal_growth": tg, "horizon_years": n, "discount_rate": r,
             "discount_rate_basis": "analyst-supplied WACC assumption; not a calculated company WACC",
+            "parameter_sources": {k: ("caller_supplied" if tool_input.get(k) is not None
+                                  or (k == "high_growth" and tool_input.get("base_growth") is not None)
+                                  else "model_default")
+                                  for k in ("horizon_years", "discount_rate", "terminal_growth", "high_growth", "weights")},
             "scenario_deltas": {"bear": a["bear_delta"], "base": a["base_delta"], "bull": a["bull_delta"]},
             # per-scenario high-growth rates (base + delta) — first-class so a note
             # citing "16% bull-case growth" grounds against a genuinely computed value.
