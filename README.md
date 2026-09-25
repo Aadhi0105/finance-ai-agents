@@ -125,6 +125,14 @@ happen to rhyme:
 
 ## Agent 1 — Equity Research
 
+Batch 1 financial hardening adds explicit currency/unit/period contracts,
+provider working-capital normalization, finite-input checks, and tested DCF,
+peer, consensus, and trend edge cases. See the
+[financial contract and model limitations](docs/agent1-financial-contract.md).
+Validation-gate, narrative-grounding, and execution/reporting hardening remain
+separate work; this batch does not establish end-to-end publication safety.
+
+
 Give it a ticker; it produces a defensible, auditable fundamental view — the draft
 a junior analyst would produce, numerically grounded and self-flagging, not an
 oracle. It is deliberately the *least* agentic of the platform: the loop is

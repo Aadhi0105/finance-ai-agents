@@ -12,16 +12,30 @@
     "cash_and_equivalents": 12000000000,
     "ebit": 11301400000,
     "depreciation_amortization": 1400000000,
-    "capex": -1300000000,
+    "capex": 1300000000,
     "tax_provision": 1690000000,
     "pretax_income": 11299400000,
-    "change_in_working_capital": -450000000
+    "change_in_working_capital": -450000000,
+    "currency": "EUR",
+    "monetary_unit": "base",
+    "period_type": "annual",
+    "prior_period": "2024-12-31",
+    "statement_periods": {
+      "income": "2025-12-31",
+      "cash_flow": "2025-12-31",
+      "balance_sheet": "2025-12-31"
+    },
+    "working_capital_convention": "balance_change",
+    "capex_convention": "outflow_magnitude"
   },
   "prices": {
     "current_price": 650.0,
     "market_cap": 255450000000,
     "shares_outstanding": 393000000,
-    "history_note": "full price series is a live-only / charts-checkpoint concern; fixture carries scalars only"
+    "history_note": "full price series is a live-only / charts-checkpoint concern; fixture carries scalars only",
+    "currency": "EUR",
+    "monetary_unit": "base",
+    "as_of": "2025-12-31"
   },
   "trend": {
     "revenue_by_year": {

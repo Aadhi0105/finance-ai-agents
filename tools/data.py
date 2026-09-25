@@ -18,6 +18,8 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from datetime import datetime, timezone
+from tools.financial_contract import number, annual_pair
 
 _FIXTURE_DIR = Path(__file__).resolve().parent.parent / "fixtures"
 
@@ -52,7 +54,40 @@ def get_financials(tool_input: dict, state=None) -> dict:
     fx = _load_fixture(ticker)
     if fx is None or "financials" not in fx:
         return {"error": f"no financials fixture for {ticker}", "ticker": ticker}
-    return {"ticker": ticker, "source": "fixture", "financials": fx["financials"]}
+    return {"ticker": ticker, "source": "fixture", "financials": fx["financials"],
+            "retrieved_at": None, "provenance": "committed illustrative fixture; not live data"}
+
+
+def _retrieved():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _date(col):
+    return str(col.date()) if hasattr(col, "date") else str(col)
+
+
+def _row(df, period, *labels):
+    """Read ONLY the requested period, skipping missing/non-finite aliases."""
+    if df is None or getattr(df, "empty", True):
+        return None
+    cols = [c for c in df.columns if _date(c) == period]
+    if len(cols) != 1:
+        return None
+    for label in labels:
+        try:
+            value = number(df.loc[label, cols[0]])
+            if value is not None:
+                return value
+        except (KeyError, TypeError, ValueError):
+            continue
+    return None
+
+
+def _info(tk):
+    try:
+        return tk.info or {}
+    except Exception:
+        return {}
 
 
 def _financials_yfinance(ticker: str) -> dict:
@@ -61,81 +96,63 @@ def _financials_yfinance(ticker: str) -> dict:
     fin = tk.financials
     if fin is None or fin.empty:
         return {"error": f"yfinance returned no financials for {ticker}", "ticker": ticker}
-    latest = fin.columns[0]
-
-    def _get(label):
+    period = max(_date(c) for c in fin.columns)
+    warnings = []
+    statements = {"income": fin}
+    for name, attr in (("cash_flow", "cashflow"), ("balance_sheet", "balance_sheet")):
         try:
-            return float(fin.loc[label, latest])
+            statements[name] = getattr(tk, attr)
         except Exception:
-            return None
-
-    financials = {
-        "period": str(latest.date()) if hasattr(latest, "date") else str(latest),
-        "revenue": _get("Total Revenue"),
-        "gross_profit": _get("Gross Profit"),
-        "operating_income": _get("Operating Income"),
-        "net_income": _get("Net Income"),
+            statements[name] = None
+    periods = {}
+    for name, frame in statements.items():
+        periods[name] = period if frame is not None and period in [_date(c) for c in frame.columns] else None
+        if periods[name] is None:
+            warnings.append(f"{name} unavailable for {period}; no other period substituted")
+    cf, bs = statements["cash_flow"], statements["balance_sheet"]
+    fields = {
+        "revenue": (fin, ("Total Revenue",)), "gross_profit": (fin, ("Gross Profit",)),
+        "operating_income": (fin, ("Operating Income",)), "net_income": (fin, ("Net Income",)),
+        "ebit": (fin, ("EBIT", "Operating Income")),
+        "tax_provision": (fin, ("Tax Provision", "Income Tax Expense")),
+        "pretax_income": (fin, ("Pretax Income", "Income Before Tax")),
+        "depreciation_amortization": (cf, ("Depreciation And Amortization", "Depreciation Amortization Depletion", "Depreciation Depletion And Amortization")),
+        "capex": (cf, ("Capital Expenditure", "Capital Expenditures")),
+        "free_cash_flow": (cf, ("Free Cash Flow",)),
+        "total_debt": (bs, ("Total Debt",)),
+        "cash_and_equivalents": (bs, ("Cash And Cash Equivalents",)),
     }
-    if len(fin.columns) > 1:
-        prev = fin.columns[1]
-        try:
-            financials["revenue_prior"] = float(fin.loc["Total Revenue", prev])
-        except Exception:
-            financials["revenue_prior"] = None
-
-    # --- DCF v2 inputs: free cash flow (cash-flow statement) + net-debt items ---
-    # yfinance row labels drift across versions/filers, so each lookup tries a
-    # few known labels and returns None if absent (DCF v2 then falls back and logs it).
-    def _row(df, *labels):
-        if df is None or getattr(df, "empty", True):
-            return None
-        col = df.columns[0]
-        for lab in labels:
-            try:
-                v = df.loc[lab, col]
-                if v is not None:
-                    return float(v)
-            except Exception:
-                continue
-        return None
-
-    try:
-        cf = tk.cashflow
-    except Exception:
-        cf = None
-    try:
-        bs = tk.balance_sheet
-    except Exception:
-        bs = None
-
-    fcf = _row(cf, "Free Cash Flow")
-    if fcf is None:  # derive from OCF - capex if the explicit FCF row is missing
-        ocf = _row(cf, "Operating Cash Flow", "Total Cash From Operating Activities")
-        capex = _row(cf, "Capital Expenditure", "Capital Expenditures")
-        if ocf is not None and capex is not None:
-            fcf = ocf + capex  # capex is reported negative, so add
-
-    financials["free_cash_flow"] = fcf
-    financials["total_debt"] = _row(bs, "Total Debt")
-    financials["cash_and_equivalents"] = _row(
-        bs, "Cash And Cash Equivalents",
-        "Cash Cash Equivalents And Short Term Investments",
-        "Cash And Cash Equivalents And Short Term Investments",
-    )
-
-    # --- FCFF (unlevered) inputs: EBIT(1-T) + D&A - CapEx - dNWC ---
-    # Row labels verified against live yfinance income/cash-flow statements.
-    financials["ebit"] = _row(fin, "EBIT") or financials.get("operating_income")
-    financials["depreciation_amortization"] = (
-        _row(cf, "Depreciation And Amortization", "Depreciation Amortization Depletion")
-        or _row(fin, "Reconciled Depreciation"))
-    financials["capex"] = _row(cf, "Capital Expenditure", "Capital Expenditures")
-    financials["tax_provision"] = _row(fin, "Tax Provision", "Income Tax Expense")
-    financials["pretax_income"] = _row(fin, "Pretax Income", "Income Before Tax")
-    financials["change_in_working_capital"] = _row(cf, "Change In Working Capital")
-    return {"ticker": ticker, "source": "yfinance", "financials": financials}
-
-
+    financials = {key: _row(frame, period, *labels) for key, (frame, labels) in fields.items()}
+    if _row(fin, period, "EBIT") is None and financials["ebit"] is not None:
+        warnings.append("EBIT unavailable; operating income used as explicitly labelled proxy")
+    if financials["depreciation_amortization"] is None:
+        financials["depreciation_amortization"] = _row(fin, period, "Reconciled Depreciation")
+    raw_capex = financials["capex"]
+    financials["capex"] = abs(raw_capex) if raw_capex is not None else None
+    if financials["free_cash_flow"] is None:
+        ocf = _row(cf, period, "Operating Cash Flow", "Total Cash From Operating Activities")
+        if ocf is not None and raw_capex is not None:
+            financials["free_cash_flow"] = ocf - abs(raw_capex)
+    # Yahoo's cash-flow row is a signed contribution to operating cash flow.
+    # Contract uses the opposite sign: investment/absorption in working capital.
+    raw_wc = _row(cf, period, "Change In Working Capital")
+    financials["change_in_working_capital"] = -raw_wc if raw_wc is not None else None
+    previous = sorted((d for d in (_date(c) for c in fin.columns) if annual_pair(period, d)), reverse=True)
+    financials["revenue_prior"] = _row(fin, previous[0], "Total Revenue") if previous else None
+    financials.update({
+        "period": period, "prior_period": previous[0] if previous else None,
+        "ebit_basis": "reported EBIT" if _row(fin, period, "EBIT") is not None else "operating income proxy",
+        "period_type": "annual", "statement_periods": periods,
+        "currency": _info(tk).get("financialCurrency"), "monetary_unit": "base",
+        "working_capital_convention": "balance_change", "capex_convention": "outflow_magnitude",
+        "working_capital_basis": "provider operating-assets/liabilities aggregate; may include non-current items",
+        "period_basis": "provider annual period labels; may differ from issuer fiscal closing date",
+    })
+    return {"ticker": ticker, "source": "yfinance", "retrieved_at": _retrieved(),
+            "financials": financials, "warnings": warnings,
+            "normalization": {"working_capital": {"raw": raw_wc, "raw_convention": "cash_flow_contribution",
+                               "operation": "negate", "normalized": financials["change_in_working_capital"]},
+                              "capex": {"raw": raw_capex, "operation": "absolute_outflow"}}}
 
 
 # --- get_prices -----------------------------------------------------------
@@ -159,6 +176,9 @@ def get_prices(tool_input: dict, state=None) -> dict:
         "current_price": p.get("current_price"),
         "market_cap": p.get("market_cap"),
         "shares_outstanding": p.get("shares_outstanding"),
+        "currency": p.get("currency"), "monetary_unit": p.get("monetary_unit"),
+        "as_of": p.get("as_of"), "retrieved_at": None,
+        "provenance": "committed illustrative fixture; not live data",
     }
 
 
@@ -172,8 +192,8 @@ def _prices_yfinance(ticker: str) -> dict:
         for k in keys:
             try:
                 v = fi[k]
-                if v:
-                    return float(v)
+                if number(v) is not None:
+                    return number(v)
             except Exception:
                 pass
         return None
@@ -182,12 +202,9 @@ def _prices_yfinance(ticker: str) -> dict:
     market_cap = _fi("market_cap", "marketCap")
     shares = _fi("shares", "sharesOutstanding")
 
+    info = _info(tk)
     if shares is None:
-        try:
-            so = tk.info.get("sharesOutstanding")
-            shares = float(so) if so else None
-        except Exception:
-            shares = None
+        shares = number(info.get("sharesOutstanding"))
 
     return {
         "ticker": ticker,
@@ -195,6 +212,9 @@ def _prices_yfinance(ticker: str) -> dict:
         "current_price": current_price,
         "market_cap": market_cap,
         "shares_outstanding": shares,
+        "currency": info.get("currency"), "monetary_unit": "base",
+        "as_of": None, "provider_quote_time": info.get("regularMarketTime"),
+        "timestamp_note": "fast_info price timestamp unavailable; provider_quote_time belongs to info snapshot", "retrieved_at": _retrieved(),
     }
 
 # --- get_price_history ----------------------------------------------------
@@ -298,51 +318,70 @@ def home_index_ticker(ticker: str) -> str | None:
 # honestly, and the *model* must decide to call get_historical_trend instead.
 # That decision is where the loop stops being a pipeline.
 
+def _consensus_result(ticker, source, estimates, **metadata):
+    cleaned = {}
+    for key in ("price_target", "revenue_estimate_avg", "eps_estimate_avg"):
+        values = {str(k): number(v) for k, v in (estimates.get(key) or {}).items()}
+        values = {k: v for k, v in values.items() if v is not None}
+        if key == "price_target":
+            values = {k: v for k, v in values.items() if k in ("low", "high", "mean", "median") and v > 0}
+        else:
+            values = {k: v for k, v in values.items() if k in ("0q", "+1q", "0y", "+1y")}
+            if key == "revenue_estimate_avg":
+                values = {k: v for k, v in values.items() if v > 0}
+        if values:
+            cleaned[key] = values
+    return {"ticker": ticker, "source": source, "available": bool(cleaned),
+            "consensus": cleaned, "monetary_unit": "base",
+            "reason": None if cleaned else "no usable analyst estimates",
+            **metadata}
+
+
 def get_consensus(tool_input: dict, state=None) -> dict:
     ticker = tool_input["ticker"].upper()
     if _source() == "yfinance":
         return _consensus_yfinance(ticker)
-    # Offline: no consensus fixture -> demonstrates the common null path.
     fx = _load_fixture(ticker) or {}
-    if "consensus" in fx:
-        return {"ticker": ticker, "source": "fixture", "available": True, "consensus": fx["consensus"]}
-    return {"ticker": ticker, "source": "fixture", "available": False,
-            "reason": "no analyst consensus available (expected — it is the paywalled input)"}
+    return _consensus_result(ticker, "fixture", fx.get("consensus", {}), retrieved_at=None,
+                             as_of=None, coverage={}, warnings=["illustrative fixture"],
+                             reporting_currency=fx.get("financials", {}).get("currency"),
+                             quote_currency=fx.get("prices", {}).get("currency"))
 
 
 def _consensus_yfinance(ticker: str) -> dict:
     import yfinance as yf
     tk = yf.Ticker(ticker)
-    out = {}
-    # Analyst price targets (dict-like on recent yfinance).
+    out, coverage, warnings = {}, {}, []
     try:
-        pt = tk.analyst_price_targets
-        if pt:
-            out["price_target"] = {k: float(pt[k]) for k in ("current", "low", "high", "mean", "median")
-                                   if pt.get(k) is not None}
-    except Exception:
-        pass
-    # Forward revenue / EPS estimates.
+        out["price_target"] = tk.analyst_price_targets or {}
+    except Exception as exc:
+        warnings.append(f"price targets unavailable ({type(exc).__name__})")
     for attr, key in (("revenue_estimate", "revenue_estimate_avg"),
                       ("earnings_estimate", "eps_estimate_avg")):
         try:
             df = getattr(tk, attr)
             if df is not None and not df.empty and "avg" in df.columns:
-                out[key] = {str(idx): float(df.loc[idx, "avg"]) for idx in df.index
-                            if df.loc[idx, "avg"] == df.loc[idx, "avg"]}
-        except Exception:
-            pass
-    if out:
-        return {"ticker": ticker, "source": "yfinance", "available": True, "consensus": out}
-    return {"ticker": ticker, "source": "yfinance", "available": False,
-            "reason": "yfinance returned no analyst estimates for this ticker"}
+                out[key], coverage[key] = {}, {}
+                for idx in df.index:
+                    count = number(df.loc[idx, "numberOfAnalysts"]) if "numberOfAnalysts" in df.columns else None
+                    coverage[key][str(idx)] = count
+                    if count is None or count > 0:
+                        out[key][str(idx)] = number(df.loc[idx, "avg"])
+        except Exception as exc:
+            warnings.append(f"{key} unavailable ({type(exc).__name__})")
+    info = _info(tk)
+    coverage["price_target"] = number(info.get("numberOfAnalystOpinions"))
+    if coverage["price_target"] is None:
+        coverage["price_target"] = number(out.get("price_target", {}).get("numberOfAnalysts"))
+    if coverage["price_target"] is not None and coverage["price_target"] <= 0:
+        out.pop("price_target", None)
+    return _consensus_result(ticker, "yfinance", out, retrieved_at=_retrieved(), as_of=None,
+                            reporting_currency=info.get("financialCurrency"),
+                            quote_currency=info.get("currency"), coverage=coverage,
+                            warnings=warnings + ["provider estimate publication dates unavailable; retrieval time is not estimate date"])
 
 
-# --- get_historical_trend -------------------------------------------------
-#
-# The fallback basis the model reaches for when consensus is null: the
-# company's OWN multi-year trajectory (revenue, net income, margins, CAGR).
-# Always available from the same fundamentals source.
+# --- annual historical trend ---------------------------------------------
 
 def get_historical_trend(tool_input: dict, state=None) -> dict:
     ticker = tool_input["ticker"].upper()
@@ -351,8 +390,12 @@ def get_historical_trend(tool_input: dict, state=None) -> dict:
     fx = _load_fixture(ticker) or {}
     if "trend" not in fx:
         return {"ticker": ticker, "source": "fixture", "error": "no trend fixture"}
-    return _summarise_trend(ticker, "fixture", fx["trend"]["revenue_by_year"],
-                            fx["trend"]["net_income_by_year"])
+    result = _summarise_trend(ticker, "fixture", fx["trend"]["revenue_by_year"],
+                              fx["trend"]["net_income_by_year"])
+    result.update({"currency": fx.get("financials", {}).get("currency"),
+                   "monetary_unit": "base", "retrieved_at": None,
+                   "provenance": "committed illustrative annual fixture; not live data"})
+    return result
 
 
 def _trend_yfinance(ticker: str) -> dict:
@@ -361,34 +404,58 @@ def _trend_yfinance(ticker: str) -> dict:
     fin = tk.financials
     if fin is None or fin.empty:
         return {"ticker": ticker, "source": "yfinance", "error": "no financials for trend"}
-    rev, ni = {}, {}
-    for col in list(fin.columns)[:4]:
-        y = str(col.date().year) if hasattr(col, "date") else str(col)
-        try:
-            rev[y] = float(fin.loc["Total Revenue", col])
-        except Exception:
-            pass
-        try:
-            ni[y] = float(fin.loc["Net Income", col])
-        except Exception:
-            pass
-    return _summarise_trend(ticker, "yfinance", rev, ni)
+    rev, ni, periods, excluded = {}, {}, {}, []
+    # Start at the latest period; exclude stubs and preserve exact source dates.
+    previous = None
+    for col in sorted(fin.columns, key=_date, reverse=True):
+        period = _date(col)
+        if previous and not annual_pair(previous, period):
+            excluded.append({"period": period, "reason": "not a comparable consecutive annual period"})
+            continue
+        year = period[:4]
+        if year in periods:
+            excluded.append({"period": period, "reason": "duplicate fiscal year"})
+            continue
+        periods[year] = period
+        rev[year] = _row(fin, period, "Total Revenue")
+        ni[year] = _row(fin, period, "Net Income")
+        previous = period
+    out = _summarise_trend(ticker, "yfinance", rev, ni)
+    out.update({"periods": periods, "excluded_periods": excluded, "retrieved_at": _retrieved(),
+                "currency": _info(tk).get("financialCurrency"), "monetary_unit": "base"})
+    return out
 
 
 def _summarise_trend(ticker: str, source: str, rev: dict, ni: dict) -> dict:
-    years = sorted(rev.keys())
-    net_margin_by_year = {y: round(ni[y] / rev[y], 4) for y in years
-                          if y in ni and rev.get(y)}
+    rev = {str(y): number(v) for y, v in rev.items() if str(y).isdigit() and len(str(y)) == 4}
+    ni = {str(y): number(v) for y, v in ni.items()}
+    years = sorted(rev)
+    net_margin_by_year = {y: number(round(ni[y] / rev[y], 4)) for y in years
+                          if ni.get(y) is not None and rev[y] is not None and rev[y] > 0}
     cagr = None
-    if len(years) >= 2 and rev.get(years[0]):
-        n = int(years[-1]) - int(years[0])
-        if n > 0:
-            cagr = round((rev[years[-1]] / rev[years[0]]) ** (1 / n) - 1, 4)
+    # Use only the latest contiguous usable annual sequence. Yahoo often adds
+    # an all-NaN oldest column; it must not discard four valid recent years.
+    cagr_years = []
+    for y in reversed(years):
+        if rev[y] is None or rev[y] <= 0:
+            break
+        if cagr_years and int(cagr_years[-1]) - int(y) != 1:
+            break
+        cagr_years.append(y)
+    cagr_years.reverse()
+    comparable = len(cagr_years) >= 2
+    if comparable:
+        try:
+            cagr = number((rev[cagr_years[-1]] / rev[cagr_years[0]]) ** (1 / (len(cagr_years) - 1)) - 1)
+        except OverflowError:
+            cagr = None
+        comparable = cagr is not None
     return {
-        "ticker": ticker, "source": source,
+        "ticker": ticker, "source": source, "available": comparable,
         "revenue_by_year": {y: rev[y] for y in years},
-        "net_margin_by_year": net_margin_by_year,
-        "revenue_cagr": cagr,
-        "basis": "company_own_history",
+        "net_margin_by_year": net_margin_by_year, "revenue_cagr": round(cagr, 4) if cagr is not None else None,
+        "cagr_years": cagr_years if comparable else [],
+        "basis": "company_own_history" if comparable else "insufficient_comparable_history",
+        "reason": None if comparable else "need at least two consecutive annual periods with positive finite revenues",
         "computed_by": "get_historical_trend (python)",
     }
