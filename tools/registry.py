@@ -179,4 +179,11 @@ class ToolRegistry:
             return {"error": error, "error_type": "invalid_arguments"}
         if self.state.ticker and tool_input['ticker'].upper() != self.state.ticker.upper():
             return {"error": "ticker differs from run subject", "error_type": "ticker_mismatch"}
+        pinned = self.state.configuration.get('peers')
+        if name == 'peer_outlier_check' and pinned:
+            supplied = [ticker.upper() for ticker in tool_input['peers']]
+            expected = [ticker.upper() for ticker in pinned]
+            if len(supplied) != len(set(supplied)) or set(supplied) != set(expected):
+                return {"error": "peers differ from the explicitly requested set",
+                        "error_type": "peer_set_mismatch"}
         return impl(tool_input, self.state)

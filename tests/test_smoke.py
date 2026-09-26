@@ -5,29 +5,19 @@ the spine)."""
 import json
 import os
 
-os.environ.setdefault("AGENT_DATA_SOURCE", "fixture")
-
-
 def test_agent1_offline_run_emits_grounded_sidecar(tmp_path):
-    # Drive the analytical chain directly (no model needed) and ground a note.
-    from tools import data
-    from tools.analytical import compute_ratios, run_dcf
-    from validation import gate, note_grounding
-    from tests.conftest import make_state
-
-    fin = data.get_financials({"ticker": "ASML.AS"})["financials"]
-    pr = data.get_prices({"ticker": "ASML.AS"})
-    s = make_state("ASML.AS", fin, {"market_cap": pr["market_cap"],
-                                    "shares_outstanding": pr["shares_outstanding"],
-                                    "current_price": pr["current_price"]})
-    s.results["compute_ratios"] = compute_ratios({"ticker": "ASML.AS"}, s)
-    s.results["run_dcf"] = run_dcf({"ticker": "ASML.AS"}, s)
-    v = gate.assess(s.results)
-    assert v["verdict"] in ("pass", "flag_for_review")
-    # a note using only computed numbers must ground cleanly
-    dcf = s.results["run_dcf"]
-    note = "[[claim:dcf_value]]"
-    assert note_grounding.ground_note(note, s.results)["passed"] is True
+    from run import run_offline
+    assert run_offline(output_root=tmp_path) == 3
+    sidecar, = tmp_path.glob("*/model.json")
+    record = json.loads(sidecar.read_text())
+    assert record["execution"]["status"] == "completed"
+    assert record["validation"]["verdict"] == "flag_for_review"
+    assert record["validation"]["note_grounding"]["passed"]
+    assert record["artifacts"]["status"] == "complete"
+    assert len(record["call_history"]) == 7
+    assert len(record["artifacts"]["charts"]) == 5
+    assert (sidecar.parent / "report_REVIEW.html").exists()
+    assert not (sidecar.parent / "report.html").exists()
 
 
 def test_agent2_cycle_runs():

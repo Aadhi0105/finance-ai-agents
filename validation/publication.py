@@ -13,6 +13,9 @@ def assess_record(record):
     checks = result['checks'] + [{'check': 'note_grounding',
         'status': 'pass' if grounding['passed'] else 'fail',
         'detail': grounding['note'] if grounding['passed'] else str(grounding['unmatched'])}]
+    if record.get('schema_version') != 2:
+        checks.append({'check': 'record_schema', 'status': 'fail',
+                       'detail': 'unsupported or legacy record schema; current version is 2'})
     execution = record.get('execution') or {}
     if execution.get('status') != 'completed' or (execution.get('outcome') or {}).get('status') != 'completed':
         checks.append({'check': 'execution_status', 'status': 'fail',
