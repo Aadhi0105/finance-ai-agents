@@ -118,6 +118,47 @@ def _new_output(ticker, output_root="output"):
     return str(out), run_id
 
 
+def _narrative_feedback(note, results):
+    from validation.note_grounding import ground_note, build_evidence_catalog
+    import json
+    checked = ground_note(note, results)
+    if checked['passed']:
+        return None
+    return (
+        'Your draft failed numerical grounding. Rewrite the entire note once using '
+        'the existing tool evidence. Do not request more tools or change assumptions. '
+        'Remove all free-text digits, number words, numeric thresholds and dates. '
+        'Express interpretation qualitatively. Put each numerical claim in a '
+        'standalone [[claim:ID]] marker; do not repeat its value in prose. '
+        'Use only these available IDs: ' + ', '.join(build_evidence_catalog(results)) +
+        '. Validation findings: ' + json.dumps(checked['unmatched'])
+    )
+
+
+def _finalize_narrative(state):
+    """Withhold rejected interpretation; never clean numeric prose by deletion."""
+    from validation.note_grounding import ground_note, build_evidence_catalog
+    outcome = state.outcome
+    if not outcome or outcome.status != 'completed':
+        return outcome.text if outcome else ''
+    if ground_note(outcome.text, state.results)['passed']:
+        return outcome.text
+    catalog = build_evidence_catalog(state.results)
+    if not catalog:
+        return outcome.text  # No substitute evidence can be manufactured.
+    template = (
+        'The model narrative failed numerical grounding. Interpretive prose is '
+        'withheld. These statements are generated from saved evidence and require '
+        'analyst review.\n\n' + '\n'.join('[[claim:' + key + ']]' for key in catalog)
+    )
+    if not ground_note(template, state.results)['passed']:
+        return outcome.text
+    state.configuration['narrative_output'] = 'evidence_only_fallback'
+    state.record_note('rejected model interpretation withheld; deterministic evidence-only fallback')
+    state.finish('completed', template, outcome.reason, outcome.iterations)
+    return template
+
+
 def _snapshot(ticker, mode, note, state, out_dir, run_id=None, provenance=None):
     import composer
     if not note and state.outcome:
@@ -154,6 +195,12 @@ def _emit_artifacts(ticker, mode, note, state, out_dir=None, run_id=None, proven
             data = get_price_history(symbol)
             if not isinstance(data, dict) or data.get('error') or not data.get('history'):
                 raise ValueError('history unavailable')
+            from tools.price_history import prepare_history
+            data = prepare_history(data)
+            json.dumps(data, allow_nan=False)
+            record['chart_data'][key] = data
+            if data.get('error'):
+                raise ValueError('history contains unusable observations')
             composer._valid_history(data['history'])
             # Validate the whole payload before it can replace a durable checkpoint.
             json.dumps(data, allow_nan=False)
@@ -236,8 +283,9 @@ def _execute(ticker, mode, peers=None, output_root='output', trace=False):
                 model = StubModel(script=build_offline_script(ticker))
             registry = ToolRegistry(state)
             result = run_agent(model=model, registry=registry, state=state, system=SYSTEM, goal=goal,
+                final_feedback=_narrative_feedback if mode == 'live' else None,
                 checkpoint=lambda current: _snapshot(ticker, mode, '', current, out_dir, run_id, provenance))
-            note = result.text
+            note = _finalize_narrative(state) if mode == 'live' else result.text
         except KeyboardInterrupt:
             state.finish('incomplete', note, 'interrupted')
         except Exception as exc:

@@ -135,6 +135,10 @@ peer, consensus, and trend edge cases. See the
 Batch 2 adds [evidence validation and named numerical claims](docs/agent1-evidence-validation.md).
 Batch 3 adds [execution checkpoints and report lifecycle controls](docs/agent1-execution-reporting.md).
 Batch 4 adds [acceptance tests and a verification record](docs/agent1-verification.md).
+Live drafts now get at most one numerical-grounding correction request, followed
+by revalidation. A rejected revision falls back to explicitly labelled evidence
+statements with model interpretation withheld. Charts may end before invalid trailing observations with visible
+warnings and retained excluded rows; internal gaps are never bridged.
 
 Give it a ticker; it produces a defensible, auditable fundamental view — the draft
 a junior analyst would produce, numerically grounded and self-flagging, not an

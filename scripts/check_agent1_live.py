@@ -41,6 +41,9 @@ def worker(ticker, operation):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             fn = getattr(data, operation)
             evidence = fn(ticker, period='1mo') if operation == 'get_price_history' else fn({'ticker':ticker})
+            if operation == 'get_price_history' and not evidence.get('error'):
+                from tools.price_history import prepare_history
+                evidence = prepare_history(evidence)
         json.dumps(evidence, allow_nan=False)
         issues = []
         if evidence.get('error'):
@@ -61,6 +64,7 @@ def worker(ticker, operation):
         elif operation == 'get_price_history':
             from composer import _valid_history
             _valid_history(evidence.get('history', []))
+            issues.extend(evidence.get('warnings', []))
         return {'status':'review' if issues else 'observed', 'issues':issues, 'evidence':evidence}
     except Exception as exc:
         return {'status':'unavailable','error_type':type(exc).__name__}
