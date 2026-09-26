@@ -11,6 +11,15 @@ The shared loop returns a `RunOutcome` with status `completed`, `incomplete`, or
 with nonempty text and no outstanding tool requests completes. Truncation,
 refusal, exhausted offline scripts, and the iteration limit are incomplete.
 Invalid tool protocols and model exceptions fail. Interruptions are incomplete.
+Agent 1 checks a completed draft's numerical grounding and may request one
+revision within the existing iteration limit. The original draft, feedback,
+revised draft and token usage stay in the conversation audit. The revision
+cannot request tools or alter financial inputs. If the revision still fails, its interpretation is withheld and Python emits
+only named evidence statements, explicitly marked for analyst review. Both
+model drafts remain in the audit conversation. If no usable evidence exists,
+no substitute is manufactured and validation still fails. Truncation or a
+failed correction is not completion. The fixed offline script does not retry.
+This checks numeric attribution, not the truth of qualitative interpretation.
 All text blocks in a final answer are retained. Agent 2's triage wrapper keeps
 its string interface and labels incomplete or failed results.
 
@@ -51,8 +60,13 @@ completion. Usage on a response that never arrives cannot be recovered locally.
 Analysis is saved before chart data acquisition or importing matplotlib.
 History acquisition and each chart render are independent. Failed charts are
 labelled unavailable; other charts and the underlying analysis remain saved.
-Empty, unordered, duplicate-date, nonfinite, or nonpositive price histories are
-rejected. Artifact errors require a review report and a failure exit code.
+Unordered or duplicate dates are rejected. Missing/nonpositive observations
+at the end of a series may be excluded from the chart window only when at least
+two valid observations remain and there are no internal gaps. The sidecar keeps
+all source rows (nonfinite values represented as null), excluded dates, policy,
+and effective end date. A visible warning requires review. No interpolation or
+substitution of today's quote occurs. Invalid interior observations or an
+insufficient remaining window still prevent chart generation. Artifact errors require a review report and a failure exit code.
 
 JSON, PNG, and self-contained HTML writes use same-directory temporary files,
 flush/fsync, and atomic replacement. This is atomic per file, not a transaction

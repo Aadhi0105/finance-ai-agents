@@ -11,7 +11,7 @@ MAX_ITERS = 12
 
 
 def run_agent(*, model, registry, state, system: str, goal: str, checkpoint=None,
-              max_iters: int = MAX_ITERS) -> RunOutcome:
+              max_iters: int = MAX_ITERS, final_feedback=None) -> RunOutcome:
     """Only end_turn with nonempty text completes. All other exits are explicit.
 
     Checkpoint errors deliberately propagate: never continue a paid run after
@@ -39,6 +39,8 @@ def run_agent(*, model, registry, state, system: str, goal: str, checkpoint=None
 
     save()
     partial = ''
+    revision_requested = False
+    state.configuration['max_narrative_revisions'] = 1 if final_feedback else 0
     seen_ids = set()
     for iteration in range(max_iters):
         state.record_note(f'iteration {iteration}: asking model')
@@ -68,7 +70,17 @@ def run_agent(*, model, registry, state, system: str, goal: str, checkpoint=None
         partial = '\n'.join(b['text'] for b in blocks if b['type'] == 'text')
         requested = [b for b in blocks if b['type'] == 'tool_use']
         save()
+        if revision_requested and requested:
+            return finish('incomplete', partial, 'narrative_revision_requested_tools', iteration + 1)
         if stop == 'end_turn' and not requested:
+            if partial.strip() and final_feedback and not revision_requested:
+                feedback = final_feedback(partial, state.results)
+                if feedback and iteration + 1 < max_iters:
+                    revision_requested = True
+                    messages.append({'role': 'user', 'content': feedback})
+                    state.record_note('narrative validation failed; requested the single allowed revision')
+                    save()
+                    continue
             return finish('completed' if partial.strip() else 'incomplete', partial,
                           'end_turn' if partial.strip() else 'empty_answer', iteration + 1)
         if stop == 'end_turn' and requested:

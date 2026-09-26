@@ -246,8 +246,8 @@ def _history_yfinance(ticker: str, period: str) -> dict:
         d = idx.date().isoformat() if hasattr(idx, "date") else str(idx)
         rows.append({
             "date": d,
-            "close": round(float(row["Close"]), 4),
-            "volume": int(row["Volume"]) if row.get("Volume") == row.get("Volume") else None,
+            "close": round(number(row["Close"]), 4) if number(row["Close"]) is not None else None,
+            "volume": int(number(row.get("Volume"))) if number(row.get("Volume")) is not None else None,
         })
     return {"ticker": ticker, "source": "yfinance", "period": period, "history": rows}
 

@@ -102,8 +102,8 @@ CI now declares Python 3.11 and 3.12 jobs; their remote results must be checked 
 the Batch 4 PR. Local results do not establish that both CI environments passed.
 No line-coverage percentage or exhaustive proof is claimed by the matrix above.
 
-No paid live-model run was performed. Model behavior is tested with protocol
-responses/doubles; full live research remains sensitive to model choice, provider
+No paid live-model run was performed during Batch 4; the follow-up below records
+later live verification. Full live research remains sensitive to model choice, provider
 availability, missing fields and peer selection. Approval checks numerical and
 execution evidence, not the economic truth of qualitative prose. There is no
 company-specific WACC estimator, operating-driver forecast, automatic FX/ADR
@@ -113,3 +113,39 @@ Missing data and unsuitable DCF inputs still require review or refusal.
 Batches 1–4 address the agreed Agent 1 remediation scope with these explicit
 limits. The showcase, other agents and platform-wide integration still require
 their scheduled audit phases; they are not certified by these tests.
+
+
+## Live recovery follow-up — 2026-09-26 UTC
+
+The first full live ASML run completed its model/tool work but failed numerical
+narrative grounding and produced only two charts. Yahoo's latest daily row had
+no adjusted or unadjusted closing price. Rejecting that input was correct, but
+it prevented use of the otherwise valid historical chart window.
+
+The follow-up implements one bounded narrative correction, then revalidation.
+If the revision still fails, Python emits explicitly labelled evidence statements
+and withholds the model's interpretation; original and revised model drafts remain
+in the audit conversation. Fallback output always requires analyst review.
+The shared loop's total iteration cap still applies, and correction cannot invoke
+tools. The offline script does not request a model revision.
+
+The chart policy permits excluding invalid trailing observations only. Source
+rows with missing values, excluded dates, and the effective chart end date remain
+in the sidecar. The report displays the limitation and requires review. Internal
+gaps are never bridged and missing prices are never interpolated.
+
+Final fresh live verification used claude-sonnet-4-5-20250929 for ASML.AS with
+ASM.AS, BESI.AS and LRCX as the enforced peer set:
+
+- Completed in five model turns with eight successful tool calls.
+- One narrative revision was requested and passed grounding; fallback was not needed.
+- Zero validation failures and all five charts generated.
+- Charts ended on 2026-09-24; the invalid 2026-09-25 row was retained as excluded evidence.
+- Exit code 3 and `report_REVIEW.html`, as expected for unresolved timestamp,
+  model-assumption and peer-comparability warnings.
+- A rebuild preserved execution, analysis, call history and chart-data records.
+- Full local suite: **362 tests passed** on Python 3.11.9.
+
+This verifies a successful live execution and numerical grounding, not the
+investment merits of the model's qualitative opinion or reliability on all
+future model/provider responses. No approval was forced by weakening the gate.

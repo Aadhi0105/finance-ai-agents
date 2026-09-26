@@ -17,9 +17,17 @@ def assess_record(record):
         checks.append({'check': 'record_schema', 'status': 'fail',
                        'detail': 'unsupported or legacy record schema; current version is 2'})
     execution = record.get('execution') or {}
+    if (execution.get('configuration') or {}).get('narrative_output') == 'evidence_only_fallback':
+        checks.append({'check': 'narrative_fallback', 'status': 'quality_warn',
+                       'detail': 'model interpretation withheld after grounding failure; evidence-only output'})
     if execution.get('status') != 'completed' or (execution.get('outcome') or {}).get('status') != 'completed':
         checks.append({'check': 'execution_status', 'status': 'fail',
                        'detail': 'model execution not completed or completion evidence missing'})
+    for name, series in (record.get('chart_data') or {}).items():
+        if isinstance(series, dict):
+            for warning in series.get('warnings', []):
+                checks.append({'check': 'history_' + name, 'status': 'quality_warn',
+                               'detail': warning})
     artifacts = record.get('artifacts') or {}
     for error in artifacts.get('errors', []):
         checks.append({'check': 'artifact_' + error['stage'], 'status': 'quality_warn',
