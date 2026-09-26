@@ -133,7 +133,8 @@ provider working-capital normalization, finite-input checks, and tested DCF,
 peer, consensus, and trend edge cases. See the
 [financial contract and model limitations](docs/agent1-financial-contract.md).
 Batch 2 adds [evidence validation and named numerical claims](docs/agent1-evidence-validation.md).
-Execution and report lifecycle hardening remain separate work.
+Batch 3 adds [execution checkpoints and report lifecycle controls](docs/agent1-execution-reporting.md).
+Batch 4 adds [acceptance tests and a verification record](docs/agent1-verification.md).
 
 Give it a ticker; it produces a defensible, auditable fundamental view — the draft
 a junior analyst would produce, numerically grounded and self-flagging, not an
@@ -528,12 +529,11 @@ suite exists so the integrity fixes above can't silently regress.
 Stated plainly, because knowing a tool's limits is part of building it:
 
 - **Agent 1's DCF is a deliberate scaffold**, not a full three-statement model — a
-  two-stage fade with scenario weights on real FCF. Defensible and auditable, not a
+  two-stage fade with scenario weights on reconstructed FCFF with explicit assumptions. Defensible and auditable, not a
   valuation an equity desk would ship as-is.
-- **The peer check is directional at small n**, and the model picks its own peers
-  live, so peer sets aren't perfectly reproducible across runs — that's the agentic
-  behaviour, with reproducibility as the trade-off (Agent 3 solves the same tension
-  by *pinning* the proposed set).
+- **The peer check is directional at small n.** In Agent 1, `--peers` enforces
+  the requested set at dispatch; without it, the live model selects peers.
+  Neither path establishes economic comparability automatically.
 - **Agent 2's fixture series are deliberately clean**, so drift t-stats read sharp;
   real, noisier data would produce more graduated signals. The machinery is what's
   demonstrated.

@@ -176,8 +176,8 @@ def render_dcf_footballfield_png(dcf: dict, ticker: str, currency: str | None = 
     # show an honest placeholder rather than a misleading EV-per-share chart.
     if bear is None or base is None or bull is None:
         return _placeholder_png(ticker, "DCF football field",
-                                "enterprise value only — no equity per-share "
-                                "(equity valuation unavailable)")
+                                "equity per-share valuation unavailable; "
+                                "see saved analysis and validation")
 
     fig, ax = plt.subplots(figsize=(9, 2.8))
     y = 0
@@ -207,6 +207,10 @@ def render_peer_scatter_png(peer: dict, ticker: str) -> bytes:
     target_pe = peer.get("target_pe")
     median = peer.get("peer_median")
     mad = peer.get("peer_mad")
+
+    from tools.financial_contract import finite
+    if not finite(target_pe) or not peer_pes:
+        return _placeholder_png(ticker, "Peer P/E comparison", "insufficient usable target or peer evidence")
 
     names = list(peer_pes.keys()) + [ticker]
     vals = list(peer_pes.values()) + [target_pe]

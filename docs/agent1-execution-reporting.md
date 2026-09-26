@@ -88,5 +88,7 @@ Modes are mutually exclusive and malformed arguments fail before execution.
 
 Offline fixture runs normally return 3. Runtime dependencies include jsonschema
 and filelock; offline execution is not a standard-library-only installation.
-Tests use local fixtures and simulated failures, with no paid LLM calls. Broader
-verification and remaining Agent 1 audit work belong to Batch 4.
+Tests use local fixtures and simulated failures, with no paid LLM calls.
+[Batch 4 verification](agent1-verification.md) adds full CLI acceptance checks,
+controlled provider observations, enforced peer selection, and schema-version
+checks.

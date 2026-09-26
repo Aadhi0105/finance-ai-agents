@@ -6,7 +6,12 @@ network — which is exactly what Agent 1's design makes possible.
 import os
 import pytest
 
-os.environ.setdefault("AGENT_DATA_SOURCE", "fixture")
+@pytest.fixture(autouse=True)
+def offline_environment(monkeypatch):
+    """Isolate tests from ambient live-data settings; tests may override explicitly."""
+    monkeypatch.setenv("AGENT_DATA_SOURCE", "fixture")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
 
 from agent.state import RunState
 

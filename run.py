@@ -154,6 +154,9 @@ def _emit_artifacts(ticker, mode, note, state, out_dir=None, run_id=None, proven
             data = get_price_history(symbol)
             if not isinstance(data, dict) or data.get('error') or not data.get('history'):
                 raise ValueError('history unavailable')
+            composer._valid_history(data['history'])
+            # Validate the whole payload before it can replace a durable checkpoint.
+            json.dumps(data, allow_nan=False)
             if key == 'index_history':
                 data['index_ticker'] = symbol
             record['chart_data'][key] = data
