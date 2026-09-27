@@ -22,6 +22,10 @@ Run:  python -m mcp_server.server   (speaks MCP over stdin/stdout)
 from __future__ import annotations
 
 from mcp.server.mcpserver import MCPServer
+from typing import Annotated
+from pydantic import Field, StrictInt
+
+FiniteNumber = Annotated[float, Field(strict=True, allow_inf_nan=False)]
 
 from tools.statistical_checks import (
     anomaly_significance_check as _anomaly,
@@ -34,24 +38,24 @@ server = MCPServer("agent-stats")
 
 
 @server.tool()
-def anomaly_significance_check(values: list[float], min_obs: int = 6,
-                              z_flag: float = 3.5) -> dict:
+def anomaly_significance_check(values: list[FiniteNumber], min_obs: StrictInt = 6,
+                              z_flag: FiniteNumber = 3.5) -> dict:
     """Robust modified z-score: is the latest value a significant outlier vs the
     item's own history?"""
     return _anomaly(values, min_obs=min_obs, z_flag=z_flag)
 
 
 @server.tool()
-def drift_check(times: list[float], values: list[float], min_obs: int = 6,
-                threshold: float | None = None, direction: str | None = None) -> dict:
+def drift_check(times: list[FiniteNumber], values: list[FiniteNumber], min_obs: StrictInt = 6,
+                threshold: FiniteNumber | None = None, direction: str | None = None) -> dict:
     """OLS value~time with a t-test on the slope and prediction band: is there a
     significant trend, and how many cycles to breach?"""
     return _drift(times, values, min_obs=min_obs, threshold=threshold, direction=direction)
 
 
 @server.tool()
-def breach_probability(values: list[float], threshold: float, direction: str,
-                       horizon: int = 6, min_obs: int = 6, tail_at: float = 0.25) -> dict:
+def breach_probability(values: list[FiniteNumber], threshold: FiniteNumber, direction: str,
+                       horizon: StrictInt = 6, min_obs: StrictInt = 6, tail_at: FiniteNumber = 0.25) -> dict:
     """First-passage (barrier-crossing) probability of breaching within a horizon,
     from the series' own drift and volatility."""
     return _breach(values, threshold, direction, horizon=horizon, min_obs=min_obs, tail_at=tail_at)

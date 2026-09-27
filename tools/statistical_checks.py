@@ -24,13 +24,15 @@ distinct data observations — coherent with the data's true update frequency, n
 the monitoring cadence. (Freshness gating, a later checkpoint, guarantees history
 holds one row per real data update.)
 
-Pure Python (statistics + math) — no heavy deps, so MCP extraction stays light.
+Uses statistics/math and scipy.special for stable probability tails.
 """
 
 from __future__ import annotations
 
 import math
 import statistics
+from tools.statistical_contract import validated_statistics
+from scipy.special import erfcx
 
 # Shared significance machinery — the single source of truth reused by
 # run_event_study (Agent 3). _t_crit is kept as a local alias so drift_check's
@@ -40,6 +42,7 @@ from tools.significance import t_critical as _t_crit
 
 # --- anomaly_significance_check (statistics) ------------------------------
 
+@validated_statistics
 def anomaly_significance_check(values: list[float], min_obs: int = 6,
                                z_flag: float = 3.5) -> dict:
     """
@@ -96,6 +99,7 @@ def anomaly_significance_check(values: list[float], min_obs: int = 6,
 
 # --- drift_check (econometrics) -------------------------------------------
 
+@validated_statistics
 def drift_check(times: list[float], values: list[float], min_obs: int = 6,
                 threshold: float | None = None, direction: str | None = None) -> dict:
     """
@@ -135,7 +139,7 @@ def drift_check(times: list[float], values: list[float], min_obs: int = 6,
     # drift", the single most important case a covenant monitor must catch.
     if se_slope == 0:
         if abs(slope) > 1e-12:
-            t_slope = float("inf")
+            t_slope = None
             slope_significant = True
         else:
             t_slope = 0.0                 # perfectly flat: genuinely no drift
@@ -164,13 +168,16 @@ def drift_check(times: list[float], values: list[float], min_obs: int = 6,
     return {
         "drifting": bool(slope_significant),
         "slope": round(slope, 5),
-        "slope_tstat": round(t_slope, 2),
+        "slope_tstat": round(t_slope, 2) if t_slope is not None else None,
+        "inference_status": "zero_residual_trend" if t_slope is None else "estimated",
+        "toward_breach": bool((direction == "below" and slope > 0) or (direction == "above" and slope < 0)),
         "r_squared": round(r2, 3),
         "predicted_latest": round(pred, 4),
         "actual_latest": round(values[-1], 4),
         "band": [round(band_low, 4), round(band_high, 4)],
         "n_obs": n,
         "cycles_to_breach_at_current_drift": cycles_to_breach,
+        "time_unit": "input time units",
         "method": "OLS value~time; t-test on slope (t-dist)",
         "caveat": "trend estimate; unreliable on short or non-stationary histories",
         "computed_by": "drift_check (python)",
@@ -181,7 +188,7 @@ def drift_check(times: list[float], values: list[float], min_obs: int = 6,
 
 def _phi(x: float) -> float:
     """Standard normal CDF."""
-    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+    return 0.5 * math.erfc(-x / math.sqrt(2.0))
 
 
 def _first_passage_prob(a: float, m: float, s: float, T: float) -> float:
@@ -191,17 +198,29 @@ def _first_passage_prob(a: float, m: float, s: float, T: float) -> float:
     principle (first-passage) formula for arithmetic Brownian motion — this is the
     VaR-style barrier-crossing calc, not a terminal-value CDF.
     """
-    if a <= 0:
-        return 1.0                      # already at/over the barrier
-    if s <= 0:
-        return 1.0 if m * T >= a else 0.0
+    if a < 0:
+        return 1.0  # already strictly breached
+    if s == 0:
+        return 1.0 if m * T > a else 0.0  # touching at the horizon is not crossing
+    if a == 0:
+        return 1.0  # nonzero Brownian volatility crosses immediately
     sT = s * math.sqrt(T)
-    term1 = _phi((m * T - a) / sT)
-    expo = min(2.0 * m * a / (s * s), 700.0)   # guard overflow
-    term2 = math.exp(expo) * _phi((-m * T - a) / sT)
+    x = (m * T - a) / sT
+    y = (m * T + a) / sT
+    if not math.isfinite(x) or not math.isfinite(y):
+        raise ValueError("probability arithmetic exceeds representable range")
+    term1 = _phi(x)
+    # Avoid exp(large) * CDF(very negative), which otherwise over/underflows.
+    if y >= 0:
+        term2 = 0.5 * math.exp(-0.5 * x * x) * float(erfcx(y / math.sqrt(2)))
+    else:
+        term2 = math.exp(2 * m * a / (s * s)) * _phi(-y)
+    if not math.isfinite(term1 + term2):
+        raise ValueError("probability arithmetic exceeds representable range")
     return max(0.0, min(1.0, term1 + term2))
 
 
+@validated_statistics
 def breach_probability(values: list[float], threshold: float, direction: str,
                        horizon: int = 6, min_obs: int = 6, tail_at: float = 0.25) -> dict:
     """
@@ -233,17 +252,16 @@ def breach_probability(values: list[float], threshold: float, direction: str,
                 "computed_by": "breach_probability (python)"}
 
     p = _first_passage_prob(a, m, sigma, horizon)
-    toward_breach = a > 0 and m > 0                    # not yet breached, heading in
 
     return {
         "breach_probability": round(p, 4),
         "horizon_cycles": horizon,
-        "toward_breach": bool(a <= 0 or toward_breach),
+        "toward_breach": bool(m > 0),
         "tail_flag": bool(p >= tail_at),
         "distance_to_breach": round(a, 4),
         "drift_per_cycle": round(mu, 5),
         "volatility_per_cycle": round(sigma, 5),
-        "method": "first-passage (reflection principle) for RW-with-drift",
-        "caveat": "assumes a random-walk-with-drift; probabilities sharpen as volatility falls",
+        "method": "continuous Brownian first-passage approximation from equally spaced increments",
+        "caveat": "uncalibrated continuous-path approximation; horizon uses observation intervals, not scheduler ticks",
         "computed_by": "breach_probability (python)",
     }

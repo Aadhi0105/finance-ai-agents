@@ -72,6 +72,8 @@ class _McpStatsClient:
 
     async def _call(self, name: str, arguments: dict) -> dict:
         resp = await self._session.call_tool(name, arguments)
+        if resp.is_error:
+            return {"error": "MCP rejected tool request", "inference_status": "unavailable"}
         # The server returns a single TextContent with JSON.
         for block in resp.content:
             if getattr(block, "type", None) == "text":

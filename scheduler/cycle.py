@@ -21,6 +21,7 @@ from datetime import date, timedelta
 from state.store import StateStore
 from state.classify import classify, SURFACED
 from tools.covenant_checks import threshold_check
+from tools.financial_contract import finite
 
 # The three shared statistical checks: local by default, or over the MCP stdio
 # server when AGENT_STATS_VIA_MCP=1. Same functions, same results, two transports
@@ -57,6 +58,8 @@ def _item_data_ts(cov, cycle_n, base_date):
 def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict:
     store = StateStore(db_path) if db_path else StateStore()
     try:
+        if asof_cycle is not None and (type(asof_cycle) is not int or asof_cycle < 1):
+            raise ValueError("asof_cycle must be a positive integer")
         next_c = store.next_cycle()
         # Catch-up (skip-to-now): if data has advanced past the next cycle, process
         # the latest directly and record the gap rather than replaying every missed
@@ -70,12 +73,24 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
         # --- COMPUTE phase: read prior state, classify, run stats. No writes yet,
         # so a crash here leaves last-good state untouched. ---
         rows, skipped = [], []
+        identities = [c.get('item_id') for c in covenants]
+        if any(not isinstance(i, str) or not i.strip() for i in identities) or len(set(identities)) != len(identities):
+            raise ValueError('watchlist item IDs must be nonempty and unique')
         for cov in covenants:
+            for field in ('entity', 'metric', 'covenant_type'):
+                if not isinstance(cov.get(field), str) or not cov[field].strip():
+                    raise ValueError('missing watchlist identity: ' + field)
+            if not finite(cov.get('threshold')) or cov.get('direction') not in ('below', 'above'):
+                raise ValueError('invalid covenant threshold or direction')
             val = cov.get("cycle_values", {}).get(str(cycle_n))
             if val is None:
                 continue  # no value defined this cycle
 
             item_ts = _item_data_ts(cov, cycle_n, base_date)
+            if item_ts > cycle_ts:
+                raise ValueError('observation is later than cycle date: ' + cov['item_id'])
+            if not finite(val):
+                raise ValueError('invalid observation: ' + cov['item_id'])
             last = store.get_current(cov["item_id"])
 
             # Freshness gate: skip if this item's data has not advanced since last
@@ -86,15 +101,34 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
                 continue
 
             chk = threshold_check(val, cov["threshold"], cov["direction"])
+            if chk.get("error"):
+                raise ValueError(chk["error"])
             status = classify(last, chk["breached"], chk["margin"], is_baseline)
 
-            prior = [r["value"] for r in store.get_history_series(cov["item_id"])]
-            series = prior + [val]
-            times = list(range(1, len(series) + 1))
+            history = store.get_history_series(cov['item_id'])
+            series = [r['value'] for r in history] + [val]
+            dates = [r['data_ts'] for r in history] + [item_ts]
+            if any(d is None for d in dates):
+                raise ValueError('history lacks observation dates')
+            times = [(d - dates[0]).days for d in dates]
+            if any(b <= a for a, b in zip(times, times[1:])):
+                raise ValueError('observation dates must increase')
             anom = anomaly_significance_check(series)
             drift = drift_check(times, series,
-                                threshold=cov["threshold"], direction=cov["direction"])
-            breach = breach_probability(series, cov["threshold"], cov["direction"])
+                                threshold=cov['threshold'], direction=cov['direction'])
+            drift['time_unit'] = 'days'
+            gaps = [b - a for a, b in zip(times, times[1:])]
+            if len(set(gaps)) > 1:
+                breach = {'breach_probability': None, 'tail_flag': None,
+                          'reason': 'irregular observation intervals; probability unavailable'}
+            else:
+                breach = breach_probability(series, cov['threshold'], cov['direction'])
+                breach['observation_interval_days'] = gaps[0] if gaps else None
+                breach['horizon_days'] = (gaps[0] * breach['horizon_cycles']
+                                          if gaps and 'horizon_cycles' in breach else None)
+            for diagnostic in (anom, drift, breach):
+                if diagnostic.get('error'):
+                    raise ValueError('statistical calculation unavailable: ' + diagnostic['error'])
 
             rows.append({
                 "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": item_ts,
@@ -135,29 +169,28 @@ def _stat_tags(r) -> list[str]:
     if r.get("anomaly_significant"):
         tags.append(f"ANOMALY(z={r['anomaly_z']})")
     b = r.get("_breach_detail", {})
-    toward = bool(b.get("toward_breach"))
+    toward = bool(r.get("_drift_detail", {}).get("toward_breach"))
     # Only annotate drift when it's heading toward breach — a trend toward safety
     # is not a warning.
     if r.get("drifting") and toward:
         d = r.get("_drift_detail", {})
         ctb = d.get("cycles_to_breach_at_current_drift")
-        proj = f", ~{ctb} cycles to breach" if ctb is not None else ""
+        proj = f", ~{ctb} days to boundary" if ctb is not None else ""
         tags.append(f"DRIFT(slope={r['drift_slope']}, t={r['drift_tstat']}{proj})")
-    if b.get("tail_flag") and toward:
-        tags.append(f"BREACH_PROB({r['breach_prob']} within {b.get('horizon_cycles')}c)")
+    if b.get("tail_flag"):
+        tags.append(f"BREACH_PROB({r['breach_prob']} within {b.get('horizon_days')} days)")
     return tags
 
 
 def _surfaces(r) -> bool:
-    """Surface on a threshold change OR a significant anomaly OR a trend/tail that
-    is heading TOWARD breach. A metric drifting toward safety is not surfaced."""
+    """Surface changes, anomalies, adverse drift, or high crossing probability."""
     if r["status"] in SURFACED:
         return True
     if r.get("anomaly_significant"):
         return True
     b = r.get("_breach_detail", {})
-    toward = bool(b.get("toward_breach"))
-    return toward and (bool(r.get("drifting")) or bool(b.get("tail_flag")))
+    toward = bool(r.get("_drift_detail", {}).get("toward_breach"))
+    return (toward and bool(r.get("drifting"))) or bool(b.get("tail_flag"))
 
 
 def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> str:
@@ -192,6 +225,8 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
         # threshold-OK-but-flagged items sort after real status changes
         for r in sorted(surfaced, key=lambda x: order.get(x["status"], 8)):
             tags = _stat_tags(r)
+            if r.get("_breach_detail", {}).get("reason"):
+                tags.append("PROBABILITY_UNAVAILABLE: " + r["_breach_detail"]["reason"])
             tagstr = ("  " + " ".join(tags)) if tags else ""
             label = r["status"]
             if label not in SURFACED and tags:
@@ -200,6 +235,9 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
                          f"{r['metric']} = {r['value']} vs {r['threshold']} "
                          f"({r['direction']}), margin {r['margin']:+.3f}{tagstr}")
 
+    unavailable = [r['item_id'] for r in rows if r.get('_breach_detail', {}).get('reason')]
+    if unavailable:
+        lines.append('Probability unavailable (insufficient or irregular observations): ' + ', '.join(unavailable))
     lines.append(f"Suppressed (quiet: no change, no drift, no anomaly): {len(suppressed)}")
     if skipped:
         lines.append(f"Freshness: skipped {len(skipped)} item(s) with no new data "

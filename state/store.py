@@ -84,9 +84,9 @@ class StateStore:
         """The item's prior observations, oldest first — the input to the
         statistical checks (drift regression, anomaly baseline)."""
         rows = self.con.execute(
-            "SELECT cycle, value FROM history WHERE item_id = ? ORDER BY cycle", [item_id]
+            "SELECT cycle, value, data_ts FROM history WHERE item_id = ? ORDER BY cycle", [item_id]
         ).fetchall()
-        return [{"cycle": r[0], "value": r[1]} for r in rows]
+        return [{"cycle": r[0], "value": r[1], "data_ts": r[2]} for r in rows]
 
     def write_history(self, r: dict) -> None:
         # ON CONFLICT DO NOTHING: idempotent on (item_id, data_ts).

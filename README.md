@@ -212,6 +212,10 @@ aspirational:
 
 ## Agent 2 — Covenant Monitoring / Surveillance
 
+[Batch 1 calculation and alert contracts](docs/agent2-calculation-alerts.md) document
+finite inputs, dated drift, probability applicability and breach-priority triage.
+State recovery and model-publication hardening are still pending.
+
 Agent 1 analyses one thing, once. **Agent 2 watches many things, repeatedly, and
 its whole job is detecting *change*** — every component below is a consequence of
 that. It loops over a watchlist on a cadence, checks each item, compares to last
@@ -249,7 +253,7 @@ sophistication is in the atom, none in the trigger.
 **Model triage** (`monitoring/triage.py`) — after deterministic detection, the
 model triages the flags: it groups them by entity and *decides* whether to
 re-check ambiguous ones before escalating. The re-check verdict itself
-(`corroborated / isolated / weak`) is computed deterministically — the model
+(`breach / breach_verify / corroborated / isolated / weak`) is computed deterministically — the model
 decides *whether* to call it, never computes it. This reuses Agent 1's loop.
 
 ---
