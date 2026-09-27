@@ -155,7 +155,7 @@ def test_provider_never_substitutes_other_statement_periods(monkeypatch):
     f = result['financials']
     assert f['capex'] is None and f['total_debt'] is None
     assert f['statement_periods']['cash_flow'] is None
-    assert len(result['warnings']) == 2
+    assert sum('no other period substituted' in w for w in result['warnings']) == 2
     s = RunState(ticker='TST'); s.results['get_financials'] = result
     assert 'error' in run_dcf({'ticker':'TST'}, s)
 

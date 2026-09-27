@@ -208,6 +208,11 @@ def run_dcf(tool_input: dict, state=None) -> dict:
         return {"error": "get_financials returned no financials", "ticker": ticker}
     prices, perr = _upstream(state, "get_prices", ticker)
     f = fin["financials"]
+    # This enterprise FCFF model is not a bank, insurer, fund or property model.
+    if f.get("sector") in {"Financial Services", "Financials", "Real Estate"}:
+        return {"ticker": ticker, "error": "DCF outside supported scope: financial and real-estate businesses require a sector-specific valuation model"}
+    if f.get("instrument_type") and f["instrument_type"] != "EQUITY":
+        return {"ticker": ticker, "error": "DCF outside supported scope: only operating-company equities are supported"}
     ferr = financial_error(f)
     if ferr:
         return {"ticker": ticker, "error": ferr}

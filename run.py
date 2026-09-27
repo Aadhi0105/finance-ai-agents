@@ -62,7 +62,11 @@ SYSTEM = (
     "competitive position, backlog, management, industry conditions or risks, "
     "and do not make buy/sell/hold recommendations. Those are not supported by "
     "the available numerical tools. Do not add URLs as purported evidence. "
-    "Use marker selection to identify relevant evidence; omit unsupported facts."
+    "Use marker selection to identify relevant evidence; omit unsupported facts. "
+    "All subject tools must use the requested ticker. Obtain peer data only via "
+    "peer_outlier_check; never call subject financials or prices for peer tickers. "
+    "If DCF or peer comparison is not applicable, retain that refusal and publish "
+    "the remaining supported markers; do not work around the refusal."
 
 )
 

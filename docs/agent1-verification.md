@@ -149,3 +149,9 @@ ASM.AS, BESI.AS and LRCX as the enforced peer set:
 This verifies a successful live execution and numerical grounding, not the
 investment merits of the model's qualitative opinion or reliability on all
 future model/provider responses. No approval was forced by weakening the gate.
+
+
+## Final v1 closure
+
+The [v1 acceptance record](agent1-v1-acceptance.md) supersedes earlier test totals
+and consolidates supported scope, the broader live matrix and analyst review steps.
