@@ -12,6 +12,7 @@ decision is pure Python; the model only triages the flags afterward.
 """
 
 from __future__ import annotations
+from tools.financial_contract import finite
 
 
 def threshold_check(value: float, threshold: float, direction: str) -> dict:
@@ -27,6 +28,8 @@ def threshold_check(value: float, threshold: float, direction: str) -> dict:
       > 0  => in breach, by this much (used to detect WIDENING vs IMPROVING)
       <= 0 => headroom (not breached)
     """
+    if not finite(value) or not finite(threshold):
+        return {"error": "value and threshold must be finite numbers, not booleans", "breached": None}
     if direction == "below":
         margin = value - threshold
         breached = value > threshold
@@ -36,9 +39,11 @@ def threshold_check(value: float, threshold: float, direction: str) -> dict:
     else:
         return {"error": f"unknown direction '{direction}'", "breached": None}
 
+    if not finite(margin):
+        return {"error": "threshold arithmetic overflow", "breached": None}
     return {
         "breached": breached,
-        "margin": round(margin, 6),
+        "margin": margin,
         "value": value,
         "threshold": threshold,
         "direction": direction,

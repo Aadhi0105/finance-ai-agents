@@ -30,20 +30,21 @@ TRIAGE_SYSTEM = (
     "You are a credit-monitoring triage analyst. Deterministic checks have ALREADY "
     "produced the flags below — you do NOT detect anything yourself; you triage.\n\n"
     "Your job: (1) group flags by entity, (2) judge which are CORROBORATED (several "
-    "independent signals agree, or the move is sustained) versus ISOLATED (a single "
+    "distinct diagnostics agree; these are not independent sources) versus ISOLATED (a single "
     "signal, possibly a data glitch), (3) DECIDE whether any ambiguous flag should be "
     "re-checked before escalation — if so, call recheck_flag — and (4) write a short, "
     "prioritised commentary with a recommended action per entity.\n\n"
     "Do not invent numbers. Call inspect_item to see an item's history/flags, and "
     "recheck_flag to get a deterministic corroboration verdict. Escalate corroborated "
-    "flags; recommend verification (not escalation) for isolated ones."
+    "flags; every active threshold breach must be escalated for review even if it "
+    "is the only signal. An isolated anomaly also requires observation verification."
 )
 
 
 # --- deterministic triage tools -------------------------------------------
 
 def _toward_breach(f) -> bool:
-    bd = f.get("_breach_detail", {}) or {}
+    bd = f.get("_drift_detail", {}) or {}
     return bool(bd.get("toward_breach"))
 
 
@@ -90,7 +91,7 @@ def recheck_flag(store, flags: dict, item_id: str) -> dict:
         signals.append("anomaly")
     if f.get("drifting") and _toward_breach(f):
         signals.append("drift_toward_breach")
-    if f.get("breach_tail") and _toward_breach(f):
+    if f.get("breach_tail"):
         signals.append("high_breach_probability")
 
     # Isolated-anomaly test: is the anomalous value a single-cycle deviation from
@@ -108,9 +109,14 @@ def recheck_flag(store, flags: dict, item_id: str) -> dict:
     corroborated = len(signals) >= 2
     other_signals = [s for s in signals if s != "anomaly"]
 
-    if corroborated and isolated_anomaly and other_signals:
+    if f.get('breached'):
+        verdict = 'breach_verify' if isolated_anomaly else 'breach'
+        recommendation = ('escalate the threshold breach for review; verify the observation '
+                          'before relying on its magnitude' if isolated_anomaly else
+                          'escalate the threshold breach for review; no second diagnostic is required')
+    elif corroborated and isolated_anomaly and other_signals:
         # Several signals agree, but the anomaly is a single-cycle spike: the
-        # underlying issue is real (threshold/drift/probability corroborate it),
+        # diagnostics agree without establishing independent verification,
         # yet the anomaly's MAGNITUDE may be a bad data point.
         verdict = "corroborated_but_verify"
         recommendation = ("escalate the covenant issue (corroborated by "
@@ -151,7 +157,7 @@ class TriageRegistry:
                               "required": ["item_id"]}},
             {"name": "recheck_flag",
              "description": "Get a deterministic corroboration verdict for a flagged item "
-                            "(corroborated / isolated / weak) to decide escalate vs verify.",
+                            "(breach / breach_verify / corroborated / isolated / weak) to decide escalate vs verify.",
              "input_schema": {"type": "object",
                               "properties": {"item_id": {"type": "string"}},
                               "required": ["item_id"]}},
