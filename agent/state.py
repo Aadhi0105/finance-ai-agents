@@ -48,18 +48,22 @@ class RunState:
 
     def record_tool(self, name: str, tool_input: Any, output: Any,
                     duration_ms: float | None = None, tool_use_id: str | None = None):
-        changed = {name}
-        while True:
-            affected = {tool for tool, deps in DEPENDENCIES.items() if changed.intersection(deps)}
-            if affected <= changed:
-                break
-            changed |= affected
-        removed = sorted(k for k in changed - {name} if k in self.results)
-        for key in removed:
-            del self.results[key]
-        if removed:
-            self.invalidations.append({'after_call': len(self._calls), 'trigger': name, 'removed': removed})
-        self.results[name] = deepcopy(output)
+        # A rejected request for another company is not a refresh of this subject.
+        rejected_other_ticker = (isinstance(output, dict)
+                                 and output.get('error_type') == 'ticker_mismatch')
+        if not rejected_other_ticker:
+            changed = {name}
+            while True:
+                affected = {tool for tool, deps in DEPENDENCIES.items() if changed.intersection(deps)}
+                if affected <= changed:
+                    break
+                changed |= affected
+            removed = sorted(k for k in changed - {name} if k in self.results)
+            for key in removed:
+                del self.results[key]
+            if removed:
+                self.invalidations.append({'after_call': len(self._calls), 'trigger': name, 'removed': removed})
+            self.results[name] = deepcopy(output)
         status = 'error' if isinstance(output, dict) and output.get('error') else 'success'
         self._calls.append({'call_index': len(self._calls), 'tool': name,
                             'input': deepcopy(tool_input), 'output': deepcopy(output),

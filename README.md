@@ -4,7 +4,7 @@
 
 A multi-agent platform for finance & markets analysis, built on one shared
 analytical spine. Four agents run today — an **equity-research** agent that turns a
-ticker into an auditable fundamental view, a **covenant-monitoring** agent that
+ticker into an auditable financial-evidence report, a **covenant-monitoring** agent that
 watches many items over time and detects change, a **market/news-intelligence**
 agent that tests whether events move a stock and projects the next one, and an
 **FP&A / variance** agent that explains why a P&L missed plan — with their shared
@@ -135,6 +135,8 @@ peer, consensus, and trend edge cases. See the
 Batch 2 adds [evidence validation and named numerical claims](docs/agent1-evidence-validation.md).
 Batch 3 adds [execution checkpoints and report lifecycle controls](docs/agent1-execution-reporting.md).
 Batch 4 adds [acceptance tests and a verification record](docs/agent1-verification.md).
+The [Agent 1 v1 acceptance record](docs/agent1-v1-acceptance.md) defines supported
+scope, final closure results and the analyst review procedure.
 Live drafts now get at most one numerical-grounding correction request, followed
 by revalidation. A rejected revision falls back to explicitly labelled evidence
 statements with model interpretation withheld. All published notes also pass the
@@ -159,12 +161,12 @@ a research tool reliability beats flash.
 | `run_dcf` | analytical | **probability** — two-stage, scenario-weighted (bear/base/bull) |
 | `peer_outlier_check` | analytical | **statistics** — robust median/MAD outlier test |
 
-**The agentic moment:** `get_consensus` is designed to often return null (analyst
-consensus is the one genuinely paywalled input). When it does, the model *decides*
+**The agentic moment:** `get_consensus` returns unavailable when usable provider
+estimates are missing. When that happens, the model *decides*
 to call `get_historical_trend` and anchor its view to the company's own history
 instead — a real branch, visible in the trace, not a hidden fallback.
 
-**Output — three artifacts per run:** `report.html` (the prose note with five
+**Output — three artifacts per run:** `report.html` or `report_REVIEW.html` (financial evidence with up to five
 embedded charts: price vs. home index, price + moving averages, volatility &
 drawdown, the peer-multiple scatter, and the DCF football-field), `model.json`
 (the evidence, conversation, configuration, and execution audit trail), and
@@ -499,7 +501,7 @@ agent4/      decomposition.py                (variance bridge, integer cents)
 
 mcp_server/  server.py (stdio MCP server) . client.py (persistent client shim)
 fixtures/    offline sample data (equities, covenants, events, news, P&L)
-tests/       50 deterministic tests (ratios, DCF, gate, grounding, determinism, smoke)
+tests/       deterministic regression and acceptance tests
 .github/     workflows/ci.yml — runs pytest on every push
 ```
 
@@ -518,7 +520,7 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-50 tests, no API calls or network, covering the invariants that matter — the
+Offline tests, with no API calls or network, covering the invariants that matter — the
 finance math (real EV/EBIT, negative-multiple nulling, None-vs-zero, margins), the
 DCF guards (r ≤ g refused, complete-vs-partial bridge, net-cash equity > EV),
 ticker integrity, the gate verdicts (findings vs quality-warns vs fails), note

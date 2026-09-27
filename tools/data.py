@@ -146,6 +146,7 @@ def _financials_yfinance(ticker: str) -> dict:
     financials["revenue_prior"] = _row(fin, previous[0], "Total Revenue") if previous else None
     financials.update({
         "period": period, "prior_period": previous[0] if previous else None,
+        "sector": _info(tk).get("sector"), "instrument_type": _info(tk).get("quoteType"),
         "ebit_basis": "operating income; excludes separately reported non-operating income" if operating_income is not None else "provider EBIT proxy; operating income unavailable",
         "period_type": "annual", "statement_periods": periods,
         "currency": _info(tk).get("financialCurrency"), "monetary_unit": "base",
@@ -153,6 +154,7 @@ def _financials_yfinance(ticker: str) -> dict:
         "working_capital_basis": "provider operating-assets/liabilities aggregate; may include tax and non-current items; operating split unverified",
         "period_basis": "provider annual period labels; may differ from issuer fiscal closing date",
     })
+    warnings.append("provider classification and ordinary-share basis require analyst verification; no automatic ADR conversion")
     return {"ticker": ticker, "source": "yfinance", "retrieved_at": _retrieved(),
             "financials": financials, "warnings": warnings,
             "normalization": {"working_capital": {"raw": raw_wc, "raw_convention": "cash_flow_contribution",
