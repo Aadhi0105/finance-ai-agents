@@ -57,8 +57,12 @@ SYSTEM = (
     "bear_value, base_value, bull_value, bear_ev, base_ev, bull_ev, "
     "consensus_revenue_current_year, consensus_revenue_next_year, consensus_target. "
     "For consensus_growth or growth_vs_history, call compute_derived first. "
-    "Include at least one valid marker. Explain interpretation and limitations "
-    "qualitatively in separate paragraphs. Unknown figures must be left out."
+    "Include at least one valid marker. The final report publishes only these "
+    "standalone markers rendered by Python. Do not write free-form claims about "
+    "competitive position, backlog, management, industry conditions or risks, "
+    "and do not make buy/sell/hold recommendations. Those are not supported by "
+    "the available numerical tools. Do not add URLs as purported evidence. "
+    "Use marker selection to identify relevant evidence; omit unsupported facts."
 
 )
 
@@ -128,7 +132,7 @@ def _narrative_feedback(note, results):
         'Your draft failed numerical grounding. Rewrite the entire note once using '
         'the existing tool evidence. Do not request more tools or change assumptions. '
         'Remove all free-text digits, number words, numeric thresholds and dates. '
-        'Express interpretation qualitatively. Put each numerical claim in a '
+        'Omit qualitative claims, headings and recommendations. Return only '
         'standalone [[claim:ID]] marker; do not repeat its value in prose. '
         'Use only these available IDs: ' + ', '.join(build_evidence_catalog(results)) +
         '. Validation findings: ' + json.dumps(checked['unmatched'])

@@ -188,5 +188,6 @@ def test_matplotlib_unavailable_preserves_text_report(tmp_path, monkeypatch):
     record = json.loads(path.read_text())
     assert record['artifacts']['status'] == 'degraded'
     assert record['artifacts']['charts'] == []
-    assert 'Qualitative note.' in Path(report).read_text()
+    assert 'Qualitative note.' not in Path(report).read_text()
+    assert 'Unsourced model interpretation' in Path(report).read_text()
     assert record['execution']['status'] == 'completed'

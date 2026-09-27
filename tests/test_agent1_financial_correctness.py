@@ -141,7 +141,7 @@ def test_provider_zero_preserved_and_nan_alias_skipped(monkeypatch):
     obj.financials.loc['EBIT', date] = 0
     obj.cashflow.loc['Depreciation And Amortization', date] = 0
     f = data._financials_yfinance('TST')['financials']
-    assert f['ebit'] == 0 and f['depreciation_amortization'] == 0
+    assert f['ebit'] == 200 and f['provider_ebit'] == 0 and f['depreciation_amortization'] == 0
     obj.financials.loc['EBIT', date] = float('nan')
     f = data._financials_yfinance('TST')['financials']
     assert f['ebit'] == 200
@@ -160,7 +160,8 @@ def test_provider_never_substitutes_other_statement_periods(monkeypatch):
     assert 'error' in run_dcf({'ticker':'TST'}, s)
 
 
-@pytest.mark.parametrize('raw,expected', [(-100,750), (100,950)])
+# Operating income 200 (not provider EBIT 1000): 200*.75+200-100 = 250.
+@pytest.mark.parametrize('raw,expected', [(-100,150), (100,350)])
 def test_provider_wc_absorption_and_release_end_to_end(monkeypatch, raw, expected):
     obj = provider(monkeypatch)
     obj.cashflow.loc['Change In Working Capital', obj.cashflow.columns[0]] = raw

@@ -137,12 +137,13 @@ Batch 3 adds [execution checkpoints and report lifecycle controls](docs/agent1-e
 Batch 4 adds [acceptance tests and a verification record](docs/agent1-verification.md).
 Live drafts now get at most one numerical-grounding correction request, followed
 by revalidation. A rejected revision falls back to explicitly labelled evidence
-statements with model interpretation withheld. Charts may end before invalid trailing observations with visible
+statements with model interpretation withheld. All published notes also pass the
+strict named-evidence-only qualitative control. Charts may end before invalid trailing observations with visible
 warnings and retained excluded rows; internal gaps are never bridged.
 
-Give it a ticker; it produces a defensible, auditable fundamental view — the draft
-a junior analyst would produce, numerically grounded and self-flagging, not an
-oracle. It is deliberately the *least* agentic of the platform: the loop is
+Give it a ticker; it produces an auditable financial-evidence report. Unsourced
+model interpretation is withheld from publication and retained in the audit record.
+See the [issuer reconciliation and qualitative controls](docs/agent1-issuer-and-claims.md). It is deliberately the *least* agentic of the platform: the loop is
 constrained (the model picks tool order and optional tools, but the phases
 *gather -> compute -> compare -> draft -> validate* stay scaffolded), because for
 a research tool reliability beats flash.
@@ -198,7 +199,7 @@ aspirational:
 - **Named numerical evidence** (`validation/note_grounding.py`): the model selects
   standalone evidence markers; Python supplies complete statements with metric,
   company, period, value and unit. Unbound numerical prose requires review.
-  Qualitative interpretation is not mechanically verified. Original text,
+  Unsourced qualitative interpretation is withheld from reports. Original text,
   rendered statements and evidence references are preserved in the sidecar.
 - **Auditable + reproducible:** `model.json` carries full provenance (model id, git
   commit, data source, statement period, currency) and the complete append-only
