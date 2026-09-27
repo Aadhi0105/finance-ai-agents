@@ -1,0 +1,65 @@
+{
+  "source_run_commit": "ec870a6d65a0b360872c9192b2ed19559f4a4b46",
+  "financials": {
+    "ticker": "ASML.AS",
+    "source": "yfinance",
+    "retrieved_at": "2026-09-26T06:12:02.314130+00:00",
+    "financials": {
+      "revenue": 32667300000.0,
+      "gross_profit": 17258000000.0,
+      "operating_income": 11301400000.0,
+      "net_income": 9609400000.0,
+      "ebit": 11524400000.0,
+      "tax_provision": 2013400000.0,
+      "pretax_income": 11406100000.0,
+      "depreciation_amortization": 1025900000.0,
+      "capex": 1631200000.0,
+      "free_cash_flow": 11027300000.0,
+      "total_debt": 4390900000.0,
+      "cash_and_equivalents": 12916000000.0,
+      "change_in_working_capital": -1026500000.0,
+      "revenue_prior": 28262900000.0,
+      "period": "2025-12-31",
+      "prior_period": "2024-12-31",
+      "ebit_basis": "reported EBIT",
+      "period_type": "annual",
+      "statement_periods": {
+        "income": "2025-12-31",
+        "cash_flow": "2025-12-31",
+        "balance_sheet": "2025-12-31"
+      },
+      "currency": "EUR",
+      "monetary_unit": "base",
+      "working_capital_convention": "balance_change",
+      "capex_convention": "outflow_magnitude",
+      "working_capital_basis": "provider operating-assets/liabilities aggregate; may include non-current items",
+      "period_basis": "provider annual period labels; may differ from issuer fiscal closing date"
+    },
+    "warnings": [],
+    "normalization": {
+      "working_capital": {
+        "raw": 1026500000.0,
+        "raw_convention": "cash_flow_contribution",
+        "operation": "negate",
+        "normalized": -1026500000.0
+      },
+      "capex": {
+        "raw": -1631200000.0,
+        "operation": "absolute_outflow"
+      }
+    }
+  },
+  "prices": {
+    "ticker": "ASML.AS",
+    "source": "yfinance",
+    "current_price": 1522.6,
+    "market_cap": 584830660000.0,
+    "shares_outstanding": 384100000.0,
+    "currency": "EUR",
+    "monetary_unit": "base",
+    "as_of": null,
+    "provider_quote_time": 1790350787,
+    "timestamp_note": "fast_info price timestamp unavailable; provider_quote_time belongs to info snapshot",
+    "retrieved_at": "2026-09-26T06:12:02.703344+00:00"
+  }
+}

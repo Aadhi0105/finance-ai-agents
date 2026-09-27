@@ -1,5 +1,6 @@
 """One publication decision for live runs and saved-record rebuilds."""
 from validation import gate, note_grounding
+from validation.qualitative_claims import control_note
 
 
 def assess_record(record):
@@ -12,7 +13,7 @@ def assess_record(record):
     result = gate.assess(analysis, calls=record.get('call_history', []))
     checks = result['checks'] + [{'check': 'note_grounding',
         'status': 'pass' if grounding['passed'] else 'fail',
-        'detail': grounding['note'] if grounding['passed'] else str(grounding['unmatched'])}]
+        'detail': grounding['note'] if grounding['passed'] else 'numerical grounding failed; detailed findings retained in the audit record'}]
     if record.get('schema_version') != 2:
         checks.append({'check': 'record_schema', 'status': 'fail',
                        'detail': 'unsupported or legacy record schema; current version is 2'})
@@ -32,6 +33,11 @@ def assess_record(record):
     for error in artifacts.get('errors', []):
         checks.append({'check': 'artifact_' + error['stage'], 'status': 'quality_warn',
                        'detail': error.get('error_type', 'artifact generation incomplete')})
+    qualitative = control_note(template, analysis)
+    if qualitative['withheld_count']:
+        checks.append({'check': 'qualitative_claims', 'status': 'quality_warn',
+                       'detail': 'unsourced prose withheld; see audit record; qualitative claims not verified'})
     result = gate.aggregate_checks(checks)
     result['note_grounding'] = grounding
-    return result, grounding['rendered_note']
+    result['qualitative_controls'] = qualitative
+    return result, qualitative['published_note']

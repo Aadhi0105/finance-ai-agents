@@ -1,0 +1,66 @@
+{
+  "ticker": "ASML.AS",
+  "period": "2025-12-31",
+  "currency": "EUR",
+  "accounting_basis": "US GAAP",
+  "source_url": "https://ourbrand.asml.com/m/71076aaad607de4d/original/asml-2025-annual-report-based-on-us-gaap.pdf",
+  "source_sha256": "add58be9d9822ca12584b63c55c089b36e1ae5bf7a1825ebf1d1572628f2c52c",
+  "reviewed_on": "2026-09-27",
+  "units": "EUR millions in filing; base EUR in reference",
+  "statement_pages": {
+    "income": 276,
+    "balance_sheet": 278,
+    "cash_flow": 281,
+    "interest": 299
+  },
+  "expected_provider_fields": {
+    "revenue": 32667300000,
+    "gross_profit": 17258000000,
+    "operating_income": 11301400000,
+    "net_income": 9609400000,
+    "pretax_income": 11406100000,
+    "tax_provision": 2013400000,
+    "depreciation_amortization": 1025900000,
+    "capex": 1631200000,
+    "total_debt": 4390900000,
+    "cash_and_equivalents": 12916000000,
+    "free_cash_flow": 11027300000,
+    "provider_ebit": 11524400000
+  },
+  "cash_flow_components": {
+    "accounts_receivable": 1415500000,
+    "finance_receivables": -227200000,
+    "inventories": -832500000,
+    "other_assets": -561900000,
+    "accrued_liabilities": -237300000,
+    "accounts_payable": 13400000,
+    "current_tax_assets_and_liabilities": 334100000,
+    "contract_assets_and_liabilities": 1122400000
+  },
+  "operating_cash_flow": 12658500000,
+  "pp_and_e_purchases": 1573600000,
+  "intangible_purchases": 57600000,
+  "current_borrowings": 1681900000,
+  "noncurrent_debt": 2709000000,
+  "interest_income": 223000000,
+  "interest_expense": 118300000,
+  "provider_ebit": 11524400000,
+  "issuer_year_end_shares": 385417665,
+  "issuer_weighted_average_basic_shares": 388500000,
+  "issuer_weighted_average_diluted_shares": 388900000,
+  "limitations": [
+    "current provider shares are not reconciled to year-end or weighted-average filing shares",
+    "operating working-capital aggregate remains a proxy including finance receivables and other assets",
+    "reported D&A includes financing-related amortization; no unsupported split is inferred",
+    "effective consolidated tax rate is an operating-tax assumption, not separately disclosed operating cash tax",
+    "debt-minus-cash bridge does not separately value non-operating investments, associates or loans; it is not a comprehensive sum-of-parts valuation"
+  ],
+  "noncash_adjustments": {
+    "depreciation_amortization": 1025900000,
+    "impairment_and_loss_on_disposal": 49700000,
+    "share_based_compensation": 202300000,
+    "inventory_reserves": 469400000,
+    "deferred_tax_expense": 180700000,
+    "equity_method_investments_adjustment": 94600000
+  }
+}

@@ -103,3 +103,8 @@ non-finite values, stale dependencies, default assumptions, date policy, peer
 lineage, raw-number bypasses, signs/currencies, percentage points, wrong-company
 claims and sidecar/report integration. They use deterministic local inputs and
 require no paid LLM calls.
+
+
+Subsequent [qualitative controls](agent1-issuer-and-claims.md) restrict published
+notes to generated named evidence. Unsupported model prose is retained in the
+audit but withheld from reports; numerical grounding alone is not semantic verification.

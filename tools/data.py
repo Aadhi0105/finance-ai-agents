@@ -50,7 +50,9 @@ def _load_fixture(ticker: str):
 def get_financials(tool_input: dict, state=None) -> dict:
     ticker = tool_input["ticker"].upper()
     if _source() == "yfinance":
-        return _financials_yfinance(ticker)
+        from tools.issuer_reconciliation import apply_reviewed_profile
+        result = _financials_yfinance(ticker)
+        return apply_reviewed_profile(result) if not result.get('error') else result
     fx = _load_fixture(ticker)
     if fx is None or "financials" not in fx:
         return {"error": f"no financials fixture for {ticker}", "ticker": ticker}
@@ -113,7 +115,7 @@ def _financials_yfinance(ticker: str) -> dict:
     fields = {
         "revenue": (fin, ("Total Revenue",)), "gross_profit": (fin, ("Gross Profit",)),
         "operating_income": (fin, ("Operating Income",)), "net_income": (fin, ("Net Income",)),
-        "ebit": (fin, ("EBIT", "Operating Income")),
+        "ebit": (fin, ("Operating Income", "EBIT")),
         "tax_provision": (fin, ("Tax Provision", "Income Tax Expense")),
         "pretax_income": (fin, ("Pretax Income", "Income Before Tax")),
         "depreciation_amortization": (cf, ("Depreciation And Amortization", "Depreciation Amortization Depletion", "Depreciation Depletion And Amortization")),
@@ -123,8 +125,11 @@ def _financials_yfinance(ticker: str) -> dict:
         "cash_and_equivalents": (bs, ("Cash And Cash Equivalents",)),
     }
     financials = {key: _row(frame, period, *labels) for key, (frame, labels) in fields.items()}
-    if _row(fin, period, "EBIT") is None and financials["ebit"] is not None:
-        warnings.append("EBIT unavailable; operating income used as explicitly labelled proxy")
+    provider_ebit = _row(fin, period, "EBIT")
+    operating_income = financials['operating_income']
+    if operating_income is None and provider_ebit is not None:
+        warnings.append('operating income unavailable; provider EBIT proxy may contain non-operating income')
+    financials['provider_ebit'] = provider_ebit
     if financials["depreciation_amortization"] is None:
         financials["depreciation_amortization"] = _row(fin, period, "Reconciled Depreciation")
     raw_capex = financials["capex"]
@@ -141,11 +146,11 @@ def _financials_yfinance(ticker: str) -> dict:
     financials["revenue_prior"] = _row(fin, previous[0], "Total Revenue") if previous else None
     financials.update({
         "period": period, "prior_period": previous[0] if previous else None,
-        "ebit_basis": "reported EBIT" if _row(fin, period, "EBIT") is not None else "operating income proxy",
+        "ebit_basis": "operating income; excludes separately reported non-operating income" if operating_income is not None else "provider EBIT proxy; operating income unavailable",
         "period_type": "annual", "statement_periods": periods,
         "currency": _info(tk).get("financialCurrency"), "monetary_unit": "base",
         "working_capital_convention": "balance_change", "capex_convention": "outflow_magnitude",
-        "working_capital_basis": "provider operating-assets/liabilities aggregate; may include non-current items",
+        "working_capital_basis": "provider operating-assets/liabilities aggregate; may include tax and non-current items; operating split unverified",
         "period_basis": "provider annual period labels; may differ from issuer fiscal closing date",
     })
     return {"ticker": ticker, "source": "yfinance", "retrieved_at": _retrieved(),

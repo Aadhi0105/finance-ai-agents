@@ -479,7 +479,7 @@ def build_report(model_json_path: str, out_dir: str | None = None) -> str:
 </head><body><h1>{escape(ticker)} — Equity Research</h1>
 <p class="meta">Mode: {escape(str(meta.get('mode')))} · Run: {escape(str(meta.get('run_id')))} · Execution: {escape(str(record.get('execution', {}).get('status', 'unknown')))}</p>
 {_validation_banner(record['validation'])}
-<h2>Analyst note</h2>{_markdown_to_html(record['note'])}
+<h2>Financial evidence</h2>{_markdown_to_html(record['note'])}
 {''.join(chart_html)}
 <p>Chart data and numerical evidence are preserved in model.json. Rebuilt {escape(artifacts['rebuilt_at'])}.</p>
 </body></html>"""

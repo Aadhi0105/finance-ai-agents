@@ -2,8 +2,9 @@
 
 Batch 1 covers ingestion, ratios, scenario DCF, annual trends, peer screening,
 and consensus. Publication gates and narrative grounding are covered by
-[Batch 2](agent1-evidence-validation.md). CLI completion states and report
-lifecycle hardening remain separate work.
+[Batch 2](agent1-evidence-validation.md). Execution/report controls are documented in [Batch 3](agent1-execution-reporting.md).
+The [issuer review](agent1-issuer-and-claims.md) supersedes the original EBIT
+selection and refines the ASML FY2025 working-capital input.
 
 ## Data and provenance
 
@@ -42,9 +43,11 @@ This is a consistency screen, not proof that ADR/share classes are comparable.
   a signed operating cash-flow contribution, so ingestion negates it. Both raw
   and normalized values are recorded. This aggregate can include non-current
   operating assets/liabilities; the output explicitly identifies that proxy.
-- EBIT is used consistently for DCF and EV/EBIT. If Yahoo lacks EBIT but provides
-  operating income, the proxy is explicitly labelled. A legitimate zero EBIT
-  never triggers the fallback.
+- The live adapter uses operating income for DCF and EV/EBIT, retaining provider
+  EBIT separately; missing operating income may use a warned provider-EBIT proxy.
+  A legitimate zero operating income never triggers the fallback. The reviewed
+  ASML FY2025 profile removes identified current-tax cash movements from working
+  capital only after the period-specific issuer reconciliation passes.
 - An explicit tax-rate override must be finite in [0,1]. Otherwise an effective
   rate is used only with positive pretax income and a ratio in [0,1]. There is
   no silent 50% cap. A default 25% rate and missing-WC assumption of zero are

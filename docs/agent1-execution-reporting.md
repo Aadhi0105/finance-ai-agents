@@ -106,3 +106,8 @@ Tests use local fixtures and simulated failures, with no paid LLM calls.
 [Batch 4 verification](agent1-verification.md) adds full CLI acceptance checks,
 controlled provider observations, enforced peer selection, and schema-version
 checks.
+
+
+The [issuer and claim controls](agent1-issuer-and-claims.md) further restrict the
+report note to Python-rendered numerical evidence. Unsourced model prose is
+withheld on both initial publication and rebuild, with the original kept in the audit.
