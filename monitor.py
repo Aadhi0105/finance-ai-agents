@@ -18,24 +18,36 @@ import sys
 from scheduler.cycle import run_cycle
 from state.store import StateStore, _DEFAULT_DB
 from filelock import FileLock
-from monitoring.triage import run_triage
+from monitoring.triage import run_triage, run_triage_record, HistorySnapshot, prepare_live
 
 _DB = _DEFAULT_DB
 
 
 def _triage_if_needed(result, live: bool) -> None:
     surfaced = result.get("surfaced", [])
-    if result.get('replayed') or not surfaced:
+    if result.get('replayed'):
+        print('Triage skipped: saved cycle replay; no new model call.')
         return
-    store = StateStore(_DB)
+    if not surfaced:
+        print('Triage not needed: no newly surfaced flags; this does not establish compliance.')
+        return
     try:
-        commentary = run_triage(store, surfaced, live=live)
-    finally:
-        store.close()
-    if commentary:
-        print("\n----- MODEL TRIAGE -----")
-        print(commentary)
-        print("------------------------")
+        store = StateStore(_DB)
+        try:
+            snapshot = HistorySnapshot(store, surfaced, result['cycle'])
+        finally:
+            store.close()
+        triage = run_triage_record(snapshot, surfaced, live=live, cycle=result['cycle'])
+    except (Exception, KeyboardInterrupt) as exc:
+        print(f"Triage failed ({type(exc).__name__}); monitoring cycle remains committed.", file=sys.stderr)
+        raise SystemExit(2)
+    print(f"\nTriage mode: {'live model' if live else 'offline stub'}; data: bundled fixtures")
+    print(f"Triage audit: {triage['audit_path']}")
+    if triage['status'] != 'completed':
+        print(f"Triage {triage['status']}: {triage['reason']}; commentary withheld. "
+              "Monitoring cycle remains committed.", file=sys.stderr)
+        raise SystemExit(2)
+    print(triage['commentary'])
 
 
 def _reset():
@@ -75,6 +87,15 @@ if __name__ == "__main__":
     _DB = str(Path(parsed.db).expanduser().resolve())
     sys.argv = [sys.argv[0], *remaining]
     arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
+    if "--live" in sys.argv:
+        if arg not in {"--once", "--catchup"}:
+            sys.exit("--live is supported only with --once or --catchup")
+        try:
+            prepare_live()
+        except ValueError as exc:
+            sys.exit(str(exc))
+    if arg in {"--once", "--catchup", "--run", "--loop", "--state"}:
+        print("Data source: bundled fixtures (not a live market feed).")
     if arg == "--reset":
         _reset()
     elif arg == "--state":

@@ -252,11 +252,16 @@ downtime (with the gap surfaced), idempotent re-runs (`(item_id, data_ts)` key),
 and a thin scheduler firing `run_cycle()`. No Airflow/Celery/Kafka — all the
 sophistication is in the atom, none in the trigger.
 
-**Model triage** (`monitoring/triage.py`) — after deterministic detection, the
-model triages the flags: it groups them by entity and *decides* whether to
-re-check ambiguous ones before escalating. The re-check verdict itself
-(`breach / breach_verify / corroborated / isolated / weak`) is computed deterministically — the model
-decides *whether* to call it, never computes it. This reuses Agent 1's loop.
+**Model triage** (`monitoring/triage.py`) reuses Agent 1's tool loop to
+investigate flags and propose an ordering. Publication accepts only a complete
+list of known item IDs. Python renders facts and recommendations for every flag,
+with active breaches first; model prose is withheld. Each attempt saves its input
+snapshot, prompts, responses, tools and outcome under `output/monitor-triage/`.
+
+`monitor.py --once --live` and `--catchup N --live` use the real model, loading the
+repository `.env`; missing credentials fail explicitly. **Monitoring data remain
+bundled fixtures in both modes.** Offline triage is scripted. `--run` and `--loop`
+perform deterministic monitoring only. See [Batch 3 controls](docs/agent2-triage-publication.md).
 
 ---
 
@@ -511,9 +516,10 @@ tests/       deterministic regression and acceptance tests
 .github/     workflows/ci.yml — runs pytest on every push
 ```
 
-Every layer follows one offline/live pattern: a scripted `StubModel` + fixture data
+Research and event layers use a scripted `StubModel` + fixture data
 for deterministic offline runs, the real model + `yfinance` + FinBERT when live, and
-local functions vs. the MCP server for the shared checks.
+local functions vs. the MCP server for the shared checks. Agent 2 always uses
+bundled observation fixtures; its `--live` flag changes only the triage model.
 
 ---
 
