@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from datetime import date, timedelta
 
 from state.store import StateStore
@@ -35,7 +36,7 @@ else:
         anomaly_significance_check, drift_check, breach_probability,
     )
 
-_FIXTURE = os.path.join("fixtures", "covenants.json")
+_FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "covenants.json"
 
 
 def _load_watchlist():
@@ -61,6 +62,11 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
         if asof_cycle is not None and (type(asof_cycle) is not int or asof_cycle < 1):
             raise ValueError("asof_cycle must be a positive integer")
         next_c = store.next_cycle()
+        if asof_cycle is not None and asof_cycle < next_c:
+            saved = store.get_run(asof_cycle)
+            if saved is None:
+                raise ValueError('cycle predates ledger or was skipped; cannot replay unavailable evidence')
+            return {**saved, 'replayed': True}
         # Catch-up (skip-to-now): if data has advanced past the next cycle, process
         # the latest directly and record the gap rather than replaying every missed
         # cycle.
@@ -82,9 +88,17 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
                     raise ValueError('missing watchlist identity: ' + field)
             if not finite(cov.get('threshold')) or cov.get('direction') not in ('below', 'above'):
                 raise ValueError('invalid covenant threshold or direction')
+            pending = store.pending_review(cov['item_id'])
+            if pending:
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                                'reason': 'pending_review', 'original_review': pending,
+                                'candidate_value': cov.get('cycle_values', {}).get(str(cycle_n))})
+                continue
             val = cov.get("cycle_values", {}).get(str(cycle_n))
             if val is None:
-                continue  # no value defined this cycle
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                                'reason': 'missing_observation'})
+                continue
 
             item_ts = _item_data_ts(cov, cycle_n, base_date)
             if item_ts > cycle_ts:
@@ -93,11 +107,22 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
                 raise ValueError('invalid observation: ' + cov['item_id'])
             last = store.get_current(cov["item_id"])
 
-            # Freshness gate: skip if this item's data has not advanced since last
-            # processed (e.g. quarterly data on a daily cadence).
-            if last is not None and last.get("data_ts") is not None and item_ts <= last["data_ts"]:
-                skipped.append({"item_id": cov["item_id"], "entity": cov["entity"],
-                                "reason": f"no new data (still {item_ts})"})
+            # Revisions are quarantined with evidence, never silently overwritten.
+            definition = ('entity', 'metric', 'covenant_type', 'threshold', 'direction')
+            candidate = {k: cov[k] for k in definition}
+            candidate.update(value=val, data_ts=str(item_ts))
+            if last is not None and any(last[k] != cov[k] for k in definition):
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                                'reason': 'definition_change_requires_review', 'candidate': candidate,
+                                'previous': {k: last[k] for k in definition}})
+                continue
+            if last is not None and last.get('data_ts') is not None and item_ts <= last['data_ts']:
+                previous = store.get_observation(cov['item_id'], item_ts)
+                identical = previous is not None and previous['value'] == val
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                                'reason': 'duplicate_observation' if identical else 'correction_requires_review',
+                                'candidate': candidate,
+                                'previous_value': previous['value'] if previous else None})
                 continue
 
             chk = threshold_check(val, cov["threshold"], cov["direction"])
@@ -143,22 +168,31 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
                 "drift_tstat": drift.get("slope_tstat"),
                 "breach_prob": breach.get("breach_probability"),
                 "breach_tail": breach.get("tail_flag"),
+                "_anomaly_detail": anom,
                 "_drift_detail": drift,
                 "_breach_detail": breach,
             })
 
-        # --- WRITE phase: one transaction, all-or-nothing. ---
-        with store.transaction():
-            for row in rows:
-                clean = {k: v for k, v in row.items() if not k.startswith("_")}
-                store.write_history(clean)
-                store.upsert_current(clean)
-
+        # Render and serialize BEFORE committing so report failures cannot advance state.
         report = _build_report(cycle_n, cycle_ts, is_baseline, rows, skipped, gap)
         surfaced = [] if is_baseline else [r for r in rows if _surfaces(r)]
-        return {"cycle": cycle_n, "data_ts": str(cycle_ts), "baseline": is_baseline,
-                "gap": gap, "skipped": skipped, "rows": rows, "surfaced": surfaced,
-                "report": report}
+        review = any(s['reason'] in ('correction_requires_review', 'definition_change_requires_review', 'pending_review') for s in skipped)
+        status = 'review_required' if review else ('processed' if rows else 'no_new_observations')
+        result = {'cycle': cycle_n, 'data_ts': str(cycle_ts), 'baseline': is_baseline,
+                  'status': status, 'gap': gap, 'skipped': skipped, 'rows': rows,
+                  'surfaced': surfaced, 'report': report, 'replayed': False}
+        from state.store import _json_date
+        result = json.loads(json.dumps(result, default=_json_date, allow_nan=False))
+        with store.transaction():
+            for row in rows:
+                store.write_history(row)
+                store.upsert_current(row)
+            for item in skipped:
+                if item['reason'] in ('correction_requires_review', 'definition_change_requires_review'):
+                    store.write_review(item, cycle_n)
+            store.write_run(result)
+        return result
+
     finally:
         store.close()
 
@@ -203,6 +237,11 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
         lines.append(f"CATCH-UP: {gap} cycle(s) missed before this run — flagged "
                      f"changes may have originated during the gap, not just now.")
 
+    if skipped:
+        lines.append('Observation coverage: ' + '; '.join(s['item_id'] + ': ' + s['reason'] for s in skipped))
+    if not rows:
+        lines.append('NO NEW OBSERVATIONS — compliance was not reassessed; prior state is retained.')
+        return '\n'.join(lines)
     if is_baseline:
         lines.append(f"BASELINE CYCLE — established state for {len(rows)} item(s). "
                      f"Classification and alerting suppressed. Detection begins next cycle.")
@@ -211,14 +250,14 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
             lines.append(f"  · {r['item_id']} ({r['entity']}): {r['metric']} "
                          f"{r['value']} vs {r['threshold']} [{state}]")
         if skipped:
-            lines.append(f"Freshness: skipped {len(skipped)} item(s) with no new data.")
+            lines.append(f"Coverage: skipped {len(skipped)} item(s); see reasons above.")
         return "\n".join(lines)
 
     surfaced = [r for r in rows if _surfaces(r)]
     suppressed = [r for r in rows if not _surfaces(r)]
 
     if not surfaced:
-        lines.append("No exceptions this cycle — nothing changed, breached, drifted, or resolved.")
+        lines.append("No newly surfaced exceptions among the observations assessed; prior breaches may remain active.")
     else:
         lines.append(f"EXCEPTIONS ({len(surfaced)}):")
         order = {"NEW_BREACH": 0, "WIDENING": 1, "RESOLVED": 2, "IMPROVING": 3}
@@ -240,6 +279,6 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
         lines.append('Probability unavailable (insufficient or irregular observations): ' + ', '.join(unavailable))
     lines.append(f"Suppressed (quiet: no change, no drift, no anomaly): {len(suppressed)}")
     if skipped:
-        lines.append(f"Freshness: skipped {len(skipped)} item(s) with no new data "
+        lines.append(f"Coverage: skipped {len(skipped)} item(s); see reasons above "
                      f"({', '.join(s['item_id'] for s in skipped)}).")
     return "\n".join(lines)

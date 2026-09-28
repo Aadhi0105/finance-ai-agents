@@ -214,7 +214,9 @@ aspirational:
 
 [Batch 1 calculation and alert contracts](docs/agent2-calculation-alerts.md) document
 finite inputs, dated drift, probability applicability and breach-priority triage.
-State recovery and model-publication hardening are still pending.
+The [Batch 2 state and recovery contract](docs/agent2-state-recovery.md) adds a
+transactional cycle ledger, replay, correction holds and process locking.
+Model-publication hardening remains pending.
 
 Agent 1 analyses one thing, once. **Agent 2 watches many things, repeatedly, and
 its whole job is detecting *change*** — every component below is a consequence of

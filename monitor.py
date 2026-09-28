@@ -16,17 +16,18 @@ import os
 import sys
 
 from scheduler.cycle import run_cycle
-from state.store import StateStore
+from state.store import StateStore, _DEFAULT_DB
+from filelock import FileLock
 from monitoring.triage import run_triage
 
-_DB = os.path.join("state", "monitor.duckdb")
+_DB = _DEFAULT_DB
 
 
 def _triage_if_needed(result, live: bool) -> None:
     surfaced = result.get("surfaced", [])
-    if not surfaced:
+    if result.get('replayed') or not surfaced:
         return
-    store = StateStore()
+    store = StateStore(_DB)
     try:
         commentary = run_triage(store, surfaced, live=live)
     finally:
@@ -38,15 +39,19 @@ def _triage_if_needed(result, live: bool) -> None:
 
 
 def _reset():
-    if os.path.exists(_DB):
-        os.remove(_DB)
-        print(f"reset: removed {_DB}")
-    else:
-        print("reset: no state DB to remove")
+    os.makedirs(os.path.dirname(_DB), exist_ok=True)
+    with FileLock(_DB + ".lock", timeout=10):
+        if os.path.exists(_DB):
+            os.remove(_DB)
+            if os.path.exists(_DB + ".wal"):
+                os.remove(_DB + ".wal")
+            print(f"reset: removed {_DB}")
+        else:
+            print("reset: no state DB to remove")
 
 
 def _print_state():
-    store = StateStore()
+    store = StateStore(_DB)
     try:
         rows = store.full_state()
     finally:
@@ -62,6 +67,13 @@ def _print_state():
 
 
 if __name__ == "__main__":
+    import argparse
+    from pathlib import Path
+    options = argparse.ArgumentParser(add_help=False)
+    options.add_argument('--db', default=_DB)
+    parsed, remaining = options.parse_known_args()
+    _DB = str(Path(parsed.db).expanduser().resolve())
+    sys.argv = [sys.argv[0], *remaining]
     arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
     if arg == "--reset":
         _reset()
@@ -69,7 +81,7 @@ if __name__ == "__main__":
         _print_state()
     elif arg == "--once":
         live = "--live" in sys.argv
-        result = run_cycle()
+        result = run_cycle(db_path=_DB)
         print(result["report"])
         _triage_if_needed(result, live)
     elif arg == "--catchup":
@@ -77,7 +89,7 @@ if __name__ == "__main__":
         # advanced to cycle ASOF; skip-to-now and surface the gap.
         if len(sys.argv) < 3:
             sys.exit("Usage: python monitor.py --catchup ASOF_CYCLE")
-        result = run_cycle(asof_cycle=int(sys.argv[2]))
+        result = run_cycle(db_path=_DB, asof_cycle=int(sys.argv[2]))
         print(result["report"])
         _triage_if_needed(result, "--live" in sys.argv)
     elif arg == "--run":
@@ -85,7 +97,7 @@ if __name__ == "__main__":
         # of the atom). No triage — use --once to triage a cycle's exceptions.
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
         for _ in range(n):
-            print(run_cycle()["report"])
+            print(run_cycle(db_path=_DB)["report"])
             print()
     elif arg == "--loop":
         # Thin scheduler: fire run_cycle() on a cadence. INTERVAL seconds
@@ -95,12 +107,12 @@ if __name__ == "__main__":
         max_cycles = None
         if "--max" in sys.argv:
             max_cycles = int(sys.argv[sys.argv.index("--max") + 1])
-        run_forever(interval_seconds=interval, max_cycles=max_cycles)
+        run_forever(interval_seconds=interval, max_cycles=max_cycles, db_path=_DB)
     elif arg == "--cron":
         from scheduler.trigger import cron_line
         sched = sys.argv[2] if len(sys.argv) > 2 else "0 6 * * 1-5"
         print("# Add to your crontab (crontab -e) to run one cycle on a cadence:")
-        print(cron_line(sched))
+        print(cron_line(sched, db_path=_DB))
     else:
         sys.exit("Usage: python monitor.py "
                  "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "

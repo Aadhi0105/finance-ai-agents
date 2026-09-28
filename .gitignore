@@ -27,3 +27,6 @@ output/*
 *.duckdb.wal
 waterfall_demo.svg
 *.svg
+
+# Interprocess monitor lock (never remove while another process may be using it)
+*.duckdb.lock
