@@ -221,7 +221,7 @@ with s.transaction():
 
 def test_replay_does_not_run_model_triage(monkeypatch):
     import monitor
-    monkeypatch.setattr(monitor,'run_triage',lambda *a,**k:pytest.fail('replayed triage'))
+    monkeypatch.setattr(monitor,'run_triage_record',lambda *a,**k:pytest.fail('replayed triage'))
     monitor._triage_if_needed({'replayed':True,'surfaced':[{'item_id':'x'}]},live=True)
 
 
