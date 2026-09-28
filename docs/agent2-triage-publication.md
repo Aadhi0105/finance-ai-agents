@@ -9,7 +9,8 @@ its tools or recommendations.
 
 The model may investigate using inspect_item and recheck_flag and return only
 `{"item_ids": ["..."]}`. Every surfaced ID must appear exactly once, with no
-unknown IDs or additional fields. Invalid output is review_required and is
+unknown IDs or additional fields. A single whole-response JSON code fence is
+accepted; surrounding prose and duplicate JSON keys are rejected. Invalid output is review_required and is
 withheld. Arbitrary prose, invented numbers, and model recommendations never
 reach published commentary. Python computes recommendations for all listed
 items, places active breaches first, requires breach escalation even with one
@@ -50,5 +51,5 @@ retry or live observation ingestion is introduced in this batch.
 Regression tests cover hostile or malformed responses, omitted/duplicated IDs,
 breach ordering, recovery, model failures and interruption, required audit
 persistence, missing credentials, historical cutoff, real cycle date serialization,
-and successful database reopening during triage. A paid live model run remains
-part of the final acceptance batch.
+and successful database reopening during triage. A paid live model run was
+subsequently verified in [Batch 4 acceptance](agent2-v1-acceptance.md).

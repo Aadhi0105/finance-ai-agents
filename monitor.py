@@ -18,7 +18,7 @@ import sys
 from scheduler.cycle import run_cycle
 from state.store import StateStore, _DEFAULT_DB
 from filelock import FileLock
-from monitoring.triage import run_triage, run_triage_record, HistorySnapshot, prepare_live
+from monitoring.triage import run_triage_record, HistorySnapshot, prepare_live
 
 _DB = _DEFAULT_DB
 

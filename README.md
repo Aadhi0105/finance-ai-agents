@@ -263,6 +263,11 @@ repository `.env`; missing credentials fail explicitly. **Monitoring data remain
 bundled fixtures in both modes.** Offline triage is scripted. `--run` and `--loop`
 perform deterministic monitoring only. See [Batch 3 controls](docs/agent2-triage-publication.md).
 
+Agent 2 v1 acceptance includes twelve-cycle local/MCP parity and a successful
+real-model CLI triage run. See [acceptance evidence and operating limits](docs/agent2-v1-acceptance.md).
+Repeat offline with `python -m scripts.check_agent2_acceptance`; add `--live` for
+an opt-in paid model check. Both modes create isolated test databases.
+
 ---
 
 ## Agent 3 — Market / News Intelligence

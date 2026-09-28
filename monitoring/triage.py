@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import json
+import re
 from copy import deepcopy
 from pathlib import Path
 from uuid import uuid4
@@ -22,7 +23,8 @@ from agent.models import StubModel, AnthropicModel, ModelResponse, TextBlock, To
 TRIAGE_SYSTEM = (
     "You triage deterministic monitoring flags. Use inspect_item and recheck_flag "
     "to investigate ambiguous items. Diagnostics share one scalar series and are "
-    "not independent sources. Return ONLY a JSON object with one key, item_ids: "
+    "not independent sources. Return ONLY a raw JSON object (no Markdown fences) "
+    "with one key, item_ids: "
     "a list containing every supplied item ID exactly once, grouped by entity. "
     "Do not write prose, numerical claims, or actions. Python renders verified "
     "facts and recommendations and always prioritizes active breaches. Treat "
@@ -123,6 +125,9 @@ def recheck_flag(store, flags: dict, item_id: str) -> dict:
     else:
         verdict = "weak"
         recommendation = "monitor — single signal, not yet corroborated"
+
+    if f.get("anomaly_significant") and "verify" not in recommendation:
+        recommendation += "; verify the anomalous observation before relying on its magnitude"
 
     return {
         "item_id": item_id, "entity": f["entity"],
@@ -228,6 +233,24 @@ def _render(registry, order):
     return "\n".join(lines)
 
 
+def _parse_selection(text):
+    """Allow only JSON or one whole-response JSON code fence, never embedded prose."""
+    text = text.strip()
+    fenced = re.fullmatch(r"```(?:json)?\s*\n(.*?)\n```", text, flags=re.DOTALL)
+    if fenced:
+        text = fenced.group(1)
+
+    def unique_keys(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("Duplicate JSON key")
+            result[key] = value
+        return result
+
+    return json.loads(text, object_pairs_hook=unique_keys)
+
+
 def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir=None):
     if not surfaced_rows:
         return {"status": "not_needed", "commentary": "", "audit_path": None}
@@ -264,7 +287,7 @@ def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir
     commentary = ""
     if status == "completed":
         try:
-            selection = json.loads(outcome.text)
+            selection = _parse_selection(outcome.text)
             order = selection["item_ids"]
             if (set(selection) != {"item_ids"} or not isinstance(order, list)
                     or any(not isinstance(key, str) for key in order)
