@@ -1,10 +1,12 @@
 """
 Persistent state store for Agent 2 (spec §3.3, State).
 
-Two logical layers over one DuckDB file:
+Core observation layers over one DuckDB file:
   - current_state : latest snapshot per item. Serves compare-to-last AND is the
                     on-demand full-state view.
-  - history       : append-only, every cycle. Serves drift, audit, trend.
+  - history       : append-only distinct observations. Serves drift, audit, trend.
+  - cycle_runs    : complete results, including empty cycles, for replay/progress.
+  - observation_details / review_queue : diagnostic snapshots and review holds.
 
 Shape is long/tidy panel data: one row per (item_id, cycle, metric). This is the
 same shape the thesis / Safe Assets econometrics live in, so the drift model
@@ -13,19 +15,22 @@ same shape the thesis / Safe Assets econometrics live in, so the drift model
 This is Agent 2's PRIVATE store — file-based, no server, and emphatically NOT a
 shared MCP service (spec §3.3 MCP).
 
-Note: the single-transaction crash-safety write is a LATER robustness checkpoint;
-this checkpoint keeps writes straightforward to prove the state machine first.
+A process lock covers the store lifetime. Cycle ledger, observations and diagnostic
+evidence commit atomically; legacy observations remain readable.
 """
 
 from __future__ import annotations
 
 import os
+import json
+from pathlib import Path
+from filelock import FileLock
 from contextlib import contextmanager
 from datetime import date
 
 import duckdb
 
-_DEFAULT_DB = os.path.join("state", "monitor.duckdb")
+_DEFAULT_DB = str(Path(__file__).resolve().parent / "monitor.duckdb")
 
 _COLUMNS = ("item_id", "cycle", "data_ts", "entity", "covenant_type", "metric",
            "value", "threshold", "direction", "breached", "margin", "status",
@@ -35,10 +40,17 @@ _COLUMNS = ("item_id", "cycle", "data_ts", "entity", "covenant_type", "metric",
 
 class StateStore:
     def __init__(self, path: str = _DEFAULT_DB):
-        self.path = path
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        self.con = duckdb.connect(path)
-        self._init_schema()
+        self.path = str(Path(path).expanduser().resolve())
+        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        self._lock = FileLock(self.path + '.lock', timeout=10)
+        self._lock.acquire()
+        self.con = None
+        try:
+            self.con = duckdb.connect(self.path)
+            self._init_schema()
+        except BaseException:
+            self.close()
+            raise
 
     def _init_schema(self) -> None:
         cols = """
@@ -54,6 +66,9 @@ class StateStore:
         self.con.execute(
             f"CREATE TABLE IF NOT EXISTS history ({cols}, UNIQUE(item_id, data_ts));")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")
+        self.con.execute("CREATE TABLE IF NOT EXISTS review_queue (item_id VARCHAR PRIMARY KEY, payload VARCHAR NOT NULL)")
+        self.con.execute("CREATE TABLE IF NOT EXISTS cycle_runs (cycle INTEGER PRIMARY KEY, payload VARCHAR NOT NULL)")
+        self.con.execute("CREATE TABLE IF NOT EXISTS observation_details (item_id VARCHAR, data_ts DATE, payload VARCHAR NOT NULL, PRIMARY KEY(item_id, data_ts))")
 
     @contextmanager
     def transaction(self):
@@ -63,12 +78,12 @@ class StateStore:
         try:
             yield
             self.con.execute("COMMIT")
-        except Exception:
+        except BaseException:
             self.con.execute("ROLLBACK")
             raise
 
     def next_cycle(self) -> int:
-        row = self.con.execute("SELECT max(cycle) FROM history").fetchone()
+        row = self.con.execute("SELECT max(cycle) FROM (SELECT cycle FROM history UNION ALL SELECT cycle FROM cycle_runs)").fetchone()
         return (row[0] or 0) + 1
 
     def get_current(self, item_id: str) -> dict | None:
@@ -89,12 +104,47 @@ class StateStore:
         return [{"cycle": r[0], "value": r[1], "data_ts": r[2]} for r in rows]
 
     def write_history(self, r: dict) -> None:
-        # ON CONFLICT DO NOTHING: idempotent on (item_id, data_ts).
+        existing = self.con.execute('SELECT ' + ', '.join(_COLUMNS) +
+                                    ' FROM history WHERE item_id=? AND data_ts=?',
+                                    [r['item_id'], r['data_ts']]).fetchone()
+        if existing:
+            expected = [r[c] for c in _COLUMNS]
+            expected[2] = date.fromisoformat(expected[2]) if isinstance(expected[2], str) else expected[2]
+            if tuple(expected) != existing:
+                raise ValueError('conflicting observation; explicit correction review required')
+            return
         self.con.execute(
-            f"INSERT INTO history ({', '.join(_COLUMNS)}) "
-            f"VALUES ({', '.join(['?']*len(_COLUMNS))}) ON CONFLICT DO NOTHING",
-            [r[c] for c in _COLUMNS],
-        )
+            f"INSERT INTO history ({', '.join(_COLUMNS)}) VALUES ({', '.join(['?']*len(_COLUMNS))})",
+            [r[c] for c in _COLUMNS])
+        self.con.execute('INSERT INTO observation_details VALUES (?, ?, ?)',
+                         [r['item_id'], r['data_ts'], json.dumps(r, default=_json_date, allow_nan=False)])
+
+    def get_observation(self, item_id, data_ts):
+        row = self.con.execute('SELECT * FROM history WHERE item_id=? AND data_ts=?',
+                               [item_id, data_ts]).fetchone()
+        return dict(zip([d[0] for d in self.con.description], row)) if row else None
+
+    def get_observation_evidence(self, item_id, data_ts):
+        row = self.con.execute('SELECT payload FROM observation_details WHERE item_id=? AND data_ts=?',
+                               [item_id, data_ts]).fetchone()
+        return json.loads(row[0]) if row else None  # legacy detail is unknown, never fabricated
+
+    def pending_review(self, item_id):
+        row = self.con.execute('SELECT payload FROM review_queue WHERE item_id=?', [item_id]).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def write_review(self, skipped, cycle):
+        self.con.execute('INSERT INTO review_queue VALUES (?, ?) ON CONFLICT DO NOTHING',
+                         [skipped['item_id'], json.dumps({'cycle': cycle, **skipped},
+                                                        default=_json_date, allow_nan=False)])
+
+    def get_run(self, cycle):
+        row = self.con.execute('SELECT payload FROM cycle_runs WHERE cycle=?', [cycle]).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def write_run(self, result):
+        self.con.execute('INSERT INTO cycle_runs VALUES (?, ?)',
+                         [result['cycle'], json.dumps(result, default=_json_date, allow_nan=False)])
 
     def upsert_current(self, r: dict) -> None:
         # Simple upsert: delete the item's row, insert the fresh snapshot.
@@ -111,4 +161,15 @@ class StateStore:
         return [dict(zip(cols, row)) for row in rows]
 
     def close(self) -> None:
-        self.con.close()
+        try:
+            if self.con is not None:
+                self.con.close()
+                self.con = None
+        finally:
+            self._lock.release()
+
+
+def _json_date(value):
+    if isinstance(value, date):
+        return value.isoformat()
+    raise TypeError('unsupported audit value')
