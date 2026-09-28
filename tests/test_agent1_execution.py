@@ -166,12 +166,12 @@ def test_model_adapter_metadata_and_unsupported_blocks():
 
 def test_shared_triage_interface_stays_string(monkeypatch):
     from monitoring import triage
-    from agent.state import RunOutcome
-    rows = [{'status':'watch','item_id':'a','entity':'A','metric':'ratio'}]
-    monkeypatch.setattr(triage,'run_agent',lambda **kw: RunOutcome('completed','triage note'))
-    assert triage.run_triage(None,rows) == 'triage note'
-    monkeypatch.setattr(triage,'run_agent',lambda **kw: RunOutcome('incomplete','partial','max_tokens'))
-    assert triage.run_triage(None,rows) == '[triage incomplete: max_tokens] partial'
+    monkeypatch.setattr(triage, 'run_triage_record', lambda *a, **kw:
+                        {'status': 'completed', 'commentary': 'verified note'})
+    assert triage.run_triage(None, [{'item_id': 'a'}]) == 'verified note'
+    monkeypatch.setattr(triage, 'run_triage_record', lambda *a, **kw:
+                        {'status': 'incomplete', 'reason': 'max_tokens', 'commentary': ''})
+    assert triage.run_triage(None, [{'item_id': 'a'}]) == '[triage incomplete: max_tokens]'
 
 
 def test_registry_blocks_subject_change_before_provider(monkeypatch):
