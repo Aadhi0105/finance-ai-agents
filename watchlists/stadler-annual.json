@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "note": "Illustrative analyst monitoring policies, not Stadler financing covenants. Annual consolidated data only; no interim/TTM substitution.",
+  "items": [
+    {
+      "item_id": "stadler_current_ratio_v1",
+      "entity": "Stadler Rail",
+      "ticker": "SRAIL.SW",
+      "metric": "current_ratio",
+      "currency": "CHF",
+      "threshold": 1.0,
+      "direction": "above",
+      "threshold_basis": "analyst_policy",
+      "definition_version": "annual-v1",
+      "max_age_days": 550,
+      "require_issuer_reconciliation": true
+    },
+    {
+      "item_id": "stadler_interest_coverage_v1",
+      "entity": "Stadler Rail",
+      "ticker": "SRAIL.SW",
+      "metric": "operating_interest_coverage",
+      "currency": "CHF",
+      "threshold": 3.0,
+      "direction": "above",
+      "threshold_basis": "analyst_policy",
+      "definition_version": "annual-v1",
+      "max_age_days": 550,
+      "require_issuer_reconciliation": true
+    },
+    {
+      "item_id": "stadler_net_leverage_v1",
+      "entity": "Stadler Rail",
+      "ticker": "SRAIL.SW",
+      "metric": "net_debt_to_operating_ebitda_proxy",
+      "currency": "CHF",
+      "threshold": 3.5,
+      "direction": "below",
+      "threshold_basis": "analyst_policy",
+      "definition_version": "annual-v1",
+      "max_age_days": 550,
+      "require_issuer_reconciliation": true
+    }
+  ]
+}

@@ -66,6 +66,7 @@ class StateStore:
         self.con.execute(
             f"CREATE TABLE IF NOT EXISTS history ({cols}, UNIQUE(item_id, data_ts));")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")
+        self.con.execute("CREATE TABLE IF NOT EXISTS monitor_metadata (key VARCHAR PRIMARY KEY, value VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS review_queue (item_id VARCHAR PRIMARY KEY, payload VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS cycle_runs (cycle INTEGER PRIMARY KEY, payload VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS observation_details (item_id VARCHAR, data_ts DATE, payload VARCHAR NOT NULL, PRIMARY KEY(item_id, data_ts))")
@@ -81,6 +82,16 @@ class StateStore:
         except BaseException:
             self.con.execute("ROLLBACK")
             raise
+
+    def source_mode(self):
+        row = self.con.execute("SELECT value FROM monitor_metadata WHERE key='data_mode'").fetchone()
+        return row[0] if row else ('bundled_fixtures' if self.next_cycle() > 1 else None)
+
+    def bind_source(self, mode):
+        existing = self.source_mode()
+        if existing is not None and existing != mode:
+            raise ValueError('database data source mismatch; use a separate database')
+        self.con.execute("INSERT INTO monitor_metadata VALUES ('data_mode', ?) ON CONFLICT DO NOTHING", [mode])
 
     def next_cycle(self) -> int:
         row = self.con.execute("SELECT max(cycle) FROM (SELECT cycle FROM history UNION ALL SELECT cycle FROM cycle_runs)").fetchone()

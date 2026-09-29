@@ -1,0 +1,31 @@
+{
+  "ticker": "SRAIL.SW",
+  "period": "2025-12-31",
+  "currency": "CHF",
+  "source_url": "https://www.stadlerrail.com/api/docs/x/518f589306/annual-report_2025_en.pdf",
+  "source_sha256": "2fb7d7590e261b5aab7bfe2754d48ab358ae19498813cf52efe4d1b7a0725d08",
+  "units": "CHF base units converted from CHF thousands",
+  "absolute_tolerance": 1000,
+  "pages": [
+    182,
+    183,
+    184,
+    215
+  ],
+  "expected_fields": {
+    "current_assets": 4236715000,
+    "current_liabilities": 4428274000,
+    "total_debt": 939643000,
+    "cash": 664190000,
+    "operating_income": 160571000,
+    "interest_expense": 42378000,
+    "da": 117880000
+  },
+  "notes": [
+    "Debt = current 433906000 + noncurrent financial liabilities 505737000.",
+    "Interest includes 42097000 interest expenses + 281000 finance lease interest; excludes bank charges and guarantee costs.",
+    "EBITDA proxy = operating income + cash-flow depreciation and amortisation; not contractual adjusted EBITDA.",
+    "Current assets include work in progress and compensation claims; ratio is not a standalone liquidity conclusion.",
+    "Comparisons verify this historical period only; no contractual thresholds verified."
+  ]
+}

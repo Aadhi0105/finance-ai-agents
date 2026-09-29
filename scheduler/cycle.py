@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 
 from state.store import StateStore
 from state.classify import classify, SURFACED
@@ -56,9 +56,37 @@ def _item_data_ts(cov, cycle_n, base_date):
     return base_date + timedelta(days=cycle_n - 1)
 
 
-def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict:
+def run_cycle(db_path: str | None = None, asof_cycle: int | None = None,
+              watchlist_path=None) -> dict:
+    if watchlist_path is None:
+        return _run_cycle(db_path, asof_cycle)
+    # Replay is served without network access. Provider fetches never hold the DB lock.
     store = StateStore(db_path) if db_path else StateStore()
     try:
+        if store.source_mode() not in (None, 'yfinance'):
+            raise ValueError('live observations require a separate database')
+        if asof_cycle is not None:
+            if type(asof_cycle) is not int or asof_cycle < 1:
+                raise ValueError('asof_cycle must be a positive integer')
+            if asof_cycle < store.next_cycle():
+                saved = store.get_run(asof_cycle)
+                if saved is None:
+                    raise ValueError('cannot replay unavailable cycle')
+                return {**saved, 'replayed': True}
+    finally:
+        store.close()
+    from monitoring.live_data import prepare
+    today = datetime.now(timezone.utc).date()
+    prepared = prepare(watchlist_path, today)
+    return _run_cycle(db_path, asof_cycle, prepared, today)
+
+
+def _run_cycle(db_path=None, asof_cycle=None, live_inputs=None, observed_on=None) -> dict:
+    store = StateStore(db_path) if db_path else StateStore()
+    try:
+        mode = 'yfinance' if live_inputs is not None else 'bundled_fixtures'
+        if store.source_mode() not in (None, mode):
+            raise ValueError('database data source mismatch; use a separate database')
         if asof_cycle is not None and (type(asof_cycle) is not int or asof_cycle < 1):
             raise ValueError("asof_cycle must be a positive integer")
         next_c = store.next_cycle()
@@ -73,8 +101,18 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
         cycle_n = asof_cycle if (asof_cycle and asof_cycle > next_c) else next_c
         gap = max(0, cycle_n - next_c)
         is_baseline = cycle_n == 1
-        covenants, base_date = _load_watchlist()
-        cycle_ts = base_date + timedelta(days=cycle_n - 1)
+        if live_inputs is None:
+            covenants, base_date = _load_watchlist()
+            cycle_ts = base_date + timedelta(days=cycle_n - 1)
+        else:
+            cycle_ts = base_date = observed_on
+            covenants = []
+            for entry in live_inputs:
+                item, obs = entry['item'], entry['observation']
+                covenants.append({**item, 'covenant_type': 'analyst_policy',
+                    'cycle_values': {str(cycle_n): obs['value']},
+                    'data_ts_by_cycle': {str(cycle_n): str(obs.get('data_ts', cycle_ts))},
+                    '_evidence': obs['evidence'], '_unavailable_reason': obs.get('reason')})
 
         # --- COMPUTE phase: read prior state, classify, run stats. No writes yet,
         # so a crash here leaves last-good state untouched. ---
@@ -97,7 +135,8 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
             val = cov.get("cycle_values", {}).get(str(cycle_n))
             if val is None:
                 skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
-                                'reason': 'missing_observation'})
+                                'reason': cov.get('_unavailable_reason') or 'missing_observation',
+                                'evidence': cov.get('_evidence')})
                 continue
 
             item_ts = _item_data_ts(cov, cycle_n, base_date)
@@ -111,6 +150,13 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
             definition = ('entity', 'metric', 'covenant_type', 'threshold', 'direction')
             candidate = {k: cov[k] for k in definition}
             candidate.update(value=val, data_ts=str(item_ts))
+            if live_inputs is not None:
+                candidate['evidence'] = cov['_evidence']
+                prior = store.get_observation_evidence(cov['item_id'], last['data_ts']) if last else None
+                if last and (prior or {}).get('_evidence', {}).get('definition_hash') != cov['_evidence']['definition_hash']:
+                    skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                        'reason': 'definition_change_requires_review', 'candidate': candidate, 'previous': prior})
+                    continue
             if last is not None and any(last[k] != cov[k] for k in definition):
                 skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
                                 'reason': 'definition_change_requires_review', 'candidate': candidate,
@@ -171,19 +217,29 @@ def run_cycle(db_path: str | None = None, asof_cycle: int | None = None) -> dict
                 "_anomaly_detail": anom,
                 "_drift_detail": drift,
                 "_breach_detail": breach,
+                **({"_evidence": cov["_evidence"], "data_mode": mode} if live_inputs is not None else {}),
             })
 
         # Render and serialize BEFORE committing so report failures cannot advance state.
         report = _build_report(cycle_n, cycle_ts, is_baseline, rows, skipped, gap)
+        if live_inputs is not None:
+            report = ('Data: live yfinance annual statements; thresholds: analyst policies, not contractual covenants.\n'
+                      'Observation dates are statement periods, not publication or retrieval dates.\n' + report)
+            report += '\n' + '\n'.join(f"Period {r['data_ts']}: {r['item_id']}" for r in rows)
         surfaced = [] if is_baseline else [r for r in rows if _surfaces(r)]
         review = any(s['reason'] in ('correction_requires_review', 'definition_change_requires_review', 'pending_review') for s in skipped)
+        if live_inputs is not None and any(s['reason'] != 'duplicate_observation' for s in skipped):
+            review = True
         status = 'review_required' if review else ('processed' if rows else 'no_new_observations')
         result = {'cycle': cycle_n, 'data_ts': str(cycle_ts), 'baseline': is_baseline,
                   'status': status, 'gap': gap, 'skipped': skipped, 'rows': rows,
-                  'surfaced': surfaced, 'report': report, 'replayed': False}
+                  'surfaced': surfaced, 'report': report, 'replayed': False, 'data_mode': mode}
+        if live_inputs is not None:
+            result['observation_attempts'] = live_inputs
         from state.store import _json_date
         result = json.loads(json.dumps(result, default=_json_date, allow_nan=False))
         with store.transaction():
+            store.bind_source(mode)
             for row in rows:
                 store.write_history(row)
                 store.upsert_current(row)
