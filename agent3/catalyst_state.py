@@ -88,7 +88,7 @@ class CatalystStore:
             ON CONFLICT (run_id) DO NOTHING
         """, [run_id, study.get("event_type"), datetime.now(),
               study.get("n_events"), study.get("caar"), study.get("t_stat"),
-              bool(study.get("caar_significant")), verdict.get("verdict"),
+              study.get("caar_significant"), verdict.get("verdict"),
               verdict.get("confidence"), ",".join(pinned_peers or [])])
 
     def outcomes_for(self, event_type: str) -> list[dict]:

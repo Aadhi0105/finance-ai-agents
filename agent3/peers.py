@@ -45,10 +45,15 @@ _STUB_PEERS = {
 
 
 def _pin(ticker: str, proposal: dict, source: str) -> dict:
-    tkr = ticker.upper()
+    from tools.event_contracts import ticker as normalize
+    tkr = normalize(ticker)
+    if not isinstance(proposal, dict) or not isinstance(proposal.get("peers", []), list):
+        raise ValueError("peer proposal must contain a list of ticker strings")
+    if len(proposal.get("peers", [])) > 20:
+        raise ValueError("at most 20 peers supported")
     # normalize: uppercase, drop the target (case-insensitively), dedup preserving order
     peers = list(dict.fromkeys(
-        p.upper() for p in proposal.get("peers", []) if p and p.upper() != tkr))
+        normalize(p) for p in proposal.get("peers", []) if normalize(p) != tkr))
     return {
         "ticker": tkr,
         "sector": proposal.get("sector", "unspecified"),
@@ -67,7 +72,7 @@ def propose_peers(ticker: str, override: list[str] | None = None,
       - live + API key  -> the model proposes.
       - otherwise       -> deterministic offline stub.
     """
-    if override:
+    if override is not None:
         return _pin(ticker, {"sector": "user-specified", "peers": override,
                              "rationale": "explicit --peers override"}, "override")
 

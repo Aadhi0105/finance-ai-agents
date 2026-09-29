@@ -26,17 +26,18 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
+from tools.event_contracts import finite, EST_LEN, EST_GAP, EVT_PRE, EVT_POST
 
-_FIXTURE = os.path.join("fixtures", "events.json")
-
-# Window conventions (spec §Agent 3 deep-dive 2).
-EST_LEN = 250        # estimation window length (trading days)
-EST_GAP = 30         # gap between estimation window and the event (no leakage)
-EVT_PRE, EVT_POST = 1, 1   # event window [-1, +1]
-
+_FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "events.json"
 
 def _returns(prices: list[float]) -> list[float]:
-    return [prices[i] / prices[i - 1] - 1.0 for i in range(1, len(prices))]
+    if not isinstance(prices, list) or not all(finite(p) and p > 0 for p in prices):
+        raise ValueError("prices must be finite positive numbers, excluding booleans")
+    returns = [prices[i] / prices[i - 1] - 1.0 for i in range(1, len(prices))]
+    if not all(finite(r) and -1 < r <= 100 for r in returns):
+        raise ValueError("price series produces nonfinite or out-of-contract returns")
+    return returns
 
 
 def _slice_event(stock_px: list[float], mkt_px: list[float], event_idx: int,
@@ -44,6 +45,14 @@ def _slice_event(stock_px: list[float], mkt_px: list[float], event_idx: int,
     """Slice estimation + event window returns around a price-series index.
     Returns (est_stock, est_market, evt_stock, evt_market) or None if the series
     can't cover the requested windows."""
+    if len(stock_px) != len(mkt_px):
+        raise ValueError("stock and benchmark price arrays must be aligned and equal length")
+    if any(type(v) is not int for v in (event_idx, est_len, est_gap, pre, post)):
+        raise ValueError("window settings must be integers")
+    if (est_len, est_gap, pre, post) != (250, 30, 1, 1):
+        raise ValueError("supported windows are estimation [-280,-31] and event [-1,+1]")
+    _returns(stock_px)
+    _returns(mkt_px)
     # Estimation window ENDS est_gap days before the event; event window brackets it.
     est_start = event_idx - est_gap - est_len
     est_end = event_idx - est_gap                # exclusive
@@ -77,7 +86,7 @@ def assemble_event(ticker: str, event_date: str,
 
 def load_event_set(event_type: str, source: str | None = None,
                    ticker: str | None = None, peers: list[str] | None = None,
-                   live_propose: bool = False) -> dict:
+                   live_propose: bool = False, study_plan: dict | None = None) -> dict:
     """
     Assemble a cross-ticker, same-event-type set ready for run_event_study.
     Offline reads fixtures/events.json; live pulls earnings dates + prices via
@@ -85,7 +94,9 @@ def load_event_set(event_type: str, source: str | None = None,
     """
     src = source or os.environ.get("AGENT_DATA_SOURCE", "fixture")
     if src == "yfinance":
-        return _load_live(event_type, ticker=ticker, peers=peers, live_propose=live_propose)
+        return _load_live(event_type, ticker=ticker, peers=peers, live_propose=live_propose, study_plan=study_plan)
+    if src != "fixture":
+        raise ValueError("source must be fixture or yfinance")
     return _load_fixture(event_type)
 
 
@@ -95,7 +106,7 @@ def _load_fixture(event_type: str) -> dict:
     grp = fx["event_types"].get(event_type)
     if grp is None:
         return {"event_type": event_type, "events": [], "placebo_events": [],
-                "error": f"no fixture for event_type '{event_type}'"}
+                "verdict": "REFUSED", "reason": f"no fixture for event_type '{event_type}'"}
 
     events, placebos, tickers = [], [], []
     for item in grp["members"]:
@@ -114,11 +125,11 @@ def _load_fixture(event_type: str) -> dict:
 
     return {"event_type": event_type, "source": "fixture",
             "events": events, "placebo_events": placebos,
-            "tickers": tickers, "n_requested": len(grp["members"])}
+            "tickers": tickers, "pinned_peers": tickers, "contributing_peers": sorted({e["ticker"] for e in events}), "n_requested": len(grp["members"])}
 
 
 def _load_live(event_type: str, ticker: str | None = None,
-               peers: list[str] | None = None, live_propose: bool = False) -> dict:
+               peers: list[str] | None = None, live_propose: bool = False, study_plan: dict | None = None) -> dict:
     """
     Live Track-A assembly. Needs a ticker; peers come from an override or a
     model proposal (pinned for reproducibility). Delegates fetching + assembly to
@@ -126,11 +137,11 @@ def _load_live(event_type: str, ticker: str | None = None,
     """
     if not ticker:
         return {"event_type": event_type, "source": "yfinance", "events": [],
-                "error": "live Track-A needs a ticker (load_event_set(..., ticker=...))"}
+                "verdict": "REFUSED", "reason": "live Track-A needs a ticker (load_event_set(..., ticker=...))"}
     from agent3.peers import propose_peers
     from agent3.track_a_live import load_live_event_set
 
     pinned = propose_peers(ticker, override=peers, live=live_propose)
-    res = load_live_event_set(ticker, pinned["peers"], event_type)
+    res = load_live_event_set(ticker, pinned["peers"], event_type, study_plan=study_plan)
     res["pinned_peer_set"] = pinned          # the full pinned proposal (sector, rationale, source)
     return res

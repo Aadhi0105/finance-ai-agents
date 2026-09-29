@@ -11,10 +11,10 @@ def _study(significant=True, placebo_sig=None, n=8, caar=0.0225):
            for i, c in enumerate([0.03, -0.01, 0.05, 0.02, -0.02, 0.04, 0.01, 0.06][:n], 1)]
     s = {"event_type": "x", "n_events": n, "caar": caar,
          "caar_significant": significant, "t_stat": 4.3, "p_value": 0.003,
-         "per_event": per}
+         "per_event": per, "inference_status": "available" if significant is not None else "unavailable"}
     if placebo_sig is not None:
         s["placebo"] = {"n_events": n, "caar": 0.02, "caar_significant": placebo_sig,
-                        "t_stat": 3.9, "interpretation": "placebo"}
+                        "t_stat": 3.9, "interpretation": "placebo", "inference_status": "available"}
     return s
 
 
@@ -53,8 +53,12 @@ def test_orchestrator_scenario_held_when_gate_holds():
     from agent3.orchestrator import analyze_event_type
     # fixture study has all events on one date -> confound -> gate HOLD
     r = analyze_event_type("semicap_earnings", source="fixture")
-    if r["gate"]["verdict"] == "HOLD_FOR_REVIEW" and r["scenario"]["verdict"] == "CALIBRATED":
-        assert r["scenario"]["publication_state"] == "HELD_FOR_REVIEW"
+    assert r["gate"]["verdict"] == "HOLD_FOR_REVIEW"
+    assert r["scenario"]["publication_state"] == "HELD_FOR_REVIEW"
+    assert r["scenario"]["distribution"] is None
+    from agent3.orchestrator import render_brief, render_scan
+    assert "CALIBRATED" not in render_brief(r) + render_scan([r])
+    assert "next comparable catalyst" not in render_brief(r)
 
 
 # --- §28: content-hashed run_id, no silent collision ---

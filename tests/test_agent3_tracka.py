@@ -18,10 +18,10 @@ def _series(seed, start, n, drop_every=0):
     return out
 
 
-def test_align_index_finds_on_or_before():
+def test_align_index_finds_on_or_after():
     dates = [date(2026, 1, 5), date(2026, 1, 6), date(2026, 1, 8)]
     assert tal._align_index(dates, date(2026, 1, 6)) == 1
-    assert tal._align_index(dates, date(2026, 1, 7)) == 2 or tal._align_index(dates, date(2026, 1, 7)) == 1
+    assert tal._align_index(dates, date(2026, 1, 7)) == 2
     # exact match
     assert tal._align_index(dates, date(2026, 1, 8)) == 2
 
@@ -34,10 +34,10 @@ def test_align_index_rejects_stale_anchor():
     assert tal._align_index(dates, date(2026, 2, 6), tol_days=4) is None
 
 
-def test_align_index_weekend_snaps_within_tolerance():
+def test_align_index_weekend_requires_following_session():
     dates = [date(2026, 1, 9)]  # a Friday
-    # Saturday target (gap 1) should still find the Friday within tol
-    assert tal._align_index(dates, date(2026, 1, 10), tol_days=4) == 0
+    # A Saturday release must not use the preceding Friday as its anchor.
+    assert tal._align_index(dates, date(2026, 1, 10), tol_days=4) is None
 
 
 def test_common_calendar_alignment_and_windows():
