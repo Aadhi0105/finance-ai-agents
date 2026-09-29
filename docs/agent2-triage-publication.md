@@ -1,5 +1,8 @@
 # Agent 2 Batch 3: audited triage and controlled publication
 
+Subsequent update: [correction decisions and triage retry](agent2-review-recovery.md)
+extend the original milestone described below.
+
 The monitoring cycle commits before optional model triage. Triage receives a
 copy of surfaced rows and histories bounded to that cycle, then releases the
 state database lock before calling the model. A later cycle cannot contaminate

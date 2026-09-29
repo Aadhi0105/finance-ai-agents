@@ -126,6 +126,9 @@ def _run_cycle(db_path=None, asof_cycle=None, live_inputs=None, observed_on=None
                     raise ValueError('missing watchlist identity: ' + field)
             if not finite(cov.get('threshold')) or cov.get('direction') not in ('below', 'above'):
                 raise ValueError('invalid covenant threshold or direction')
+            if store.is_retired(cov['item_id']):
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'], 'reason': 'retired_definition'})
+                continue
             pending = store.pending_review(cov['item_id'])
             if pending:
                 skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
@@ -152,6 +155,11 @@ def _run_cycle(db_path=None, asof_cycle=None, live_inputs=None, observed_on=None
             candidate.update(value=val, data_ts=str(item_ts))
             if live_inputs is not None:
                 candidate['evidence'] = cov['_evidence']
+            if store.rejected_candidate(cov['item_id'], candidate):
+                skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
+                                'reason': 'rejected_candidate', 'candidate': candidate})
+                continue
+            if live_inputs is not None:
                 prior = store.get_observation_evidence(cov['item_id'], last['data_ts']) if last else None
                 if last and (prior or {}).get('_evidence', {}).get('definition_hash') != cov['_evidence']['definition_hash']:
                     skipped.append({'item_id': cov['item_id'], 'entity': cov['entity'],
@@ -171,54 +179,8 @@ def _run_cycle(db_path=None, asof_cycle=None, live_inputs=None, observed_on=None
                                 'previous_value': previous['value'] if previous else None})
                 continue
 
-            chk = threshold_check(val, cov["threshold"], cov["direction"])
-            if chk.get("error"):
-                raise ValueError(chk["error"])
-            status = classify(last, chk["breached"], chk["margin"], is_baseline)
-
-            history = store.get_history_series(cov['item_id'])
-            series = [r['value'] for r in history] + [val]
-            dates = [r['data_ts'] for r in history] + [item_ts]
-            if any(d is None for d in dates):
-                raise ValueError('history lacks observation dates')
-            times = [(d - dates[0]).days for d in dates]
-            if any(b <= a for a, b in zip(times, times[1:])):
-                raise ValueError('observation dates must increase')
-            anom = anomaly_significance_check(series)
-            drift = drift_check(times, series,
-                                threshold=cov['threshold'], direction=cov['direction'])
-            drift['time_unit'] = 'days'
-            gaps = [b - a for a, b in zip(times, times[1:])]
-            if len(set(gaps)) > 1:
-                breach = {'breach_probability': None, 'tail_flag': None,
-                          'reason': 'irregular observation intervals; probability unavailable'}
-            else:
-                breach = breach_probability(series, cov['threshold'], cov['direction'])
-                breach['observation_interval_days'] = gaps[0] if gaps else None
-                breach['horizon_days'] = (gaps[0] * breach['horizon_cycles']
-                                          if gaps and 'horizon_cycles' in breach else None)
-            for diagnostic in (anom, drift, breach):
-                if diagnostic.get('error'):
-                    raise ValueError('statistical calculation unavailable: ' + diagnostic['error'])
-
-            rows.append({
-                "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": item_ts,
-                "entity": cov["entity"], "covenant_type": cov["covenant_type"],
-                "metric": cov["metric"], "value": val, "threshold": cov["threshold"],
-                "direction": cov["direction"], "breached": chk["breached"],
-                "margin": chk["margin"], "status": status,
-                "anomaly_significant": anom.get("significant"),
-                "anomaly_z": anom.get("modified_z"),
-                "drifting": drift.get("drifting"),
-                "drift_slope": drift.get("slope"),
-                "drift_tstat": drift.get("slope_tstat"),
-                "breach_prob": breach.get("breach_probability"),
-                "breach_tail": breach.get("tail_flag"),
-                "_anomaly_detail": anom,
-                "_drift_detail": drift,
-                "_breach_detail": breach,
-                **({"_evidence": cov["_evidence"], "data_mode": mode} if live_inputs is not None else {}),
-            })
+            rows.append(calculate_observation(cov, val, item_ts, cycle_n, last,
+                                              store.get_history_series(cov['item_id']), is_baseline))
 
         # Render and serialize BEFORE committing so report failures cannot advance state.
         report = _build_report(cycle_n, cycle_ts, is_baseline, rows, skipped, gap)
@@ -234,6 +196,8 @@ def _run_cycle(db_path=None, asof_cycle=None, live_inputs=None, observed_on=None
         result = {'cycle': cycle_n, 'data_ts': str(cycle_ts), 'baseline': is_baseline,
                   'status': status, 'gap': gap, 'skipped': skipped, 'rows': rows,
                   'surfaced': surfaced, 'report': report, 'replayed': False, 'data_mode': mode}
+        result['triage_history'] = {r['item_id']: store.get_history_series(r['item_id']) +
+            [{'cycle': r['cycle'], 'value': r['value'], 'data_ts': r['data_ts']}] for r in surfaced}
         if live_inputs is not None:
             result['observation_attempts'] = live_inputs
         from state.store import _json_date
@@ -338,3 +302,53 @@ def _build_report(cycle_n, data_ts, is_baseline, rows, skipped=None, gap=0) -> s
         lines.append(f"Coverage: skipped {len(skipped)} item(s); see reasons above "
                      f"({', '.join(s['item_id'] for s in skipped)}).")
     return "\n".join(lines)
+
+def calculate_observation(cov, val, item_ts, cycle_n, last, history, is_baseline=False):
+    """Shared deterministic calculation for new observations and approved restatements."""
+    chk = threshold_check(val, cov["threshold"], cov["direction"])
+    if chk.get("error"):
+        raise ValueError(chk["error"])
+    status = classify(last, chk["breached"], chk["margin"], is_baseline)
+
+    series = [r['value'] for r in history] + [val]
+    dates = [r['data_ts'] for r in history] + [item_ts]
+    if any(d is None for d in dates):
+        raise ValueError('history lacks observation dates')
+    times = [(d - dates[0]).days for d in dates]
+    if any(b <= a for a, b in zip(times, times[1:])):
+        raise ValueError('observation dates must increase')
+    anom = anomaly_significance_check(series)
+    drift = drift_check(times, series,
+                        threshold=cov['threshold'], direction=cov['direction'])
+    drift['time_unit'] = 'days'
+    gaps = [b - a for a, b in zip(times, times[1:])]
+    if len(set(gaps)) > 1:
+        breach = {'breach_probability': None, 'tail_flag': None,
+                  'reason': 'irregular observation intervals; probability unavailable'}
+    else:
+        breach = breach_probability(series, cov['threshold'], cov['direction'])
+        breach['observation_interval_days'] = gaps[0] if gaps else None
+        breach['horizon_days'] = (gaps[0] * breach['horizon_cycles']
+                                  if gaps and 'horizon_cycles' in breach else None)
+    for diagnostic in (anom, drift, breach):
+        if diagnostic.get('error'):
+            raise ValueError('statistical calculation unavailable: ' + diagnostic['error'])
+
+    return {
+        "item_id": cov["item_id"], "cycle": cycle_n, "data_ts": item_ts,
+        "entity": cov["entity"], "covenant_type": cov["covenant_type"],
+        "metric": cov["metric"], "value": val, "threshold": cov["threshold"],
+        "direction": cov["direction"], "breached": chk["breached"],
+        "margin": chk["margin"], "status": status,
+        "anomaly_significant": anom.get("significant"),
+        "anomaly_z": anom.get("modified_z"),
+        "drifting": drift.get("drifting"),
+        "drift_slope": drift.get("slope"),
+        "drift_tstat": drift.get("slope_tstat"),
+        "breach_prob": breach.get("breach_probability"),
+        "breach_tail": breach.get("tail_flag"),
+        "_anomaly_detail": anom,
+        "_drift_detail": drift,
+        "_breach_detail": breach,
+        **({"_evidence": cov["_evidence"], "data_mode": "yfinance"} if "_evidence" in cov else {}),
+    }

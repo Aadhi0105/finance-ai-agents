@@ -258,6 +258,10 @@ Its selected FY2025 inputs are checked against the issuer filing. Thresholds are
 illustrative analyst policies, not contractual covenants. See the
 [live observation guide](docs/agent2-live-observations.md) for commands and limits.
 
+**Review and recovery:** held corrections now support explicit approval/rejection,
+audited recalculation and saved-cycle triage retry. See the
+[review commands and recovery contract](docs/agent2-review-recovery.md).
+
 **Model triage** (`monitoring/triage.py`) reuses Agent 1's tool loop to
 investigate flags and propose an ordering. Publication accepts only a complete
 list of known item IDs. Python renders facts and recommendations for every flag,

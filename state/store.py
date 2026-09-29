@@ -4,9 +4,10 @@ Persistent state store for Agent 2 (spec §3.3, State).
 Core observation layers over one DuckDB file:
   - current_state : latest snapshot per item. Serves compare-to-last AND is the
                     on-demand full-state view.
-  - history       : append-only distinct observations. Serves drift, audit, trend.
+  - history       : effective dated observations; approved restatements are archived.
   - cycle_runs    : complete results, including empty cycles, for replay/progress.
   - observation_details / review_queue : diagnostic snapshots and review holds.
+  - review_decisions : immutable decision records, including before/after histories.
 
 Shape is long/tidy panel data: one row per (item_id, cycle, metric). This is the
 same shape the thesis / Safe Assets econometrics live in, so the drift model
@@ -67,6 +68,8 @@ class StateStore:
             f"CREATE TABLE IF NOT EXISTS history ({cols}, UNIQUE(item_id, data_ts));")
         self.con.execute(f"CREATE TABLE IF NOT EXISTS current_state ({cols});")
         self.con.execute("CREATE TABLE IF NOT EXISTS monitor_metadata (key VARCHAR PRIMARY KEY, value VARCHAR NOT NULL)")
+        self.con.execute("CREATE TABLE IF NOT EXISTS review_decisions (review_id VARCHAR PRIMARY KEY, payload VARCHAR NOT NULL)")
+        self.con.execute("CREATE TABLE IF NOT EXISTS retired_series (item_id VARCHAR PRIMARY KEY, replacement_id VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS review_queue (item_id VARCHAR PRIMARY KEY, payload VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS cycle_runs (cycle INTEGER PRIMARY KEY, payload VARCHAR NOT NULL)")
         self.con.execute("CREATE TABLE IF NOT EXISTS observation_details (item_id VARCHAR, data_ts DATE, payload VARCHAR NOT NULL, PRIMARY KEY(item_id, data_ts))")
@@ -110,7 +113,7 @@ class StateStore:
         """The item's prior observations, oldest first — the input to the
         statistical checks (drift regression, anomaly baseline)."""
         rows = self.con.execute(
-            "SELECT cycle, value, data_ts FROM history WHERE item_id = ? ORDER BY cycle", [item_id]
+            "SELECT cycle, value, data_ts FROM history WHERE item_id = ? ORDER BY data_ts", [item_id]
         ).fetchall()
         return [{"cycle": r[0], "value": r[1], "data_ts": r[2]} for r in rows]
 
@@ -149,6 +152,23 @@ class StateStore:
                          [skipped['item_id'], json.dumps({'cycle': cycle, **skipped},
                                                         default=_json_date, allow_nan=False)])
 
+    def reviews(self):
+        from monitoring.recovery import review_id
+        return [{'review_id': review_id(json.loads(row[0])), **json.loads(row[0])}
+                for row in self.con.execute('SELECT payload FROM review_queue ORDER BY item_id').fetchall()]
+
+    def decisions(self):
+        return [json.loads(row[0]) for row in self.con.execute('SELECT payload FROM review_decisions ORDER BY review_id').fetchall()]
+
+    def rejected_candidate(self, item_id, candidate):
+        from monitoring.recovery import candidate_key
+        key = candidate_key(candidate)
+        return any(d['item_id'] == item_id and d['action'] == 'reject' and d['candidate_key'] == key
+                   for d in self.decisions())
+
+    def is_retired(self, item_id):
+        return self.con.execute('SELECT replacement_id FROM retired_series WHERE item_id=?', [item_id]).fetchone() is not None
+
     def get_run(self, cycle):
         row = self.con.execute('SELECT payload FROM cycle_runs WHERE cycle=?', [cycle]).fetchone()
         return json.loads(row[0]) if row else None
@@ -169,7 +189,12 @@ class StateStore:
         """On-demand full-state view: a read onto current_state (all items)."""
         rows = self.con.execute("SELECT * FROM current_state ORDER BY item_id").fetchall()
         cols = [d[0] for d in self.con.description]
-        return [dict(zip(cols, row)) for row in rows]
+        result = [dict(zip(cols, row)) for row in rows]
+        retired = dict(self.con.execute('SELECT item_id, replacement_id FROM retired_series').fetchall())
+        for row in result:
+            if row['item_id'] in retired:
+                row['retired_to'] = retired[row['item_id']]
+        return result
 
     def close(self) -> None:
         try:

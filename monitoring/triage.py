@@ -208,6 +208,19 @@ class HistorySnapshot:
         self.history = json.loads(json.dumps(self.history, default=lambda value:
             value.isoformat() if isinstance(value, date) else value, allow_nan=False))
 
+    @classmethod
+    def from_cycle(cls, store, result):
+        instance = cls.__new__(cls)
+        if 'triage_history' in result:
+            instance.history = deepcopy(result['triage_history'])
+        else:
+            # Older cycle ledgers predate frozen triage history. Reconstruct only
+            # before any restatement, otherwise refuse to mix original and revised facts.
+            if store.decisions():
+                raise ValueError('legacy cycle lacks frozen triage history after review; use its original audit')
+            instance = cls(store, result['surfaced'], result['cycle'])
+        return instance
+
     def get_history_series(self, item_id):
         return deepcopy(self.history.get(item_id, []))
 
@@ -253,7 +266,7 @@ def _parse_selection(text):
     return json.loads(text, object_pairs_hook=unique_keys)
 
 
-def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir=None):
+def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir=None, retry_context=None):
     if not surfaced_rows:
         return {"status": "not_needed", "commentary": "", "audit_path": None}
     rows = deepcopy(surfaced_rows)
@@ -265,7 +278,7 @@ def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir
     path = root / f"cycle-{cycle}-{uuid4().hex}" / "model.json"
     record = {"cycle": cycle, "data_mode": rows[0].get("data_mode", "bundled_fixtures"),
               "model_mode": "live" if live else "offline_stub", "rows": rows,
-              "history": snapshot.history, "publication": "pending"}
+              "history": snapshot.history, "publication": "pending", "retry_context": retry_context}
 
     def checkpoint(current):
         record.update(execution=current.execution_record(), calls=current.calls)
@@ -296,6 +309,8 @@ def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir
                     or len(order) != len(registry.flags) or set(order) != set(registry.flags)):
                 raise ValueError("Invalid selection")
             commentary = _render(registry, order)
+            if retry_context:
+                commentary = f"Saved cycle {cycle}: original evidence, not current state.\n" + commentary
         except (ValueError, TypeError, KeyError):
             status, reason = "review_required", "invalid_selection"
     record.update(publication="published" if commentary else "withheld",

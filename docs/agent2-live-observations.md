@@ -1,5 +1,8 @@
 # Agent 2: first live observation integration
 
+Subsequent update: [correction decisions and triage retry](agent2-review-recovery.md)
+extend the original milestone described below.
+
 Agent 2 can now fetch annual statements for an explicit watchlist independently
 of its triage model. `--data-source yfinance` selects real observations;
 `--live` still selects the paid triage model. Neither switch implies the other.

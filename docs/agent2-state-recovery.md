@@ -1,5 +1,8 @@
 # Agent 2 batch 2 — durable state and recovery
 
+Subsequent update: [correction decisions and triage retry](agent2-review-recovery.md)
+extend the original milestone described below.
+
 The cycle ledger is separate from observation history. Every successfully processed
 cycle commits a saved result, including cycles with an empty watchlist, missing
 values, duplicate data or review-held items. The next automatic cycle advances
