@@ -34,7 +34,7 @@ def _triage_if_needed(result, live: bool) -> None:
     try:
         store = StateStore(_DB)
         try:
-            snapshot = HistorySnapshot(store, surfaced, result['cycle'])
+            snapshot = HistorySnapshot.from_cycle(store, result)
         finally:
             store.close()
         triage = run_triage_record(snapshot, surfaced, live=live, cycle=result['cycle'])
@@ -74,9 +74,11 @@ def _print_state():
     if not rows:
         print("full-state: (empty — no cycles run yet)")
         return
-    print("===== FULL STATE (current snapshot per item) =====")
+    print("===== FULL STATE (effective current snapshot per item) =====")
     for r in rows:
         state = "breached" if r["breached"] else "ok"
+        if r.get('retired_to'):
+            state += f"; retired, replaced by {r['retired_to']}"
         print(f"  {r['item_id']} ({r['entity']}): {r['metric']} = {r['value']} "
               f"vs {r['threshold']} [{state}] status={r['status']} cycle={r['cycle']}")
 
@@ -88,10 +90,19 @@ if __name__ == "__main__":
     options.add_argument('--db', default=_DB)
     options.add_argument('--data-source', choices=['fixture', 'yfinance'], default='fixture')
     options.add_argument('--watchlist')
+    options.add_argument('--reviewer')
+    options.add_argument('--reason')
+    options.add_argument('--replacement-item-id')
     parsed, remaining = options.parse_known_args()
     _DB = str(Path(parsed.db).expanduser().resolve())
     sys.argv = [sys.argv[0], *remaining]
     arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
+    if any(value is not None for value in (parsed.reviewer, parsed.reason, parsed.replacement_item_id)) and arg not in {'--approve-review', '--reject-review'}:
+        options.error('reviewer, reason and replacement item ID require a review decision command')
+    if arg in {'--reviews', '--review-decisions'} and len(sys.argv) != 2:
+        options.error('unexpected review listing arguments')
+    if arg == '--retry-triage' and (len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != '--live')):
+        options.error('use --retry-triage CYCLE [--live]')
     watchlist = None
     if parsed.data_source == 'yfinance':
         if not parsed.watchlist or arg not in {'--once', '--catchup'}:
@@ -102,15 +113,43 @@ if __name__ == "__main__":
     elif parsed.watchlist:
         sys.exit('--watchlist requires --data-source yfinance')
     if "--live" in sys.argv:
-        if arg not in {"--once", "--catchup"}:
-            sys.exit("--live is supported only with --once or --catchup")
+        if arg not in {"--once", "--catchup", "--retry-triage"}:
+            sys.exit("--live is supported only with --once, --catchup or --retry-triage")
         try:
             prepare_live()
         except ValueError as exc:
             sys.exit(str(exc))
     if arg in {"--once", "--catchup", "--run", "--loop"}:
         print("Data source: live annual statements; analyst policies." if watchlist else "Data source: bundled fixtures (not a live market feed).")
-    if arg == "--reset":
+    if arg in {'--reviews', '--review-decisions'}:
+        import json
+        store = StateStore(_DB)
+        try:
+            print(json.dumps(store.reviews() if arg == '--reviews' else store.decisions(), indent=2))
+        finally:
+            store.close()
+    elif arg in {'--approve-review', '--reject-review'}:
+        import json
+        from monitoring.recovery import decide
+        if len(sys.argv) != 3:
+            sys.exit('Specify exactly one review ID, --reviewer NAME and --reason TEXT')
+        result = decide(_DB, sys.argv[2], 'approve' if arg == '--approve-review' else 'reject',
+                        parsed.reviewer, parsed.reason, parsed.replacement_item_id)
+        print(json.dumps(result, indent=2))
+    elif arg == '--retry-triage':
+        from monitoring.recovery import retry_triage
+        if len(sys.argv) < 3:
+            sys.exit('Specify the saved cycle number')
+        try:
+            result = retry_triage(_DB, int(sys.argv[2]), live='--live' in sys.argv)
+        except (Exception, KeyboardInterrupt) as exc:
+            print(f"Triage retry failed ({type(exc).__name__}); saved cycle unchanged.", file=sys.stderr)
+            raise SystemExit(2)
+        print(f"Triage audit: {result['audit_path']}")
+        print(result['commentary'] or f"Triage {result['status']}; saved cycle unchanged.")
+        if result['status'] not in {'completed', 'not_needed'}:
+            raise SystemExit(2)
+    elif arg == "--reset":
         _reset()
     elif arg == "--state":
         _print_state()
@@ -155,4 +194,5 @@ if __name__ == "__main__":
     else:
         sys.exit("Usage: python monitor.py "
                  "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "
-                 "--cron [SCHEDULE] | --run N | --reset | --state]")
+                 "--cron [SCHEDULE] | --run N | --reset | --state | --reviews | --review-decisions | "
+                 "--approve-review ID | --reject-review ID | --retry-triage CYCLE [--live]]")
