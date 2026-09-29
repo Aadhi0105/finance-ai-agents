@@ -1,146 +1,132 @@
+"""Market-model historical study with conservative, explicit inference eligibility.
+
+Repeated issuers or overlapping event windows are descriptive only. This bounded
+version does not estimate clustered standard errors from a small peer universe.
 """
-Event study engine (Agent 3, the flagship). Local function first; lifted to the
-MCP server in a later checkpoint.
-
-This is the owner's master's-thesis DiD, relabelled — not new skill, a transfer:
-  abnormal return          = treatment effect
-  market model             = the counterfactual (what the return would have been)
-  estimation window        = the pre-period / parallel-trend baseline
-  placebo on non-event days = the 2019 placebo (no effect where none should exist)
-  t-test on mean CAAR      = the SE / p-value
-  multiple windows / models = the four specifications
-
-Method (all deterministic Python; the LLM never does the math):
-  1. Per event, fit a market model  R_it = alpha + beta * R_mt + e  by OLS on an
-     estimation window that ENDS before the event (no look-ahead, event-free).
-  2. Abnormal return AR_t = R_t - (alpha_hat + beta_hat * R_mt) over the event window.
-  3. Cumulate -> CAR for that event.
-  4. Average CAR across N comparable events -> CAAR (cross-ticker, same event type).
-     This averaging is what gives statistical power; a single event is noise.
-  5. Significance: one-sample t-test on the per-event CARs (via tools.significance),
-     is mean CAAR different from zero? Non-parametric sign test shipped alongside.
-  6. Placebo: run the identical machinery on non-event ("pseudo-event") dates; a
-     clean study shows no significant CAAR there.
-
-Comparability is the load-bearing assumption for cross-ticker CAAR: the caller
-supplies events judged to be the same catalyst type. N and basis are always
-reported; power is honestly low at small N.
-"""
-
 from __future__ import annotations
-
+from collections import Counter
+import math
 import statistics
-
-from tools.significance import one_sample_t, t_critical
-
-
-def _ols_market_model(stock_rets: list[float], mkt_rets: list[float]) -> tuple[float, float]:
-    """OLS of stock returns on market returns over the estimation window.
-    Returns (alpha, beta)."""
-    n = len(stock_rets)
-    mbar = statistics.mean(mkt_rets)
-    sbar = statistics.mean(stock_rets)
-    s_mm = sum((mkt_rets[i] - mbar) ** 2 for i in range(n))
-    if s_mm == 0:
-        return sbar, 0.0
-    s_ms = sum((mkt_rets[i] - mbar) * (stock_rets[i] - sbar) for i in range(n))
-    beta = s_ms / s_mm
-    alpha = sbar - beta * mbar
-    return alpha, beta
+from scipy import stats
+from tools.event_contracts import validate_event, finite, MAX_EVENTS, review_complete, release_provenance_complete
+from tools.significance import one_sample_t
 
 
-def _car_for_event(event: dict) -> dict | None:
-    """
-    Compute one event's CAR.
+def _ols_market_model(stock_rets, mkt_rets):
+    mbar, sbar = statistics.mean(mkt_rets), statistics.mean(stock_rets)
+    s_mm = sum((r - mbar) ** 2 for r in mkt_rets)
+    if s_mm <= 1e-16:
+        raise ValueError('market-model slope is unidentifiable: insufficient market variance')
+    beta = sum((m - mbar) * (s - sbar) for m, s in zip(mkt_rets, stock_rets)) / s_mm
+    return sbar - beta * mbar, beta
 
-    event = {
-      "ticker": str, "event_date": str,
-      "est_stock": [...], "est_market": [...],     # estimation window returns
-      "evt_stock": [...], "evt_market": [...],     # event-window returns (e.g. [-1,+1])
-    }
-    Returns per-event abnormal returns and CAR, or None if the estimation window
-    is too short to fit a market model.
-    """
-    est_s, est_m = event["est_stock"], event["est_market"]
-    evt_s, evt_m = event["evt_stock"], event["evt_market"]
-    if len(est_s) < 10 or len(est_s) != len(est_m) or len(evt_s) != len(evt_m):
-        return None
 
-    alpha, beta = _ols_market_model(est_s, est_m)
-    ars = [evt_s[i] - (alpha + beta * evt_m[i]) for i in range(len(evt_s))]
+def _car_for_event(event):
+    e = validate_event(event)
+    alpha, beta = _ols_market_model(e['est_stock'], e['est_market'])
+    ars = [s - alpha - beta * m for s, m in zip(e['evt_stock'], e['evt_market'])]
     car = sum(ars)
-    return {
-        "ticker": event.get("ticker"), "event_date": event.get("event_date"),
-        "alpha": round(alpha, 6), "beta": round(beta, 4),
-        "abnormal_returns": [round(a, 6) for a in ars], "car": round(car, 6),
-    }
+    if not all(finite(v) for v in [alpha, beta, car, *ars]):
+        raise ValueError('nonfinite market-model output')
+    return {k: v for k, v in {**e, 'alpha': alpha, 'beta': beta,
+            'abnormal_returns': ars, 'car': car}.items()
+            if k not in ('est_stock', 'est_market', 'evt_stock', 'evt_market')}
 
 
-def _sign_test(cars: list[float]) -> dict:
-    """Non-parametric sign test: are positive CARs more common than chance?
-    Robust to the non-normality that a parametric t-test assumes."""
-    pos = sum(1 for c in cars if c > 0)
-    neg = sum(1 for c in cars if c < 0)
+def _sign_test(cars):
+    pos, neg = sum(c > 0 for c in cars), sum(c < 0 for c in cars)
     n = pos + neg
-    if n == 0:
-        return {"n_nonzero": 0, "positive": 0, "significant": None}
-    # Exact binomial test (p=0.5) -- correct at the small N (5-20) Agent 3 works
-    # in, where the normal approximation is unreliable.
-    from scipy import stats as _sps
-    p_value = float(_sps.binomtest(pos, n, 0.5, alternative="two-sided").pvalue)
-    return {"n_nonzero": n, "positive": pos, "negative": neg,
-            "p_value": round(p_value, 6), "significant": bool(p_value < 0.05)}
+    p = float(stats.binomtest(pos, n, .5).pvalue) if n else None
+    return {'n_nonzero': n, 'positive': pos, 'negative': neg,
+            'p_value': p, 'significant': p < .05 if p is not None else None}
 
 
-def run_event_study(events: list[dict], event_type: str = "unspecified",
+def _collect(events):
+    accepted, rejected, identities, windows = [], [], set(), {}
+    if not isinstance(events, list) or len(events) > MAX_EVENTS:
+        return [], [{'index': None, 'reason': f'events must be a list of at most {MAX_EVENTS} records'}]
+    for i, event in enumerate(events):
+        try:
+            e = validate_event(event)
+            issuer = e.get('issuer_id') or e['ticker']
+            if not isinstance(issuer, str) or not issuer.strip():
+                raise ValueError('invalid issuer identity')
+            issuer = issuer.strip().upper()
+            e['issuer_id'] = issuer
+            anchor = e.get('anchor_date', e['event_date'])
+            identity = (issuer, anchor)
+            if identity in identities:
+                raise ValueError('duplicate issuer/event anchor')
+            # Same issuer's overlapping measurement windows cannot be independent events.
+            ds = set(e.get('window_dates', []))
+            if ds & windows.get(issuer, set()):
+                raise ValueError('overlapping event windows for issuer')
+            c = _car_for_event(e)
+            identities.add(identity)
+            windows.setdefault(issuer, set()).update(ds)
+            accepted.append(c)
+        except (ValueError, TypeError, KeyError, OverflowError) as exc:
+            rejected.append({'index': i, 'reason': str(exc)})
+    return accepted, rejected
+
+
+def _summarize(events, event_type):
+    per, rejected = _collect(events)
+    n = len(per)
+    counts = Counter(e.get('issuer_id', e['ticker']) for e in per)
+    reasons = []
+    if rejected: reasons.append('rejected_input_records')
+    if n < 10: reasons.append('fewer_than_10_independent_events')
+    if any(c > 1 for c in counts.values()): reasons.append('repeated_issuer_dependence')
+    all_dates = [d for e in per for d in e.get('window_dates', [])]
+    if len(set(all_dates)) != len(all_dates): reasons.append('overlapping_cross_issuer_windows')
+    if any(not e.get('window_dates') or not e.get('est_dates') for e in per):
+        reasons.append('missing_window_dates')
+    if any(e.get('date_status') != 'reviewed' for e in per): reasons.append('unverified_event_dates')
+    if any(not release_provenance_complete(e) for e in per): reasons.append('missing_or_inconsistent_release_provenance')
+    if any(e.get('benchmark_status') != 'reviewed' for e in per): reasons.append('unverified_benchmark_basis')
+    if any(e.get('quality_flags') for e in per): reasons.append('price_calendar_quality_flags')
+    if any(e.get('design_status') != 'reviewed' for e in per): reasons.append('unreviewed_sampling_assumptions')
+    for e in per:
+        evidence = e.get('review_evidence') or {}
+        if not isinstance(evidence,dict) or not all(review_complete(evidence.get(k), source=k != 'design') for k in ('date','benchmark','design')):
+            reasons.append('missing_review_evidence')
+            break
+    cars = [e['car'] for e in per]
+    ttest = one_sample_t(cars)
+    if ttest['inference_status'] != 'available': reasons.append(ttest['inference_status'])
+    eligible = not reasons
+    return {'event_type': event_type, 'n_events': n, 'n_issuers': len(counts),
+            'events_by_issuer': dict(counts), 'weighting': 'equal weight per accepted event',
+            'caar': statistics.mean(cars) if cars else None,
+            'caar_significant': ttest['significant'] if eligible else None,
+            't_stat': ttest['t_stat'] if eligible else None,
+            'p_value': ttest['p_value'] if eligible else None,
+            'inference_status': 'available' if eligible else 'unavailable',
+            'inference_reasons': reasons, 'rejected_events': rejected, 'per_event': per,
+            'sign_test': _sign_test(cars) if eligible else {'significant': None, 'p_value': None, 'reason': 'same independence restrictions as t-test'},
+            'power_note': 'Sample size alone does not establish statistical power.',
+            'method': 'OLS market model; historical equal-event CAR mean; independent-event Student-t only when eligible',
+            'computed_by': 'run_event_study (python)'}
+
+
+def run_event_study(events: list[dict], event_type: str = 'unspecified',
                     placebo_events: list[dict] | None = None) -> dict:
-    """
-    Multi-event CAAR study over a set of comparable events (cross-ticker, same
-    event type). Returns the CAAR, its significance (parametric t via the shared
-    helper + non-parametric sign test), the per-event detail, and — always — a
-    placebo result when placebo events are supplied.
-    """
-    per_event = [c for c in (_car_for_event(e) for e in events) if c is not None]
-    n = len(per_event)
-    if n < 2:
-        return {"event_type": event_type, "n_events": n,
-                "reason": "need at least 2 usable events for a CAAR test",
-                "computed_by": "run_event_study (python)"}
-
-    cars = [c["car"] for c in per_event]
-    caar = statistics.mean(cars)
-    ttest = one_sample_t(cars, mu0=0.0)
-    sign = _sign_test(cars)
-
-    result = {
-        "event_type": event_type,
-        "n_events": n,
-        "caar": round(caar, 6),
-        "caar_significant": ttest["significant"],
-        "t_stat": ttest["t_stat"],
-        "p_value": ttest.get("p_value"),
-        "sign_test": sign,
-        "power_note": ("low power at small N — interpret with caution"
-                       if n < 10 else "adequate N for a CAAR test"),
-        "per_event": per_event,
-        "method": "market-model OLS; multi-event CAAR; t-test via tools.significance",
-        "computed_by": "run_event_study (python)",
-    }
-
-    # Placebo: identical machinery on non-event dates. A clean study finds nothing.
-    if placebo_events:
-        pe = [c for c in (_car_for_event(e) for e in placebo_events) if c is not None]
-        if len(pe) >= 2:
-            p_cars = [c["car"] for c in pe]
-            p_t = one_sample_t(p_cars, mu0=0.0)
-            result["placebo"] = {
-                "n_events": len(pe),
-                "caar": round(statistics.mean(p_cars), 6),
-                "caar_significant": p_t["significant"],
-                "t_stat": p_t["t_stat"],
-                "interpretation": ("PASS — no significant effect on non-event dates"
-                                   if not p_t["significant"]
-                                   else "WARN — placebo is significant; the design may be confounded"),
-            }
-
+    if not isinstance(event_type,str) or not event_type.strip() or len(event_type)>200:
+        result = _summarize([], 'invalid_event_type')
+        result['rejected_events'] = [{'index':None,'reason':'event_type must be a nonempty string of at most 200 characters'}]
+        return result
+    result = _summarize(events, event_type)
+    placebo = _summarize([] if placebo_events is None else placebo_events, event_type)
+    actual_days = {(e['issuer_id'],d) for e in result['per_event'] for d in e.get('window_dates', [])}
+    control_days = {(e['issuer_id'],d) for e in placebo['per_event'] for d in e.get('window_dates', [])}
+    if actual_days & control_days:
+        placebo.update(inference_status='unavailable', caar_significant=None, p_value=None, t_stat=None,
+                       sign_test={'significant':None,'p_value':None})
+        placebo['inference_reasons'].append('control_overlaps_real_event')
+    sig = placebo['caar_significant']
+    placebo['interpretation'] = ('UNAVAILABLE — control inference unresolved' if sig is None else
+        'REVIEW — control mean differs from zero' if sig else
+        'No statistically detectable control mean; this does not prove absence of an effect')
+    result['placebo'] = placebo
     return result

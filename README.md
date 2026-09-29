@@ -68,7 +68,7 @@ AGENT_STATS_VIA_MCP=1 python monitor.py --run 10
 **Agent 3 — market / news intelligence** (event study + scenario, and a news brief):
 
 ```bash
-# Track A (rigor): cross-ticker event study on real earnings dates + a forward scenario
+# Track A: historical earnings analysis; unresolved evidence is held for review
 python -m agent3.run_live ASML.AS semicap_earnings
 python -m agent3.run_live ALO.PA european_rail
 
@@ -282,91 +282,54 @@ an opt-in paid model check. Both modes create isolated test databases.
 
 ## Agent 3 — Market / News Intelligence
 
-Agent 1 valued a company from its numbers; Agent 2 watched those numbers change.
-**Agent 3 turns events and text into a tested, forward-looking view** — its motto
-is *read -> prove -> project*. It reads what happened, proves whether it moved the
-stock (statistically), and projects the next comparable event as a
-probability-weighted range. It is the only agent with two primary disciplines
-(econometrics *and* probability).
+Agent 3 has two separate tracks. Track A measures **historical** earnings-window
+abnormal returns. Track B produces a current-news sentiment brief; its sentiment
+never enters the event-study calculation.
 
-It runs on **two tracks that never contaminate each other:**
+### Track A — bounded historical analysis
 
-- **Track A — the rigor lane.** Scheduled, dated events (earnings) — dated at day resolution (time-of-day/session not yet modelled). The
-  home of the event study, because exact timing is what makes a clean measurement
-  possible.
-- **Track B — the breadth lane.** Unstructured news, sentiment-scored. Messier and
-  current-only, so it powers a daily brief — never a rigorous claim. The firewall
-  is absolute: Track B sentiment never feeds a Track-A tested result.
+Live assembly fetches prices and earnings timestamps for an explicit or proposed
+peer universe. An OLS market model uses **250 estimation returns [-280,-31]** and
+three event returns **[-1,+1]**. The output includes an equal-event-weighted mean
+CAR, event/issuer counts, excluded evidence and historical quantiles.
 
-### Track A — the event study (the flagship)
+Batch 1 enforces finite numeric/window contracts, exact Student-t decisions,
+duplicate/overlap rejection, timezone/session-aware anchoring and a publication
+guard. Provider dates, default benchmarks and generated controls remain
+**unverified**. A sourced study plan can supply reviewed dates, return bases,
+peer-comparability and sampling assumptions, and a declared hypothesis family.
 
-`run_event_study` (`tools/event_study.py`) is a standard market-model event study
-that transfers the counterfactual-and-falsification discipline from the owner's
-causal-inference (difference-in-differences) work into an event-study framework:
-the abnormal return is the effect, the market model is the counterfactual, the
-estimation window is the pre-event baseline, and a placebo on non-event dates is
-the falsification test. (It is not literally a DiD — there is no treated-vs-control
-panel with a parallel-trends assumption; the shared discipline is the
-counterfactual and the placebo.) Deterministic Python throughout:
+Repeated quarterly observations from the same firms and overlapping market dates
+are **descriptive only**: no independence-based significance claim or iid bootstrap
+interval is issued. At least ten independently eligible single-event issuers and
+complete reviewed evidence are required by the bounded inference policy. This
+minimum is not a power guarantee. Unresolved data, calendar, comparability,
+sampling or control evidence holds publication. No result is called a calibrated
+forecast; held distributions are diagnostics only.
 
-1. Fit a market model `R = a + b*R_market` by OLS on a pre-event estimation
-   window (`[-250,-30]`), per event.
-2. Abnormal return over the event window (`[-1,+1]`), cumulated to CAR.
-3. Average across N comparable, cross-ticker events -> **CAAR** (the step that
-   gives statistical power; a single event is noise).
-4. Significance via a one-sample t-test (the shared `tools/significance.py`) plus
-   a non-parametric sign test, with an **always-on placebo** that must come up
-   empty for the result to be believable.
+```sh
+python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS
+# Optional sourced reviewer input:
+python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS --study-plan reviewed-plan.json
+```
 
-Peers come from a **model-proposes-and-pins** flow (`agent3/peers.py`): give it one
-ticker, the model proposes a comparable peer set, and that set is *pinned* into the
-run so the result is reproducible — a `--peers` override forces a set, and the
-validation gate is the backstop against a loose one. The live assembly
-(`agent3/track_a_live.py`) pulls real earnings dates + prices, drops-and-reports
-peers with unusable data (some Euronext names return earnings dates that predate
-their price history — labeled and excluded honestly), and refuses the study if too
-few events survive.
+Use explicit peers for now: the live LLM proposal adapter is pending Batch 2.
+MCP is opt-in with `AGENT_STATS_VIA_MCP=1`; local/MCP calculations share the same
+contract. Exit 3 means held; exit 2 means assembly refused. DuckDB retains summary
+history, not a complete replay bundle. Calendar CRUD exists, but calendar ingestion
+and automatic scheduling are not part of the live flow.
 
-### Track A — the scenario engine ("project")
+See [Agent 3 Batch 1](docs/agent3-batch1.md) for the review-plan schema, exact date,
+benchmark and inference policies, commands, tests and remaining limitations.
 
-`agent3/scenario.py` bootstraps the event study's *realized* per-event CAR
-distribution into a forward, probability-weighted range for the next comparable
-catalyst (p25 / median / p75, P(positive), and a separate confidence interval on
-the mean effect). It is **calibration, not prediction** — a re-expression of what
-comparable events did — and it refuses when the evidence is too thin (below an N
-floor) or reports an explicit **null** when the underlying effect isn't
-significant, rather than dressing noise up as a forecast.
+### Track B — current news (later fix batch)
 
-### Track B — the news funnel
+The independent news funnel ingests, clusters, scores and aggregates current
+headlines. It supports a stub, a financial lexicon subset, FinBERT and a divergence
+scorer. Track B still needs relevance/timestamp controls, explicit real-scorer
+selection and final review/evidence preservation; Batch 1 does not certify it.
+Its default stub score must not be used as a real sentiment finding.
 
-`agent3/news_funnel.py` turns raw news into a per-entity-per-day signal through
-deterministic stages: ingest (the publication timestamp is sacred — undated items
-are dropped, so there is no look-ahead), dedup/cluster (the same wire story from
-twenty outlets is *one* signal, collapsed by headline similarity — coverage volume
-is tracked but never counted as signal strength), relevance filter, score, and
-aggregate. The entity-day signal carries **level, dispersion, count, and
-confidence** — so a consumer knows how much to trust it (news that disagrees with
-itself lowers confidence).
-
-Sentiment scoring (`agent3/sentiment.py`) is pluggable: a real **Loughran-McDonald
-lexicon** (transparent, offline, `tools`-free), a real **FinBERT** transformer, and
-a **divergence scorer** that runs both and turns their *disagreement* into a free
-confidence signal — when a context-aware model and a rule-based lexicon contradict
-each other on a headline, that is exactly when a human should look, and the funnel
-flags it.
-
-### Assembly
-
-`agent3/orchestrator.py` ties it together: assemble events -> event study (via MCP)
--> scenario -> validation gate -> record the outcome to a catalyst-calendar DuckDB
-store (`agent3/catalyst_state.py`), rendered as either a per-entity **brief** or a
-cross-entity **scan**. The **validation gate** (`agent3/validation.py`) carries the
-Agent-3-specific checks: *confound* (a significant CAAR that is really an
-index-wide move, flagged when events cluster on too few dates), *thin data* (too
-few events / peers), and *multiple testing* (a significant result that doesn't
-survive a multiplicity adjustment when many event types were tested). A significant
-result isn't emitted automatically — it has to survive the gate; an insignificant
-one is an honest null and passes cleanly.
 
 ---
 
@@ -438,7 +401,7 @@ a server would be decoration.
 - **Agent 2 is the second consumer** of the shared statistical checks, so they are
   lifted to an MCP server (`mcp_server/server.py`) and Agent 2 calls them as a
   client.
-- **Agent 3 consumes the event study over MCP** — it reuses those same checks and
+- **Agent 3 can consume the event study over MCP** — it reuses those same checks and
   adds one tool (`run_event_study`) to the server, which *internally calls* the
   shared significance family rather than reimplementing it. It can run that engine
   through the MCP boundary (`AGENT_STATS_VIA_MCP=1`) or locally; local execution is
@@ -476,7 +439,7 @@ Each is *primary* in at least one agent (**P** primary · **S** secondary · **L
 
 | | Agent 1 — Equity Research | Agent 2 — Monitoring | Agent 3 — Market/News | Agent 4 — FP&A |
 |---|---|---|---|---|
-| **Probability** | L — scenario-weighted valuation | S — breach probability, tail flags | **P** — catalyst -> forward distribution | S — P(hit target), forecast bands |
+| **Probability** | L — scenario-weighted valuation | S — breach probability, tail flags | **P** — historical event distributions | S — P(hit target), forecast bands |
 | **Statistics** | S — peer-outlier check | **P** — anomaly significance | S — sentiment / significance of CAAR | S — variance significance vs. noise |
 | **Econometrics** | S — trend framing | S — drift regression | **P** — event study (market model, CAAR) | **P** — reforecast / expected-range |
 
@@ -484,7 +447,7 @@ Each is *primary* in at least one agent (**P** primary · **S** secondary · **L
 DCF, not one of the three disciplines.)
 
 The event study runs all three in one pipeline: econometrics estimates abnormal
-returns, statistics tests their significance, probability projects them forward.
+returns, statistics tests eligible independent samples, and probability summarizes their historical distribution.
 
 ---
 
@@ -508,7 +471,7 @@ monitor.py   Agent 2 entry point
 
 agent3/      track_a.py, track_a_live.py     (event assembly: fixture + live yfinance)
              peers.py                        (model-proposes-and-pins peer sets)
-             scenario.py                     (bootstrap forward distribution)
+             scenario.py                     (historical quantiles; eligible mean bootstrap)
              news_funnel.py, news_live.py     (Track B funnel + live news)
              sentiment.py, lm_lexicon.py      (LM lexicon, FinBERT, divergence scorer)
              validation.py                   (confound / thin-data / multiple-testing gate)
@@ -571,18 +534,12 @@ Stated plainly, because knowing a tool's limits is part of building it:
 - **Agent 2's fixture series are deliberately clean**, so drift t-stats read sharp;
   real, noisier data would produce more graduated signals. The machinery is what's
   demonstrated.
-- **Agent 3's pooled earnings event studies typically come back insignificant on
-  real data** — which is the honest, correct result (earnings surprises wash out
-  across a diversified peer set), and the scenario engine reports it as a null
-  rather than manufacturing a signal. Finding a significant event-driven effect
-  needs a sharper event type (e.g. filtered surprises), a documented extension.
-- **Agent 3's CAAR inference treats per-firm quarterly events as independent.**
-  Pooling several quarters from each peer overstates the effective sample size,
-  because a firm's successive earnings CARs are correlated. A firm-clustered /
-  block bootstrap is the correct next step and a documented extension; at the
-  small peer counts here (5–10) cluster-robust standard errors are themselves
-  fragile, so the honest current stance is to report N and the peer set plainly
-  rather than assert an over-precise significance.
+- **Agent 3's pooled quarterly studies are descriptive.** Repeated firms and
+  overlapping windows do not receive independent-event inference or an iid mean
+  interval. Provider dates and calendars remain unverified unless supported by
+  review evidence; date/gap/benchmark uncertainty holds publication. Historical
+  quantiles are not forward predictive calibration. See the bounded policy in
+  [Agent 3 Batch 1](docs/agent3-batch1.md).
 - **Track B is current-news only** on free sources — a daily sentiment brief, not
   historical sentiment-return analysis (which the two-track firewall keeps out of
   the rigorous lane by design). Some names return sparse earnings-date history from
