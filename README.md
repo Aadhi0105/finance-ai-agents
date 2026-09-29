@@ -2,30 +2,32 @@
 
 [![tests](https://github.com/Aadhi0105/finance-ai-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/Aadhi0105/finance-ai-agents/actions/workflows/ci.yml)
 
-A multi-agent platform for finance & markets analysis, built on one shared
-analytical spine. Four agents run today — an **equity-research** agent that turns a
-ticker into an auditable financial-evidence report, a **covenant-monitoring** agent that
-watches many items over time and detects change, a **market/news-intelligence**
-agent that tests whether events move a stock and projects the next one, and an
-**FP&A / variance** agent that explains why a P&L missed plan — with their shared
-analytical tools exposed over an **MCP server**.
+Four finance agents share deterministic analytical tools: **equity research**,
+**covenant monitoring**, **historical market-event and current-news analysis**, and
+**FP&A / variance analysis**. Shared statistical checks are also available through
+an MCP server.
 
-> **Governing principle: the LLM never does the math.** Every number — every DCF,
-> regression, z-score, CAAR, and probability — comes from deterministic Python.
-> The model decides *which* tool to call, *reads* the result, and *writes* the
-> narrative. It never computes in its head. For a finance audience this is the
-> whole difference between a system whose figures you can audit and a toy that
-> invents them.
+> **Governing principle: the LLM never does the math.** Python computes financial
+> figures and statistical results. Agents 1 and 2 constrain model output against
+> saved evidence; Agent 3 has a separate deterministic event-study orchestrator,
+> and Agent 4 uses a deterministic accounting engine.
 
-This is a **platform, not a pipeline**: the agents are siblings on a shared
-foundation, not stages in a chain. They have different triggers and cadences — one
-runs on-demand per ticker, one is scheduled over a watchlist, one reads an event
-universe, one runs at month-end close — and they share tools and conventions
-rather than feeding one another. The clearest proof they are one platform: a single
-significance/anomaly tooling is shared across all four — covenant drift and
-event-study CAAR go through the t-test primitives in `tools/significance.py`, while
-variance materiality and persistence reuse the same robust `anomaly_significance_check`
-that Agent 2 uses — byte-identical whether in-process or over the MCP server.
+The agents run independently. Covenant drift and event-study inference share
+Student-t primitives; monitoring and FP&A reuse robust anomaly checks. Tested
+local/MCP paths preserve the same calculation contracts. Fixture monitoring can
+loop on a cadence; no unattended live schedule or notification service is installed.
+
+## Current status — 30 September 2026
+
+| Component | Completed scope | Remaining boundary |
+|---|---|---|
+| Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
+| Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection and saved-cycle triage recovery | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
+| Agent 3 | Detailed audit and Batch 1 financial/statistical correctness and publication holds | Batches 2–4: peer/operator recovery, news evidence controls, durable replay and integration |
+| Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation | Detailed hardening audit still pending |
+| Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
+
+The per-agent guides below record acceptance evidence and operating limits.
 
 ---
 
@@ -51,12 +53,26 @@ for checkpoints, rebuild behavior, and exit codes.
 **Agent 2 — covenant monitoring** (watchlist -> change detection over cycles):
 
 ```bash
-python monitor.py --reset      # fresh state
+python monitor.py --reset      # deletes the default fixture database; demo reset only
 python monitor.py --run 10     # run 10 cycles; drift is flagged before the hard breach
 python monitor.py --once       # one cycle, with model triage of any exceptions
 python monitor.py --state      # on-demand full-state snapshot
-python monitor.py --catchup 9  # skip-to-now after downtime, surfacing the gap
+python monitor.py --catchup 9  # records missed monitoring cycles; not provider history backfill
 ```
+
+For the reviewed live annual workflow, use a separate database:
+
+```bash
+python monitor.py --once --data-source yfinance --watchlist watchlists/stadler-annual.json --db state/stadler-live.duckdb
+python monitor.py --state --db state/stadler-live.duckdb
+python monitor.py --reviews --db state/stadler-live.duckdb
+python monitor.py --review-decisions --db state/stadler-live.duckdb
+```
+
+`--live` selects paid model triage; `--data-source yfinance` selects live observations.
+Approval/rejection requires an explicit review ID, reviewer and reason; see
+[review and recovery commands](docs/agent2-review-recovery.md). Triage retry reuses
+saved cycle evidence without fetching data or advancing monitoring state.
 
 Run the same monitoring cycles with the statistical checks served over MCP
 instead of in-process — the output is byte-identical:
@@ -69,16 +85,22 @@ AGENT_STATS_VIA_MCP=1 python monitor.py --run 10
 
 ```bash
 # Track A: historical earnings analysis; unresolved evidence is held for review
-python -m agent3.run_live ASML.AS semicap_earnings
-python -m agent3.run_live ALO.PA european_rail
+python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS
+python -m agent3.run_live ALO.PA european_rail --peers SRAIL.SW CAF.MC
 
 # Track B (breadth): current news -> sentiment signal
-AGENT_SENTIMENT_SCORER=lm         python -m agent3.run_news ASML.AS   # real lexicon, offline
+AGENT_SENTIMENT_SCORER=lm         python -m agent3.run_news ASML.AS   # lexicon subset; news retrieval uses network
 AGENT_SENTIMENT_SCORER=divergence python -m agent3.run_news ASML.AS   # FinBERT + lexicon cross-check
 ```
 
-The event study also runs on fixtures with no network — see the per-agent
-sections below.
+Exit 3 means historical evidence is held for review, not a publishable forecast.
+FinBERT/divergence scoring needs optional `torch` and `transformers` dependencies;
+real FinBERT weights have not been validated in the current acceptance work.
+For an illustrative, held event study without network access:
+
+```bash
+python -c "from agent3.orchestrator import analyze_event_type, render_brief; print(render_brief(analyze_event_type('semicap_earnings')))"
+```
 
 **Agent 4 — FP&A / variance** (decompose a P&L, classify, reforecast, board pack):
 
@@ -107,8 +129,8 @@ happen to rhyme:
 
 - **Data access** — prices, fundamentals, and earnings dates via `yfinance` (EU
   *and* US tickers: `ASML.AS`, `SAP.DE`, `AAPL`, ...). Used by the market-facing
-  agents (1 and 3); Agents 2 and 4 run on their own domain data (covenant feeds,
-  internal budgets).
+  agents (1 and 3) and Agent 2’s explicit annual-statement mode; Agent 4 uses
+  internal-budget fixtures.
 - **Agent loop** — one *plan -> call tool -> observe -> decide -> repeat*
   controller, hand-rolled on the raw Anthropic tool-use API (no framework).
   Written once in `agent/loop.py`; Agent 1 uses it directly and Agent 2's triage
@@ -120,9 +142,10 @@ happen to rhyme:
   them. The significance/anomaly primitives in `tools/significance.py` and the
   robust anomaly check are reused across covenant drift, event studies, and
   variance materiality/persistence.
-- **Validation / confidence layer** — every agent scores its outputs and gates
-  low-confidence or untrustworthy results rather than emitting them blindly. The
-  gates differ per agent; the discipline is the shared thread.
+- **Validation layer** — Agents 1 and 2 constrain evidence and publication,
+  Agent 3 Track A holds unresolved inference, and Agent 4 checks accounting and
+  commentary integrity. Agent 3 Track B still needs final evidence/flag preservation.
+  Review verdicts are not calibrated confidence probabilities.
 
 ---
 
@@ -216,7 +239,11 @@ aspirational:
 finite inputs, dated drift, probability applicability and breach-priority triage.
 The [Batch 2 state and recovery contract](docs/agent2-state-recovery.md) adds a
 transactional cycle ledger, replay, correction holds and process locking.
-Model-publication hardening remains pending.
+[Batch 3 publication controls](docs/agent2-triage-publication.md) constrain model
+triage to known item IDs and render facts in Python. [Batch 4 acceptance](docs/agent2-v1-acceptance.md)
+checks the bounded workflow, local/MCP parity and real-model triage. Subsequent
+[live ingestion](docs/agent2-live-observations.md) and
+[review/recovery](docs/agent2-review-recovery.md) extend that reviewed scope.
 
 Agent 1 analyses one thing, once. **Agent 2 watches many things, repeatedly, and
 its whole job is detecting *change*** — every component below is a consequence of
@@ -237,20 +264,20 @@ cycle's stored state, classifies what changed, and reports only the exceptions.
 Together these catch a covenant *drifting toward breach cycles before it actually
 crosses* — the difference between a monitoring system and a threshold alarm.
 
-**Persistent state** (`state/store.py`) — a DuckDB store with two layers over one
-file: *current-state* (latest snapshot per item, doubling as the full-state view)
-and *history* (append-only, every cycle) in long/tidy panel shape (`item x time`).
-Change is classified against stored status — `NEW_BREACH / WIDENING / IMPROVING /
-RESOLVED / KNOWN_STABLE` — with a cold-start baseline that suppresses first-cycle
-alerts.
+**Persistent state** (`state/store.py`) — a transactional DuckDB cycle ledger,
+current snapshots, observation history and immutable completed-cycle reports.
+Explicitly approved corrections can restate effective history, preserving the
+before/after evidence and decision audit. Change is classified against stored
+status — `NEW_BREACH / WIDENING / IMPROVING / RESOLVED / KNOWN_STABLE`.
+Cold-start baselines suppress initial alerts; active baseline breaches remain
+visible in state and are not evidence of compliance.
 
-**Production-honest, not a toy** (`scheduler/cycle.py`, `scheduler/trigger.py`):
-transactional writes (a mid-cycle crash rolls back to last-good state), freshness
-gating (skip an item whose data hasn't advanced, so a daily monitor over a
-quarterly covenant doesn't manufacture phantom cycles), skip-to-now catch-up after
-downtime (with the gap surfaced), idempotent re-runs (`(item_id, data_ts)` key),
-and a thin scheduler firing `run_cycle()`. No Airflow/Celery/Kafka — all the
-sophistication is in the atom, none in the trigger.
+**Execution and recovery** (`scheduler/cycle.py`, `scheduler/trigger.py`):
+transactional writes, process locking, freshness gating, idempotent replay and
+skip-to-now catch-up with missed cycles surfaced. Live observations support
+`--once` and `--catchup`; live `--run`, `--loop` and `--cron` are refused.
+The fixture scheduler/cron helper does not install a live schedule. Catch-up does
+not retrieve missing historical provider statements.
 
 **Live observations:** an explicit Stadler Rail annual watchlist now supports
 `--data-source yfinance --watchlist watchlists/stadler-annual.json --db state/stadler-live.duckdb`.
@@ -259,7 +286,10 @@ illustrative analyst policies, not contractual covenants. See the
 [live observation guide](docs/agent2-live-observations.md) for commands and limits.
 
 **Review and recovery:** held corrections now support explicit approval/rejection,
-audited recalculation and saved-cycle triage retry. See the
+audited recalculation and saved-cycle triage retry. Reviewer names are recorded
+attestations, not authenticated signatures. Definition changes require a new
+series identity; legacy cycles lacking enough frozen evidence cannot be retried.
+See the
 [review commands and recovery contract](docs/agent2-review-recovery.md).
 
 **Model triage** (`monitoring/triage.py`) reuses Agent 1's tool loop to
@@ -387,43 +417,19 @@ budget -> favourable/adverse steps -> actual, residual explicit, always tying.
 
 ---
 
-## MCP — and why it enters exactly here
+## Shared tools over MCP
 
-**MCP** (Model Context Protocol) is a standard for exposing tools so any
-MCP-compatible client can discover and call them. Here it is used with **stdio**
-transport (the server is a local subprocess).
+The MCP server uses stdio transport and wraps four existing Python tools:
+`anomaly_significance_check`, `drift_check`, `breach_probability` and
+`run_event_study`. Agent 2 and Agent 3 Track A can opt in with
+`AGENT_STATS_VIA_MCP=1`; local execution is the default. The monitoring acceptance
+runner checks twelve-cycle local/MCP parity, and event-study regressions check the
+shared result contract.
 
-The rule this project follows: **MCP earns its place only at a boundary** — a tool
-with more than one consumer. A lone agent has no boundary, so wrapping its tools in
-a server would be decoration.
-
-- **Agent 1 uses no MCP** — nothing else consumes its tools.
-- **Agent 2 is the second consumer** of the shared statistical checks, so they are
-  lifted to an MCP server (`mcp_server/server.py`) and Agent 2 calls them as a
-  client.
-- **Agent 3 can consume the event study over MCP** — it reuses those same checks and
-  adds one tool (`run_event_study`) to the server, which *internally calls* the
-  shared significance family rather than reimplementing it. It can run that engine
-  through the MCP boundary (`AGENT_STATS_VIA_MCP=1`) or locally; local execution is
-  the default for development and the deterministic tests.
-- **Agent 4 adds nothing to the server** — it is the *fourth consumer* of the
-  significance library (calling it at two sites: variance materiality and variance
-  persistence). Its decomposition and reforecast are Agent-4-specific and stay
-  local. The restraint is the point: a good abstraction is measured by whether what
-  is shared is *genuinely* shared, not by tool count.
-
-The discipline is in what *doesn't* move: only the four shared analytical tools go
-on the server. `threshold_check`, the data-refresh and Track-A assembly layers, the
-news funnel, the scenario engine, the decomposition and reforecast engines, and
-every state store stay local — they don't cross a boundary, and putting them on the
-server would be the exact "MCP as decoration" mistake this design avoids. The server
-*wraps* the existing functions rather than reimplementing them, which is what makes
-the two transports provably identical — a full 10-cycle covenant run is
-byte-identical in-process vs. over MCP (`AGENT_STATS_VIA_MCP=1`). **Shared
-statistical tooling, four unrelated consumers** — covenant drift and event-study
-CAAR share the t-test primitives; variance materiality and persistence reuse the
-same robust anomaly checker Agent 2 uses — is the tangible proof that this is one
-platform, not four scripts.
+Agent 1 uses its tools locally. Agent 4 reuses the robust anomaly checker locally
+for materiality and persistence. Threshold checks, data acquisition, event
+assembly, news scoring, scenario summaries, accounting engines and state stores
+remain local. MCP does not independently verify the underlying financial evidence.
 
 ---
 
@@ -432,7 +438,7 @@ platform, not four scripts.
 | Discipline | The question it answers | Its job |
 |---|---|---|
 | **Probability** | "How likely, and how big could the move be?" | Distributions: scenario weighting, tail/breach likelihood. |
-| **Statistics** | "Is this signal real or noise?" | Significance testing, anomaly detection. What confidence scores are, underneath. |
+| **Statistics** | "Is this signal real or noise?" | Significance testing, anomaly detection. Eligibility and assumptions determine when inference is available. |
 | **Econometrics** | "What's the relationship, over time?" | Regression, trend models, event studies. |
 
 Each is *primary* in at least one agent (**P** primary · **S** secondary · **L** light):
@@ -458,7 +464,8 @@ agent/       loop.py (orchestrator) . models.py (Stub/Anthropic) . state.py
 tools/       data.py, analytical.py          (Agent 1 tools)
              covenant_checks.py              (threshold_check — local)
              statistical_checks.py           (shared checks — served over MCP)
-             significance.py                 (shared t-test library — 4 consumers)
+             significance.py                 (Student-t primitives: drift and event studies)
+             event_contracts.py              (strict event/window/evidence contracts)
              event_study.py                  (run_event_study — served over MCP)
 validation/  gate.py                         (Agent 1 confidence gate)
 composer.py  Agent 1 report + charts + model.json
@@ -470,11 +477,11 @@ monitoring/  triage.py                       (Agent 2 model triage; reuses agent
 monitor.py   Agent 2 entry point
 
 agent3/      track_a.py, track_a_live.py     (event assembly: fixture + live yfinance)
-             peers.py                        (model-proposes-and-pins peer sets)
+             peers.py, study_plan.py          (explicit peers and reviewer attestations)
              scenario.py                     (historical quantiles; eligible mean bootstrap)
              news_funnel.py, news_live.py     (Track B funnel + live news)
              sentiment.py, lm_lexicon.py      (LM lexicon, FinBERT, divergence scorer)
-             validation.py                   (confound / thin-data / multiple-testing gate)
+             validation.py                   (evidence, eligibility and multiple-testing gate)
              catalyst_state.py               (catalyst calendar + outcome history, DuckDB)
              orchestrator.py                 (assembly + brief/scan output modes)
              run_live.py, run_news.py         (Agent 3 entry points)
@@ -483,7 +490,7 @@ agent4/      decomposition.py                (variance bridge, integer cents)
              hierarchy.py                    (P&L roll-up, penny-reconcile per node)
              materiality.py                  (materiality x significance 2x2)
              reforecast.py                   (method ladder + P(hit target))
-             persistence.py                  (one-off vs structural; 4th consumer)
+             persistence.py                  (one-off vs structural; robust anomaly reuse)
              state.py                        (versioned budget/actuals/reforecast, DuckDB)
              commentary.py                   (three-tier taxonomy + reconciliation gate)
              output.py                       (board pack / exception view + waterfall SVG)
@@ -491,33 +498,43 @@ agent4/      decomposition.py                (variance bridge, integer cents)
 mcp_server/  server.py (stdio MCP server) . client.py (persistent client shim)
 fixtures/    offline sample data (equities, covenants, events, news, P&L)
 tests/       deterministic regression and acceptance tests
-.github/     workflows/ci.yml — runs pytest on every push
+docs/        per-agent contracts, operating guides and acceptance records
+watchlists/  explicit live monitoring configurations
+references/  issuer reconciliation evidence
+scripts/     check_agent2_acceptance.py (isolated offline / opt-in paid checks)
+keystone-showcase/  illustrative static prototype
+.github/     workflows/ci.yml — pytest on pull requests and pushes to main
 ```
 
-Research and event layers use a scripted `StubModel` + fixture data
-for deterministic offline runs, the real model + `yfinance` + FinBERT when live, and
-local functions vs. the MCP server for the shared checks. Agent 2 defaults to bundled observation fixtures; its `--live` flag changes only
-the triage model. Its explicit `--data-source yfinance` mode fetches annual statements.
+Agent 1 separates scripted fixture mode from live model/provider mode. Agent 2's
+`--live` flag changes only triage; its explicit `--data-source yfinance` mode fetches
+annual statements. Agent 3 Track A uses fixture or live price/date assembly;
+Track B independently selects stub, lexicon or optional ML sentiment scoring.
 
 ---
 
 ## Testing
 
-A deterministic test suite runs on every push (GitHub Actions):
+GitHub Actions runs deterministic tests on pull requests and pushes to `main`,
+with Python 3.11 and 3.12:
 
 ```bash
-pip install -r requirements-dev.txt
-pytest
+pip install -r requirements.txt -r requirements-dev.txt
+pytest -q
 ```
 
-Offline tests, with no API calls or network, covering the invariants that matter — the
-finance math (real EV/EBIT, negative-multiple nulling, None-vs-zero, margins), the
-DCF guards (r ≤ g refused, complete-vs-partial bridge, net-cash equity > EV),
-ticker integrity, the gate verdicts (findings vs quality-warns vs fails), note
-grounding (a fabricated figure is caught), offline determinism (a real
-cross-process reproducibility check), and a cross-agent smoke layer that runs all
-four agents and asserts the shared significance library imports into each. The
-suite exists so the integrity fixes above can't silently regress.
+The latest local Agent 3 Batch 1 validation passed **586 tests on Python 3.11.9**,
+including 49 added regressions. Earlier acceptance guides retain their historical
+suite counts. Coverage includes financial contracts and report grounding, monitoring
+transactions/replay/review recovery, publication controls, exact statistical decisions,
+event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
+Offline tests need no API key or live provider calls.
+
+`python -m scripts.check_agent2_acceptance` verifies the isolated offline monitoring
+workflow; `--live` explicitly opts into a paid model check. Live provider and model
+observations are documented separately and are not a guarantee of universal coverage.
+The Agent 3 live check assembled 36 events across three firms and correctly held
+publication; it did not establish an approved forecast or validate real FinBERT weights.
 
 ---
 
@@ -534,17 +551,22 @@ Stated plainly, because knowing a tool's limits is part of building it:
 - **Agent 2's fixture series are deliberately clean**, so drift t-stats read sharp;
   real, noisier data would produce more graduated signals. The machinery is what's
   demonstrated.
+- **Agent 2's live scope is bounded:** latest annual statements and selected Stadler
+  FY2025 issuer reconciliation. Example thresholds are analyst policies, not verified
+  contractual terms. No historical provider backfill, installed live schedule or
+  notification delivery is claimed.
 - **Agent 3's pooled quarterly studies are descriptive.** Repeated firms and
   overlapping windows do not receive independent-event inference or an iid mean
   interval. Provider dates and calendars remain unverified unless supported by
   review evidence; date/gap/benchmark uncertainty holds publication. Historical
   quantiles are not forward predictive calibration. See the bounded policy in
   [Agent 3 Batch 1](docs/agent3-batch1.md).
-- **Track B is current-news only** on free sources — a daily sentiment brief, not
-  historical sentiment-return analysis (which the two-track firewall keeps out of
-  the rigorous lane by design). Some names return sparse earnings-date history from
-  the free source and are labeled and excluded rather than silently dropped.
-- **Agent 4 runs on synthetic-company fixtures** — FP&A data is internal, so this
+- **Agent 3 is not fully hardened.** Its live LLM peer adapter awaits Batch 2;
+  use explicit peers. Track B defaults to a stub and still needs relevance, date,
+  deduplication and publication controls. Saved Track A state is summary-only;
+  complete durable replay remains pending. Sparse or invalid event histories are
+  reported as exclusions or assembly refusals.
+- **Agent 4 still awaits its detailed audit and runs on synthetic-company fixtures** — FP&A data is internal, so this
   is the standard, honest way to portfolio it. The reforecast is a *defensible*
   projection (a method ladder with an honest dispersion-based band), not a
   production forecasting engine; portfolio-level correlated Monte Carlo is a
@@ -554,15 +576,18 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 ## Roadmap
 
-All four sibling agents on the shared spine are built. Possible extensions:
+The next hardening work is:
 
-- **Event-study extensions** — earnings-*surprise* filtering (to isolate a sharper,
-  potentially significant effect), standardized cross-sectional (BMP) significance,
-  and wider event windows as robustness specs.
-- **Agent 4 seasonal model** — a full seasonal-decomposition significance band
-  (the current layer degrades to period-aware-when-history-allows, else labelled).
-- **Static showcase** — a precompute-only site (`keystone-showcase/`) presents each
-  agent's signature output, with Agent 4's variance waterfall as the fourth tile.
+1. **Agent 3 Batch 2:** repair the live peer adapter and complete operator error/recovery controls.
+2. **Agent 3 Batch 3:** news relevance, timestamps, deduplication, scorer selection and final review evidence.
+3. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
+4. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
+
+Agent 2 live scheduling and notification delivery remain deferred. The existing
+showcase is illustrative; exporting verified run artifacts is still pending.
+Further statistical extensions (cluster-aware inference, surprise filtering,
+robustness windows and richer seasonal forecasting) require separate implementation
+and validation.
 
 ---
 
