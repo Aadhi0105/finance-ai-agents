@@ -252,6 +252,12 @@ downtime (with the gap surfaced), idempotent re-runs (`(item_id, data_ts)` key),
 and a thin scheduler firing `run_cycle()`. No Airflow/Celery/Kafka — all the
 sophistication is in the atom, none in the trigger.
 
+**Live observations:** an explicit Stadler Rail annual watchlist now supports
+`--data-source yfinance --watchlist watchlists/stadler-annual.json --db state/stadler-live.duckdb`.
+Its selected FY2025 inputs are checked against the issuer filing. Thresholds are
+illustrative analyst policies, not contractual covenants. See the
+[live observation guide](docs/agent2-live-observations.md) for commands and limits.
+
 **Model triage** (`monitoring/triage.py`) reuses Agent 1's tool loop to
 investigate flags and propose an ordering. Publication accepts only a complete
 list of known item IDs. Python renders facts and recommendations for every flag,
@@ -259,8 +265,8 @@ with active breaches first; model prose is withheld. Each attempt saves its inpu
 snapshot, prompts, responses, tools and outcome under `output/monitor-triage/`.
 
 `monitor.py --once --live` and `--catchup N --live` use the real model, loading the
-repository `.env`; missing credentials fail explicitly. **Monitoring data remain
-bundled fixtures in both modes.** Offline triage is scripted. `--run` and `--loop`
+repository `.env`; missing credentials fail explicitly. **The triage flag does not select the observation source.** Without
+`--data-source yfinance`, observations remain bundled fixtures. Offline triage is scripted. `--run` and `--loop`
 perform deterministic monitoring only. See [Batch 3 controls](docs/agent2-triage-publication.md).
 
 Agent 2 v1 acceptance includes twelve-cycle local/MCP parity and a successful
@@ -523,8 +529,8 @@ tests/       deterministic regression and acceptance tests
 
 Research and event layers use a scripted `StubModel` + fixture data
 for deterministic offline runs, the real model + `yfinance` + FinBERT when live, and
-local functions vs. the MCP server for the shared checks. Agent 2 always uses
-bundled observation fixtures; its `--live` flag changes only the triage model.
+local functions vs. the MCP server for the shared checks. Agent 2 defaults to bundled observation fixtures; its `--live` flag changes only
+the triage model. Its explicit `--data-source yfinance` mode fetches annual statements.
 
 ---
 

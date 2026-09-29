@@ -41,7 +41,7 @@ def _triage_if_needed(result, live: bool) -> None:
     except (Exception, KeyboardInterrupt) as exc:
         print(f"Triage failed ({type(exc).__name__}); monitoring cycle remains committed.", file=sys.stderr)
         raise SystemExit(2)
-    print(f"\nTriage mode: {'live model' if live else 'offline stub'}; data: bundled fixtures")
+    print(f"\nTriage mode: {'live model' if live else 'offline stub'}; data: {result.get('data_mode', 'bundled_fixtures')}")
     print(f"Triage audit: {triage['audit_path']}")
     if triage['status'] != 'completed':
         print(f"Triage {triage['status']}: {triage['reason']}; commentary withheld. "
@@ -66,6 +66,9 @@ def _print_state():
     store = StateStore(_DB)
     try:
         rows = store.full_state()
+        print(f"Data source: {store.source_mode() or 'uninitialized'}")
+        if store.source_mode() == "yfinance":
+            print("Threshold basis: analyst policies, not contractual covenants.")
     finally:
         store.close()
     if not rows:
@@ -83,10 +86,21 @@ if __name__ == "__main__":
     from pathlib import Path
     options = argparse.ArgumentParser(add_help=False)
     options.add_argument('--db', default=_DB)
+    options.add_argument('--data-source', choices=['fixture', 'yfinance'], default='fixture')
+    options.add_argument('--watchlist')
     parsed, remaining = options.parse_known_args()
     _DB = str(Path(parsed.db).expanduser().resolve())
     sys.argv = [sys.argv[0], *remaining]
     arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
+    watchlist = None
+    if parsed.data_source == 'yfinance':
+        if not parsed.watchlist or arg not in {'--once', '--catchup'}:
+            sys.exit('Live observations require --watchlist PATH with --once or --catchup; inspect state using --state --db PATH')
+        watchlist = str(Path(parsed.watchlist).expanduser().resolve())
+        from monitoring.live_data import load_profile
+        load_profile(watchlist)
+    elif parsed.watchlist:
+        sys.exit('--watchlist requires --data-source yfinance')
     if "--live" in sys.argv:
         if arg not in {"--once", "--catchup"}:
             sys.exit("--live is supported only with --once or --catchup")
@@ -94,25 +108,29 @@ if __name__ == "__main__":
             prepare_live()
         except ValueError as exc:
             sys.exit(str(exc))
-    if arg in {"--once", "--catchup", "--run", "--loop", "--state"}:
-        print("Data source: bundled fixtures (not a live market feed).")
+    if arg in {"--once", "--catchup", "--run", "--loop"}:
+        print("Data source: live annual statements; analyst policies." if watchlist else "Data source: bundled fixtures (not a live market feed).")
     if arg == "--reset":
         _reset()
     elif arg == "--state":
         _print_state()
     elif arg == "--once":
         live = "--live" in sys.argv
-        result = run_cycle(db_path=_DB)
+        result = run_cycle(db_path=_DB, watchlist_path=watchlist)
         print(result["report"])
         _triage_if_needed(result, live)
+        if watchlist and result["status"] == "review_required":
+            raise SystemExit(3)
     elif arg == "--catchup":
         # Simulate the monitor coming back online after downtime: data has
         # advanced to cycle ASOF; skip-to-now and surface the gap.
         if len(sys.argv) < 3:
             sys.exit("Usage: python monitor.py --catchup ASOF_CYCLE")
-        result = run_cycle(db_path=_DB, asof_cycle=int(sys.argv[2]))
+        result = run_cycle(db_path=_DB, asof_cycle=int(sys.argv[2]), watchlist_path=watchlist)
         print(result["report"])
         _triage_if_needed(result, "--live" in sys.argv)
+        if watchlist and result["status"] == "review_required":
+            raise SystemExit(3)
     elif arg == "--run":
         # Convenience for demos: run N cycles in sequence (each still one cycle
         # of the atom). No triage — use --once to triage a cycle's exceptions.

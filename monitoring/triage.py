@@ -110,7 +110,7 @@ def recheck_flag(store, flags: dict, item_id: str) -> dict:
         # diagnostics agree without establishing independent verification,
         # yet the anomaly's MAGNITUDE may be a bad data point.
         verdict = "corroborated_but_verify"
-        recommendation = ("escalate the covenant issue (corroborated by "
+        recommendation = ("escalate the monitoring issue (corroborated by "
                           f"{', '.join(other_signals)}), but verify the anomaly value "
                           "before trusting its magnitude — single-cycle deviation")
     elif corroborated:
@@ -222,7 +222,9 @@ def prepare_live():
 def _render(registry, order):
     # Stable severity ordering: model ordering can never demote a breach.
     order = sorted(order, key=lambda key: not registry.flags[key].get("breached", False))
-    lines = ["Data: bundled fixtures. Recommendations: deterministic Python checks.",
+    mode = next(iter(registry.flags.values())).get('data_mode', 'bundled_fixtures')
+    label = 'live yfinance annual statements; analyst policy thresholds, not contractual covenants' if mode == 'yfinance' else 'bundled fixtures'
+    lines = [f"Data: {label}. Recommendations: deterministic Python checks.",
              "Diagnostics share one scalar series; they are not independent sources."]
     for key in order:
         row = registry.flags[key]
@@ -261,7 +263,7 @@ def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir
     state = RunState(ticker="__monitor__")
     root = Path(audit_dir) if audit_dir else Path(__file__).resolve().parents[1] / "output" / "monitor-triage"
     path = root / f"cycle-{cycle}-{uuid4().hex}" / "model.json"
-    record = {"cycle": cycle, "data_mode": "bundled_fixtures",
+    record = {"cycle": cycle, "data_mode": rows[0].get("data_mode", "bundled_fixtures"),
               "model_mode": "live" if live else "offline_stub", "rows": rows,
               "history": snapshot.history, "publication": "pending"}
 

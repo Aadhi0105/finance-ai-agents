@@ -1,5 +1,9 @@
 # Agent 2 v1 acceptance and operating boundary
 
+This records the fixture-only milestone. The subsequent
+[live observation integration](agent2-live-observations.md) adds explicit annual
+provider ingestion and a reviewed Stadler example; other limits below remain.
+
 Agent 2 is an analyst-reviewed monitoring prototype over a bundled, dated covenant
 watchlist. Its deterministic cycle detects changes, retains evidence and recovery
 state, and optionally uses an audited model to investigate and order surfaced
