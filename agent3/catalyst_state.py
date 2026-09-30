@@ -6,31 +6,28 @@ never a shared boundary; only the analytical tools are).
 Two tables, each with a clear job:
   - catalyst_calendar : upcoming, scheduled events to watch (an earnings date, a
                         guidance day). The daily brief is ephemeral; THIS persists.
-  - event_outcomes    : the result of each event study run (event_type, CAAR, t,
-                        significant, N, verdict, when). So a scenario can calibrate
-                        on the accumulated real outcome history over time, and so
-                        the agent can answer "what did comparable catalysts do?"
-                        from stored fact rather than recomputing from scratch.
+  - event_outcomes: summary rows (event type, CAR, nullable significance, gate).
 
-Design carried from Agent 2: stable IDs, append-only outcome history for audit,
-straightforward reads. The store holds facts the agent produced; the model stays
-stateless per run and is fed only what a given run needs.
+Full run evidence lives in CLI attempt files. This summary database does not drive
+a historical replay or calibrated forecast. Full immutable conflict handling and
+calendar lifecycle/reconciliation are deferred to Batch 4.
 """
 
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from datetime import date, datetime
 
 import duckdb
 
-_DEFAULT_DB = os.path.join("state", "catalyst.duckdb")
+_DEFAULT_DB = str(Path(__file__).resolve().parents[1] / "state" / "catalyst.duckdb")
 
 
 class CatalystStore:
     def __init__(self, path: str = _DEFAULT_DB):
         self.path = path
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        os.makedirs(os.path.dirname(os.fspath(path)) or ".", exist_ok=True)
         self.con = duckdb.connect(path)
         self._init_schema()
 

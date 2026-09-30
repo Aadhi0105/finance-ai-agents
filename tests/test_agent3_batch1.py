@@ -300,7 +300,8 @@ def test_assembly_contains_failure_for_one_peer(monkeypatch):
     result=load_live_event_set('ASML.AS',['BAD'],'earnings')
     assert result['target_contributed'] and result['contributing_peers']==['ASML.AS']
     assert result['excluded_peers']==['BAD']
-    assert result['per_peer_report'][1]['error'].startswith('ValueError')
+    assert result['per_peer_report'][1]['error'].startswith('AssemblyInputError')
+    assert result['per_peer_report'][1]['reason']=='stock_dates_not_unique_ascending'
 
 
 def test_cli_and_renderers_cannot_publish_a_held_forward_distribution(monkeypatch,capsys,tmp_path):
@@ -310,9 +311,10 @@ def test_cli_and_renderers_cannot_publish_a_held_forward_distribution(monkeypatc
     result=analyze_event_type('semicap_earnings')
     # Simulate an older saved shape with a CALIBRATED scenario under a held gate.
     result['scenario'].update(verdict='CALIBRATED',publication_state='HELD_FOR_REVIEW',distribution={'p25':999})
-    monkeypatch.setattr(run_live,'analyze_event_type',lambda *a,**k:result)
-    monkeypatch.setattr(run_live,'CatalystStore',lambda:CatalystStore(str(tmp_path/'db.duckdb')))
-    assert run_live.main(['ASML.AS','earnings','--peers','ASM.AS'])==3
+    from agent3 import execution
+    monkeypatch.setattr(execution,'analyze_event_type',lambda *a,**k:result)
+    monkeypatch.setattr(run_live,'run_bounded',lambda attempt, timeout:execution.execute(attempt))
+    assert run_live.main(['ASML.AS','earnings','--peers','ASM.AS','--db',str(tmp_path/'db.duckdb'),'--output-dir',str(tmp_path/'runs')])==3
     output=capsys.readouterr().out+render_brief(result)+render_scan([result])
     assert 'CALIBRATED' not in output and '999' not in output
     assert 'HELD_FOR_REVIEW' in output

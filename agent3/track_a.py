@@ -16,10 +16,9 @@ For each (ticker, event_date) it:
      [-pre, +post] around it,
   5. returns the dict shape run_event_study expects.
 
-Fixture-first: offline it reads bars from a fixture; live (later) will pull from
-yfinance. Track A is the RIGOR track — events are scheduled and dated (day resolution),
-so the "when did it happen" question that wrecks event studies is answered
-exactly. Cross-ticker, same-event-type sets are assembled here to give CAAR its N.
+Offline assembly reads fixtures; live assembly fetches provider prices and earnings
+metadata. Dates and comparability remain unverified without a reviewed plan;
+provider scheduling does not establish an issuer-confirmed release session.
 """
 
 from __future__ import annotations
@@ -86,7 +85,7 @@ def assemble_event(ticker: str, event_date: str,
 
 def load_event_set(event_type: str, source: str | None = None,
                    ticker: str | None = None, peers: list[str] | None = None,
-                   live_propose: bool = False, study_plan: dict | None = None) -> dict:
+                   live_propose: bool = False, study_plan: dict | None = None, checkpoint=None, peer_decision=None) -> dict:
     """
     Assemble a cross-ticker, same-event-type set ready for run_event_study.
     Offline reads fixtures/events.json; live pulls earnings dates + prices via
@@ -94,7 +93,7 @@ def load_event_set(event_type: str, source: str | None = None,
     """
     src = source or os.environ.get("AGENT_DATA_SOURCE", "fixture")
     if src == "yfinance":
-        return _load_live(event_type, ticker=ticker, peers=peers, live_propose=live_propose, study_plan=study_plan)
+        return _load_live(event_type, ticker=ticker, peers=peers, live_propose=live_propose, study_plan=study_plan, checkpoint=checkpoint, peer_decision=peer_decision)
     if src != "fixture":
         raise ValueError("source must be fixture or yfinance")
     return _load_fixture(event_type)
@@ -129,7 +128,7 @@ def _load_fixture(event_type: str) -> dict:
 
 
 def _load_live(event_type: str, ticker: str | None = None,
-               peers: list[str] | None = None, live_propose: bool = False, study_plan: dict | None = None) -> dict:
+               peers: list[str] | None = None, live_propose: bool = False, study_plan: dict | None = None, checkpoint=None, peer_decision=None) -> dict:
     """
     Live Track-A assembly. Needs a ticker; peers come from an override or a
     model proposal (pinned for reproducibility). Delegates fetching + assembly to
@@ -141,7 +140,25 @@ def _load_live(event_type: str, ticker: str | None = None,
     from agent3.peers import propose_peers
     from agent3.track_a_live import load_live_event_set
 
-    pinned = propose_peers(ticker, override=peers, live=live_propose)
-    res = load_live_event_set(ticker, pinned["peers"], event_type, study_plan=study_plan)
+    if peers is None and not live_propose:
+        return {'verdict': 'REFUSED', 'reason': 'live assembly requires explicit peers or live model proposal',
+                'event_type': event_type, 'events': []}
+    if peer_decision is not None:
+        from agent3.peers import _pin, _validate_model
+        pinned = dict(peer_decision)
+        requested = _pin(ticker, {'peers': peers}, 'retry')
+        if pinned.get('ticker') != requested['ticker'] or pinned.get('peers') != requested['peers']:
+            raise ValueError('saved peer decision differs from retry universe')
+        if pinned.get('proposed_by') == 'model':
+            _validate_model(pinned, ticker)
+        if checkpoint:
+            checkpoint('peer_selection', {'pinned_peer_set': pinned})
+    else:
+        pinned = propose_peers(ticker, override=peers, live=live_propose, checkpoint=checkpoint)
+    if checkpoint:
+        checkpoint('assembly', {})
+    res = load_live_event_set(ticker, pinned["peers"], event_type, study_plan=study_plan, checkpoint=checkpoint,
+                              peer_assessments={a['ticker']: a for a in pinned.get('assessments', [])}
+                              if pinned.get('proposed_by') == 'model' else None)
     res["pinned_peer_set"] = pinned          # the full pinned proposal (sector, rationale, source)
     return res

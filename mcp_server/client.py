@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 import threading
 import atexit
@@ -58,7 +59,10 @@ class _McpStatsClient:
 
     async def _open(self):
         # Spawn `python -m mcp_server.server` as the stdio server subprocess.
-        params = StdioServerParameters(command=sys.executable, args=["-m", "mcp_server.server"])
+        args = ["-m", "mcp_server.server"]
+        if os.environ.get("AGENT_MCP_PARENT_GUARD") == "1":
+            args = ["-m", "mcp_server.parent_guard", str(os.getpid())]
+        params = StdioServerParameters(command=sys.executable, args=args)
         self._cm = stdio_client(params)
         read, write = await self._cm.__aenter__()
         self._session_cm = ClientSession(read, write)
