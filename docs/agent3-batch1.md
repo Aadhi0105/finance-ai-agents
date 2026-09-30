@@ -1,5 +1,7 @@
 # Agent 3 Batch 1: bounded historical event analysis
 
+> Follow-up: [Batch 2](agent3-batch2.md) supersedes the live-adapter, CLI configuration and recovery limitations recorded below. This file preserves the Batch 1 milestone.
+
 This batch fixes the event-study calculation boundary and blocks unsupported publication. It implements the financial/statistical portion of the September 2026 audit. News scoring and the live LLM peer adapter remain later work.
 
 ## Supported behavior

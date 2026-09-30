@@ -23,7 +23,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 |---|---|---|
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection and saved-cycle triage recovery | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
-| Agent 3 | Detailed audit and Batch 1 financial/statistical correctness and publication holds | Batches 2–4: peer/operator recovery, news evidence controls, durable replay and integration |
+| Agent 3 | Detailed audit, Batch 1 financial/statistical correctness, Batch 2 audited live peer selection and bounded execution/retry | Batches 3–4: news evidence controls, durable replay and integration |
 | Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation | Detailed hardening audit still pending |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
@@ -343,14 +343,30 @@ python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS
 python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS --study-plan reviewed-plan.json
 ```
 
-Use explicit peers for now: the live LLM proposal adapter is pending Batch 2.
-MCP is opt-in with `AGENT_STATS_VIA_MCP=1`; local/MCP calculations share the same
-contract. Exit 3 means held; exit 2 means assembly refused. DuckDB retains summary
-history, not a complete replay bundle. Calendar CRUD exists, but calendar ingestion
-and automatic scheduling are not part of the live flow.
+[Batch 2](docs/agent3-batch2.md) repairs live model peer selection. Without `--peers`,
+the CLI requests an audited proposal using `ANTHROPIC_API_KEY`; it loads the
+repository `.env` without overriding exported variables. Missing credentials and
+invalid proposals fail explicitly, with no fixture fallback. Model assessments and
+source leads remain unverified; provider listing/source-domain mismatches or missing
+identity evidence exclude model-selected peers before their events are pooled.
+Economic comparability still requires explicit review.
 
-See [Agent 3 Batch 1](docs/agent3-batch1.md) for the review-plan schema, exact date,
-benchmark and inference policies, commands, tests and remaining limitations.
+Every started CLI attempt writes a unique `output/agent3-runs/<id>/run.json`, with
+proposal decisions, per-peer progress, review results and failure stages. The worker
+has a 300-second default deadline (`--timeout`, 30–3600 seconds); it makes no automatic
+model or whole-run retries. `--retry-from <run.json>` creates a new attempt using
+saved peers/review inputs and **fresh** provider data, without modifying the original.
+It is not historical snapshot replay. Process-group deadline cleanup supports macOS/Linux.
+
+MCP is opt-in with `AGENT_STATS_VIA_MCP=1`; local calculation remains the default.
+Exit statuses: 0 completed historical result, 2 refused, 3 held, 4 unavailable,
+5 failed. Brief and scan output recheck saved evidence and hold unknown publication
+states. DuckDB retains summary history, not a complete replay bundle. Calendar CRUD
+exists, but calendar ingestion and automatic scheduling are not in the live flow.
+
+See [Agent 3 Batch 1](docs/agent3-batch1.md) for the review-plan schema, date,
+benchmark and inference policies, and [Batch 2](docs/agent3-batch2.md) for live
+selection, checkpoints, retry commands, exit codes and verification evidence.
 
 ### Track B — current news (later fix batch)
 
@@ -484,6 +500,7 @@ agent3/      track_a.py, track_a_live.py     (event assembly: fixture + live yfi
              validation.py                   (evidence, eligibility and multiple-testing gate)
              catalyst_state.py               (catalyst calendar + outcome history, DuckDB)
              orchestrator.py                 (assembly + brief/scan output modes)
+             execution.py                    (bounded worker, attempt checkpoints and retry)
              run_live.py, run_news.py         (Agent 3 entry points)
 
 agent4/      decomposition.py                (variance bridge, integer cents)
@@ -523,8 +540,8 @@ pip install -r requirements.txt -r requirements-dev.txt
 pytest -q
 ```
 
-The latest local Agent 3 Batch 1 validation passed **586 tests on Python 3.11.9**,
-including 49 added regressions. Earlier acceptance guides retain their historical
+The latest local Agent 3 Batch 2 validation passed **639 tests on Python 3.11.9**,
+including 53 new Batch 2 regressions (Batch 1 previously added 49). Earlier acceptance guides retain their historical
 suite counts. Coverage includes financial contracts and report grounding, monitoring
 transactions/replay/review recovery, publication controls, exact statistical decisions,
 event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
@@ -533,8 +550,11 @@ Offline tests need no API key or live provider calls.
 `python -m scripts.check_agent2_acceptance` verifies the isolated offline monitoring
 workflow; `--live` explicitly opts into a paid model check. Live provider and model
 observations are documented separately and are not a guarantee of universal coverage.
-The Agent 3 live check assembled 36 events across three firms and correctly held
-publication; it did not establish an approved forecast or validate real FinBERT weights.
+The Batch 2 live recovery check reused model-proposed peers without another model
+call, excluded a provider/model listing mismatch, and held 48 events across four
+contributing firms for review. ASML remained excluded at window assembly. This did
+not establish an approved forecast or validate real FinBERT weights. See the
+[Batch 2 verification record](docs/agent3-batch2.md).
 
 ---
 
@@ -561,8 +581,8 @@ Stated plainly, because knowing a tool's limits is part of building it:
   review evidence; date/gap/benchmark uncertainty holds publication. Historical
   quantiles are not forward predictive calibration. See the bounded policy in
   [Agent 3 Batch 1](docs/agent3-batch1.md).
-- **Agent 3 is not fully hardened.** Its live LLM peer adapter awaits Batch 2;
-  use explicit peers. Track B defaults to a stub and still needs relevance, date,
+- **Agent 3 is not fully hardened.** Model-proposed peers remain unverified even
+  after listing consistency checks. Track B defaults to a stub and still needs relevance, date,
   deduplication and publication controls. Saved Track A state is summary-only;
   complete durable replay remains pending. Sparse or invalid event histories are
   reported as exclusions or assembly refusals.
@@ -578,10 +598,9 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 The next hardening work is:
 
-1. **Agent 3 Batch 2:** repair the live peer adapter and complete operator error/recovery controls.
-2. **Agent 3 Batch 3:** news relevance, timestamps, deduplication, scorer selection and final review evidence.
-3. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
-4. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
+1. **Agent 3 Batch 3:** news relevance, timestamps, deduplication, scorer selection and final review evidence.
+2. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
+3. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; exporting verified run artifacts is still pending.

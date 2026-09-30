@@ -81,17 +81,23 @@ def _align_index(dates, target, tol_days=4):
     return None
 
 
+class AssemblyInputError(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
 def _prices(rows, name):
     if not isinstance(rows, list):
-        raise ValueError(f'{name}: expected a price list')
+        raise AssemblyInputError(f'{name}_price_list_required')
     out = []
     for d, px in rows:
         d = _to_date(d)
         if type(d) is not date or not finite(px) or px <= 0:
-            raise ValueError(f'{name}: invalid date or nonpositive/nonfinite price')
+            raise AssemblyInputError(f'{name}_invalid_date_or_price')
         out.append((d, px))
     if [d for d, _ in out] != sorted({d for d, _ in out}):
-        raise ValueError(f'{name}: price dates must be unique and ascending')
+        raise AssemblyInputError(f'{name}_dates_not_unique_ascending')
     return out
 
 
@@ -215,7 +221,33 @@ def assemble_peer_events(ticker, stock_px, mkt_px, earnings_dates, max_events=12
     return events, placebos, report
 
 
-def load_live_event_set(ticker, peers, event_type, *, study_plan=None):
+def _fetch_identity(ticker):
+    import yfinance as yf
+    info = yf.Ticker(ticker).info
+    return {k: info.get(k) for k in ('symbol', 'longName', 'shortName', 'website', 'quoteType')}
+
+
+def _identity_check(ticker, assessment):
+    """Conservative domain consistency, not proof of identity or comparability."""
+    from urllib.parse import urlparse
+    identity = _fetch_identity(ticker)
+    if not isinstance(identity, dict):
+        identity = {}
+    def host(url):
+        if not isinstance(url, str):
+            return None
+        parsed = urlparse(url if '://' in url else 'https://' + url)
+        return (parsed.hostname or '').lower().removeprefix('www.') or None
+    website = host(identity.get('website'))
+    sources = [host(u) for u in assessment.get('source_urls', [])]
+    consistent = (identity.get('quoteType') == 'EQUITY' and identity.get('symbol', '').upper() == ticker
+                  and website and any(h and (h == website or h.endswith('.' + website)) for h in sources))
+    return {'status': 'provider_consistent' if consistent else 'unresolved_identity',
+            'provider': identity, 'model_source_urls': assessment.get('source_urls', []),
+            'note': 'Provider website/source-domain consistency only; comparability remains unverified'}
+
+
+def load_live_event_set(ticker, peers, event_type, *, study_plan=None, checkpoint=None, peer_assessments=None):
     tk = normalize(ticker)
     if not isinstance(peers, list) or len(peers) > 20:
         raise ValueError('peers must be a list of at most 20 tickers')
@@ -223,20 +255,42 @@ def load_live_event_set(ticker, peers, event_type, *, study_plan=None):
     plan = validate_plan(study_plan, all_peers, event_type)
     events, placebos, reports = [], [], []
     for pk in all_peers:
+        operation = 'listing_configuration'
+        identity = None
         try:
             c = plan['companies'][pk] if plan else {}
             bench, tz = (c['benchmark'], c['timezone']) if c else listing(pk)
+            assessment = (peer_assessments or {}).get(pk)
+            if assessment is not None:
+                operation = 'peer_identity'
+                identity = _identity_check(pk, assessment)
+                if identity['status'] != 'provider_consistent':
+                    reports.append({'ticker': pk, 'excluded': True, 'reason': 'model/provider listing identity unresolved',
+                                    'identity_check': identity})
+                    if checkpoint:
+                        checkpoint('assembly', {'per_peer_report': reports})
+                    continue
+            operation = 'stock_prices'
             px = _fetch_prices(pk, return_basis=c.get('stock_return_basis','total_return'))
+            operation = 'benchmark_prices'
             ix = _fetch_prices(bench, return_basis=c.get('benchmark_return_basis','price_return'))
+            operation = 'earnings_dates'
             if c.get('reviewed_events'):
                 eds = [{**e, 'date_status':'reviewed'} for e in c['reviewed_events']]
             else:
                 eds = _fetch_earnings_dates(pk)
+            operation = 'window_assembly'
             ev, pe, rep = assemble_peer_events(pk, px, ix, eds, exchange_timezone=tz,
                                                benchmark=bench, company=c, plan=plan)
+            if identity is not None:
+                rep['identity_check'] = identity
             events.extend(ev); placebos.extend(pe); reports.append(rep)
         except Exception as exc:
-            reports.append({'ticker':pk, 'excluded':True, 'error':f'{type(exc).__name__}: {exc}'})
+            reports.append({'ticker':pk, 'excluded':True, 'error':f'{type(exc).__name__}: {operation} unavailable',
+                            'failure_stage': operation, 'identity_check': identity,
+                            'reason': exc.code if isinstance(exc, AssemblyInputError) else f'{operation} unavailable'})
+        if checkpoint:
+            checkpoint('assembly', {'per_peer_report': reports})
     contributing = [r['ticker'] for r in reports if r.get('assembled',0)]
     result = {'event_type':event_type, 'event_class':'earnings', 'source':'yfinance',
               'target':tk, 'target_contributed':tk in contributing, 'pinned_peers':all_peers,
