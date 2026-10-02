@@ -363,8 +363,9 @@ It is not historical snapshot replay. Process-group deadline cleanup supports ma
 MCP is opt-in with `AGENT_STATS_VIA_MCP=1`; local calculation remains the default.
 Exit statuses: 0 completed historical result, 2 refused, 3 held, 4 unavailable,
 5 failed. Brief and scan output recheck saved evidence and hold unknown publication
-states. DuckDB retains summary history, not a complete replay bundle. Calendar CRUD
-exists, but calendar ingestion and automatic scheduling are not in the live flow.
+states. DuckDB retains conflict-checked summary history and an index of immutable
+run bundles. Calendar transitions and corrections retain revision history;
+calendar ingestion and automatic scheduling are not in the live flow.
 
 See [Agent 3 Batch 1](docs/agent3-batch1.md) for the review-plan schema, date,
 benchmark and inference policies, and [Batch 2](docs/agent3-batch2.md) for live
@@ -393,6 +394,31 @@ Scores describe document tone, not entity-specific sentiment or expected returns
 Live Stadler and ASML checks returned empty feeds and correctly produced held
 records. Populated-feed processing is verified with deterministic fixtures;
 real FinBERT weights have not been run in the current environment.
+
+
+### Saved evidence, offline replay and delivery
+
+[Batch 4](docs/agent3-batch4.md) seals each terminal CLI attempt into `bundle.json`,
+including held results and failures. Bundles retain normalized inputs, available
+provider snapshots, settings, peer decisions, output, code/runtime provenance and
+integrity hashes. Unique attempt IDs are separate from input fingerprints.
+
+```bash
+python -m agent3.bundles /path/to/bundle.json --output replay.json --html report.html
+# Recover a missing database index entry from its sealed bundle:
+python -m agent3.bundles /path/to/bundle.json --index-db state/catalyst.duckdb
+```
+
+Replay makes no provider/model calls: Track A recomputes from saved return windows;
+Track B rebuilds its funnel using retained scorer responses. Exact output comparison
+blocks mismatches. Incomplete attempts receive no verified analytical output.
+Held and failed results stay restricted. Legacy checkpoint files are not retroactive
+replay bundles. Hashes verify file integrity, not source authenticity.
+
+Outcome IDs reject conflicting writes; significance remains true/false/unknown.
+Calendar corrections require reasons and keep before/after history. Bundle indexing
+can be recovered independently after a database failure. Actual HTML exports are
+separate from the visibly labelled illustrative showcase.
 
 
 ---
@@ -559,8 +585,8 @@ pip install -r requirements.txt -r requirements-dev.txt
 pytest -q
 ```
 
-The latest local Agent 3 Batch 3 validation passed **686 tests on Python 3.11.9**,
-including 47 new Batch 3 regressions (Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
+The latest local Agent 3 Batch 4 validation passed **726 tests on Python 3.11.9**,
+including 40 new Batch 4 regressions (Batch 3 added 47; Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
 suite counts. Coverage includes financial contracts and report grounding, monitoring
 transactions/replay/review recovery, publication controls, exact statistical decisions,
 event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
@@ -603,8 +629,9 @@ Stated plainly, because knowing a tool's limits is part of building it:
 - **Agent 3 is not fully hardened.** Model-proposed peers remain unverified even
   after listing consistency checks. News aliases and language metadata are not
   automatically verified; conservative clustering can miss reworded copies.
-  Real FinBERT accuracy and a populated live news feed remain unverified. Saved Track A state is summary-only;
-  complete durable replay remains pending. Sparse or invalid event histories are
+  Real FinBERT accuracy and a populated live news feed remain unverified. Offline
+  replay verifies retained windows/scores; it does not establish source authenticity
+  or rerun provider/model retrieval. Sparse or invalid event histories are
   reported as exclusions or assembly refusals.
 - **Agent 4 still awaits its detailed audit and runs on synthetic-company fixtures** — FP&A data is internal, so this
   is the standard, honest way to portfolio it. The reforecast is a *defensible*
@@ -618,11 +645,12 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 The next hardening work is:
 
-1. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
+1. **Agent 3 closure validation:** issuer-checked US/non-US live event studies, resolve
+   ASML target assembly, verify a populated live news feed and optional real FinBERT.
 2. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
-showcase is illustrative; exporting verified run artifacts is still pending.
+showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.
 Further statistical extensions (cluster-aware inference, surprise filtering,
 robustness windows and richer seasonal forecasting) require separate implementation
 and validation.
