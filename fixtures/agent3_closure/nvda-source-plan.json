@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "event_class": "earnings",
+  "validation_only": true,
+  "hypotheses": [
+    "issuer_date_validation"
+  ],
+  "companies": {
+    "NVDA": {
+      "issuer_id": "NVDA",
+      "benchmark": "^GSPC",
+      "timezone": "America/New_York",
+      "stock_return_basis": "price_return",
+      "benchmark_return_basis": "price_return",
+      "benchmark_review": {
+        "reviewed_by": "Codex automated source check; not human approval",
+        "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+        "source_url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
+        "rationale": "Local broad-market price index for pipeline validation; unadjusted Close selected on both legs. Economic suitability and historical corporate-action quality not approved."
+      },
+      "reviewed_events": [
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2024/08/28/2937384/0/en/nvidia-announces-financial-results-for-second-quarter-fiscal-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2024-08-28T16:20:00-04:00",
+          "session": "after_close",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2024-08-28 16:20 ET",
+          "expected_anchor_date": "2024-08-29"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2024/11/20/2984778/0/en/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2024-11-20T16:20:00-05:00",
+          "session": "after_close",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2024-11-20 16:20 ET",
+          "expected_anchor_date": "2024-11-21"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/02/26/3033384/0/en/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-02-26T16:20:00-05:00",
+          "session": "after_close",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-02-26 16:20 ET",
+          "expected_anchor_date": "2025-02-27"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/05/28/3089944/0/en/nvidia-announces-financial-results-for-first-quarter-fiscal-2026.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-05-28T16:20:00-04:00",
+          "session": "after_close",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-05-28 16:20 ET",
+          "expected_anchor_date": "2025-05-29"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/08/27/3140390/0/en/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2026.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-08-27T16:20:00-04:00",
+          "session": "after_close",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-08-27 16:20 ET",
+          "expected_anchor_date": "2025-08-28"
+        }
+      ]
+    }
+  },
+  "comparability_review": {
+    "reviewed_by": "Codex automated source check; not human approval",
+    "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+    "source_url": "https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2025/default.aspx",
+    "rationale": "Single issuer validation, no cross-company comparability approval."
+  },
+  "sampling_review": {
+    "reviewed_by": "Codex automated source check; not human approval",
+    "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+    "source_url": "https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2025/default.aspx",
+    "rationale": "Five convenience-sampled published releases for execution/date checks. Repeated issuer; neither independent observations nor a confirmatory research design."
+  }
+}

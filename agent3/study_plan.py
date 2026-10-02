@@ -37,6 +37,8 @@ def validate_plan(plan, tickers, event_type):
         raise ValueError('study plan requires schema_version=1')
     if plan.get('event_class') != 'earnings':
         raise ValueError('only earnings events are supported')
+    if type(plan.get('validation_only', False)) is not bool:
+        raise ValueError('validation_only must be a boolean')
     companies = plan.get('companies')
     if not isinstance(companies, dict) or set(companies) != set(tickers):
         raise ValueError('plan companies must exactly match the requested target and peers, in uppercase')

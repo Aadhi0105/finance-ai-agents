@@ -8,6 +8,8 @@ def assess(study, *, contributing_peers=None, n_event_types_tested=1,
            study_plan=None, comparability_status='unverified', assembly_issues=None):
     checks=[]
     def add(name, status, detail): checks.append({'check':name,'status':status,'detail':detail})
+    if isinstance(study_plan, dict) and study_plan.get('validation_only') is not False and 'validation_only' in study_plan:
+        add('validation_only', 'fail', 'Source-check/acceptance plan is not a human-approved research design')
     n=study.get('n_events'); per=study.get('per_event')
     valid = (type(n) is int and isinstance(per,list) and n == len(per) and n >= 10
              and finite(study.get('caar')) and study.get('inference_status') == 'available'

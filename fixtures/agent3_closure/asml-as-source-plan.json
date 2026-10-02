@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "event_class": "earnings",
+  "validation_only": true,
+  "hypotheses": [
+    "issuer_date_validation"
+  ],
+  "companies": {
+    "ASML.AS": {
+      "issuer_id": "ASML.AS",
+      "benchmark": "^AEX",
+      "timezone": "Europe/Amsterdam",
+      "stock_return_basis": "price_return",
+      "benchmark_return_basis": "price_return",
+      "benchmark_review": {
+        "reviewed_by": "Codex automated source check; not human approval",
+        "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+        "source_url": "https://live.euronext.com/fr/product/indices/NL0000000107-XAMS",
+        "rationale": "Local broad-market price index for pipeline validation; unadjusted Close selected on both legs. Economic suitability and historical corporate-action quality not approved."
+      },
+      "reviewed_events": [
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/01/29/3016895/0/en/ASML-reports-28-3-billion-total-net-sales-and-7-6-billion-net-income-in-2024.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-01-29T07:00:00+01:00",
+          "session": "before_open",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-01-29 01:00 ET",
+          "expected_anchor_date": "2025-01-29"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/04/16/3062264/0/en/ASML-reports-7-7-billion-total-net-sales-and-2-4-billion-net-income-in-Q1-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-04-16T07:00:00+02:00",
+          "session": "before_open",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-04-16 01:00 ET",
+          "expected_anchor_date": "2025-04-16"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/07/16/3116126/0/en/ASML-reports-7-7-billion-total-net-sales-and-2-3-billion-net-income-in-Q2-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-07-16T07:00:00+02:00",
+          "session": "before_open",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-07-16 01:00 ET",
+          "expected_anchor_date": "2025-07-16"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2025/10/15/3166781/0/en/ASML-reports-7-5-billion-total-net-sales-and-2-1-billion-net-income-in-Q3-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2025-10-15T07:00:00+02:00",
+          "session": "before_open",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2025-10-15 01:00 ET",
+          "expected_anchor_date": "2025-10-15"
+        },
+        {
+          "reviewed_by": "Codex automated source check; not human approval",
+          "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+          "source_url": "https://www.globenewswire.com/news-release/2026/01/28/3227191/0/en/asml-reports-32-7-billion-total-net-sales-and-9-6-billion-net-income-in-2025.html",
+          "rationale": "Issuer-distributed earnings release; publication timestamp in Eastern Time converted with IANA timezone. Validation only; investor-call time is not used.",
+          "release_timestamp": "2026-01-28T07:00:00+01:00",
+          "session": "before_open",
+          "source": "issuer_release_via_globenewswire",
+          "source_timestamp_text": "2026-01-28 01:00 ET",
+          "expected_anchor_date": "2026-01-28"
+        }
+      ]
+    }
+  },
+  "comparability_review": {
+    "reviewed_by": "Codex automated source check; not human approval",
+    "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+    "source_url": "https://investor.asml.com/quarterly-results",
+    "rationale": "Single issuer validation, no cross-company comparability approval."
+  },
+  "sampling_review": {
+    "reviewed_by": "Codex automated source check; not human approval",
+    "reviewed_at": "2026-10-02T20:42:34.874563+00:00",
+    "source_url": "https://investor.asml.com/quarterly-results",
+    "rationale": "Five convenience-sampled published releases for execution/date checks. Repeated issuer; neither independent observations nor a confirmatory research design."
+  }
+}
