@@ -133,9 +133,15 @@ The previous Batch 1–3 tests are retained. Final local verification on 2026-10
   replay → held HTML report. This check caught and fixed equivalent UTC `Z` versus
   `+00:00` formatting during replay; the CLI regression now uses `Z`.
 - Showcase JavaScript syntax and repository whitespace checks passed.
-- Browser preview was blocked by the in-app browser's local-file URL policy;
-  visual layout is unverified. HTML escaping and held/publication behavior were
-  tested without browser access.
+- Browser follow-up: previewed the showcase and both exported fixture reports
+  through a localhost server restricted to those three HTML files. At measured
+  300 px and 984 px CSS viewport widths, reports wrapped without horizontal
+  overflow. The event-group dropdown initially overflowed at 300 px; constraining
+  its width fixed it. Both Agent 3 groups were then selectable without page
+  overflow, and demo/held-result disclosures remained visible. Temporary viewport
+  overrides were reset. Screenshots are saved with the local verification artifacts.
+  The original direct `file:` preview remains unsupported; this verification used
+  the restricted HTTP preview instead.
 
 Local verification artifacts are under `output/agent3-batch4-verification/`
 (ignored by Git). These are fixtures, not live company validation. Live
