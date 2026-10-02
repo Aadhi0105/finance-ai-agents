@@ -1,5 +1,7 @@
 # Agent 3 Batch 2 — reliable live execution and peer selection
 
+> Follow-up: [Batch 3](agent3-batch3.md) implements Track B evidence and publication controls. The remaining news limitations below describe the Batch 2 milestone.
+
 This batch addresses the review/live-execution portion of the Agent 3 audit
 (F03/F04/F06/F20/F22 and configuration in F24). It retains Batch 1's strict
 historical inference policy. It does not certify Track B or forward forecasts.

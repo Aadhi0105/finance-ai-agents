@@ -1,18 +1,6 @@
-"""
-Loughran-McDonald financial sentiment lexicon (Agent 3, Track B).
-
-LM is a purpose-built FINANCIAL sentiment dictionary — general-purpose lists mark
-"liability" or "cost" as negative when in finance they're neutral, which is why a
-finance-specific lexicon matters. This module holds a curated WORKING SUBSET of
-the real LM positive/negative word lists (the lists are publicly documented). It
-is deliberately not the full ~2,700-word Master Dictionary — point `load_full()`
-at the official CSV to use the complete lexicon in production.
-
-Why a lexicon at all when we also have FinBERT? Because the DISAGREEMENT between a
-transformer (context-aware, opaque) and a lexicon (transparent, rule-based) is a
-free, quantitative confidence signal: when they agree, trust the score; when they
-diverge, flag it for human review. The lexicon is deterministic and auditable —
-you can see exactly which words drove the score.
+"""Repository-curated financial tone subset; not a verified official LM dictionary.
+Explicit CSV configuration fails closed. Runtime output records content identity,
+vocabulary sizes and matched tokens; no contextual sentiment calibration is claimed.
 """
 
 from __future__ import annotations
@@ -20,7 +8,7 @@ from __future__ import annotations
 import os
 import re
 
-# A curated subset of genuine LM positive words (working set; full list is ~350).
+# Repository-curated positive words; official membership is unverified (working set; full list is ~350).
 _POSITIVE = {
     "able", "abundance", "achieve", "achieved", "achievement", "achievements",
     "advance", "advanced", "advancement", "advances", "advantage", "advantaged",
@@ -55,7 +43,7 @@ _POSITIVE = {
     "winner", "winning", "worthy",
 }
 
-# A curated subset of genuine LM negative words (working set; full list is ~2,300).
+# Repository-curated negative words; official membership is unverified (working set; full list is ~2,300).
 _NEGATIVE = {
     "abandon", "abandoned", "abandoning", "abandonment", "abnormal", "abnormally",
     "adverse", "adversely", "adversity", "aggravate", "aggravated", "alarming",
@@ -103,45 +91,53 @@ _NEGATIVE = {
 _WORD = re.compile(r"[a-zA-Z]+")
 
 
-def load_full(csv_path: str) -> tuple[set, set]:
-    """Load the full LM Master Dictionary CSV (columns include 'Word', 'Positive',
-    'Negative' with non-zero year-flags for membership). Returns (positive, negative)
-    lowercased word sets. Falls back to the built-in subset on any error."""
+def load_full(csv_path: str, *, content=None) -> tuple[set, set]:
+    """Load explicitly requested category flags. Negative years mean removed entries."""
     import csv
+    import io
+    from pathlib import Path
     pos, neg = set(), set()
-    try:
-        with open(csv_path, newline="") as f:
-            for row in csv.DictReader(f):
-                w = (row.get("Word") or "").strip().lower()
-                if not w:
-                    continue
-                if (row.get("Positive") or "0") not in ("0", "", None):
-                    pos.add(w)
-                if (row.get("Negative") or "0") not in ("0", "", None):
-                    neg.add(w)
-        if pos and neg:
-            return pos, neg
-    except Exception:
-        pass
-    return set(_POSITIVE), set(_NEGATIVE)
+    data = content if content is not None else Path(csv_path).read_bytes()
+    with io.StringIO(data.decode('utf-8-sig'), newline='') as f:
+        reader = csv.DictReader(f)
+        if not {'Word', 'Positive', 'Negative'} <= set(reader.fieldnames or []):
+            raise ValueError('dictionary requires Word/Positive/Negative columns')
+        for row in reader:
+            w = row['Word'].strip().lower()
+            if not w or not w.isalpha():
+                raise ValueError('invalid dictionary word')
+            if int(row['Positive'] or 0) > 0:
+                pos.add(w)
+            if int(row['Negative'] or 0) > 0:
+                neg.add(w)
+    if not pos or not neg or pos & neg:
+        raise ValueError('dictionary needs disjoint nonempty positive and negative vocabularies')
+    return pos, neg
 
 
-def _lexicon() -> tuple[set, set]:
-    csv_path = os.environ.get("LM_DICTIONARY_CSV")
-    if csv_path and os.path.exists(csv_path):
-        return load_full(csv_path)
-    return _POSITIVE, _NEGATIVE
+def load_dictionary():
+    import hashlib
+    import json
+    from pathlib import Path
+    path = os.environ.get('LM_DICTIONARY_CSV')
+    data = Path(path).read_bytes() if path else None
+    pos, neg = load_full(path, content=data) if path else (set(_POSITIVE), set(_NEGATIVE))
+    data = data if path else json.dumps([sorted(pos), sorted(neg)]).encode()
+    metadata = {'mode': 'configured_csv' if path else 'curated_subset',
+                'version': Path(path).name if path else 'repository-subset-v1',
+                'sha256': hashlib.sha256(data).hexdigest(),
+                'positive_words': len(pos), 'negative_words': len(neg),
+                'official_membership_verified': False, 'language': 'en',
+                'method': 'token counts; no negation, context or entity attribution'}
+    return pos, neg, metadata
 
 
-def score_text(text: str) -> dict:
-    """Lexicon sentiment for a piece of text. Returns a score in [-1, +1] plus the
-    positive/negative hit counts (auditable — you can see what drove it)."""
-    pos_set, neg_set = _lexicon()
-    words = [w.lower() for w in _WORD.findall(text or "")]
-    if not words:
-        return {"score": 0.0, "pos_hits": 0, "neg_hits": 0, "tone_words": 0}
-    p = sum(1 for w in words if w in pos_set)
-    n = sum(1 for w in words if w in neg_set)
-    tone = p + n
-    score = 0.0 if tone == 0 else (p - n) / tone
-    return {"score": round(score, 4), "pos_hits": p, "neg_hits": n, "tone_words": tone}
+def score_text(text: str, dictionary=None) -> dict:
+    pos_set, neg_set, metadata = dictionary or load_dictionary()
+    words = [w.lower() for w in _WORD.findall(text or '')]
+    pos = [w for w in words if w in pos_set]
+    neg = [w for w in words if w in neg_set]
+    tone = len(pos) + len(neg)
+    return {'score': (len(pos)-len(neg))/tone if tone else None,
+            'pos_hits': len(pos), 'neg_hits': len(neg), 'tone_words': tone,
+            'matched_positive': pos, 'matched_negative': neg, 'dictionary': metadata}

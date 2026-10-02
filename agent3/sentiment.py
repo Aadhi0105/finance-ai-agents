@@ -1,168 +1,130 @@
-"""
-Sentiment scoring stage (Agent 3, Track B) — pluggable.
-
-The scorer OWNS the number; the funnel owns the structure. Scoring is isolated
-behind one interface (`.score(item) -> {score, confidence, scorer, ...}`) with
-several implementations, mirroring the platform's stub/live pattern:
-
-  - StubScorer        : deterministic fixture/hash score. No torch, no network —
-                        the funnel is provable offline.
-  - LoughranMcDonaldScorer : real financial lexicon (transparent, auditable).
-  - FinbertScorer     : real transformer (ProsusAI/finbert). Lazy-loads torch +
-                        transformers and downloads weights on first use, so it
-                        runs on a machine with network + the deps — not in CI.
-  - DivergenceScorer  : runs a transformer AND the lexicon; their DISAGREEMENT is
-                        a free, quantitative confidence signal. Agreement -> high
-                        confidence; divergence -> low confidence + a flag the
-                        validation gate can act on ("shaky score, human eyes").
-
-Governing principle carries: the model never scores sentiment — a scorer does,
-and the number is auditable. Score convention: float in [-1, +1] plus a
-confidence in [0, 1].
-"""
-
+"""Document-level tone scorers with explicit identity and non-calibrated diagnostics."""
 from __future__ import annotations
-
+import math
 import os
-
+import re
+from importlib.metadata import version
 from agent3 import lm_lexicon
+from tools.event_contracts import finite
 
 
-def _text_of(item: dict) -> str:
+def _text_of(item):
     return f"{item.get('headline', '')} {item.get('body', '')}".strip()
 
 
+def validate_score(result):
+    if not isinstance(result, dict) or not isinstance(result.get('scorer'), str):
+        raise ValueError('invalid scorer record')
+    if not finite(result.get('score')) or not -1 <= result['score'] <= 1:
+        raise ValueError('score must be finite in [-1,1]')
+    confidence = result.get('confidence')
+    if confidence is not None and (not finite(confidence) or not 0 <= confidence <= 1):
+        raise ValueError('invalid confidence')
+    if 'flag_review' in result and type(result['flag_review']) is not bool:
+        raise ValueError('invalid review flag')
+    return result
+
+
 class StubScorer:
-    """Deterministic offline scorer (fixture score, or a reproducible pseudo-score)."""
-
-    name = "stub"
-
-    def score(self, item: dict) -> dict:
-        if "stub_score" in item:
-            s = float(item["stub_score"])
-            conf = float(item.get("stub_confidence", 0.8))
-        else:
-            text = _text_of(item).lower()
-            h = sum(ord(c) for c in text)
-            s = round(((h % 201) - 100) / 100.0, 3)
-            conf = 0.5
-        return {"score": max(-1.0, min(1.0, s)), "confidence": conf, "scorer": self.name}
+    name = 'stub'
+    def score(self, item):
+        # No pseudo-random fallback: demo scores require fixture evidence.
+        result = {'score': item.get('stub_score'), 'confidence': item.get('stub_confidence'),
+                  'scorer': self.name, 'flag_review': True, 'review_reasons': ['synthetic_demo_score']}
+        return validate_score(result)
 
 
 class LoughranMcDonaldScorer:
-    """Real financial-lexicon scorer — transparent and fully offline. Confidence
-    scales with how many tone words were found (more evidence -> more confident)."""
-
-    name = "lm"
-
-    def score(self, item: dict) -> dict:
-        r = lm_lexicon.score_text(_text_of(item))
-        tone = r["tone_words"]
-        conf = 0.3 if tone == 0 else min(0.9, 0.4 + 0.1 * tone)
-        return {"score": r["score"], "confidence": round(conf, 3), "scorer": self.name,
-                "pos_hits": r["pos_hits"], "neg_hits": r["neg_hits"]}
+    name = 'lm'
+    def __init__(self):
+        self.dictionary = lm_lexicon.load_dictionary()
+    def score(self, item):
+        r = lm_lexicon.score_text(_text_of(item), self.dictionary)
+        reasons = ['lexical_tone_not_contextual_sentiment']
+        if r['dictionary']['mode'] == 'curated_subset':
+            reasons.append('unverified_dictionary_subset')
+        if not r['tone_words']:
+            reasons.append('no_lexical_tone_evidence')
+        return {**r, 'confidence': None, 'scorer': self.name,
+                'flag_review': True, 'review_reasons': reasons}
 
 
 class FinbertScorer:
-    """Real FinBERT (ProsusAI/finbert). Lazy-loads torch + transformers and
-    downloads weights on first use — so it runs on a networked machine with the
-    deps installed, not in the build container. Score = P(positive) - P(negative)."""
-
-    name = "finbert"
-
-    def __init__(self, model_name: str = "ProsusAI/finbert"):
+    name = 'finbert'
+    def __init__(self, model_name='ProsusAI/finbert', revision=None):
         self.model_name = model_name
+        self.revision = revision or os.environ.get('AGENT_FINBERT_REVISION')
+        if not isinstance(self.revision, str) or not re.fullmatch('[a-fA-F0-9]{40}', self.revision):
+            raise ValueError('AGENT_FINBERT_REVISION must pin a 40-character model commit')
         self._pipe = None
-
     def _pipeline(self):
         if self._pipe is None:
-            from transformers import pipeline  # heavy import, deferred
-            self._pipe = pipeline("text-classification", model=self.model_name,
+            from transformers import pipeline
+            self._pipe = pipeline('text-classification', model=self.model_name,
+                                  tokenizer=self.model_name, revision=self.revision,
                                   top_k=None, truncation=True)
         return self._pipe
-
-    def score(self, item: dict) -> dict:
+    def score(self, item):
         text = _text_of(item)
         if not text:
-            return {"score": 0.0, "confidence": 0.3, "scorer": self.name}
-        out = self._pipeline()(text)[0]   # list of {label, score}
-        probs = {d["label"].lower(): d["score"] for d in out}
-        s = probs.get("positive", 0.0) - probs.get("negative", 0.0)
-        # confidence = how far from neutral the model is
-        conf = round(min(1.0, abs(s) + probs.get("positive", 0) + probs.get("negative", 0)) / 2 + 0.5, 3)
-        return {"score": round(s, 4), "confidence": min(0.95, conf), "scorer": self.name,
-                "probs": {k: round(v, 3) for k, v in probs.items()}}
+            raise ValueError('empty sentiment text')
+        pipe = self._pipeline()
+        token_count = len(pipe.tokenizer(text, truncation=False)['input_ids'])
+        limit = min(pipe.tokenizer.model_max_length, pipe.model.config.max_position_embeddings)
+        out = pipe(text, truncation=True, max_length=limit)[0]
+        if len(out) != 3 or {d['label'].lower() for d in out} != {'positive','negative','neutral'}:
+            raise ValueError('FinBERT must return three distinct named classes')
+        probs = {d['label'].lower(): d['score'] for d in out}
+        if not all(finite(p) and 0 <= p <= 1 for p in probs.values()) or not math.isclose(sum(probs.values()), 1, abs_tol=1e-5):
+            raise ValueError('invalid FinBERT probability vector')
+        ordered = sorted(probs.values(), reverse=True)
+        reasons = []
+        if token_count > limit:
+            reasons.append('input_truncated')
+        if ordered[0]-ordered[1] < .1:
+            reasons.append('ambiguous_class_probabilities')
+        return {'score': probs['positive']-probs['negative'], 'confidence': None,
+                'scorer': self.name, 'probs': probs, 'top_class_probability': ordered[0],
+                'class_margin': ordered[0]-ordered[1], 'token_count': token_count,
+                'token_limit': limit, 'truncated': token_count > limit,
+                'model': self.model_name, 'revision': self.revision, 'tokenizer_revision': self.revision,
+                'dependencies': {k: version(k) for k in ('transformers', 'torch')},
+                'flag_review': bool(reasons), 'review_reasons': reasons,
+                'probability_note': 'Model class probabilities, not calibrated reliability or return probabilities'}
 
 
 class DivergenceScorer:
-    """Runs a primary (transformer) scorer AND the LM lexicon; combines them and
-    turns their DISAGREEMENT into a confidence signal.
-
-      - agreement (same sign, close magnitude) -> high confidence, flag_review False
-      - divergence (opposite signs, or one strong/one flat) -> low confidence,
-        flag_review True (the validation gate can route these to human eyes)
-
-    The combined score is the primary's number (the transformer is context-aware);
-    the lexicon's job is to CHECK it, not to average it away.
-    """
-
-    name = "divergence"
-
-    def __init__(self, primary=None, secondary=None, diverge_threshold: float = 0.5):
-        self.primary = primary or _default_primary()
-        self.secondary = secondary or LoughranMcDonaldScorer()
+    name = 'divergence'
+    def __init__(self, primary=None, secondary=None, diverge_threshold=.5):
+        self.primary = primary if primary is not None else FinbertScorer()
+        self.secondary = secondary if secondary is not None else LoughranMcDonaldScorer()
+        if not finite(diverge_threshold) or not 0 < diverge_threshold <= 1:
+            raise ValueError('invalid divergence threshold')
         self.diverge_threshold = diverge_threshold
-
-    def score(self, item: dict) -> dict:
-        p = self.primary.score(item)
+    def score(self, item):
+        p = validate_score(self.primary.score(item))
         q = self.secondary.score(item)
-        ps, qs = p["score"], q["score"]
-        divergence = abs(ps - qs) / 2.0                 # in [0, 1]
-        opposite_signs = (ps > 0.05 and qs < -0.05) or (ps < -0.05 and qs > 0.05)
-        # strong-vs-flat: one scorer confident, the other essentially neutral — a
-        # real disagreement the docstring promised to flag but the magnitude test
-        # alone missed (0.8 vs 0.0 gives divergence 0.4, below the 0.5 threshold).
-        strong_vs_flat = (abs(ps) >= 0.6 and abs(qs) <= 0.1) or \
-                         (abs(qs) >= 0.6 and abs(ps) <= 0.1)
-        flag = opposite_signs or strong_vs_flat or divergence >= self.diverge_threshold
-        # confidence: primary's own confidence, discounted by divergence
-        conf = round(max(0.1, p.get("confidence", 0.6) * (1.0 - divergence)), 3)
-        return {
-            "score": ps,                                # trust the transformer's number
-            "confidence": conf,
-            "scorer": f"{self.primary.name}+{self.secondary.name}",
-            "primary_score": ps, "secondary_score": qs,
-            "divergence": round(divergence, 4),
-            "flag_review": bool(flag),
-            "reason": ("scorers disagree — flag for review" if flag
-                       else "scorers agree"),
-        }
+        reasons = list(p.get('review_reasons', [])) + list(q.get('review_reasons', []))
+        ps, qs = p['score'], q.get('score')
+        divergence = None
+        if qs is None:
+            reasons.append('secondary_tone_unavailable')
+        else:
+            validate_score(q)
+            divergence = abs(ps-qs)/2
+            if (ps > .05 and qs < -.05) or (ps < -.05 and qs > .05) or (abs(ps) >= .6 and abs(qs) <= .1) or (abs(qs) >= .6 and abs(ps) <= .1) or divergence >= self.diverge_threshold:
+                reasons.append('scorers_disagree')
+        if p.get('flag_review') or q.get('flag_review'):
+            reasons.append('component_requires_review')
+        return {'score': ps, 'confidence': None, 'scorer': f'{self.primary.name}+{self.secondary.name}',
+                'primary_score': ps, 'secondary_score': qs, 'primary': p, 'secondary': q,
+                'divergence': divergence, 'flag_review': bool(reasons),
+                'review_reasons': sorted(set(reasons)), 'reason': '; '.join(sorted(set(reasons)))}
 
 
-def _default_primary():
-    """FinBERT if available/allowed, else the stub (keeps offline runs working)."""
-    if os.environ.get("AGENT_SENTIMENT_SCORER") == "finbert":
-        return FinbertScorer()
-    return StubScorer()
-
-
-def get_scorer(source: str | None = None):
-    """Return the scorer for the current mode.
-      - default / 'stub'      : deterministic offline stub.
-      - 'lm'                  : the real Loughran-McDonald lexicon (offline).
-      - 'finbert'             : real FinBERT alone (networked machine).
-      - 'divergence'          : FinBERT primary + LM check, disagreement-as-confidence.
-    """
-    src = source or os.environ.get("AGENT_SENTIMENT_SCORER", "stub")
-    if src == "lm":
-        return LoughranMcDonaldScorer()
-    if src == "finbert":
-        return FinbertScorer()
-    if src == "divergence":
-        # Explicitly FinBERT primary + LM cross-check. Previously DivergenceScorer()
-        # fell back to _default_primary(), which — seeing the env var "divergence"
-        # rather than "finbert" — returned the STUB, so the advertised
-        # "FinBERT + Loughran-McDonald divergence" silently ran stub + LM.
-        return DivergenceScorer(primary=FinbertScorer(),
-                                secondary=LoughranMcDonaldScorer())
-    return StubScorer()
+def get_scorer(source=None):
+    src = source if source is not None else os.environ.get('AGENT_SENTIMENT_SCORER', 'lm')
+    factories = {'stub': StubScorer, 'lm': LoughranMcDonaldScorer, 'finbert': FinbertScorer, 'divergence': DivergenceScorer}
+    if src not in factories:
+        raise ValueError('scorer must be lm, finbert, divergence or explicit stub demo')
+    return factories[src]()

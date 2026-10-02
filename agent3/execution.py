@@ -87,6 +87,12 @@ class Attempt:
         if status in ('unavailable', 'failed', 'refused') and 'result' in self.record:
             result = self.record['result']
             result['status'] = status
+            if 'signals' in result:
+                result['publication_state'] = 'HELD_FOR_REVIEW'
+                for item in result['signals']:
+                    if item.get('level') is not None:
+                        item['diagnostic_level'] = item['level']
+                    item.update(level=None, flag_review=True, publication_state='HELD_FOR_REVIEW')
             scenario = result.get('scenario')
             if isinstance(scenario, dict):
                 distribution = scenario.pop('distribution', None)
@@ -143,11 +149,11 @@ def execute(attempt):
     return EXIT_CODES[attempt.record['status']]
 
 
-def run_bounded(attempt, timeout):
+def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
     """Kill the worker group; the guarded MCP server detects parent loss separately."""
     process = None
     try:
-        process = subprocess.Popen([sys.executable, '-m', 'agent3.execution', str(attempt.path)],
+        process = subprocess.Popen([sys.executable, '-m', worker_module, str(attempt.path)],
                                    cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                    start_new_session=True)
         process.wait(timeout=timeout)

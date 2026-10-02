@@ -17,13 +17,13 @@ Student-t primitives; monitoring and FP&A reuse robust anomaly checks. Tested
 local/MCP paths preserve the same calculation contracts. Fixture monitoring can
 loop on a cadence; no unattended live schedule or notification service is installed.
 
-## Current status — 30 September 2026
+## Current status — 2 October 2026
 
 | Component | Completed scope | Remaining boundary |
 |---|---|---|
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection and saved-cycle triage recovery | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
-| Agent 3 | Detailed audit, Batch 1 financial/statistical correctness, Batch 2 audited live peer selection and bounded execution/retry | Batches 3–4: news evidence controls, durable replay and integration |
+| Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
 | Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation | Detailed hardening audit still pending |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
@@ -88,13 +88,15 @@ AGENT_STATS_VIA_MCP=1 python monitor.py --run 10
 python -m agent3.run_live ASML.AS semicap_earnings --peers ASM.AS BESI.AS
 python -m agent3.run_live ALO.PA european_rail --peers SRAIL.SW CAF.MC
 
-# Track B (breadth): current news -> sentiment signal
-AGENT_SENTIMENT_SCORER=lm         python -m agent3.run_news ASML.AS   # lexicon subset; news retrieval uses network
-AGENT_SENTIMENT_SCORER=divergence python -m agent3.run_news ASML.AS   # FinBERT + lexicon cross-check
+# Track B: current news -> reviewed document-tone evidence
+python -m agent3.run_news ASML.AS --alias ASML --scorer lm  # lexical diagnostics; live retrieval
+# FinBERT/divergence also require dependencies and AGENT_FINBERT_REVISION:
+python -m agent3.run_news ASML.AS --alias ASML --scorer divergence
 ```
 
 Exit 3 means historical evidence is held for review, not a publishable forecast.
-FinBERT/divergence scoring needs optional `torch` and `transformers` dependencies;
+FinBERT/divergence scoring needs optional `torch` and `transformers` dependencies
+and a 40-character model commit in `AGENT_FINBERT_REVISION`;
 real FinBERT weights have not been validated in the current acceptance work.
 For an illustrative, held event study without network access:
 
@@ -144,7 +146,7 @@ happen to rhyme:
   variance materiality/persistence.
 - **Validation layer** — Agents 1 and 2 constrain evidence and publication,
   Agent 3 Track A holds unresolved inference, and Agent 4 checks accounting and
-  commentary integrity. Agent 3 Track B still needs final evidence/flag preservation.
+  commentary integrity. Agent 3 Track B retains news evidence and holds unresolved tone results.
   Review verdicts are not calibrated confidence probabilities.
 
 ---
@@ -368,13 +370,29 @@ See [Agent 3 Batch 1](docs/agent3-batch1.md) for the review-plan schema, date,
 benchmark and inference policies, and [Batch 2](docs/agent3-batch2.md) for live
 selection, checkpoints, retry commands, exit codes and verification evidence.
 
-### Track B — current news (later fix batch)
+### Track B — current-news evidence and document tone
 
-The independent news funnel ingests, clusters, scores and aggregates current
-headlines. It supports a stub, a financial lexicon subset, FinBERT and a divergence
-scorer. Track B still needs relevance/timestamp controls, explicit real-scorer
-selection and final review/evidence preservation; Batch 1 does not certify it.
-Its default stub score must not be used as a real sentiment finding.
+[Batch 3](docs/agent3-batch3.md) replaces assumed ticker relevance with explicit
+headline alias/cashtag checks. It validates timezone-aware publication/retrieval
+instants, applies a bounded freshness window, groups UTC days and records exclusions.
+Conservative text clustering preserves negation, changed stories and every cluster
+member; counts are heuristic clusters, not demonstrated independent stories.
+
+The live default is a disclosed curated lexical subset (`lm`), held as diagnostic
+lexical tone. Explicit dictionary errors do not fall back. Optional FinBERT modes
+require a pinned revision and validate probability vectors, language metadata and
+truncation. Stub scores require explicit fixture/demo mode. Unknown scorer names
+fail. No calibrated confidence is reported.
+
+Per-story scorer evidence, source references, review reasons and aggregate flags
+are saved in `output/agent3-news/<id>/run.json`. Held signals have `level=null`;
+diagnostic means are separate. The CLI uses the saved scores without rescoring,
+rechecks published levels against their evidence, and has a bounded worker deadline.
+Scores describe document tone, not entity-specific sentiment or expected returns.
+
+Live Stadler and ASML checks returned empty feeds and correctly produced held
+records. Populated-feed processing is verified with deterministic fixtures;
+real FinBERT weights have not been run in the current environment.
 
 
 ---
@@ -496,6 +514,7 @@ agent3/      track_a.py, track_a_live.py     (event assembly: fixture + live yfi
              peers.py, study_plan.py          (explicit peers and reviewer attestations)
              scenario.py                     (historical quantiles; eligible mean bootstrap)
              news_funnel.py, news_live.py     (Track B funnel + live news)
+             news_contracts.py, news_execution.py (UTC evidence contracts + bounded news worker)
              sentiment.py, lm_lexicon.py      (LM lexicon, FinBERT, divergence scorer)
              validation.py                   (evidence, eligibility and multiple-testing gate)
              catalyst_state.py               (catalyst calendar + outcome history, DuckDB)
@@ -540,8 +559,8 @@ pip install -r requirements.txt -r requirements-dev.txt
 pytest -q
 ```
 
-The latest local Agent 3 Batch 2 validation passed **639 tests on Python 3.11.9**,
-including 53 new Batch 2 regressions (Batch 1 previously added 49). Earlier acceptance guides retain their historical
+The latest local Agent 3 Batch 3 validation passed **686 tests on Python 3.11.9**,
+including 47 new Batch 3 regressions (Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
 suite counts. Coverage includes financial contracts and report grounding, monitoring
 transactions/replay/review recovery, publication controls, exact statistical decisions,
 event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
@@ -582,8 +601,9 @@ Stated plainly, because knowing a tool's limits is part of building it:
   quantiles are not forward predictive calibration. See the bounded policy in
   [Agent 3 Batch 1](docs/agent3-batch1.md).
 - **Agent 3 is not fully hardened.** Model-proposed peers remain unverified even
-  after listing consistency checks. Track B defaults to a stub and still needs relevance, date,
-  deduplication and publication controls. Saved Track A state is summary-only;
+  after listing consistency checks. News aliases and language metadata are not
+  automatically verified; conservative clustering can miss reworded copies.
+  Real FinBERT accuracy and a populated live news feed remain unverified. Saved Track A state is summary-only;
   complete durable replay remains pending. Sparse or invalid event histories are
   reported as exclusions or assembly refusals.
 - **Agent 4 still awaits its detailed audit and runs on synthetic-company fixtures** — FP&A data is internal, so this
@@ -598,9 +618,8 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 The next hardening work is:
 
-1. **Agent 3 Batch 3:** news relevance, timestamps, deduplication, scorer selection and final review evidence.
-2. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
-3. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
+1. **Agent 3 Batch 4:** durable replay, state conflicts and verified showcase/disclosure integration.
+2. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; exporting verified run artifacts is still pending.
