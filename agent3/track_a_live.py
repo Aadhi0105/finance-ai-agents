@@ -173,11 +173,11 @@ def assemble_peer_events(ticker, stock_px, mkt_px, earnings_dates, max_events=12
                   release_timestamp=record.get('release_timestamp'), provider_timestamp=record.get('provider_timestamp'),
                   source=record.get('source', 'reviewed_study_plan' if reviewed else 'provider'),
                   retrieved_at=record.get('retrieved_at'), exchange_timezone=tz, session=record.get('session','unknown'),
-                  date_status='reviewed' if reviewed else 'unverified', benchmark=bench,
+                  date_status=('source_checked' if plan and plan.get('validation_only') else 'reviewed') if reviewed else 'unverified', benchmark=bench,
                   stock_return_basis=company.get('stock_return_basis','total_return'),
                   benchmark_return_basis=company.get('benchmark_return_basis','unverified'),
-                  benchmark_status='reviewed' if company else 'unverified',
-                  design_status='reviewed' if plan else 'unverified', review_evidence=evidence,
+                  benchmark_status=('source_checked' if plan and plan.get('validation_only') else 'reviewed') if company else 'unverified',
+                  design_status='reviewed' if plan and not plan.get('validation_only') else 'unverified', review_evidence=evidence,
                   quality_flags=flags, window_spec={'estimation':[-280,-31], 'event':[-1,1]})
         return ev, i
     events, used = [], set()
@@ -306,8 +306,12 @@ def load_live_event_set(ticker, peers, event_type, *, study_plan=None, checkpoin
                 rep['identity_check'] = identity
             events.extend(ev); placebos.extend(pe); reports.append(rep)
         except Exception as exc:
+            import traceback
+            frames = traceback.extract_tb(exc.__traceback__)
+            origin = frames[-1] if frames else None
+            location = {'function': origin.name, 'line': origin.lineno} if origin else None
             reports.append({'ticker':pk, 'excluded':True, 'error':f'{type(exc).__name__}: {operation} unavailable',
-                            'failure_stage': operation, 'identity_check': identity,
+                            'failure_stage': operation, 'failure_location': location, 'identity_check': identity,
                             'reason': exc.code if isinstance(exc, AssemblyInputError) else f'{operation} unavailable'})
         if checkpoint:
             checkpoint('assembly', {'per_peer_report': reports})
@@ -316,7 +320,8 @@ def load_live_event_set(ticker, peers, event_type, *, study_plan=None, checkpoin
               'target':tk, 'target_contributed':tk in contributing, 'pinned_peers':all_peers,
               'contributing_peers':contributing, 'excluded_peers':[r['ticker'] for r in reports if r.get('excluded')],
               'per_peer_report':reports, 'events':events, 'placebo_events':placebos,
-              'study_plan':plan, 'comparability_status':'human_reviewed' if plan else 'unverified',
+              'study_plan':plan, 'comparability_status':('validation_only' if plan and plan.get('validation_only') else
+                                                      'human_reviewed' if plan else 'unverified'),
               'retrieved_at':datetime.now(timezone.utc).isoformat(), 'n_events':len(events),
               'verdict':'OK' if len(events) >= 5 else 'REFUSED'}
     if result['verdict'] == 'REFUSED': result['reason'] = 'fewer than five usable historical events'

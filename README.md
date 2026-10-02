@@ -585,8 +585,8 @@ pip install -r requirements.txt -r requirements-dev.txt
 pytest -q
 ```
 
-The latest local Agent 3 Batch 4 validation passed **726 tests on Python 3.11.9**,
-including 40 new Batch 4 regressions (Batch 3 added 47; Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
+The latest local Agent 3 closure validation passed **736 tests on Python 3.11.9**,
+including 10 new closure regressions (Batch 4 added 40; Batch 3 added 47; Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
 suite counts. Coverage includes financial contracts and report grounding, monitoring
 transactions/replay/review recovery, publication controls, exact statistical decisions,
 event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
@@ -597,8 +597,12 @@ workflow; `--live` explicitly opts into a paid model check. Live provider and mo
 observations are documented separately and are not a guarantee of universal coverage.
 The Batch 2 live recovery check reused model-proposed peers without another model
 call, excluded a provider/model listing mismatch, and held 48 events across four
-contributing firms for review. ASML remained excluded at window assembly. This did
-not establish an approved forecast or validate real FinBERT weights. See the
+contributing firms for review. ASML was excluded at window assembly in that historical run.
+The [closure validation](docs/agent3-closure-validation.md) now assembles ASML successfully
+and verifies five issuer-dated ASML events and five NVIDIA events against retained
+prices, independent calculations, actual MCP execution and offline replay. Both
+remain held; the old exception could not be reconstructed without its original inputs.
+No approved forecast or real FinBERT accuracy is claimed. See also the
 [Batch 2 verification record](docs/agent3-batch2.md).
 
 ---
@@ -645,8 +649,9 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 The next hardening work is:
 
-1. **Agent 3 closure validation:** issuer-checked US/non-US live event studies, resolve
-   ASML target assembly, verify a populated live news feed and optional real FinBERT.
+1. **Agent 3 remaining closure:** restore and verify populated live news (the observed
+   provider response was HTTP 404), plus optional real FinBERT validation. Issuer-dated
+   ASML/NVIDIA execution and retained-price checks passed; research publication stays held.
 2. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
