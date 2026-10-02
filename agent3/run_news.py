@@ -1,68 +1,62 @@
-"""
-Live Track-B run — RUN ON A MACHINE WITH NETWORK + (optionally) FinBERT deps.
-
-Fetches current news for an entity, scores it, and runs the funnel to an
-entity-day sentiment signal — the daily-brief BREADTH view.
-
-    python -m agent3.run_news ASML.AS
-    AGENT_SENTIMENT_SCORER=divergence python -m agent3.run_news ASML.AS
-
-Scorer via AGENT_SENTIMENT_SCORER:
-    stub        (default) deterministic, offline
-    lm          real Loughran-McDonald lexicon (offline, no deps)
-    finbert     real FinBERT alone (needs: pip install transformers torch)
-    divergence  FinBERT primary + LM cross-check, disagreement-as-confidence
-
-FinBERT downloads ~400MB of weights on first use. If it's not installed, use
-'lm' for a fully-offline real financial-sentiment score.
-
-HONEST SCOPE: free news is current-only — this is the daily sentiment brief, not
-historical sentiment-return analysis (which Track B never does; Track A owns
-event-timed rigor).
-"""
-
-from __future__ import annotations
-
+"""Current-news document tone with explicit review controls and saved evidence."""
+import argparse
 import os
+from pathlib import Path
 import sys
-
-from agent3.news_live import fetch_entity_news
-from agent3.news_funnel import run_funnel
-from agent3.sentiment import get_scorer
-
-
-def main(argv):
-    if not argv:
-        print("usage: python -m agent3.run_news TICKER")
-        return 1
-    ticker = argv[0]
-    scorer_name = os.environ.get("AGENT_SENTIMENT_SCORER", "stub")
-
-    print(f"=== LIVE Track-B: {ticker}  (scorer={scorer_name}) ===")
-    fetched = fetch_entity_news(ticker)
-    print(f"  news: {fetched['raw_count']} raw -> {fetched['shaped_count']} timestamped")
-    print(f"  scope: {fetched['scope_note']}")
-    if not fetched["items"]:
-        print("  no usable news items (empty or all un-timestamped).")
-        return 0
-
-    scorer = get_scorer(scorer_name)
-    res = run_funnel(fetched["items"], universe={ticker.upper()}, scorer=scorer)
-    print(f"\n  funnel: {res['funnel']}")
-    print("\n  entity-day signals:")
-    for s in res["signals"]:
-        print(f"    {s['entity']:<9} {s['day']}  level={s['level']:+.3f} "
-              f"dispersion={s['dispersion']:.3f} count={s['count']} "
-              f"conf={s['confidence']:.3f} coverage={s['total_coverage']}")
-
-    # Show a few scored headlines with any divergence flags (divergence scorer only)
-    print("\n  sample scored headlines:")
-    for it in fetched["items"][:5]:
-        sc = scorer.score(it)
-        flag = " [FLAG: scorers disagree]" if sc.get("flag_review") else ""
-        print(f"    {sc['score']:+.2f} (conf {sc.get('confidence',0):.2f}){flag}  {it['headline'][:55]}")
-    return 0
+from agent3.execution import Attempt, ROOT, run_bounded
+from agent3.news_funnel import render_news
+from agent3.news_contracts import asof
+from tools.event_contracts import ticker
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('ticker')
+    parser.add_argument('--alias', action='append', default=[], help='explicit issuer headline alias, repeatable')
+    parser.add_argument('--scorer', choices=['lm','finbert','divergence','stub'])
+    parser.add_argument('--demo', action='store_true', help='allow stub only with an explicit fixture')
+    parser.add_argument('--fixture', help='offline JSON with items list')
+    parser.add_argument('--as-of', help='timezone-aware cutoff; required for historical fixtures')
+    parser.add_argument('--max-age-days', type=int, default=7)
+    parser.add_argument('--timeout', type=int, default=180)
+    parser.add_argument('--output-dir', default=str(ROOT/'output'/'agent3-news'))
+    args = parser.parse_args(argv)
+    from dotenv import load_dotenv
+    load_dotenv(ROOT/'.env', override=False)
+    try:
+        tk = ticker(args.ticker)
+        name = args.scorer or os.environ.get('AGENT_SENTIMENT_SCORER', 'lm')
+        if name not in ('lm', 'finbert', 'divergence', 'stub'):
+            raise ValueError('unsupported scorer')
+        if name == 'stub' and not (args.demo and args.fixture):
+            raise ValueError('stub requires --demo and --fixture')
+        if args.demo and name != 'stub':
+            raise ValueError('--demo is reserved for fixture stub scores')
+        if not 30 <= args.timeout <= 3600 or not 1 <= args.max_age_days <= 30:
+            raise ValueError('invalid timeout or freshness window')
+        if any(len(a.strip()) < 3 or len(a) > 200 for a in args.alias) or len(args.alias) > 20:
+            raise ValueError('aliases must be 3–200 characters, at most 20')
+        if args.as_of:
+            asof(args.as_of)
+        if args.fixture and not args.as_of:
+            raise ValueError('fixture mode requires --as-of')
+        request = {'ticker': tk, 'aliases': args.alias, 'scorer': name,
+                   'data_mode': 'fixture' if args.fixture else 'live',
+                   'fixture': str(Path(args.fixture).resolve()) if args.fixture else None,
+                   'as_of': args.as_of, 'max_age_days': args.max_age_days}
+        attempt = Attempt.create(args.output_dir, request)
+        code = run_bounded(attempt, args.timeout, worker_module='agent3.news_execution')
+        result = attempt.record.get('result')
+        if result:
+            print(render_news(result))
+        else:
+            print(f"{attempt.record['status'].upper()}: {attempt.record.get('reason')} at {attempt.record['stage']}")
+        print(f'Run record: {attempt.path}')
+        return code
+    except (OSError, ValueError) as exc:
+        print(f'REFUSED: news configuration/input ({type(exc).__name__}); check scorer, aliases, dates and paths.', file=sys.stderr)
+        return 2
+
+
+if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
