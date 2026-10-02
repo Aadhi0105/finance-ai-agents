@@ -254,6 +254,7 @@ def load_live_event_set(ticker, peers, event_type, *, study_plan=None, checkpoin
     all_peers = list(dict.fromkeys([tk] + [normalize(p) for p in peers]))
     plan = validate_plan(study_plan, all_peers, event_type)
     events, placebos, reports = [], [], []
+    snapshots = {}
     for pk in all_peers:
         operation = 'listing_configuration'
         identity = None
@@ -270,15 +271,34 @@ def load_live_event_set(ticker, peers, event_type, *, study_plan=None, checkpoin
                     if checkpoint:
                         checkpoint('assembly', {'per_peer_report': reports})
                     continue
+            snapshot = snapshots[pk] = {'ticker': pk, 'benchmark': bench, 'timezone': tz,
+                                        'company': c, 'identity_check': identity, 'provider': 'yfinance',
+                                        'stock_return_basis': c.get('stock_return_basis', 'total_return'),
+                                        'benchmark_return_basis': c.get('benchmark_return_basis', 'price_return')}
+            def retain(name, value):
+                # Preserve partial retrieval too, before later provider/assembly failures.
+                def serial(v):
+                    if isinstance(v, (date, datetime)): return v.isoformat()
+                    if isinstance(v, dict): return {k: serial(x) for k, x in v.items()}
+                    if isinstance(v, (tuple, list)): return [serial(x) for x in v]
+                    if isinstance(v, float) and not finite(v): return None
+                    return v
+                snapshot[name] = serial(value)
+                snapshot[name + '_retrieved_at'] = datetime.now(timezone.utc).isoformat()
+                if checkpoint:
+                    checkpoint('assembly', {'provider_snapshots': snapshots})
             operation = 'stock_prices'
             px = _fetch_prices(pk, return_basis=c.get('stock_return_basis','total_return'))
+            retain('stock_prices', px)
             operation = 'benchmark_prices'
             ix = _fetch_prices(bench, return_basis=c.get('benchmark_return_basis','price_return'))
+            retain('benchmark_prices', ix)
             operation = 'earnings_dates'
             if c.get('reviewed_events'):
                 eds = [{**e, 'date_status':'reviewed'} for e in c['reviewed_events']]
             else:
                 eds = _fetch_earnings_dates(pk)
+            retain('earnings_dates', eds)
             operation = 'window_assembly'
             ev, pe, rep = assemble_peer_events(pk, px, ix, eds, exchange_timezone=tz,
                                                benchmark=bench, company=c, plan=plan)

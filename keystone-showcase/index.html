@@ -68,7 +68,7 @@
 
   .subselect{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
   .subselect label{font-size:13.5px;color:var(--soft)}
-  select{font-family:var(--sans);font-size:14.5px;color:var(--ink);background:var(--panel);
+  select{max-width:100%;min-width:0;font-family:var(--sans);font-size:14.5px;color:var(--ink);background:var(--panel);
     border:1px solid var(--line);border-radius:7px;padding:9px 34px 9px 12px;appearance:none;cursor:pointer;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%234a5a66' fill='none' stroke-width='1.5'/></svg>");
     background-repeat:no-repeat;background-position:right 12px center}
@@ -164,6 +164,10 @@
 
 <main class="wrap">
 
+  <aside class="principle" role="note"><strong>Illustrative demo — all embedded numbers are placeholders.</strong>
+    These panels are not verified agent runs. For a real Agent 3 report, export a saved bundle using
+    <code>python -m agent3.bundles BUNDLE --html report.html</code> and open that file.
+    <a href="about-this-showcase.md">Scope and limitations</a></aside>
   <section class="hero">
     <h1>One platform. Four agents. One analytical spine.</h1>
     <p class="lede">Keystone is a set of finance agents that share one foundation — the same
@@ -201,8 +205,8 @@
     <div class="scope">
       <strong style="color:var(--ink)">Honest scope.</strong> A research and surveillance platform that
       <em>tests</em> relationships and flags what it can't support — not an alpha-prediction engine.
-      Runs shown here are precomputed on a curated set of large-cap names; results include honest nulls
-      and excluded data where the evidence doesn't hold.
+      All embedded panels use illustrative placeholder data. They are not evidence of real runs or reproducibility.
+      Exported Agent 3 reports preserve their recorded status and review restrictions.
     </div>
     <div>
       <div class="mono" style="color:var(--ink)">github.com/Aadhi0105/finance-ai-agents</div>
@@ -215,10 +219,8 @@
 /* ============================================================================
    MANIFEST — the single source the showcase renders from.
    In the prototype it is embedded so the file opens and runs offline.
-   To wire in real runs: move this object to manifest.json, and replace the line
-   marked below with:  MANIFEST = await fetch('manifest.json').then(r=>r.json());
-   A small Python "collector" runs each agent on your curated names and writes
-   the entries here (see README).
+   Actual Agent 3 bundles are exported to separate HTML reports (see README).
+   No collector or evidence-aware manifest adapter is implemented here.
    All numbers below are ILLUSTRATIVE placeholders.
    ========================================================================== */
 const EMBEDDED_MANIFEST = {
@@ -488,7 +490,7 @@ function renderAgent3(run){
   const p=el('div');
   const head=el('div','agent-head');
   head.innerHTML=`<div class="who"><h2>${run.group}</h2>
-    <div class="sub">Market/news intelligence — tests whether events move a stock and projects the next one. Cross-ticker by design: an event study needs a peer group, not one name.</div></div>
+    <div class="sub">Market/news intelligence — shows illustrative historical event diagnostics; no return forecast. Cross-ticker by design: an event study needs a peer group, not one name.</div></div>
     <div class="badge ${run.sverdict}">${run.sig.verdict}</div>`;
   p.appendChild(head);
 
@@ -498,8 +500,8 @@ function renderAgent3(run){
   p.appendChild(pk);
 
   const chart=el('div','chart');
-  chart.innerHTML=`<div class="ct">Cumulative abnormal return (CAAR) around the event</div>
-    <div class="cs">event study in teal · placebo on non-event dates in grey (must stay flat)</div>`+
+  chart.innerHTML=`<div class="ct">Illustrative chart placeholder — not an exported CAAR path</div>
+    <div class="cs">Demo drawing only. The actual engine uses three-day CAR windows and does not export this eleven-day path.</div>`+
     lineChart([
       {data:run.caar,color:"#0d5b66"},
       {data:run.placebo,color:"#8aa0ab",w:1.4,dash:true}
@@ -519,19 +521,8 @@ function renderAgent3(run){
   p.appendChild(gate);
 
   const sc=el('div','scen');
-  if(run.scenario.null){
-    sc.innerHTML=`<div class="sh">Forward scenario</div><div class="snull">${run.scenario.msg}</div>`;
-  }else{
-    sc.innerHTML=`<div class="sh">Forward scenario — next comparable catalyst</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:14px;margin-top:8px">
-      <div><div class="k" style="font-size:12px;color:var(--soft)">p25</div><div class="num">${run.scenario.p25}</div></div>
-      <div><div class="k" style="font-size:12px;color:var(--soft)">median</div><div class="num">${run.scenario.median}</div></div>
-      <div><div class="k" style="font-size:12px;color:var(--soft)">p75</div><div class="num">${run.scenario.p75}</div></div>
-      <div><div class="k" style="font-size:12px;color:var(--soft)">P(positive)</div><div class="num">${run.scenario.pPos}</div></div>
-      <div><div class="k" style="font-size:12px;color:var(--soft)">95% CI on mean</div><div class="num">${run.scenario.ci}</div></div>
-      </div>
-      <div style="font-size:12.5px;color:var(--soft);margin-top:10px">Calibration, not prediction: a re-expression of what comparable events did, with a regime caveat. Never a point forecast.</div>`;
-  }
+  sc.appendChild(el('div','sh','Illustrative diagnostics — held for review'));
+  sc.appendChild(el('div','snull','No forward scenario or probability is published. These placeholder panels have no verified evidence bundle. Open a separately exported saved-run report to inspect actual gate results.'));
   p.appendChild(sc);
   return p;
 }
@@ -576,8 +567,7 @@ function draw(){buildTabs();buildSub();drawPanel();}
 
 async function init(){
   $('#spine').insertAdjacentHTML('beforeend',spineSVG());
-  // PROTOTYPE: embedded. To wire real runs, replace next line with:
-  // MANIFEST = await fetch('manifest.json').then(r=>r.json());
+  // Illustrative embedded data only. Real reports use agent3.bundles exports.
   MANIFEST = EMBEDDED_MANIFEST;
   draw();
 }

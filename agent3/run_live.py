@@ -95,13 +95,19 @@ def main(argv=None):
             for report in record.get('per_peer_report', []):
                 print(f"  {report.get('ticker')}: {report.get('reason', report.get('error', 'excluded'))}")
         print(f'Run record: {attempt.path}')
+        print(f'Immutable bundle: {attempt.path.with_name("bundle.json")}')
         if record['status'] in ('failed', 'unavailable'):
             print('Retry with --retry-from <run.json>; accepted peers are reused, market data is fetched again.')
         return code
     except (OSError, ValueError, KeyError, TypeError) as exc:
         if attempt is not None:
+            if attempt.path.with_name('bundle.json').exists():
+                print('FAILED: operation after bundle publication; the sealed attempt is unchanged.', file=sys.stderr)
+                return 5
             try:
                 attempt.finish('refused', 'invalid_configuration', type(exc).__name__)
+                from agent3.bundles import seal
+                seal(attempt)
                 print(f'Run record: {attempt.path}')
             except OSError:
                 pass

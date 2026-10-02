@@ -19,6 +19,7 @@ def main(argv=None):
     parser.add_argument('--as-of', help='timezone-aware cutoff; required for historical fixtures')
     parser.add_argument('--max-age-days', type=int, default=7)
     parser.add_argument('--timeout', type=int, default=180)
+    parser.add_argument('--db', default=str(ROOT/'state'/'catalyst.duckdb'), help='bundle index database')
     parser.add_argument('--output-dir', default=str(ROOT/'output'/'agent3-news'))
     args = parser.parse_args(argv)
     from dotenv import load_dotenv
@@ -40,7 +41,7 @@ def main(argv=None):
             asof(args.as_of)
         if args.fixture and not args.as_of:
             raise ValueError('fixture mode requires --as-of')
-        request = {'ticker': tk, 'aliases': args.alias, 'scorer': name,
+        request = {'db': str(Path(args.db).resolve()), 'ticker': tk, 'aliases': args.alias, 'scorer': name,
                    'data_mode': 'fixture' if args.fixture else 'live',
                    'fixture': str(Path(args.fixture).resolve()) if args.fixture else None,
                    'as_of': args.as_of, 'max_age_days': args.max_age_days}
@@ -52,6 +53,7 @@ def main(argv=None):
         else:
             print(f"{attempt.record['status'].upper()}: {attempt.record.get('reason')} at {attempt.record['stage']}")
         print(f'Run record: {attempt.path}')
+        print(f'Immutable bundle: {attempt.path.with_name("bundle.json")}')
         return code
     except (OSError, ValueError) as exc:
         print(f'REFUSED: news configuration/input ({type(exc).__name__}); check scorer, aliases, dates and paths.', file=sys.stderr)

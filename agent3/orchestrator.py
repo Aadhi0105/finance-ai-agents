@@ -56,6 +56,19 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
         checkpoint('assembly', {})
     es = load_event_set(event_type, source=source, ticker=ticker, peers=peers,
                         live_propose=live_propose, study_plan=study_plan, checkpoint=checkpoint, peer_decision=peer_decision)
+    if checkpoint:
+        checkpoint('assembled', {'assembled_inputs': es, 'n_event_types_tested': n_event_types_tested})
+    result = analyze_assembled(event_type, es, n_event_types_tested=n_event_types_tested, checkpoint=checkpoint)
+    if store is not None and 'study' in result:
+        from uuid import uuid4
+        run_id = uuid4().hex
+        store.record_outcome(run_id, result['study'], result['gate'], result.get('pinned_peers'))
+        result['run_id'] = run_id
+    return result
+
+
+def analyze_assembled(event_type, es, *, n_event_types_tested=1, checkpoint=None, calculator=None):
+    """Calculate and gate retained normalized windows without fetching inputs."""
     if es.get("verdict") == "REFUSED":
         reports = es.get('per_peer_report', [])
         unavailable = bool(reports) and all(r.get('error') for r in reports)
@@ -69,7 +82,7 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
 
     if checkpoint:
         checkpoint('calculation', {})
-    run_event_study = _event_study_fn()
+    run_event_study = calculator or _event_study_fn()
     study = run_event_study(es["events"], event_type, es.get("placebo_events"))
 
     if not isinstance(study, dict) or study.get('error'):
@@ -101,6 +114,7 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
 
     result = {
         "event_type": event_type,
+        "n_event_types_tested": n_event_types_tested,
         "status": "completed" if gate["verdict"] == "PASS" else "held",
         "study": study,
         "study_plan": es.get("study_plan"),
@@ -118,22 +132,6 @@ def analyze_event_type(event_type: str, *, source: str = "fixture",
 
     if checkpoint:
         checkpoint('result', {'result': result})
-    if store is not None:
-        if checkpoint:
-            checkpoint('persistence', {})
-        # Unique attempt identity. Complete replay bundles are a later batch.
-        import hashlib, json as _json, datetime as _dt
-        payload = _json.dumps({
-            "event_type": event_type,
-            "source": es.get("source", "fixture"),
-            "pinned_peers": es.get("pinned_peers"),
-            "event_dates": sorted(e.get("event_date") for e in es.get("events", [])),
-            "n_events": study.get("n_events"),
-            "run_ts": _dt.datetime.now(_dt.timezone.utc).isoformat(),
-        }, sort_keys=True, default=str)
-        run_id = f"{event_type}:{hashlib.sha256(payload.encode()).hexdigest()[:16]}"
-        store.record_outcome(run_id, study, gate, es.get("pinned_peers"))
-
     return result
 
 
@@ -162,7 +160,7 @@ def publication_allowed(result):
         return False
     issues = [r for r in reports if r.get('excluded') or r.get('error') or r.get('rejected_events')]
     try:
-        reviewed = assess(study, contributing_peers=len(result.get('contributing_peers', [])),
+        reviewed = assess(study, n_event_types_tested=result.get('n_event_types_tested', 1), contributing_peers=len(result.get('contributing_peers', [])),
                           study_plan=result.get('study_plan'),
                           comparability_status=result.get('comparability_status', 'unverified'),
                           assembly_issues=issues)

@@ -222,6 +222,13 @@ def run_funnel(raw_items, universe=None, scorer=None, *, aliases=None, as_of=Non
     relevant = relevance_filter(ingested, universe, aliases=aliases, exclusions=excluded)
     clustered = dedup_cluster(relevant)
     scored = score_items(clustered, scorer)
+    return finalize_news(scored, ingested, excluded, cutoff=cutoff, aliases=aliases,
+                         max_age_days=max_age_days, data_mode=data_mode,
+                         counts={'raw': len(raw_items), 'after_relevance': len(relevant), 'after_dedup': len(clustered)})
+
+
+def finalize_news(scored, ingested, excluded, *, cutoff, aliases, max_age_days, data_mode, counts):
+    """Shared publication boundary for execution and replay of retained scores."""
     signals = aggregate(scored)
     reasons = sorted({r for s in signals for r in s['review_reasons']})
     if excluded:
@@ -245,8 +252,8 @@ def run_funnel(raw_items, universe=None, scorer=None, *, aliases=None, as_of=Non
             'as_of': cutoff, 'max_age_days': max_age_days, 'aliases': aliases or {},
             'signals': signals, 'scored_items': scored, 'exclusions': excluded,
             'ingested_items': ingested,
-            'funnel': {'raw': len(raw_items), 'ingested': len(ingested), 'after_relevance': len(relevant),
-                       'after_dedup': len(clustered), 'entity_days': len(signals)},
+            'funnel': {'raw': counts['raw'], 'ingested': len(ingested), 'after_relevance': counts['after_relevance'],
+                       'after_dedup': counts['after_dedup'], 'entity_days': len(signals)},
             'scope_note': 'Current retrieved news only; not a historical point-in-time archive or return forecast'}
 
 

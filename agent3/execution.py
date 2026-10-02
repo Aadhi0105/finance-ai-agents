@@ -1,4 +1,4 @@
-"""Track A attempt checkpoints and bounded worker execution (not historical replay)."""
+"""Attempt checkpoints, bounded workers and terminal immutable bundle publication."""
 from __future__ import annotations
 
 import json
@@ -21,25 +21,27 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
-def _redact(value):
+def _redact(value, secrets=None):
     # Neither raw provider/SDK stderr nor exception messages are persisted.
     # Also redact configured credentials from any model/user text saved in a record.
+    if secrets is None:
+        secrets = [secret for key, secret in os.environ.items()
+                   if any(word in key.upper() for word in ('KEY', 'TOKEN', 'SECRET', 'PASSWORD')) and len(secret) >= 8]
     if isinstance(value, str):
-        for key, secret in os.environ.items():
-            if any(word in key.upper() for word in ('KEY', 'TOKEN', 'SECRET', 'PASSWORD')) and len(secret) >= 8:
-                value = value.replace(secret, '[REDACTED]')
+        for secret in secrets:
+            value = value.replace(secret, '[REDACTED]')
         return value
     if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items()}
+        return {k: _redact(v, secrets) for k, v in value.items()}
     if isinstance(value, list):
-        return [_redact(v) for v in value]
+        return [_redact(v, secrets) for v in value]
     return value
 
 
-def read_record(path):
+def read_record(path, *, max_bytes=100_000_000):
     path = Path(path)
-    if path.stat().st_size > 10_000_000:
-        raise ValueError('record exceeds 10 MB limit')
+    if path.stat().st_size > max_bytes:
+        raise ValueError('record exceeds size limit')
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -60,9 +62,10 @@ class Attempt:
         run_id = uuid4().hex
         path = Path(directory).resolve() / run_id / 'run.json'
         path.parent.mkdir(parents=True, exist_ok=False)
+        from agent3.bundles import provenance
         attempt = cls(path, {'schema_version': 1, 'run_id': run_id, 'created_at': now(),
                              'request': request, 'retry_of': retry_of, 'status': 'running',
-                             'stage': 'configuration', 'stage_history': []})
+                             'stage': 'configuration', 'stage_history': [], 'provenance': provenance()})
         attempt.save()
         return attempt
 
@@ -83,23 +86,28 @@ class Attempt:
             self.record['reason'] = reason
         if error_type:
             self.record['error_type'] = error_type
-        # A pre-persistence result may survive a failed attempt only as held diagnostics.
-        if status in ('unavailable', 'failed', 'refused') and 'result' in self.record:
-            result = self.record['result']
-            result['status'] = status
-            if 'signals' in result:
-                result['publication_state'] = 'HELD_FOR_REVIEW'
-                for item in result['signals']:
-                    if item.get('level') is not None:
-                        item['diagnostic_level'] = item['level']
-                    item.update(level=None, flag_review=True, publication_state='HELD_FOR_REVIEW')
-            scenario = result.get('scenario')
-            if isinstance(scenario, dict):
-                distribution = scenario.pop('distribution', None)
-                if distribution is not None:
-                    scenario['diagnostic_distribution'] = distribution
-                scenario.update(distribution=None, publication_state='HELD_FOR_REVIEW')
+        if 'result' in self.record:
+            hold_terminal_result(self.record['result'], status)
         self.save()
+
+
+def hold_terminal_result(result, status):
+    """Share the terminal failure boundary between execution and offline replay."""
+    if status not in ('unavailable', 'failed', 'refused'):
+        return
+    result['status'] = status
+    if 'signals' in result:
+        result['publication_state'] = 'HELD_FOR_REVIEW'
+        for item in result['signals']:
+            if item.get('level') is not None:
+                item['diagnostic_level'] = item['level']
+            item.update(level=None, flag_review=True, publication_state='HELD_FOR_REVIEW')
+    scenario = result.get('scenario')
+    if isinstance(scenario, dict):
+        distribution = scenario.pop('distribution', None)
+        if distribution is not None:
+            scenario['diagnostic_distribution'] = distribution
+        scenario.update(distribution=None, publication_state='HELD_FOR_REVIEW')
 
 
 def execute(attempt):
@@ -174,6 +182,30 @@ def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
             os.killpg(process.pid, signal.SIGKILL)
             process.wait()
         attempt.finish('failed', 'worker_launch_or_record_failure', type(exc).__name__)
+    from agent3.bundles import seal
+    path = seal(attempt)
+    db = attempt.record['request'].get('db')
+    if db:
+        from agent3.bundles import write_once
+        receipt = {'bundle': str(path), 'indexed': False}
+        try:
+            from agent3.catalyst_state import CatalystStore
+            store = CatalystStore(db)
+            try:
+                store.index_bundle(path)
+            finally:
+                store.close()
+            receipt['indexed'] = True
+        except Exception as exc:
+            # Bundle is authoritative and already sealed. Indexing can be recovered
+            # explicitly without modifying a completed analytical attempt.
+            receipt['error_type'] = type(exc).__name__
+        try:
+            write_once(path.with_name('index-receipt.json'), receipt)
+        except (OSError, ValueError):
+            print('Bundle saved; index receipt could not be written. Inspect or reconcile the database index.')
+        if not receipt['indexed']:
+            print('Bundle saved; database index pending. Reconcile with agent3.bundles --index-db.')
     return EXIT_CODES[attempt.record['status']]
 
 
