@@ -40,15 +40,17 @@ _COLUMNS = ("item_id", "cycle", "data_ts", "entity", "covenant_type", "metric",
 
 
 class StateStore:
-    def __init__(self, path: str = _DEFAULT_DB):
+    def __init__(self, path: str = _DEFAULT_DB, *, read_only=False):
         self.path = str(Path(path).expanduser().resolve())
-        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        if not read_only:
+            Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         self._lock = FileLock(self.path + '.lock', timeout=10)
         self._lock.acquire()
         self.con = None
         try:
-            self.con = duckdb.connect(self.path)
-            self._init_schema()
+            self.con = duckdb.connect(self.path, read_only=read_only)
+            if not read_only:
+                self._init_schema()
         except BaseException:
             self.close()
             raise

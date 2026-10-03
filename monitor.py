@@ -37,7 +37,9 @@ def _triage_if_needed(result, live: bool) -> None:
             snapshot = HistorySnapshot.from_cycle(store, result)
         finally:
             store.close()
-        triage = run_triage_record(snapshot, surfaced, live=live, cycle=result['cycle'])
+        from monitoring.recovery import digest
+        triage = run_triage_record(snapshot, surfaced, live=live, cycle=result['cycle'],
+                                  evidence_context={'db_path': _DB, 'cycle_digest': digest(result)})
     except (Exception, KeyboardInterrupt) as exc:
         print(f"Triage failed ({type(exc).__name__}); monitoring cycle remains committed.", file=sys.stderr)
         raise SystemExit(2)
@@ -86,13 +88,15 @@ def _print_state():
 if __name__ == "__main__":
     import argparse
     from pathlib import Path
-    options = argparse.ArgumentParser(add_help=False)
+    options = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
     options.add_argument('--db', default=_DB)
     options.add_argument('--data-source', choices=['fixture', 'yfinance'], default='fixture')
     options.add_argument('--watchlist')
     options.add_argument('--reviewer')
     options.add_argument('--reason')
     options.add_argument('--replacement-item-id')
+    options.add_argument('--report-cycle', type=int)
+    options.add_argument('--audit-dir')
     parsed, remaining = options.parse_known_args()
     _DB = str(Path(parsed.db).expanduser().resolve())
     sys.argv = [sys.argv[0], *remaining]
@@ -103,6 +107,8 @@ if __name__ == "__main__":
         options.error('unexpected review listing arguments')
     if arg == '--retry-triage' and (len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != '--live')):
         options.error('use --retry-triage CYCLE [--live]')
+    if (parsed.report_cycle is not None or parsed.audit_dir is not None) and arg != '--report':
+        options.error('--report-cycle and --audit-dir require --report PATH')
     watchlist = None
     if parsed.data_source == 'yfinance':
         if not parsed.watchlist or arg not in {'--once', '--catchup'}:
@@ -121,7 +127,16 @@ if __name__ == "__main__":
             sys.exit(str(exc))
     if arg in {"--once", "--catchup", "--run", "--loop"}:
         print("Data source: live annual statements; analyst policies." if watchlist else "Data source: bundled fixtures (not a live market feed).")
-    if arg in {'--reviews', '--review-decisions'}:
+    if arg == '--report':
+        from monitoring.reporting import export_report
+        if len(sys.argv) != 3:
+            options.error('use --report OUTPUT.html [--report-cycle N] [--audit-dir PATH]')
+        try:
+            path = export_report(_DB, sys.argv[2], cycle=parsed.report_cycle, audit_dir=parsed.audit_dir)
+        except (ValueError, OSError) as exc:
+            sys.exit(str(exc))
+        print(f'Report saved: {path}')
+    elif arg in {'--reviews', '--review-decisions'}:
         import json
         store = StateStore(_DB)
         try:
@@ -194,5 +209,5 @@ if __name__ == "__main__":
     else:
         sys.exit("Usage: python monitor.py "
                  "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "
-                 "--cron [SCHEDULE] | --run N | --reset | --state | --reviews | --review-decisions | "
+                 "--report OUTPUT.html [--report-cycle N] | --cron [SCHEDULE] | --run N | --reset | --state | --reviews | --review-decisions | "
                  "--approve-review ID | --reject-review ID | --retry-triage CYCLE [--live]]")
