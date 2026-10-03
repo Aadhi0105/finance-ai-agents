@@ -13,6 +13,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('ticker')
     parser.add_argument('--alias', action='append', default=[], help='explicit issuer headline alias, repeatable')
+    parser.add_argument('--news-query', help='explicit provider search query (default: ticker); does not establish relevance')
     parser.add_argument('--scorer', choices=['lm','finbert','divergence','stub'])
     parser.add_argument('--demo', action='store_true', help='allow stub only with an explicit fixture')
     parser.add_argument('--fixture', help='offline JSON with items list')
@@ -37,12 +38,14 @@ def main(argv=None):
             raise ValueError('invalid timeout or freshness window')
         if any(len(a.strip()) < 3 or len(a) > 200 for a in args.alias) or len(args.alias) > 20:
             raise ValueError('aliases must be 3–200 characters, at most 20')
+        if args.news_query is not None and (args.fixture or not 1 <= len(args.news_query.strip()) <= 200):
+            raise ValueError('news query requires live mode and 1–200 characters')
         if args.as_of:
             asof(args.as_of)
         if args.fixture and not args.as_of:
             raise ValueError('fixture mode requires --as-of')
         request = {'db': str(Path(args.db).resolve()), 'ticker': tk, 'aliases': args.alias, 'scorer': name,
-                   'data_mode': 'fixture' if args.fixture else 'live',
+                   'data_mode': 'fixture' if args.fixture else 'live', 'news_query': args.news_query,
                    'fixture': str(Path(args.fixture).resolve()) if args.fixture else None,
                    'as_of': args.as_of, 'max_age_days': args.max_age_days}
         attempt = Attempt.create(args.output_dir, request)

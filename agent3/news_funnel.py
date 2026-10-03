@@ -43,8 +43,16 @@ def ingest(raw_items, *, as_of=None, max_age_days=7, exclusions=None):
             entities = raw.get('entities', [])
             if not isinstance(entities, list):
                 raise ValueError('invalid_entity_tags')
-            entities = sorted({ticker(e) for e in entities})
+            try:
+                # Provider tags include indices; they are hints, never the analysis universe.
+                entities = sorted({e.strip().upper() if isinstance(e, str) and
+                    re.fullmatch(r'\^[A-Z0-9][A-Z0-9.=_-]{0,30}', e.strip().upper()) else ticker(e)
+                    for e in entities})
+            except ValueError:
+                raise ValueError('invalid_entity_tags') from None
             flags = []
+            if raw.get('text_scope') == 'headline_only':
+                flags.append('headline_only_evidence')
             if raw.get('language') not in ('en', 'en-US', 'en-GB'):
                 flags.append('unsupported_or_unknown_language')
             url = canonical_url(raw.get('url'))
@@ -293,6 +301,9 @@ def render_news(result):
     state = 'DESCRIPTIVE' if allowed else 'HELD_FOR_REVIEW'
     lines = [f'NEWS TONE — {state}', result.get('scope_note', ''),
              f"Review: {result.get('review_reasons', [])}"]
+    scopes = sorted({i.get('text_scope', 'unspecified') for i in result.get('scored_items', [])})
+    if scopes:
+        lines.append('Scored text scope: ' + ', '.join(scopes) + '; full article text is not implied')
     for s in signals:
         value = s.get('level') if allowed else None
         lines.append(f"  {s['entity']} {s['day']} UTC: document tone={value if value is not None else 'HELD'}; clusters={s['count']}; scorers={s['scorers']}")

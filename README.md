@@ -391,9 +391,21 @@ diagnostic means are separate. The CLI uses the saved scores without rescoring,
 rechecks published levels against their evidence, and has a bounded worker deadline.
 Scores describe document tone, not entity-specific sentiment or expected returns.
 
-Live Stadler and ASML checks returned empty feeds and correctly produced held
-records. Populated-feed processing is verified with deterministic fixtures;
-real FinBERT weights have not been run in the current environment.
+[Live-news recovery](docs/agent3-live-news-recovery.md) replaces the failing ticker-news
+endpoint with checked Yahoo search retrieval. HTTP/provider failures are unavailable;
+a valid empty response is recorded separately. `--news-query` controls retrieval
+without changing the analysis target or proving headline relevance:
+
+```bash
+python -m agent3.run_news ASML.AS --news-query ASML --alias ASML --scorer lm
+python -m agent3.run_news NVDA --alias NVIDIA --scorer lm
+```
+
+Populated live acceptance retained 20 records per company, selecting 12 ASML and
+four NVIDIA headline clusters. Both passed saved-evidence accounting, offline replay
+and HTML export, and remain held for headline-only/unknown-language/lexical limits.
+Provider records and search metadata are retained; reports include evidence links.
+Real FinBERT weights and full-article sentiment accuracy remain unverified.
 
 
 ### Saved evidence, offline replay and delivery
@@ -585,8 +597,8 @@ pip install -r requirements.txt -r requirements-dev.txt
 pytest -q
 ```
 
-The latest local Agent 3 closure validation passed **736 tests on Python 3.11.9**,
-including 10 new closure regressions (Batch 4 added 40; Batch 3 added 47; Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
+The latest local Agent 3 live-news recovery validation passed **763 tests on Python 3.11.9**,
+including 27 new news-recovery regressions (closure added 10; Batch 4 added 40; Batch 3 added 47; Batch 2 added 53; Batch 1 added 49). Earlier acceptance guides retain their historical
 suite counts. Coverage includes financial contracts and report grounding, monitoring
 transactions/replay/review recovery, publication controls, exact statistical decisions,
 event timing and dependence holds, local/MCP parity and cross-agent fixture smoke tests.
@@ -633,7 +645,8 @@ Stated plainly, because knowing a tool's limits is part of building it:
 - **Agent 3 is not fully hardened.** Model-proposed peers remain unverified even
   after listing consistency checks. News aliases and language metadata are not
   automatically verified; conservative clustering can miss reworded copies.
-  Real FinBERT accuracy and a populated live news feed remain unverified. Offline
+  Real FinBERT accuracy and full-article sentiment remain unverified. Bounded populated
+  ASML/NVIDIA search feeds passed acceptance; coverage is not comprehensive. Offline
   replay verifies retained windows/scores; it does not establish source authenticity
   or rerun provider/model retrieval. Sparse or invalid event histories are
   reported as exclusions or assembly refusals.
@@ -649,9 +662,9 @@ Stated plainly, because knowing a tool's limits is part of building it:
 
 The next hardening work is:
 
-1. **Agent 3 remaining closure:** restore and verify populated live news (the observed
-   provider response was HTTP 404), plus optional real FinBERT validation. Issuer-dated
-   ASML/NVIDIA execution and retained-price checks passed; research publication stays held.
+1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
+   benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
+   passed bounded acceptance; research publication stays held.
 2. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
