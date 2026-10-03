@@ -141,5 +141,5 @@ were made. No correction approvals, rejected corrections, restatements, triage
 recovery or notification/scheduling flows were exercised.
 
 Part 1 is complete as a **review with findings**, not a clean bill of health or a
-claim that the missing browser features have been implemented. Parts 2 and 3 remain
-unstarted.
+claim that the missing browser features have been implemented. Parts 2 and 3 were
+subsequently completed in the [correction/recovery and layout review](agent2-browser-review-parts2-and3.md).
