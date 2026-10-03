@@ -266,7 +266,7 @@ def _parse_selection(text):
     return json.loads(text, object_pairs_hook=unique_keys)
 
 
-def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir=None, retry_context=None):
+def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir=None, retry_context=None, evidence_context=None):
     if not surfaced_rows:
         return {"status": "not_needed", "commentary": "", "audit_path": None}
     rows = deepcopy(surfaced_rows)
@@ -278,7 +278,7 @@ def run_triage_record(store, surfaced_rows, live=False, *, cycle=None, audit_dir
     path = root / f"cycle-{cycle}-{uuid4().hex}" / "model.json"
     record = {"cycle": cycle, "data_mode": rows[0].get("data_mode", "bundled_fixtures"),
               "model_mode": "live" if live else "offline_stub", "rows": rows,
-              "history": snapshot.history, "publication": "pending", "retry_context": retry_context}
+              "history": snapshot.history, "publication": "pending", "retry_context": retry_context, "evidence_context": evidence_context}
 
     def checkpoint(current):
         record.update(execution=current.execution_record(), calls=current.calls)

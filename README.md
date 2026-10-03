@@ -22,7 +22,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Component | Completed scope | Remaining boundary |
 |---|---|---|
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
-| Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection and saved-cycle triage recovery | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
+| Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
 | Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation | Detailed hardening audit still pending |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
@@ -57,6 +57,7 @@ python monitor.py --reset      # deletes the default fixture database; demo rese
 python monitor.py --run 10     # run 10 cycles; drift is flagged before the hard breach
 python monitor.py --once       # one cycle, with model triage of any exceptions
 python monitor.py --state      # on-demand full-state snapshot
+python monitor.py --report output/monitor-report.html  # saved cycle, effective state and recovery history
 python monitor.py --catchup 9  # records missed monitoring cycles; not provider history backfill
 ```
 
@@ -681,3 +682,6 @@ Python 3.11+ · Anthropic API (hand-rolled tool-use loop) · yfinance · DuckDB 
 matplotlib · MCP (stdio) · transformers/torch + FinBERT (optional, Track B live) ·
 pytest + GitHub Actions CI. Offline runs and the full test suite need no API key,
 no network, and no heavy ML dependencies.
+
+Agent 2 operational HTML exports, cycle selection and audit association are documented in
+[Operational reports](docs/agent2-operational-reports.md).

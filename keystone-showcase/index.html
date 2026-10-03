@@ -275,9 +275,9 @@ const EMBEDDED_MANIFEST = {
        metric:"Net Debt / EBITDA", threshold:3.50, unit:"x",
        series:[3.02,3.05,3.08,3.11,3.16,3.19,3.27,3.34,3.43,3.55],
        flaggedCycle:6, breachCycle:9,
-       classes:["BASE","STABLE","STABLE","STABLE","STABLE","WIDEN","WIDEN","WIDEN","WIDEN","BREACH"],
+       classes:["BASE","STABLE","STABLE","STABLE","STABLE","STABLE","WIDEN","WIDEN","WIDEN","BREACH"],
        lead:3,
-       exception:"Cycle 10 — hard breach: Net Debt/EBITDA 3.55x vs 3.50x covenant. Drift was flagged as significant (modified z + OLS slope, p<0.01) from cycle 6, three cycles before the crossing. Cycles-to-breach projection at cycle 7 estimated breach at cycle 9–10."},
+       exception:"Cycle 10 — hard breach: Net Debt/EBITDA 3.55x vs 3.50x covenant. Drift was flagged as significant (modified z + OLS slope, p<0.01) from cycle 7, three cycles before the crossing. Cycles-to-breach projection at cycle 7 estimated breach at cycle 9–10."},
       {id:"icr", name:"Mid-cap credits — Interest Coverage covenant",
        metric:"EBIT / Interest", threshold:2.00, unit:"x",
        series:[3.4,3.3,3.35,3.2,3.25,3.1,3.15,3.05,3.1,3.0],
@@ -481,7 +481,7 @@ function renderAgent2(run){
     p.appendChild(exc);
   }
   const co=el('div','callout');
-  co.innerHTML=`<div><span class="lab">One spine, verified.</span> The drift and significance checks run over the shared MCP server — a full run is byte-identical whether the checks run in-process or over MCP.</div>`;
+  co.innerHTML=`<div><span class="lab">Illustrative scenario.</span> These placeholder results explain the monitoring workflow; they are not a live run or validation evidence. Export saved Agent 2 runs with monitor.py --report for operational results.</div>`;
   p.appendChild(co);
   return p;
 }
