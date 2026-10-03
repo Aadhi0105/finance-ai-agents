@@ -1,7 +1,7 @@
 """Bounded Track B worker. Saves the exact scored evidence used for rendering."""
 import sys
 from agent3.execution import Attempt, read_record, EXIT_CODES
-from agent3.news_live import fetch_entity_news
+from agent3.news_live import fetch_entity_news, NewsProviderError
 from agent3.news_funnel import run_funnel
 from agent3.sentiment import get_scorer
 from agent3.news_contracts import asof
@@ -18,7 +18,7 @@ def execute(attempt):
             items = payload['items']
         else:
             attempt.checkpoint('news_fetch', {})
-            fetched = fetch_entity_news(request['ticker'])
+            fetched = fetch_entity_news(request['ticker'], **({'query': request['news_query']} if request.get('news_query') else {}))
             attempt.checkpoint('news_fetched', {'fetched': fetched})
             items = fetched['items']
         cutoff = request.get('as_of') or asof().isoformat()
@@ -31,6 +31,10 @@ def execute(attempt):
             attempt.finish('unavailable', 'all_scorers_unavailable_or_invalid')
         else:
             attempt.finish(result['status'])
+    except NewsProviderError as exc:
+        attempt.checkpoint('news_fetch', {'provider_failure': {
+            'source': 'yfinance.Search', 'query': request.get('news_query') or request['ticker'], **exc.evidence}})
+        attempt.finish('unavailable', exc.evidence['reason'], type(exc).__name__)
     except Exception as exc:
         attempt.finish('unavailable', 'news_stage_unavailable', type(exc).__name__)
     return EXIT_CODES[attempt.record['status']]

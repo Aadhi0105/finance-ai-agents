@@ -204,6 +204,21 @@ def export_html(bundle, rebuilt):
         report = f"{status.upper()}: {bundle['record'].get('reason', 'incomplete evidence')}\nNo analytical output is verified."
     else:
         report = render_news(result) if 'signals' in result else render_brief(result)
+    evidence_html = ''
+    if result is not None and 'scored_items' in result:
+        from agent3.news_contracts import canonical_url
+        rows = []
+        for item in result['scored_items']:
+            title = escape(item['headline'])
+            url = canonical_url(item.get('url'))
+            link = ('<a href="' + escape(url, quote=True) + '" rel="noreferrer">' + title + '</a>') if url else title
+            details = (f"{item.get('source', 'unknown')} | {item['published_at']} | "
+                       f"text: {item.get('text_scope', 'unspecified')} | "
+                       f"review: {', '.join(item.get('review_reasons', [])) or 'none'}")
+            rows.append('<li>' + link + '<p>' + escape(details) + '</p></li>')
+        evidence_html = ('<h2>Retained news evidence</h2><p>Links identify provider-returned sources; '
+                         'article contents and availability are not verified by replay.</p><ul>'
+                         + ''.join(rows) + '</ul>')
     labels = f"Attempt: {bundle['attempt_id']}\nStatus: {status}\nReplay: {rebuilt['verification']}\nIdentical source/runtime: {rebuilt['same_source_and_runtime']}\nInput fingerprint: {bundle['content_fingerprint']}\nBundle SHA-256: {bundle['bundle_sha256']}"
     return ('<!doctype html><html lang="en"><meta charset="utf-8"><title>Agent 3 saved run</title>'
             '<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px;color:#173641}'
@@ -211,7 +226,7 @@ def export_html(bundle, rebuilt):
             '<h1>Agent 3 — saved run</h1><p>Historical event diagnostics or current-news document tone. '
             'No return forecast. Hashes check file integrity, not source authenticity.</p><pre>'
             + escape(labels) + '</pre><pre>' + escape(report) + '</pre><p>'
-            + escape(rebuilt['scope']) + '</p></html>')
+            + escape(rebuilt['scope']) + '</p>' + evidence_html + '</html>')
 
 
 def main(argv=None):

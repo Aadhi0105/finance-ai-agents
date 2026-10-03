@@ -1,6 +1,8 @@
 # Runtime dependencies. API credentials are required only for live model calls.
 anthropic>=0.40.0
-yfinance>=0.2.40
+yfinance>=1.7.0
+# Checked news transport uses the same curl session supported by yfinance.
+curl_cffi>=0.15
 python-dotenv>=1.0.0
 matplotlib>=3.7
 
