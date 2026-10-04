@@ -142,7 +142,7 @@ def _execute_close(store, request):
     The same run_id + identical request replays before any freshness/recalculation.
     Failures before commit leave no accounting state; delivery is separate.
     """
-    _fields(request, {'run_id','entity','close_period','frequency','budget','actuals','tree','supersedes'},
+    _fields(request, {'run_id','entity','close_period','frequency','budget','actuals','tree','supersedes','data_kind'},
             {'run_id','entity','close_period','frequency','budget','actuals','tree'})
     run_id = _safe_run_id(request['run_id'])
     request_digest = digest(request)
@@ -151,6 +151,8 @@ def _execute_close(store, request):
         if existing['request_digest'] != request_digest:
             raise ValueError('run_id conflict: changed inputs require a new run_id')
         return {**existing, 'status':'replayed'}
+    if request.get('data_kind', 'unverified') not in ('synthetic', 'unverified'):
+        raise ValueError('data_kind must be synthetic or unverified')
     entity = identifier(request['entity'], 'entity')
     close = iso_period(request['close_period'])
     annual = _periods(date.fromisoformat(close).year, request['frequency'])
@@ -306,6 +308,7 @@ def main(argv=None):
     action.add_argument('--input', help='Explicit close request JSON')
     action.add_argument('--recover', help='Export a previously committed run ID without recomputation')
     parser.add_argument('--output-dir', required=True)
+    parser.add_argument('--html', action='store_true', help='Also export a portable HTML report and close-history snapshot')
     args = parser.parse_args(argv)
     try:
         with VarianceStore(args.db) as store:
@@ -321,6 +324,9 @@ def main(argv=None):
                     raise ValueError('unknown run_id')
             try:
                 delivered = deliver_run(store, run_id, args.output_dir)
+                if args.html:
+                    from agent4.report import export_reports
+                    delivered.update(export_reports(store, run_id, args.output_dir))
             except Exception as exc:
                 print(canonical({'status':'committed_delivery_failed','run_id':run_id,'error':str(exc)}))
                 return 3

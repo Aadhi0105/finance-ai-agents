@@ -181,7 +181,7 @@
       <span class="pill"><span class="dot built"></span>Agent 1 · Equity research — built</span>
       <span class="pill"><span class="dot built"></span>Agent 2 · Covenant monitoring — built</span>
       <span class="pill"><span class="dot built"></span>Agent 3 · Market/news intelligence — built</span>
-      <span class="pill"><span class="dot designed"></span>Agent 4 · FP&amp;A / variance — designed</span>
+      <span class="pill"><span class="dot designed"></span>Agent 4 · FP&amp;A — offline reports available</span>
     </div>
 
     <div class="spine" id="spine">
@@ -542,8 +542,8 @@ function buildTabs(){
     const b=el('button','seg');b.setAttribute('role','tab');
     b.setAttribute('aria-selected',a.key===current);
     b.innerHTML=`<span class="n">${a.num}</span><span>${a.name}</span>`;
-    if(!a.render){b.disabled=true;b.title="Designed, not yet built";
-      b.innerHTML=`<span class="n">${a.num} · planned</span><span>${a.name}</span>`;}
+    if(!a.render){b.disabled=true;b.title="Saved-run HTML reports are available separately; no report is attached to this showcase";
+      b.innerHTML=`<span class="n">${a.num} · separate reports</span><span>${a.name}</span>`;}
     else b.onclick=()=>{current=a.key;subIndex=0;draw();};
     t.appendChild(b);
   });

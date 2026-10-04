@@ -80,9 +80,8 @@ def test_hypothesis_with_number_rejected():
 # --- §53: SVG labels are XML-escaped ------------------------------------
 
 def test_svg_escapes_ampersand():
-    svg = variance_waterfall_svg({"name": "R&D Budget", "budget_cents": 100,
-                                  "actual_cents": 90, "total_variance_cents": -10,
-                                  "favourable": True, "children": []})
+    svg = variance_waterfall_svg(rollup({'name':'R&D Budget', 'leaf':{
+        'name':'R&D Budget','type':'fixed_cost','budget':{'amount':1},'actual':{'amount':.9}}}))
     assert "R&amp;D" in svg
     assert "R&D Budget<" not in svg    # raw & not present
 
