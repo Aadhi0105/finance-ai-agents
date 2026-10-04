@@ -24,7 +24,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
-| Agent 4 | Detailed audit and Batch 1 financial contracts/accounting/forecast boundary fixes | Batches 2–4: grounding and history, transactional close execution, operational reports |
+| Agent 4 | Detailed audit; Batches 1–2 financial contracts, shared history, diagnostic interpretation and canonical claim controls | Batches 3–4: transactional close execution and operational reports; forecast calibration unverified |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
 The per-agent guides below record acceptance evidence and operating limits.
@@ -479,11 +479,12 @@ budget (a re-budget writes a new version), append-only actuals (a restatement ke
 the original), and a reforecast versioned every close (so the forecast *walk* is
 preserved) — the auditability signature at the state level.
 
-**Commentary uses deterministic templates with a numeric gate.** The composer
-labels computed facts, observations and hypotheses. The detailed audit identified
-reference-grounding and qualitative-control gaps that remain Batch 2 work; this
-gate is not a guarantee against fabricated claims. Batch 1 independently checks
-the accounting identities before board-pack or exception-view publication.
+**Commentary uses canonical claims bound to a frozen result registry.** Batch 2
+checks node identity, references and exact generated wording; free-form rewrites,
+forged references and unsupported causal claims are rejected. The result includes
+its registry and full diagnostic/forecast evidence. Source authenticity and forecast
+calibration are not established by this gate. See the
+[history and claim controls](docs/agent4-history-claim-controls.md).
 Output remains a Python result and inline SVG; operational reports and the audited
 negative/leaf-waterfall rendering issues remain Batch 4 work.
 
@@ -665,7 +666,7 @@ The next hardening work is:
 1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
    benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
    passed bounded acceptance; research publication stays held.
-2. **Agent 4:** Batch 1 is implemented; continue with Batches 2–4 in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance. See the [financial contracts](docs/agent4-financial-contracts.md).
+2. **Agent 4:** Batches 1–2 are implemented; continue with Batches 3–4 in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance. See the [financial contracts](docs/agent4-financial-contracts.md).
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.

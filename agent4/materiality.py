@@ -135,6 +135,7 @@ def _significance(variance_history_cents: list[int], this_variance_cents: int,
     res = anomaly_significance_check([float(x) for x in series], min_obs=_MIN_OBS,
                                      z_flag=z_flag)
     return {
+        **res,
         "significant": res.get("significant"),
         "modified_z": res.get("modified_z"),
         "z_flag": round(z_flag, 3),
@@ -148,7 +149,7 @@ def classify_variance(line_result: dict, line_budget_cents: int,
                       total_budget_cents: int,
                       variance_history_cents: list[int] | None = None,
                       period=None, period_history: list[tuple] | None = None,
-                      n_lines_scanned: int = 1) -> dict:
+                      n_lines_scanned: int = 1, history_context=None) -> dict:
     """
     Place one decomposed line into the materiality x significance 2x2.
 
@@ -161,6 +162,12 @@ def classify_variance(line_result: dict, line_budget_cents: int,
                         period=period, period_history=period_history,
                         n_lines_scanned=n_lines_scanned)
 
+    if history_context and history_context.get('gaps'):
+        sig = {**sig, 'significant': None, 'inference_status': 'held_history_gap',
+               'reason': 'history has missing or irregular reporting periods'}
+    sig['interpretation'] = ('deterministic baseline break, not a stochastic significance test'
+                             if sig.get('inference_status') == 'zero_dispersion_break'
+                             else 'robust anomaly diagnostic; threshold tightening is heuristic, not calibrated family-wise error control')
     material = mat["material"]
     significant = sig["significant"]
 
@@ -184,6 +191,8 @@ def classify_variance(line_result: dict, line_budget_cents: int,
         quadrant = "NOISE"
         reason = "neither material nor a break from pattern"
 
+    if sig.get('inference_status') == 'zero_dispersion_break':
+        reason = ('material' if material else 'immaterial') + ' with a deterministic break from a flat baseline; not a stochastic significance claim'
     return {
         "name": line_result.get("name"),
         "total_variance_cents": variance,

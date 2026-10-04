@@ -70,17 +70,36 @@ def _significance(variances: list[int], period=None,
     if series is None:
         series = variances
     res = anomaly_significance_check([float(x) for x in series], min_obs=_MIN_OBS)
-    return {"significant": res.get("significant"), "modified_z": res.get("modified_z"),
-            "period_aware": period_aware}
+    return {**res, 'period_aware': period_aware,
+            'basis': 'same-period (seasonal)' if period_aware else 'full history'}
+
 
 
 def classify_persistence(variances: list[int], period=None,
                          period_history: list[tuple] | None = None,
-                         name: str = "line") -> dict:
+                         name: str = "line", *, history_context=None) -> dict:
     """
     Classify the latest variance in `variances` (most recent last) as ONE_OFF,
     STRUCTURAL, or AMBIGUOUS, with a confidence — or report insufficient history.
     """
+    from agent4.contracts import cents
+    try:
+        if not isinstance(variances, list):
+            raise ValueError('variances must be a list ending with current variance')
+        for value in variances:
+            cents(value, 'variance history')
+        if period_history is not None:
+            if not isinstance(period_history, list):
+                raise ValueError('period_history must be a list')
+            for point in period_history:
+                if not isinstance(point, (list, tuple)) or len(point) != 2:
+                    raise ValueError('seasonal history requires period/value pairs')
+                cents(point[1], 'seasonal variance')
+        if history_context and history_context.get('gaps'):
+            raise ValueError('history has missing or irregular reporting periods')
+    except ValueError as exc:
+        return {'name': name, 'persistence': 'UNKNOWN', 'confidence': None,
+                'reason': str(exc), 'computed_by': 'classify_persistence (python)'}
     n = len(variances)
     if n < _MIN_OBS + 1:
         return {"name": name, "persistence": "INSUFFICIENT_HISTORY",
@@ -92,7 +111,11 @@ def classify_persistence(variances: list[int], period=None,
 
     # significance (the shared-library call)
     sig = _significance(variances, period=period, period_history=period_history)
-    significant = sig["significant"]
+    significant = sig.get('significant')
+    if significant is None:
+        return {'name': name, 'persistence': 'UNKNOWN', 'confidence': None,
+                'reason': sig.get('reason', 'significance unavailable'), 'diagnostic': sig,
+                'computed_by': 'classify_persistence (python)'}
 
     # recurrence: consecutive same-sign run ending at the latest, counting only
     # periods whose magnitude is COMPARABLE to the current one (a small blip is not
@@ -118,14 +141,14 @@ def classify_persistence(variances: list[int], period=None,
     if structural:
         verdict = "STRUCTURAL"
         conf = min(0.95, 0.5 + 0.1 * run + 0.3 * (consistency - _CONSISTENCY))
-        reason = (f"variance has held the same direction for {run} consecutive closes "
-                  f"({consistency*100:.0f}% sign-consistent) — a persistent level shift; "
-                  f"carry into the reforecast")
+        reason = (f"variance has held the same direction for {run} consecutive observations "
+                  f"({consistency*100:.0f}% sign-consistent) — provisional persistent-pattern rule; "
+                  f"business confirmation required before carrying a shift")
     elif significant and run <= 1:
         verdict = "ONE_OFF"
         conf = 0.7
         reason = ("a significant break from pattern with no recurring run — an "
-                  "isolated spike; do NOT extrapolate into the landing")
+                  "isolated-spike candidate; reversion is unconfirmed")
     elif significant and run == 2:
         verdict = "AMBIGUOUS"
         conf = 0.4
@@ -136,10 +159,13 @@ def classify_persistence(variances: list[int], period=None,
         verdict = "ONE_OFF"
         conf = 0.5
         reason = ("neither a break from pattern nor a sustained run — transient; "
-                  "not a persistent shift")
+                  "provisional one-off candidate; reversion is unconfirmed")
 
     return {
         "name": name, "persistence": verdict, "confidence": round(conf, 3),
+        "confidence_kind": "heuristic score, not a calibrated probability",
+        "provisional": True, "diagnostic": sig,
+        "history_basis": (history_context or {}).get("basis", "caller-ordered observations; dates unverified"),
         "reason": reason,
         "signals": {"run_length": run, "sign_consistency": round(consistency, 3),
                     "significant_break": significant,
