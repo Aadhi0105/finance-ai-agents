@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from agent4.decomposition import euros
 from agent4.commentary import build_registry, compose, reconcile
+from agent4.hierarchy import validate_result
 
 from xml.sax.saxutils import escape as _xml_escape
 
@@ -126,6 +127,7 @@ def _flatten(tree: dict, out: list, depth=0):
 
 def board_pack(tree: dict, persistence_by_line=None, reforecast_by_line=None) -> dict:
     """Full board pack: hierarchy, waterfall, reconciled commentary."""
+    validate_result(tree)
     registry = build_registry(tree, reforecast_by_line)
     claims = compose(tree, persistence_by_line, reforecast_by_line)
     gate = reconcile(claims, registry)
@@ -136,7 +138,9 @@ def board_pack(tree: dict, persistence_by_line=None, reforecast_by_line=None) ->
     return {"mode": "board_pack", "hierarchy": rows,
             "waterfall_svg": variance_waterfall_svg(tree),
             "commentary": claims, "reconciliation": gate,
-            "reconciles": tree["reconciles"]}
+            "reconciles": tree["reconciles"],
+            "source_reconciliation": tree.get("source_reconciliation", "not_provided"),
+            "context": tree.get("context", {})}
 
 
 _EXCEPTION_QUADRANTS = {"TOP_PRIORITY", "EARLY_WARNING", "MATERIAL_SIG_NC"}
@@ -144,6 +148,7 @@ _EXCEPTION_QUADRANTS = {"TOP_PRIORITY", "EARLY_WARNING", "MATERIAL_SIG_NC"}
 
 def exception_view(tree: dict, persistence_by_line=None, reforecast_by_line=None) -> dict:
     """Only the lines that matter: material-and-significant / early-warning."""
+    validate_result(tree)
     registry = build_registry(tree, reforecast_by_line)
     claims = compose(tree, persistence_by_line, reforecast_by_line,
                      only_quadrants=_EXCEPTION_QUADRANTS)
@@ -157,4 +162,6 @@ def exception_view(tree: dict, persistence_by_line=None, reforecast_by_line=None
     # deserves controller attention, so it appears in both, not just the prose.
     exceptions = [r for r in rows if r["quadrant"] in _EXCEPTION_QUADRANTS]
     return {"mode": "exception_view", "exceptions": exceptions,
-            "commentary": claims, "reconciliation": gate}
+            "commentary": claims, "reconciliation": gate,
+            "source_reconciliation": tree.get("source_reconciliation", "not_provided"),
+            "context": tree.get("context", {})}

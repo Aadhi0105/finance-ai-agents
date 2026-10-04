@@ -1,5 +1,8 @@
 # Agent 4 — detailed implementation and hardening audit
 
+Follow-up: [Batch 1 implementation and remaining limits](agent4-financial-contracts.md).
+The findings below describe the pre-fix baseline.
+
 Audit date: **4 October 2026**. Reviewed implementation: **0cb6ea1**, after
 Agent 2 operational reports merged. This is a review, not a fix batch.
 

@@ -36,6 +36,8 @@ All money in integer cents.
 
 from __future__ import annotations
 
+from fractions import Fraction
+from agent4.contracts import cents
 import math
 import statistics
 
@@ -58,11 +60,11 @@ def _project(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int,
     if actual_history_cents and len(actual_history_cents) >= _TS_MIN and remaining > 0:
         n = len(actual_history_cents)
         xs = list(range(n))
-        xbar = sum(xs) / n
-        ybar = sum(actual_history_cents) / n
+        xbar = Fraction(sum(xs), n)
+        ybar = Fraction(sum(actual_history_cents), n)
         sxx = sum((x - xbar) ** 2 for x in xs)
         sxy = sum((xs[i] - xbar) * (actual_history_cents[i] - ybar) for i in range(n))
-        slope = sxy / sxx if sxx else 0.0
+        slope = sxy / sxx if sxx else Fraction(0)
         intercept = ybar - slope * xbar
         projected_remaining = sum(int(round(intercept + slope * (n + k)))
                                   for k in range(remaining))
@@ -74,14 +76,14 @@ def _project(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int,
     if budget_phasing_cents and len(budget_phasing_cents) == total_periods:
         budget_to_date = sum(budget_phasing_cents[:elapsed_periods])
         if budget_to_date != 0:
-            perf_ratio = ytd_cents / budget_to_date
+            perf_ratio = Fraction(ytd_cents, budget_to_date)
             landing = int(round(full_year_budget_cents * perf_ratio))
             return ("phasing-aware (YTD performance vs. phased budget)", landing,
-                    f"running at {perf_ratio*100:.1f}% of phased plan to date")
+                    f"running at {float(perf_ratio)*100:.1f}% of phased plan to date")
 
     # run-rate fallback (flat phasing)
     if elapsed_periods > 0:
-        landing = int(round(ytd_cents * total_periods / elapsed_periods))
+        landing = round(Fraction(ytd_cents * total_periods, elapsed_periods))
         return ("run-rate (annualized YTD, flat phasing)", landing,
                 "no phased budget available — flat annualization")
     return ("none", ytd_cents, "no elapsed periods")
@@ -105,17 +107,51 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
       - STRUCTURAL  -> the shift IS carried (the default projection already does).
       - AMBIGUOUS   -> landing kept, but the uncertainty band is widened.
     """
-    # input validation (§31): reject nonsensical period/direction inputs early.
-    if total_periods <= 0 or elapsed_periods < 0 or elapsed_periods > total_periods:
-        return {"name": name, "error": (
-            f"invalid periods: elapsed={elapsed_periods}, total={total_periods}"),
-            "computed_by": "reforecast (python)"}
-    if direction not in ("higher_is_better", "lower_is_better"):
-        return {"name": name, "error": f"invalid direction: {direction!r}",
-                "computed_by": "reforecast (python)"}
+    try:
+        for value, label in [(ytd_cents, 'YTD'), (full_year_budget_cents, 'full-year budget')]:
+            cents(value, label)
+        if target_cents is not None:
+            cents(target_cents, 'target')
+        if type(total_periods) is not int or type(elapsed_periods) is not int or not 0 <= elapsed_periods <= total_periods or not 1 <= total_periods <= 366:
+            raise ValueError('periods must be integers: 0 <= elapsed <= total <= 366')
+        if direction not in ('higher_is_better', 'lower_is_better'):
+            raise ValueError('invalid direction')
+        if persistence not in (None, 'ONE_OFF', 'STRUCTURAL', 'AMBIGUOUS', 'INSUFFICIENT_HISTORY'):
+            raise ValueError('invalid persistence classification')
+        for values, label in [(budget_phasing_cents, 'phasing'), (variance_history_cents, 'variance history'), (actual_history_cents, 'actual history')]:
+            if values is not None:
+                if not isinstance(values, list):
+                    raise ValueError(label + ' must be a list of integer cents')
+                for value in values:
+                    cents(value, label)
+        if budget_phasing_cents is not None:
+            if len(budget_phasing_cents) != total_periods or sum(budget_phasing_cents) != full_year_budget_cents:
+                raise ValueError('phasing must cover every period and sum to full-year budget')
+        if elapsed_periods == 0 and ytd_cents != 0:
+            raise ValueError('nonzero YTD with no elapsed periods')
+    except ValueError as exc:
+        return {'name': name, 'error': str(exc), 'computed_by': 'reforecast (python)'}
 
     target = target_cents if target_cents is not None else full_year_budget_cents
     remaining = total_periods - elapsed_periods
+    if elapsed_periods == 0:
+        return {'name': name, 'method': 'none', 'projected_landing_cents': None,
+                'target_cents': target, 'direction': direction, 'band_cents': None,
+                'prob_hit_target': None, 'reason': 'no elapsed observations',
+                'computed_by': 'reforecast (python, integer cents)'}
+    if remaining == 0:
+        hit = ytd_cents >= target if direction == 'higher_is_better' else ytd_cents <= target
+        return {'name': name, 'method': 'closed-year actual', 'ytd_cents': ytd_cents,
+                'elapsed_periods': elapsed_periods, 'total_periods': total_periods,
+                'remaining_periods': 0, 'projected_landing_cents': ytd_cents,
+                'target_cents': target, 'direction': direction, 'band_cents': [ytd_cents, ytd_cents],
+                'sigma_landing_cents': 0, 'prob_hit_target': float(hit),
+                'confidence': 'deterministic (no remaining horizon)',
+                'persistence': persistence, 'persistence_effect': None,
+                'computed_by': 'reforecast (python, integer cents)'}
+    if budget_phasing_cents is not None and sum(budget_phasing_cents[:elapsed_periods]) == 0 and persistence != 'ONE_OFF' and not (actual_history_cents and len(actual_history_cents) >= _TS_MIN):
+        return {'name': name, 'error': 'zero phased budget to date: performance ratio undefined',
+                'computed_by': 'reforecast (python)'}
     method, landing, note = _project(ytd_cents, full_year_budget_cents,
                                      elapsed_periods, total_periods,
                                      budget_phasing_cents, actual_history_cents)
@@ -134,7 +170,7 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
             # No phasing available: still MUST NOT extrapolate the spike. Assume
             # remaining periods run at the flat pro-rata full-year budget. The
             # assumption is flagged, rather than silently carrying a known one-off.
-            remaining_budget = int(round(full_year_budget_cents * remaining / total_periods))
+            remaining_budget = round(Fraction(full_year_budget_cents * remaining, total_periods))
             landing = ytd_cents + remaining_budget
             persistence_effect = {"classification": "ONE_OFF",
                                   "adjustment": "no phasing — remaining periods assumed at "
@@ -142,6 +178,10 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
                                                 "phased budget would refine this"}
             method = f"{method} + one-off normalization (flat pro-rata, no phasing) (§26)"
 
+    try:
+        cents(landing, 'projected landing')
+    except ValueError as exc:
+        return {'name': name, 'error': str(exc), 'computed_by': 'reforecast (python)'}
     result = {
         "name": name, "method": method, "method_note": note,
         "ytd_cents": ytd_cents, "elapsed_periods": elapsed_periods,
@@ -171,15 +211,6 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
     if persistence == "AMBIGUOUS":
         sigma_landing *= 1.5
 
-    if remaining == 0:
-        # §30: genuinely deterministic — no horizon left.
-        hit = (landing >= target) if direction == "higher_is_better" else (landing <= target)
-        result.update({
-            "band_cents": [landing, landing], "sigma_landing_cents": 0,
-            "prob_hit_target": 1.0 if hit else 0.0,
-            "confidence": "deterministic (no remaining horizon)",
-        })
-        return result
     if sigma_landing == 0:
         # §30: remaining periods exist but historical dispersion is zero (often a
         # flat/degenerate fixture). This is NOT certainty about the future — report

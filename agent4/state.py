@@ -26,6 +26,7 @@ import os
 from datetime import datetime, timezone
 
 import duckdb
+from agent4.contracts import cents
 
 _DEFAULT_DB = os.path.join("state", "variance.duckdb")
 
@@ -73,7 +74,7 @@ class VarianceStore:
         ts = datetime.now(timezone.utc)
         self.con.executemany(
             "INSERT INTO budget VALUES (?, ?, ?, ?, ?)",
-            [[version, ts, r["line"], r["period"], int(r["amount_cents"])] for r in rows])
+            [[version, ts, r["line"], r["period"], cents(r["amount_cents"], "stored amount")] for r in rows])
 
     def get_budget(self, version: str | None = None) -> list[dict]:
         version = version or self._latest("budget")
@@ -88,7 +89,7 @@ class VarianceStore:
         ts = datetime.now(timezone.utc)
         self.con.executemany(
             "INSERT INTO actuals VALUES (?, ?, ?, ?, ?)",
-            [[version, ts, r["line"], r["period"], int(r["amount_cents"])] for r in rows])
+            [[version, ts, r["line"], r["period"], cents(r["amount_cents"], "stored amount")] for r in rows])
 
     def get_actuals(self, version: str | None = None) -> list[dict]:
         version = version or self._latest("actuals")
@@ -110,7 +111,7 @@ class VarianceStore:
             version = f"rf_{close_period}_{digest}"
         self.con.executemany(
             "INSERT INTO reforecast VALUES (?, ?, ?, ?, ?, ?)",
-            [[version, ts, close_period, r["line"], int(r["landing_cents"]),
+            [[version, ts, close_period, r["line"], cents(r["landing_cents"], "stored landing"),
               float(r.get("prob_hit") if r.get("prob_hit") is not None else float("nan"))]
              for r in rows])
         return version

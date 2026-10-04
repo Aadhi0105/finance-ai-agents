@@ -24,7 +24,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
-| Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation; detailed audit completed | 24 grouped findings; financial correctness, grounding, state and operational delivery fixes pending |
+| Agent 4 | Detailed audit and Batch 1 financial contracts/accounting/forecast boundary fixes | Batches 2–4: grounding and history, transactional close execution, operational reports |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
 The per-agent guides below record acceptance evidence and operating limits.
@@ -446,10 +446,11 @@ fixtures — the honest, standard way to portfolio FP&A.
 
 Three governing properties, all mechanical:
 
-**Reconciles to the penny.** Every amount is carried as **integer cents**, and the
+**Reconciles to the penny.** Validated decimal inputs use exact factor arithmetic
+and half-even rounding to **integer cents**. The
 driver variances sum *exactly* to the total — no floating-point dust. The
 decomposition engine (`agent4/decomposition.py`) dispatches by line type (revenue ->
-price x volume x mix; variable cost -> rate x efficiency; fixed cost -> spending),
+price x volume x mix; variable cost -> rate x volume; fixed cost -> spending),
 names the convention it used (sequential by default), and surfaces the absorbed
 joint price-volume term when it is material. Lines lacking unit data report total
 variance and label the split "not computable" rather than fabricating one.
@@ -457,7 +458,8 @@ variance and label the split "not computable" rather than fabricating one.
 **Every subtotal ties, not just the bottom line.** The hierarchy roll-up
 (`agent4/hierarchy.py`) decomposes at the leaves and aggregates up the P&L tree with
 explicit add/subtract sign roles, verifying penny-reconciliation at *every node* or
-failing loudly. Favourability is resolved by profit impact at each level — a cost
+failing loudly. Optional source control totals are checked separately; internal
+arithmetic balance alone is not independent source verification. Favourability is resolved by profit impact at each level — a cost
 line coming in over budget shows a positive variance but is correctly tagged adverse.
 
 **Triage like a controller, and project forward.** The materiality x significance
@@ -477,16 +479,13 @@ budget (a re-budget writes a new version), append-only actuals (a restatement ke
 the original), and a reforecast versioned every close (so the forecast *walk* is
 preserved) — the auditability signature at the state level.
 
-**The commentary cannot fabricate a number.** The integrity gate
-(`agent4/commentary.py`) enforces a three-tier claim taxonomy — *computed fact*
-(reference-built from the engine, every figure reconciling against the registry),
-*observation* (traces to a stored classification), and *business-cause hypothesis*
-(always flagged "requires confirmation," never asserted). A hard reconciliation
-check re-verifies every figure in the prose against the computed model.json and
-**fails the run** on any fabricated or mismatched number — the prose analogue of
-the penny-reconciling bridge. Output is a **board pack** or an **exception view**,
-with the signature **variance waterfall** (`agent4/output.py`) as inline SVG:
-budget -> favourable/adverse steps -> actual, residual explicit, always tying.
+**Commentary uses deterministic templates with a numeric gate.** The composer
+labels computed facts, observations and hypotheses. The detailed audit identified
+reference-grounding and qualitative-control gaps that remain Batch 2 work; this
+gate is not a guarantee against fabricated claims. Batch 1 independently checks
+the accounting identities before board-pack or exception-view publication.
+Output remains a Python result and inline SVG; operational reports and the audited
+negative/leaf-waterfall rendering issues remain Batch 4 work.
 
 ---
 
@@ -666,7 +665,7 @@ The next hardening work is:
 1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
    benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
    passed bounded acceptance; research publication stays held.
-2. **Agent 4:** implement the four batches in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance before claiming completion.
+2. **Agent 4:** Batch 1 is implemented; continue with Batches 2–4 in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance. See the [financial contracts](docs/agent4-financial-contracts.md).
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.
