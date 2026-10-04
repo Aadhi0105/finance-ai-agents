@@ -24,7 +24,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
-| Agent 4 | Detailed audit; Batches 1–2 financial contracts, shared history, diagnostic interpretation and canonical claim controls | Batches 3–4: transactional close execution and operational reports; forecast calibration unverified |
+| Agent 4 | Detailed audit; Batches 1–3 financial contracts, shared history, canonical claim controls and transactional offline close/recovery | Batch 4: operational reports and browser acceptance; forecast calibration unverified |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
 The per-agent guides below record acceptance evidence and operating limits.
@@ -121,6 +121,16 @@ open('waterfall.svg','w').write(bp['waterfall_svg'])
 This decomposes the P&L fixture, rolls it up with penny-reconciliation at every
 node, runs the integrity-gated commentary, and writes the variance-waterfall SVG.
 Fully offline, no network or ML dependencies.
+
+For a versioned offline close with a saved evidence bundle and delivery recovery:
+
+```bash
+python -m agent4.close --input fixtures/agent4/close-june.json --db state/agent4-close.duckdb --output-dir output/agent4-close
+python -m agent4.close --recover close-june --db state/agent4-close.duckdb --output-dir output/agent4-close
+```
+
+See [Batch 3 close and recovery](docs/agent4-close-recovery.md) for the input contract,
+restatement rules and exit codes. The example is synthetic EUR data.
 
 ---
 
@@ -468,16 +478,19 @@ break from the line's own variance history, surfacing the **early-warning** quad
 (immaterial in euros but a real break from pattern) that naive threshold tools miss.
 The reforecast engine (`agent4/reforecast.py`) projects the full-year landing with a
 method ladder (run-rate / phasing-aware / time-series, naming which it used) and a
-confidence band drawn from the line's own historical dispersion that widens with
-horizon — headlined as **P(hit annual target)**, never a bare point. Persistence
-classification (`agent4/persistence.py`) labels each variance one-off vs structural
-from recurrence, sign-consistency, and significance — so a one-off spike isn't
-extrapolated and a structural shift is.
+conditional range drawn from the line's historical dispersion when eligible.
+Ranges and probabilities are withheld when evidence is insufficient; trend-parameter
+uncertainty and calibration remain unverified. Persistence classification
+(`agent4/persistence.py`) applies provisional recurrence/significance rules and
+reports unknown evidence explicitly; its scores are not calibrated probabilities.
 
 **State is versioned; nothing is overwritten** (`agent4/state.py`): an immutable
 budget (a re-budget writes a new version), append-only actuals (a restatement keeps
 the original), and a reforecast versioned every close (so the forecast *walk* is
-preserved) — the auditability signature at the state level.
+preserved). Batch 3 adds transactional headers/rows, content-checked replay,
+effective restatement snapshots, and a deterministic offline close command that
+commits sources and report evidence together. Failed file delivery can be recovered
+from the saved bundle without recomputation. See [close and recovery](docs/agent4-close-recovery.md).
 
 **Commentary uses canonical claims bound to a frozen result registry.** Batch 2
 checks node identity, references and exact generated wording; free-form rewrites,
@@ -485,7 +498,7 @@ forged references and unsupported causal claims are rejected. The result include
 its registry and full diagnostic/forecast evidence. Source authenticity and forecast
 calibration are not established by this gate. See the
 [history and claim controls](docs/agent4-history-claim-controls.md).
-Output remains a Python result and inline SVG; operational reports and the audited
+Output is available as a Python result and a saved JSON bundle containing inline SVG; operational reports and the audited
 negative/leaf-waterfall rendering issues remain Batch 4 work.
 
 ---
@@ -666,7 +679,7 @@ The next hardening work is:
 1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
    benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
    passed bounded acceptance; research publication stays held.
-2. **Agent 4:** Batches 1–2 are implemented; continue with Batches 3–4 in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance. See the [financial contracts](docs/agent4-financial-contracts.md).
+2. **Agent 4:** Batches 1–3 are implemented; continue with Batch 4 in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance. See the [financial contracts](docs/agent4-financial-contracts.md).
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.
