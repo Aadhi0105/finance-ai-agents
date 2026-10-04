@@ -32,6 +32,9 @@ from __future__ import annotations
 
 from agent4.decomposition import decompose_line, decompose_multiproduct
 from agent4.materiality import classify_variance
+from agent4.history import assemble_history
+from agent4.persistence import classify_persistence
+from copy import deepcopy
 
 
 class ReconciliationError(Exception):
@@ -53,7 +56,7 @@ def _sign_mult(node: dict, is_root: bool = False) -> int:
 
 
 def _rollup(node: dict, sign_toward_profit: int, materiality_base_cents: int,
-            n_leaves: int, path: str) -> dict:
+            n_leaves: int, path: str, close_date=None) -> dict:
     name = node.get("name", "?")
     here = f"{path}/{name}" if path else name
 
@@ -85,7 +88,7 @@ def _rollup(node: dict, sign_toward_profit: int, materiality_base_cents: int,
             "reconciles": True,
         }
         _controls(result, node, sign_toward_profit, here)
-        _attach_classification(result, node, materiality_base_cents, n_leaves)
+        _attach_classification(result, node, materiality_base_cents, n_leaves, close_date)
         return result
 
     # --- internal node ----------------------------------------------------
@@ -98,7 +101,7 @@ def _rollup(node: dict, sign_toward_profit: int, materiality_base_cents: int,
     for child in children:
         cs = _sign_mult(child)
         cr = _rollup(child, sign_toward_profit * cs, materiality_base_cents,
-                     n_leaves, here)
+                     n_leaves, here, close_date)
         child_results.append(cr)
         node_budget += cs * cr["budget_cents"]
         node_actual += cs * cr["actual_cents"]
@@ -121,27 +124,42 @@ def _rollup(node: dict, sign_toward_profit: int, materiality_base_cents: int,
         "children": child_results, "reconciles": True,
     }
     _controls(result, node, sign_toward_profit, here)
-    _attach_classification(result, node, materiality_base_cents, n_leaves)
+    _attach_classification(result, node, materiality_base_cents, n_leaves, close_date)
     return result
 
 
-def _attach_classification(result: dict, node: dict, base_cents: int,
-                           n_leaves: int) -> None:
-    """Attach the materiality x significance quadrant to a node (leaf or subtotal)."""
-    cls = classify_variance(
-        {"name": result["name"], "total_variance_cents": result["total_variance_cents"],
-         "favourable": result["favourable"]},
-        line_budget_cents=result["budget_cents"],
-        total_budget_cents=base_cents,
-        variance_history_cents=([p["variance_cents"] for p in node["observation_history"]]
-                                if "observation_history" in node else node.get("history")),
-        period=node.get("period"), period_history=node.get("period_history"),
-        n_lines_scanned=n_leaves,
-    )
-    result["quadrant"] = cls["quadrant"]
-    result["triage"] = cls["reason"]
-    result["materiality"] = cls["materiality"]
-    result["significance"] = cls["significance"]
+def _attach_classification(result, node, base_cents, n_leaves, close_date=None):
+    snapshot = assemble_history(node, result['total_variance_cents'], close_date)
+    inputs = {'line_budget_cents': result['budget_cents'], 'total_budget_cents': base_cents,
+              'variance_history_cents': snapshot['prior_cents'],
+              'period': node.get('period'), 'period_history': deepcopy(node.get('period_history')),
+              'n_lines_scanned': n_leaves, 'history_context': snapshot}
+    cls = classify_variance(result, **inputs)
+    result.update(quadrant=cls['quadrant'], triage=cls['reason'], materiality=cls['materiality'],
+                  significance=cls['significance'], history_snapshot=snapshot,
+                  classification_inputs=inputs)
+    result['persistence'] = classify_persistence(snapshot['prior_cents'] + [snapshot['current_cents']],
+        period=inputs['period'], period_history=inputs['period_history'], name=result['name'], history_context=snapshot)
+
+
+def validate_analysis(tree):
+    """Check supplied diagnostic results against saved prior/current inputs."""
+    snapshot = tree['history_snapshot']
+    if snapshot['current_cents'] != tree['total_variance_cents']:
+        raise ValueError('current variance does not match history snapshot')
+    inputs = tree['classification_inputs']
+    if inputs['history_context'] != snapshot or inputs['variance_history_cents'] != snapshot['prior_cents'] or inputs['line_budget_cents'] != tree['budget_cents']:
+        raise ValueError('classification inputs do not match node history')
+    cls = classify_variance(tree, **inputs)
+    for field, key in [('quadrant', 'quadrant'), ('triage', 'reason'), ('materiality', 'materiality'), ('significance', 'significance')]:
+        if tree[field] != cls[key]:
+            raise ValueError('classification changed since computation')
+    p = classify_persistence(snapshot['prior_cents'] + [snapshot['current_cents']],
+        period=inputs['period'], period_history=inputs['period_history'], name=tree['name'], history_context=snapshot)
+    if tree['persistence'] != p:
+        raise ValueError('persistence does not describe current observation')
+    for child in tree.get('children', []):
+        validate_analysis(child)
 
 
 def _count_leaves(node: dict) -> int:
@@ -175,7 +193,7 @@ def rollup(tree: dict, materiality_base_cents: int | None = None) -> dict:
     if materiality_base_cents < 0:
         raise ValueError('materiality base must be nonnegative')
     result = _rollup(tree, -1 if measure == 'cost' else 1,
-                     materiality_base_cents, n_leaves, '')
+                     materiality_base_cents, n_leaves, '', tree.get('context', {}).get('close_date'))
     result.update(root_measure=measure, materiality_base_basis=base_basis,
                   context={**result.get('context', {}), **tree.get('context', {})})
     validate_result(result)
@@ -212,7 +230,7 @@ def _validate_tree(tree):
         if not isinstance(node, dict) or depth > 50 or id(node) in seen:
             raise ReconciliationError('invalid, shared or cyclic tree (maximum depth 50)')
         if set(node) - {'name', 'node_id', 'sign', 'root_measure', 'context', 'leaf', 'children',
-                        'history', 'period', 'period_history', 'observation_history', 'budget_cents', 'actual_cents'}:
+                        'history', 'period', 'period_history', 'observation_history', 'history_frequency', 'budget_cents', 'actual_cents'}:
             raise ReconciliationError('unsupported tree fields')
         seen.add(id(node))
         label = name(node.get('name'))

@@ -11,13 +11,13 @@ from agent4.output import board_pack, exception_view, variance_waterfall_svg
 def _tree_and_persistence():
     pnl = json.load(open("fixtures/pnl.json"))
     tree = rollup(pnl)
+    # Persistence now comes from the same prior/current snapshot as materiality.
     persistence = {}
     def collect(n):
-        if "history" in n and "leaf" in n:
-            persistence[n["name"]] = classify_persistence(n["history"], name=n["name"])
-        for c in n.get("children", []):
-            collect(c)
-    collect(pnl)
+        persistence[n['name']] = n['persistence']
+        for child in n.get('children', []):
+            collect(child)
+    collect(tree)
     return tree, persistence
 
 

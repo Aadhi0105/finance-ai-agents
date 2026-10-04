@@ -89,7 +89,7 @@ def _project(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int,
     return ("none", ytd_cents, "no elapsed periods")
 
 
-def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int,
+def _calculate(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int,
                total_periods: int, *, budget_phasing_cents=None,
                variance_history_cents=None, actual_history_cents=None,
                direction: str = "higher_is_better", target_cents: int | None = None,
@@ -116,7 +116,7 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
             raise ValueError('periods must be integers: 0 <= elapsed <= total <= 366')
         if direction not in ('higher_is_better', 'lower_is_better'):
             raise ValueError('invalid direction')
-        if persistence not in (None, 'ONE_OFF', 'STRUCTURAL', 'AMBIGUOUS', 'INSUFFICIENT_HISTORY'):
+        if persistence not in (None, 'ONE_OFF', 'STRUCTURAL', 'AMBIGUOUS', 'INSUFFICIENT_HISTORY', 'UNKNOWN'):
             raise ValueError('invalid persistence classification')
         for values, label in [(budget_phasing_cents, 'phasing'), (variance_history_cents, 'variance history'), (actual_history_cents, 'actual history')]:
             if values is not None:
@@ -236,8 +236,74 @@ def reforecast(ytd_cents: int, full_year_budget_cents: int, elapsed_periods: int
         "sigma_period_cents": int(round(sigma_period)),
         "sigma_landing_cents": int(round(sigma_landing)),
         "band_cents": band, "band_confidence": "80%",
-        "prob_hit_target": round(p_hit, 4),
+        "prob_hit_target": p_hit,
         "confidence": "computed from the line's own historical dispersion",
         "note": "band widens with horizon (sigma scales with sqrt(remaining periods))",
     })
+    return result
+
+
+def reforecast(ytd_cents, full_year_budget_cents, elapsed_periods, total_periods, *,
+               budget_phasing_cents=None, variance_history_cents=None, actual_history_cents=None,
+               direction='higher_is_better', target_cents=None, name='line', persistence=None,
+               actual_periods=None, close_period=None, frequency=None):
+    """Freeze inputs and publish conditional, uncalibrated model estimates explicitly.
+
+    Trend actuals must be contiguous dated periods ending at this close, and their
+    last elapsed_periods must reconcile to YTD. A trend point has no probability
+    until parameter uncertainty is implemented and validated.
+    """
+    from copy import deepcopy
+    from datetime import date
+    inputs = deepcopy(dict(ytd_cents=ytd_cents, full_year_budget_cents=full_year_budget_cents,
+        elapsed_periods=elapsed_periods, total_periods=total_periods,
+        budget_phasing_cents=budget_phasing_cents, variance_history_cents=variance_history_cents,
+        actual_history_cents=actual_history_cents, direction=direction, target_cents=target_cents,
+        name=name, persistence=persistence, actual_periods=actual_periods,
+        close_period=close_period, frequency=frequency))
+    args = {k:v for k,v in inputs.items() if k not in ('actual_periods','close_period','frequency')}
+    try:
+        if actual_history_cents:
+            if frequency not in ('monthly','quarterly','annual') or not isinstance(actual_periods,list) or len(actual_periods)!=len(actual_history_cents):
+                raise ValueError('actual history requires aligned dates and reporting frequency')
+            stamps = [date.fromisoformat(s) for s in actual_periods]
+            close = date.fromisoformat(close_period)
+            step = {'monthly':1,'quarterly':3,'annual':12}[frequency]
+            if stamps[-1] != close or any(a>=b or (b.year-a.year)*12+b.month-a.month!=step for a,b in zip(stamps,stamps[1:])):
+                raise ValueError('actual history must be contiguous and end at close_period')
+            if type(elapsed_periods) is not int or elapsed_periods < 1 or len(stamps)<elapsed_periods:
+                raise ValueError('actual history does not cover YTD')
+            if any(type(v) is not int for v in actual_history_cents) or sum(actual_history_cents[-elapsed_periods:]) != ytd_cents:
+                raise ValueError('actual history does not reconcile to YTD')
+        elif actual_periods is not None or frequency is not None:
+            raise ValueError('actual dates/frequency require actual history')
+        result = _calculate(**args)
+    except (ValueError, TypeError) as exc:
+        result = {'name':name,'error':str(exc),'computed_by':'reforecast (python)'}
+    # Invalid input is not serializable evidence (e.g. NaN); do not archive it as a result.
+    if 'error' in result:
+        import json
+        try:
+            json.dumps(inputs, allow_nan=False)
+        except (ValueError, TypeError):
+            return {**result, 'publication_status':'held_invalid_inputs'}
+        return {**result, 'inputs':inputs, 'publication_status':'held_invalid_inputs'}
+    result['inputs'] = inputs
+    result['assumptions'] = [
+        'Single-line projection; no cross-line correlation model.',
+        'Historical variance dispersion assumes independent, comparable reporting periods.',
+        'Normal-distribution range/probability is conditional on the projection method; coverage is not backtested.',
+        'Persistence is a provisional rule or explicit caller scenario, not established business causation.'
+    ]
+    result['probability_kind'] = 'uncalibrated model estimate'
+    result['publication_status'] = 'point_only' if result.get('prob_hit_target') is None else 'model_estimate'
+    if result.get('remaining_periods') == 0:
+        result['probability_kind'] = 'deterministic closed-year outcome'
+        result['publication_status'] = 'deterministic'
+    elif result.get('method','').startswith('time-series'):
+        result.update(band_cents=None, prob_hit_target=None, publication_status='point_only',
+                      confidence='not computable', reason='trend parameter uncertainty has not been estimated')
+    elif persistence in ('UNKNOWN','INSUFFICIENT_HISTORY'):
+        result.update(band_cents=None, prob_hit_target=None, publication_status='point_only',
+                      confidence='not computable', reason='persistence evidence unavailable; point is an unconfirmed scenario')
     return result

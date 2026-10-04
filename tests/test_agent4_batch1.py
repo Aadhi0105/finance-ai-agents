@@ -160,9 +160,9 @@ def test_state_rejects_fractional_and_out_of_range_cents_before_writing(tmp_path
     s=VarianceStore(str(tmp_path/'state.db'))
     try:
         for value in (300.9,True,MAX_CENTS+1):
-            with pytest.raises(ValueError):s.set_budget('v1',[dict(line='A',period='Q1',amount_cents=100),dict(line='B',period='Q1',amount_cents=value)])
-            assert s.get_budget('v1')==[]
-        with pytest.raises(ValueError):s.record_reforecast('Q1',[dict(line='A',landing_cents=10.9)])
+            with pytest.raises(ValueError):s.set_budget('v1',[dict(line='A',period='2026-03-31',amount_cents=100),dict(line='B',period='2026-03-31',amount_cents=value)])
+            assert s.versions('budget')==[]
+        with pytest.raises(ValueError):s.record_reforecast('2026-03-31',[dict(line='A',landing_cents=10.9)])
     finally:s.close()
 
 
