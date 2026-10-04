@@ -24,7 +24,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
-| Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation | Detailed hardening audit still pending |
+| Agent 4 | Synthetic-fixture accounting, variance and board-pack implementation; detailed audit completed | 24 grouped findings; financial correctness, grounding, state and operational delivery fixes pending |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
 The per-agent guides below record acceptance evidence and operating limits.
@@ -651,7 +651,7 @@ Stated plainly, because knowing a tool's limits is part of building it:
   replay verifies retained windows/scores; it does not establish source authenticity
   or rerun provider/model retrieval. Sparse or invalid event histories are
   reported as exclusions or assembly refusals.
-- **Agent 4 still awaits its detailed audit and runs on synthetic-company fixtures** — FP&A data is internal, so this
+- **Agent 4 has completed its detailed audit and still runs on synthetic-company fixtures** — FP&A data is internal, so this
   is the standard, honest way to portfolio it. The reforecast is a *defensible*
   projection (a method ladder with an honest dispersion-based band), not a
   production forecasting engine; portfolio-level correlated Monte Carlo is a
@@ -666,7 +666,7 @@ The next hardening work is:
 1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
    benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
    passed bounded acceptance; research publication stays held.
-2. **Agent 4:** detailed audit and bounded acceptance before claiming completion.
+2. **Agent 4:** implement the four batches in the [detailed audit](docs/agent4-detailed-audit.md), then complete bounded acceptance before claiming completion.
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.
