@@ -215,7 +215,7 @@ def reconcile(claims: list[dict], registry: dict) -> dict:
         # allowed signed cents for THIS claim: its own refs (fall back to the
         # global signed registry only for facts that legitimately restate a node).
         ref_cents = set(int(v) for v in refs.values()
-                        if isinstance(v, (int, float)) and abs(v) >= 1)
+                        if not isinstance(v, bool) and isinstance(v, (int, float)) and (abs(v) >= 1 or v == 0))
         allowed_here = ref_cents if ref_cents else signed
 
         for m in _EURO.findall(text):

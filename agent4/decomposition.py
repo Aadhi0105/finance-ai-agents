@@ -13,7 +13,7 @@ Three governing properties (all mechanical, all demoable):
      explicit, labelled residual absorbs only genuine unexplained remainder.
 
   2. DISPATCH BY LINE TYPE. revenue -> price x volume x mix; variable cost ->
-     rate x efficiency; fixed cost -> spending (amount-only). One engine routes by the
+     rate x volume; fixed cost -> spending (amount-only). One engine routes by the
      line's declared type.
 
   3. CONVENTION NAMED, JOINT TERM SURFACED. Decompositions are convention-
@@ -35,15 +35,15 @@ cost = adverse; `favourable` is computed per line type, not from the raw sign.
 
 from __future__ import annotations
 
+from agent4.contracts import money, normalize_line, name, cents
+
 # Materiality default for surfacing the absorbed joint term (share of |total|).
 _JOINT_MATERIAL_FRAC = 0.05
 
 
 def _c(x) -> int:
-    """Coerce a money amount to integer cents. Accepts euros (float/int) or an
-    already-cents int via the callers below; here we take EUROS and round to cents
-    deterministically (round-half-to-even is fine; inputs are fixture-exact)."""
-    return int(round(x * 100))
+    """Round a major-unit decimal amount to integer cents, half-even."""
+    return money(x)
 
 
 def _favourable(line_type: str, variance_cents: int) -> bool:
@@ -71,6 +71,7 @@ def decompose_line(line: dict, convention: str = "sequential") -> dict:
     Returns total variance and the driver breakdown, all in cents, with the
     convention named and the drivers reconciling to the total exactly.
     """
+    line = normalize_line(line)
     lt = line.get("type")
     # §4: validate the line type FIRST — a malformed type carrying amount data must
     # be rejected, not silently routed into the amount path and treated as a cost.
@@ -110,13 +111,13 @@ def _decompose_amount_line(line: dict) -> dict:
     lt = line["type"]
     b_amt = _amount_of(line["budget"], "budget", line["name"])
     a_amt = _amount_of(line["actual"], "actual", line["name"])
-    total = a_amt - b_amt
+    total = cents(a_amt - b_amt, "variance")
     return {
-        "name": line["name"], "type": lt, "convention": "none (amount only)",
+        "name": line["name"], "type": lt, "context": line.get("context", {}), "convention": "none (amount only)",
         "budget_cents": b_amt, "actual_cents": a_amt, "total_variance_cents": total,
         "favourable": _favourable(lt, total),
         "drivers": [{"driver": "spending", "cents": total}],
-        "residual_cents": 0,
+        "residual_cents": 0, "rounding_tolerance_cents": 0,
         "granularity_note": ("no unit (price/volume) data — reporting total spending "
                              "variance only; volume/rate split not computable"),
         "reconciles": True,
@@ -133,7 +134,7 @@ def _decompose_pv(line: dict, price_key: str, convention: str) -> dict:
 
     b_amt = _c(bp * bv)
     a_amt = _c(ap * av)
-    total = a_amt - b_amt
+    total = cents(a_amt - b_amt, "variance")
 
     # Driver amounts computed in cents from the exact factor arithmetic.
     # Volume effect at BUDGET price: (av - bv) * bp
@@ -163,25 +164,27 @@ def _decompose_pv(line: dict, price_key: str, convention: str) -> dict:
     explained = price_drv + vol_drv
     residual = total - explained
 
+    if abs(residual) > 2:
+        raise ValueError("unexplained residual exceeds rounding tolerance")
     drivers = [
         {"driver": ("price" if price_key == "price" else "rate"), "cents": price_drv},
         {"driver": "volume", "cents": vol_drv},
     ]
 
     result = {
-        "name": line["name"], "type": lt, "convention": conv_name,
+        "name": line["name"], "type": lt, "context": line.get("context", {}), "convention": conv_name,
         "budget_cents": b_amt, "actual_cents": a_amt, "total_variance_cents": total,
         "favourable": _favourable(lt, total),
         "drivers": drivers,
-        "residual_cents": residual,
+        "residual_cents": residual, "rounding_tolerance_cents": 2,
         "reconciles": (price_drv + vol_drv + residual == total),
         "computed_by": "decompose_line (python, integer cents)",
     }
 
     # Surface the absorbed joint term when it is material (sequential only —
     # symmetric already split it into the drivers).
-    if convention != "symmetric" and abs(total) > 0 and \
-            abs(joint_surfaced) >= _JOINT_MATERIAL_FRAC * abs(total):
+    if convention != "symmetric" and joint_surfaced != 0 and \
+            abs(joint_surfaced) * 20 >= max(1, abs(price_drv) + abs(vol_drv)):
         result["joint_term_note"] = (
             f"joint price-volume interaction of {joint_surfaced} cents absorbed into "
             f"'{drivers[0]['driver']}' per sequential convention — both factors moved "
@@ -218,6 +221,18 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
         raise ValueError(
             f"decompose_multiproduct supports revenue / variable_cost, got {line_type!r}")
 
+    name(line_name)
+    if not isinstance(products, list) or not products:
+        raise ValueError('products must be a nonempty list')
+    if any(not isinstance(p, dict) or set(p) - {'name', 'budget', 'actual', 'context'} for p in products):
+        raise ValueError('product: expected name, budget, actual and optional context')
+    products = [normalize_line({**p, 'type': line_type}) for p in products]
+    if len({p['name'] for p in products}) != len(products):
+        raise ValueError('product names must be unique')
+    if len({tuple(sorted(p['context'].items())) for p in products}) > 1:
+        raise ValueError('products must have compatible context and quantity units')
+    if any(fkey not in p['budget'] for p in products):
+        raise ValueError('products require factor and volume data')
     total_b = sum(_c(p["budget"][fkey] * p["budget"]["volume"]) for p in products)
     total_a = sum(_c(p["actual"][fkey] * p["actual"]["volume"]) for p in products)
     total = total_a - total_b
@@ -225,6 +240,8 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
     bud_total_vol = sum(p["budget"]["volume"] for p in products)
     act_total_vol = sum(p["actual"]["volume"] for p in products)
 
+    if bud_total_vol == 0:
+        raise ValueError('budget mix is undefined at zero total volume; use amount-only new-activity reporting')
     price_sum = vol_sum = mix_sum = 0
     per_product = []
     for p in products:
@@ -250,8 +267,14 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
         {"driver": "volume", "cents": vol_sum},
         {"driver": "mix", "cents": mix_sum},
     ]
+    cents(total_b, 'budget total'); cents(total_a, 'actual total'); cents(total, 'variance')
+    if abs(residual) > 3 * len(products):
+        raise ValueError('unexplained residual exceeds rounding tolerance')
     return {
-        "name": line_name, "type": line_type,
+        "rounding_tolerance_cents": 3 * len(products),
+        "joint_term_cents": sum(_c((p['actual'][fkey] - p['budget'][fkey]) *
+                                    (p['actual']['volume'] - p['budget']['volume'])) for p in products),
+        "name": line_name, "type": line_type, "context": products[0]["context"],
         "convention": "sequential + mix (multi-product)",
         "budget_cents": total_b, "actual_cents": total_a, "total_variance_cents": total,
         "favourable": _favourable(line_type, total),
@@ -264,6 +287,8 @@ def decompose_multiproduct(line_name: str, line_type: str, products: list[dict],
 
 def euros(cents: int) -> str:
     """Format integer cents as a euro string for display."""
+    if type(cents) is not int:
+        raise ValueError("display amounts must be integer cents")
     sign = "-" if cents < 0 else ""
     c = abs(cents)
     return f"{sign}\u20ac{c // 100:,}.{c % 100:02d}"

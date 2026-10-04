@@ -36,6 +36,8 @@ significance threshold tightens with the number of lines scanned (mirrors Agent 
 
 from __future__ import annotations
 
+from agent4.contracts import cents, numeric
+from fractions import Fraction
 import math
 import os
 
@@ -57,24 +59,31 @@ def _is_material(variance_cents: int, line_budget_cents: int, total_budget_cents
                  abs_min_frac=_ABS_MIN_FRAC) -> dict:
     """Dual-threshold materiality. Material if it is big money OR (proportionally
     big AND not trivially small). Returns the decision plus the gates it cleared."""
+    cents(variance_cents, 'variance'); cents(line_budget_cents, 'line budget'); cents(total_budget_cents, 'materiality base')
+    if total_budget_cents < 0:
+        raise ValueError('materiality base must be nonnegative')
+    params = [numeric(v, 'materiality threshold') for v in (rel_pct, abs_floor_frac, abs_min_frac)]
+    if any(v < 0 or v > 1 for v in params):
+        raise ValueError('materiality thresholds must be between zero and one')
+    rel_pct, abs_floor_frac, abs_min_frac = params
     v = abs(variance_cents)
-    abs_floor = abs(int(abs_floor_frac * total_budget_cents))
-    abs_min = abs(int(abs_min_frac * total_budget_cents))
-    rel = (v / abs(line_budget_cents)) if line_budget_cents else 0.0
+    abs_floor = max(1, abs(int(abs_floor_frac * total_budget_cents)))
+    abs_min = max(1, abs(int(abs_min_frac * total_budget_cents)))
+    rel = (Fraction(v, abs(line_budget_cents))) if line_budget_cents else None
 
     clears_big_money = v >= abs_floor
-    clears_relative = (rel >= rel_pct) and (v >= abs_min)
+    clears_relative = (rel is not None and rel >= rel_pct) and (v >= abs_min)
     material = clears_big_money or clears_relative
 
     return {
-        "material": material,
-        "relative_pct": round(rel * 100, 2),
+        "material": material, "base_cents": total_budget_cents,
+        "relative_pct": float(round(rel * 100, 2)) if rel is not None else None,
         "abs_floor_cents": abs_floor, "abs_min_cents": abs_min,
         "cleared": ("big-money (abs floor)" if clears_big_money
                     else "relative % (non-trivial)" if clears_relative
                     else "none"),
-        "thresholds": {"rel_pct": rel_pct, "abs_floor_frac": abs_floor_frac,
-                       "abs_min_frac": abs_min_frac},
+        "thresholds": {"rel_pct": float(rel_pct), "abs_floor_frac": float(abs_floor_frac),
+                       "abs_min_frac": float(abs_min_frac)},
     }
 
 
@@ -89,6 +98,19 @@ def _significance(variance_history_cents: list[int], this_variance_cents: int,
     SAME-PERIOD series (past Decembers) when `period` is given — period-aware.
     Falls back to full history, then to "not computable", honestly labelled.
     """
+    if not isinstance(variance_history_cents, list):
+        raise ValueError('variance history must be a prior-only list of integer cents')
+    for value in variance_history_cents:
+        cents(value, 'variance history')
+    if period_history is not None:
+        if not isinstance(period_history, list):
+            raise ValueError('period history must be a list')
+        for point in period_history:
+            if not isinstance(point, (tuple, list)) or len(point) != 2:
+                raise ValueError('period history requires period/value pairs')
+            cents(point[1], 'seasonal variance history')
+    if type(n_lines_scanned) is not int or n_lines_scanned < 1:
+        raise ValueError('n_lines_scanned must be a positive integer')
     # multiple-testing: tighten the z flag as more lines are scanned (Bonferroni-ish
     # on the tail — add ~the normal quantile growth). Simple, documented, monotone.
     z_flag = _BASE_Z + (math.log(max(1, n_lines_scanned)) if n_lines_scanned > 1 else 0.0)
