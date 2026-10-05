@@ -24,7 +24,7 @@ loop on a cadence; no unattended live schedule or notification service is instal
 | Agent 1 | Batches 1–4, issuer-filing reconciliation, numerical and qualitative claim controls, bounded v1 acceptance | Company/provider coverage and economic peer comparability still require review; not universal listed-company support |
 | Agent 2 | Batches 1–4, Stadler annual live observations, audited correction approval/rejection, saved-cycle triage recovery and read-only HTML reports | Live scheduling and notifications deferred; live validation covers the documented annual workflow |
 | Agent 3 | Batches 1–3: historical calculation/review controls, audited live peer selection/recovery, news relevance and publication evidence | Batch 4 replay/state/integration; real FinBERT weight validation and populated live-news validation remain unverified |
-| Agent 4 | Detailed audit; Batches 1–4 financial contracts, shared history, canonical claims, transactional close/recovery and saved HTML reports | Controlled close-sequence acceptance and authorized internal-company validation remain; forecast calibration unverified |
+| Agent 4 | Detailed audit; Batches 1–4 and controlled offline v1 closure acceptance: financial controls, versioned closes, saved HTML and recovery | Acceptance is synthetic EUR/calendar-year/amount-based; real-company data and forecast calibration unverified |
 | Showcase | Static illustrative prototype in `keystone-showcase/` | Does not yet publish verified linked run artifacts |
 
 The per-agent guides below record acceptance evidence and operating limits.
@@ -506,6 +506,9 @@ Output is available as a Python result, saved JSON evidence and a portable HTML
 report with account drill-downs, source panels and close-version navigation. Batch 4
 fixes negative and leaf waterfalls and adds exact table alternatives and bounded
 browser acceptance. See [operational reports](docs/agent4-operational-reports.md).
+The [controlled closure validation](docs/agent4-closure-validation.md) passed a simulated
+financial year against an independent answer key, including corrections, re-budget,
+year-end and failed-delivery recovery, with local/MCP evidence parity.
 
 ---
 
@@ -685,7 +688,7 @@ The next hardening work is:
 1. **Agent 3 remaining scope:** optional real FinBERT validation and a reviewed sentiment
    benchmark. Populated ASML/NVIDIA news retrieval and issuer-dated event-study checks
    passed bounded acceptance; research publication stays held.
-2. **Agent 4:** Batches 1–4 are implemented; next run the controlled close-sequence acceptance in the [detailed audit](docs/agent4-detailed-audit.md). See the [financial contracts](docs/agent4-financial-contracts.md).
+2. **Agent 4:** Batches 1–4 and [controlled closure acceptance](docs/agent4-closure-validation.md) passed. The bounded offline v1 workflow is accepted; optional next work is an authorized internal-company pilot or forecast calibration. See the [financial contracts](docs/agent4-financial-contracts.md).
 
 Agent 2 live scheduling and notification delivery remain deferred. The existing
 showcase is illustrative; Agent 3 can export separate replay-verified saved-run reports.
