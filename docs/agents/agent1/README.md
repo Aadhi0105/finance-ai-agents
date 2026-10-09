@@ -165,9 +165,12 @@ switch that turns inadequate evidence into an approved report.
 Replace the placeholder with the exact saved file printed by the run:
 
 ```bash
-python run.py --rebuild /path/to/model.json --output output/rebuilt-research
+python run.py --rebuild /path/to/working-copy/model.json
 ```
 
+Rebuild updates the sidecar validation/artifact fields and reports in the supplied
+run directory. Copy the whole run directory first if you need to preserve the
+original delivered files. `--rebuild` does not accept `--output` or `--trace`.
 Rebuild uses saved evidence and current validation/rendering code. It does not
 refetch data or resume a model conversation. Revalidation, age-sensitive checks,
 and renderer changes mean this is not a byte-identical historical reproduction.

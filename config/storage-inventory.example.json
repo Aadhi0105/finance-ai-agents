@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "scope": "Example only: replace paths and describe the exact evidence covered",
+  "sources": [
+    {"name": "state/monitor.duckdb", "path": "/absolute/path/to/monitor.duckdb", "kind": "database", "role": "agent2_state"},
+    {"name": "audits", "path": "/absolute/path/to/monitor-triage", "kind": "tree", "role": "agent2_audits"},
+    {"name": "configuration/watchlist.json", "path": "/absolute/path/to/watchlist.json", "kind": "file", "role": "configuration"}
+  ],
+  "datasets": [
+    {
+      "id": "monitoring",
+      "source": "Declare provider and issuer references here",
+      "classification": "public_provider",
+      "period": "unknown",
+      "currency": "unknown",
+      "units": "unknown",
+      "permission": "pending",
+      "permission_evidence": "pending",
+      "freshness_policy": "pending",
+      "source_names": ["state/monitor.duckdb", "audits", "configuration/watchlist.json"]
+    }
+  ]
+}

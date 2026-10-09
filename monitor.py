@@ -86,128 +86,130 @@ def _print_state():
 
 
 if __name__ == "__main__":
-    import argparse
-    from pathlib import Path
-    options = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
-    options.add_argument('--db', default=_DB)
-    options.add_argument('--data-source', choices=['fixture', 'yfinance'], default='fixture')
-    options.add_argument('--watchlist')
-    options.add_argument('--reviewer')
-    options.add_argument('--reason')
-    options.add_argument('--replacement-item-id')
-    options.add_argument('--report-cycle', type=int)
-    options.add_argument('--audit-dir')
-    parsed, remaining = options.parse_known_args()
-    _DB = str(Path(parsed.db).expanduser().resolve())
-    sys.argv = [sys.argv[0], *remaining]
-    arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
-    if any(value is not None for value in (parsed.reviewer, parsed.reason, parsed.replacement_item_id)) and arg not in {'--approve-review', '--reject-review'}:
-        options.error('reviewer, reason and replacement item ID require a review decision command')
-    if arg in {'--reviews', '--review-decisions'} and len(sys.argv) != 2:
-        options.error('unexpected review listing arguments')
-    if arg == '--retry-triage' and (len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != '--live')):
-        options.error('use --retry-triage CYCLE [--live]')
-    if (parsed.report_cycle is not None or parsed.audit_dir is not None) and arg != '--report':
-        options.error('--report-cycle and --audit-dir require --report PATH')
-    watchlist = None
-    if parsed.data_source == 'yfinance':
-        if not parsed.watchlist or arg not in {'--once', '--catchup'}:
-            sys.exit('Live observations require --watchlist PATH with --once or --catchup; inspect state using --state --db PATH')
-        watchlist = str(Path(parsed.watchlist).expanduser().resolve())
-        from monitoring.live_data import load_profile
-        load_profile(watchlist)
-    elif parsed.watchlist:
-        sys.exit('--watchlist requires --data-source yfinance')
-    if "--live" in sys.argv:
-        if arg not in {"--once", "--catchup", "--retry-triage"}:
-            sys.exit("--live is supported only with --once, --catchup or --retry-triage")
-        try:
-            prepare_live()
-        except ValueError as exc:
-            sys.exit(str(exc))
-    if arg in {"--once", "--catchup", "--run", "--loop"}:
-        print("Data source: live annual statements; analyst policies." if watchlist else "Data source: bundled fixtures (not a live market feed).")
-    if arg == '--report':
-        from monitoring.reporting import export_report
-        if len(sys.argv) != 3:
-            options.error('use --report OUTPUT.html [--report-cycle N] [--audit-dir PATH]')
-        try:
-            path = export_report(_DB, sys.argv[2], cycle=parsed.report_cycle, audit_dir=parsed.audit_dir)
-        except (ValueError, OSError) as exc:
-            sys.exit(str(exc))
-        print(f'Report saved: {path}')
-    elif arg in {'--reviews', '--review-decisions'}:
-        import json
-        store = StateStore(_DB)
-        try:
-            print(json.dumps(store.reviews() if arg == '--reviews' else store.decisions(), indent=2))
-        finally:
-            store.close()
-    elif arg in {'--approve-review', '--reject-review'}:
-        import json
-        from monitoring.recovery import decide
-        if len(sys.argv) != 3:
-            sys.exit('Specify exactly one review ID, --reviewer NAME and --reason TEXT')
-        result = decide(_DB, sys.argv[2], 'approve' if arg == '--approve-review' else 'reject',
-                        parsed.reviewer, parsed.reason, parsed.replacement_item_id)
-        print(json.dumps(result, indent=2))
-    elif arg == '--retry-triage':
-        from monitoring.recovery import retry_triage
-        if len(sys.argv) < 3:
-            sys.exit('Specify the saved cycle number')
-        try:
-            result = retry_triage(_DB, int(sys.argv[2]), live='--live' in sys.argv)
-        except (Exception, KeyboardInterrupt) as exc:
-            print(f"Triage retry failed ({type(exc).__name__}); saved cycle unchanged.", file=sys.stderr)
-            raise SystemExit(2)
-        print(f"Triage audit: {result['audit_path']}")
-        print(result['commentary'] or f"Triage {result['status']}; saved cycle unchanged.")
-        if result['status'] not in {'completed', 'not_needed'}:
-            raise SystemExit(2)
-    elif arg == "--reset":
-        _reset()
-    elif arg == "--state":
-        _print_state()
-    elif arg == "--once":
-        live = "--live" in sys.argv
-        result = run_cycle(db_path=_DB, watchlist_path=watchlist)
-        print(result["report"])
-        _triage_if_needed(result, live)
-        if watchlist and result["status"] == "review_required":
-            raise SystemExit(3)
-    elif arg == "--catchup":
-        # Simulate the monitor coming back online after downtime: data has
-        # advanced to cycle ASOF; skip-to-now and surface the gap.
-        if len(sys.argv) < 3:
-            sys.exit("Usage: python monitor.py --catchup ASOF_CYCLE")
-        result = run_cycle(db_path=_DB, asof_cycle=int(sys.argv[2]), watchlist_path=watchlist)
-        print(result["report"])
-        _triage_if_needed(result, "--live" in sys.argv)
-        if watchlist and result["status"] == "review_required":
-            raise SystemExit(3)
-    elif arg == "--run":
-        # Convenience for demos: run N cycles in sequence (each still one cycle
-        # of the atom). No triage — use --once to triage a cycle's exceptions.
-        n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
-        for _ in range(n):
-            print(run_cycle(db_path=_DB)["report"])
-            print()
-    elif arg == "--loop":
-        # Thin scheduler: fire run_cycle() on a cadence. INTERVAL seconds
-        # (default 2 for demos; 86400 = daily in production), optional --max N.
-        from scheduler.trigger import run_forever
-        interval = float(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else 2.0
-        max_cycles = None
-        if "--max" in sys.argv:
-            max_cycles = int(sys.argv[sys.argv.index("--max") + 1])
-        run_forever(interval_seconds=interval, max_cycles=max_cycles, db_path=_DB)
-    elif arg == "--cron":
-        from scheduler.trigger import cron_line
-        sched = sys.argv[2] if len(sys.argv) > 2 else "0 6 * * 1-5"
-        print("# Add to your crontab (crontab -e) to run one cycle on a cadence:")
-        print(cron_line(sched, db_path=_DB))
-    else:
-        sys.exit("Usage: python monitor.py "
-                 "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "
-                 "--report OUTPUT.html [--report-cycle N] | --cron [SCHEDULE] | --run N | --reset | --state | --reviews | --review-decisions | "
-                 "--approve-review ID | --reject-review ID | --retry-triage CYCLE [--live]]")
+    from keystone.maintenance import gate
+    with gate():
+        import argparse
+        from pathlib import Path
+        options = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+        options.add_argument('--db', default=_DB)
+        options.add_argument('--data-source', choices=['fixture', 'yfinance'], default='fixture')
+        options.add_argument('--watchlist')
+        options.add_argument('--reviewer')
+        options.add_argument('--reason')
+        options.add_argument('--replacement-item-id')
+        options.add_argument('--report-cycle', type=int)
+        options.add_argument('--audit-dir')
+        parsed, remaining = options.parse_known_args()
+        _DB = str(Path(parsed.db).expanduser().resolve())
+        sys.argv = [sys.argv[0], *remaining]
+        arg = sys.argv[1] if len(sys.argv) > 1 else "--once"
+        if any(value is not None for value in (parsed.reviewer, parsed.reason, parsed.replacement_item_id)) and arg not in {'--approve-review', '--reject-review'}:
+            options.error('reviewer, reason and replacement item ID require a review decision command')
+        if arg in {'--reviews', '--review-decisions'} and len(sys.argv) != 2:
+            options.error('unexpected review listing arguments')
+        if arg == '--retry-triage' and (len(sys.argv) not in (3, 4) or (len(sys.argv) == 4 and sys.argv[3] != '--live')):
+            options.error('use --retry-triage CYCLE [--live]')
+        if (parsed.report_cycle is not None or parsed.audit_dir is not None) and arg != '--report':
+            options.error('--report-cycle and --audit-dir require --report PATH')
+        watchlist = None
+        if parsed.data_source == 'yfinance':
+            if not parsed.watchlist or arg not in {'--once', '--catchup'}:
+                sys.exit('Live observations require --watchlist PATH with --once or --catchup; inspect state using --state --db PATH')
+            watchlist = str(Path(parsed.watchlist).expanduser().resolve())
+            from monitoring.live_data import load_profile
+            load_profile(watchlist)
+        elif parsed.watchlist:
+            sys.exit('--watchlist requires --data-source yfinance')
+        if "--live" in sys.argv:
+            if arg not in {"--once", "--catchup", "--retry-triage"}:
+                sys.exit("--live is supported only with --once, --catchup or --retry-triage")
+            try:
+                prepare_live()
+            except ValueError as exc:
+                sys.exit(str(exc))
+        if arg in {"--once", "--catchup", "--run", "--loop"}:
+            print("Data source: live annual statements; analyst policies." if watchlist else "Data source: bundled fixtures (not a live market feed).")
+        if arg == '--report':
+            from monitoring.reporting import export_report
+            if len(sys.argv) != 3:
+                options.error('use --report OUTPUT.html [--report-cycle N] [--audit-dir PATH]')
+            try:
+                path = export_report(_DB, sys.argv[2], cycle=parsed.report_cycle, audit_dir=parsed.audit_dir)
+            except (ValueError, OSError) as exc:
+                sys.exit(str(exc))
+            print(f'Report saved: {path}')
+        elif arg in {'--reviews', '--review-decisions'}:
+            import json
+            store = StateStore(_DB)
+            try:
+                print(json.dumps(store.reviews() if arg == '--reviews' else store.decisions(), indent=2))
+            finally:
+                store.close()
+        elif arg in {'--approve-review', '--reject-review'}:
+            import json
+            from monitoring.recovery import decide
+            if len(sys.argv) != 3:
+                sys.exit('Specify exactly one review ID, --reviewer NAME and --reason TEXT')
+            result = decide(_DB, sys.argv[2], 'approve' if arg == '--approve-review' else 'reject',
+                            parsed.reviewer, parsed.reason, parsed.replacement_item_id)
+            print(json.dumps(result, indent=2))
+        elif arg == '--retry-triage':
+            from monitoring.recovery import retry_triage
+            if len(sys.argv) < 3:
+                sys.exit('Specify the saved cycle number')
+            try:
+                result = retry_triage(_DB, int(sys.argv[2]), live='--live' in sys.argv)
+            except (Exception, KeyboardInterrupt) as exc:
+                print(f"Triage retry failed ({type(exc).__name__}); saved cycle unchanged.", file=sys.stderr)
+                raise SystemExit(2)
+            print(f"Triage audit: {result['audit_path']}")
+            print(result['commentary'] or f"Triage {result['status']}; saved cycle unchanged.")
+            if result['status'] not in {'completed', 'not_needed'}:
+                raise SystemExit(2)
+        elif arg == "--reset":
+            _reset()
+        elif arg == "--state":
+            _print_state()
+        elif arg == "--once":
+            live = "--live" in sys.argv
+            result = run_cycle(db_path=_DB, watchlist_path=watchlist)
+            print(result["report"])
+            _triage_if_needed(result, live)
+            if watchlist and result["status"] == "review_required":
+                raise SystemExit(3)
+        elif arg == "--catchup":
+            # Simulate the monitor coming back online after downtime: data has
+            # advanced to cycle ASOF; skip-to-now and surface the gap.
+            if len(sys.argv) < 3:
+                sys.exit("Usage: python monitor.py --catchup ASOF_CYCLE")
+            result = run_cycle(db_path=_DB, asof_cycle=int(sys.argv[2]), watchlist_path=watchlist)
+            print(result["report"])
+            _triage_if_needed(result, "--live" in sys.argv)
+            if watchlist and result["status"] == "review_required":
+                raise SystemExit(3)
+        elif arg == "--run":
+            # Convenience for demos: run N cycles in sequence (each still one cycle
+            # of the atom). No triage — use --once to triage a cycle's exceptions.
+            n = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+            for _ in range(n):
+                print(run_cycle(db_path=_DB)["report"])
+                print()
+        elif arg == "--loop":
+            # Thin scheduler: fire run_cycle() on a cadence. INTERVAL seconds
+            # (default 2 for demos; 86400 = daily in production), optional --max N.
+            from scheduler.trigger import run_forever
+            interval = float(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else 2.0
+            max_cycles = None
+            if "--max" in sys.argv:
+                max_cycles = int(sys.argv[sys.argv.index("--max") + 1])
+            run_forever(interval_seconds=interval, max_cycles=max_cycles, db_path=_DB)
+        elif arg == "--cron":
+            from scheduler.trigger import cron_line
+            sched = sys.argv[2] if len(sys.argv) > 2 else "0 6 * * 1-5"
+            print("# Add to your crontab (crontab -e) to run one cycle on a cadence:")
+            print(cron_line(sched, db_path=_DB))
+        else:
+            sys.exit("Usage: python monitor.py "
+                     "[--once [--live] | --catchup N | --loop [INTERVAL] [--max N] | "
+                     "--report OUTPUT.html [--report-cycle N] | --cron [SCHEDULE] | --run N | --reset | --state | --reviews | --review-decisions | "
+                     "--approve-review ID | --reject-review ID | --retry-triage CYCLE [--live]]")

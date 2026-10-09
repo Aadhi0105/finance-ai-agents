@@ -210,5 +210,7 @@ def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
 
 
 if __name__ == '__main__':
-    path = Path(sys.argv[1])
-    raise SystemExit(execute(Attempt(path, read_record(path))))
+    from keystone.maintenance import gate
+    with gate():
+        path = Path(sys.argv[1])
+        raise SystemExit(execute(Attempt(path, read_record(path))))
