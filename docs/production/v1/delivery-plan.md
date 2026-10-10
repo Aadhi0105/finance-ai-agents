@@ -53,3 +53,11 @@ checkout-wide CLI lease, durable operation IDs, selected usage/deadline limits, 
 control receipts, diagnostics, hash-pinned local installation and additive upgrade/
 rollback rehearsal. Production gates remain in progress; independent protection,
 source approval and final release/capacity acceptance are not silently waived.
+
+## Batch 4 bounded offline evaluation — 10 October 2026
+
+[Financial acceptance](batch4-financial-acceptance.md) freezes retained-source and
+synthetic cases, independent calculation tolerances and explicit negative outcomes.
+Human news labels, source permissions, company FP&A data and financial reviewer
+sign-off remain dependencies. Engineering evidence can be completed without falsely
+claiming those release conditions are satisfied.

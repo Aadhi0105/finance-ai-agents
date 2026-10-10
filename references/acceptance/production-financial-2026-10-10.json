@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "status": "offline_checks_passed_with_release_holds",
+  "application_base_commit": "53aa8fd874f7b9340e59bc85cb80feecf7dd9aa2",
+  "harness_committed": false,
+  "plan_sha256": "5360ea173751f61212d6bc6180dc522f60f76df6eca8c6500a10a46714a06f29",
+  "environment": {
+    "schema_version": 1,
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "os_version": "26.6.1",
+    "python": "3.11.9",
+    "pilot_platform_matches": true,
+    "dependency_mismatches": [],
+    "lock_sha256": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349",
+    "code_commit": "53aa8fd874f7b9340e59bc85cb80feecf7dd9aa2",
+    "worktree_dirty": true,
+    "selected_path_checks": [
+      {
+        "name": "state/operations",
+        "private": true
+      }
+    ],
+    "status": "ready_for_local_checks",
+    "production_release_approved": false,
+    "limitations": [
+      "Existing reports/inputs and network exposure require separate deployment review.",
+      "Version matching does not prove installed bytes match wheel hashes.",
+      "Clean virtual environment is not clean-machine disaster recovery."
+    ]
+  },
+  "source_sha256": {
+    "scripts/check_keystone_financial.py": "67b2992a90bc6fd19de9d518448b2f0f5f61ba761b7012afb45f82b618dc8896",
+    "scripts/prepare_keystone_news_review.py": "4e0eaee30811f5f15c90e8bf886ca3a14d43867c1624b0b65f37da5b39984172",
+    "tests/test_production_financial_acceptance.py": "17b56bea609cc9bd1b3146fb6c477794ce20ea01d48b0f82dbb5ae272498b50c",
+    "fixtures/production_v1/batch4-plan.json": "5360ea173751f61212d6bc6180dc522f60f76df6eca8c6500a10a46714a06f29"
+  },
+  "agent1": {
+    "status": "passed",
+    "retained_issuer": "ASML.AS FY2025",
+    "independent_fcff": "9393581600.19638614425614364",
+    "dcf_cases": [
+      {
+        "id": "one-year",
+        "scenarios": 3,
+        "status": "passed"
+      },
+      {
+        "id": "five-year",
+        "scenarios": 3,
+        "status": "passed"
+      },
+      {
+        "id": "default-shape",
+        "scenarios": 3,
+        "status": "passed"
+      },
+      {
+        "id": "thirty-year",
+        "scenarios": 3,
+        "status": "passed"
+      }
+    ],
+    "negative_cases": 6,
+    "limitations": [
+      "Retained reference, not fresh PDF verification.",
+      "No current price/share or forecast certification."
+    ]
+  },
+  "agent2": {
+    "status": "passed",
+    "ratios": [
+      0.9567418366614171,
+      3.789017886639294,
+      0.9892332941882055
+    ],
+    "scenarios": [
+      "retained_ratios",
+      "baseline",
+      "duplicate",
+      "outage_preserves_state",
+      "stale",
+      "future",
+      "currency",
+      "units",
+      "period",
+      "unreviewed_period",
+      "issuer_mismatch",
+      "controlled_correction_approval",
+      "controlled_correction_rejection",
+      "replay"
+    ],
+    "scope": "offline constructed adapter inputs from retained issuer reference; synthetic correction workflow; no live fetch or human approval"
+  },
+  "news_synthetic": {
+    "status": "passed",
+    "relevance_cases": 20,
+    "freshness_cases": 6,
+    "dedup_cases": 6,
+    "entity_label_confusion_counts": {
+      "tp": 13,
+      "fp": 0,
+      "fn": 0,
+      "tn": 27
+    },
+    "mismatches": [],
+    "human_reviewed": false,
+    "production_quality_accepted": false
+  },
+  "events": {
+    "status": "passed",
+    "bundles": 2,
+    "checked_windows": {
+      "event": 10,
+      "control": 10
+    },
+    "raw_price_ols_oracle": "passed",
+    "offline_replay": "matched",
+    "held_exports": "passed",
+    "fresh_issuer_verification": false
+  },
+  "agent4": {
+    "status": "synthetic_checks_passed",
+    "committed_closes": 14,
+    "checks": [
+      "independent answer key",
+      "monthly closes",
+      "isolated spike",
+      "persistent pattern",
+      "missing input rollback/retry",
+      "late close rejection",
+      "partial restatement",
+      "formal re-budget",
+      "year-end exact outcome",
+      "duplicate replay",
+      "JSON/HTML failure and reopen recovery",
+      "historical immutability"
+    ],
+    "exact_cent_oracle": "passed",
+    "company_acceptance": "blocked"
+  },
+  "regression_tests": {
+    "passed": 309,
+    "seconds": 32.76,
+    "new_harness_tests": 8,
+    "scope": "Frozen listed regression modules plus acceptance harness; not a new full-suite run."
+  },
+  "human_news_review": {
+    "status": "awaiting_human_labels",
+    "items": 40,
+    "sources": [
+      {
+        "path": "output/agent3-news-recovery/asml-accepted/0ca21cb717214b6c979526bf4e30deb7/bundle.json",
+        "sha256": "2a06ecc6758e16d97e8b7ffeff3814d36c157ed6bc95b6ba10353aea66bfd949",
+        "records": 20
+      },
+      {
+        "path": "output/agent3-news-recovery/nvda-accepted/b49cd747a06244f08320e5ce6ca01697/bundle.json",
+        "sha256": "659188003f85b13b381dc258011159a6ff0e0215c5b38aaa3e6af1f14b69f5f5",
+        "records": 20
+      }
+    ],
+    "labels_sha256": "752973d79aaccd117847495b974fa7bbcfde70bca560f099557e349f994a16b2",
+    "application_predictions_shown": false,
+    "production_quality_accepted": false
+  },
+  "blocked": [
+    "Authorised Agent 4 company dataset and controller review",
+    "Source-use permission for production live acceptance",
+    "Human-labelled representative news quality evaluation",
+    "Independent backup and clean-machine recovery",
+    "Human financial reviewer sign-off and final candidate acceptance"
+  ],
+  "network_calls": 0,
+  "paid_model_calls": 0,
+  "production_release_approved": false,
+  "local_artifacts": {
+    "full_results": "output/production-financial/batch4-final/acceptance.json",
+    "blind_review": "output/production-financial/news-human-review-ready/review.html",
+    "human_labels": "output/production-financial/news-human-review-ready/labels.json"
+  }
+}
