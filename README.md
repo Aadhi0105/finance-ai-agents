@@ -247,3 +247,9 @@ gaps; it does not grant production acceptance. The
 Batch 2 adds [local snapshot and restore commands](docs/production/v1/batch2-storage.md)
 with explicit inventories and evidence-preserving relocation. Independent-device
 backup and Production v1 release acceptance remain pending.
+
+Batch 3 adds [controlled local operation](docs/production/v1/batch3-operation.md):
+one active CLI workflow, durable operation IDs, opt-in model limits, cancellation
+receipts, environment diagnostics and a hash-pinned macOS installation. Use that
+guide for the supervised operating scope; older direct commands retain their
+agent-specific behaviour and do not supply all wrapper controls.

@@ -1,9 +1,10 @@
-# Production v1 operations runbook — procedure outline
+# Production v1 operations runbook
 
 **Not yet a fully accepted production runbook.** Batch 2 supplies tested local
 [snapshot/restore procedures](batch2-storage.md); independent backup configuration
-and Batch 3 operating controls remain outstanding. Existing agent commands remain in the
-[project guide](../../../README.md). No invented backup/release command is provided.
+remains outstanding. [Batch 3 procedures](batch3-operation.md) now cover controlled
+launch, duplicate IDs, limits, interruption, diagnostics, installation and rollback. Existing agent commands remain in the
+[project guide](../../../README.md). Use the scoped commands in those implementation guides; final release acceptance is pending.
 
 | Procedure | Required content and verification | Gate |
 | --- | --- | --- |
@@ -41,3 +42,24 @@ unknown commit status, source inconsistency or secret exposure, preserve evidenc
 and stop the affected workflow; do not reset the database or weaken validation.
 Implementation support diagnoses from permission-scoped evidence. No external
 support/on-call service or automated notification system is promised by v1.
+
+## Prepared dependency procedures
+
+See [backup/key recovery and disaster drill](dependency-closure.md) and
+[source-use review](source-use-review.md). User deferred independent backup after
+the supplied Desktop folder was confirmed to be on internal storage. Only this Mac
+is available. Procedures are prepared, not executed acceptance evidence.
+
+## Start and recovery for the controlled local scope
+
+1. Run `python -m keystone doctor`; resolve drift/access holds before relying on the
+   candidate. Confirm explicit state/output paths, source permissions and protection
+   status. Deferred independent backup means no production protection claim.
+2. Use `python -m keystone.operation AGENT --operation-id UNIQUE_ID -- AGENT_ARGS`.
+   Paid models and live data each require a separate opt-in; see the Batch 3 guide.
+3. Run `python -m keystone inspect-operation UNIQUE_ID` and inspect native agent
+   evidence. Review holds are not system failure; process completion is not approval.
+4. For cancellation/unknown state, locate the saved agent cycle/close/attempt before
+   deciding on a new operation. Recover committed delivery by its original identity.
+5. Include `state/operations` in the reviewed snapshot inventory as role `logs`.
+   Never delete a lock or receipt to force a retry.

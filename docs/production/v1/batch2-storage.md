@@ -6,6 +6,9 @@ was sent to a remote service or copied to an external drive. Device-loss RPO/RTO
 external encryption/key recovery, source-use permissions and real-company FP&A
 remain unaccepted release dependencies.
 
+The maintenance-gate description below records Batch 2. [Batch 3](batch3-operation.md)
+now adds an exclusive normal-CLI mutator lease and supervised operation controls.
+
 ## What is implemented
 
 `keystone/contracts.py` validates an explicit source inventory and dataset contracts.

@@ -13,7 +13,7 @@ This hash identifies the inspected implementation, not a newly accepted release.
 | Exact macOS, hardware, Python, dependency lock identity | Unassigned |
 | Model IDs, prompts, provider/configuration identities | Unassigned |
 | RPO / RTO requirement | ≤ one active working day of device-loss changes / ≤ eight staffed recovery hours under D-02; not yet measured |
-| Independent backup destination and key recovery | Unassigned, D-03 |
+| Independent backup destination and key recovery | Deferred by user; actual device and key recovery unverified, D-03 |
 | Applicable matrix results | No complete Production v1 gate passed |
 | Authorised Agent 4 dataset | Not available; user confirmed dependency |
 | Analyst / financial-review sign-off | None |
@@ -73,3 +73,49 @@ records the final same-device run. Original generated artifacts remain in ignore
 local output. This evidence does not satisfy independent-device/clean-machine recovery,
 source-rights approval, an eight-hour measured disaster RTO, real-company FP&A, or
 Production v1 sign-off. These remain explicit matrix dependencies.
+
+## Dependency preparation — 10 October 2026
+
+Prepared [backup/key recovery and disaster-drill procedures](dependency-closure.md)
+and [source-use review](source-use-review.md) against merged Batch 2 commit
+`9584b25a804d907c66f28d993ebc27bb28616988` (PR #27). The earlier uncommitted
+candidate description records the state at the time of local testing.
+Desktop/Keystone resolved to `/dev/disk3s5` on `/System/Volumes/Data`.
+DiskManagement was unavailable, so encryption was not verified. User then deferred
+independent backup. No copy, device change, new restore or runtime test occurred.
+Only the original Mac is available. No acceptance gate is advanced.
+
+## Batch 3 local verification — 10 October 2026
+
+[Controlled operation](batch3-operation.md) and the
+[machine-readable evidence](../../../references/acceptance/production-operations-2026-10-10.json)
+record this uncommitted candidate against main `9584b25`. Runtime source hashes
+identify the tested changes independently of the unchanged base commit.
+
+- Full suite in the fresh hash-verified environment: **984 passed in 112.35 seconds**.
+- After final directory durability/evidence-location updates: **26 operation tests
+  passed in 23.03 seconds**, including one newly added durability regression.
+- An earlier serialized clean-environment check passed all 50 then-existing storage
+  and operation tests. Verification runs must not overlap in one checkout: the
+  admission lock correctly refuses competing test processes.
+- New checks exercise real CLI conflict/worker inheritance, reused operation IDs,
+  private artifacts, deadline descendant cleanup, SIGTERM cancellation, preservation
+  of committed DuckDB data while an uncommitted transaction is interrupted, safe
+  control logs, live-data admission and mocked paid-call refusal/usage limits.
+- Fresh local installation used pinned wheel hashes, no index during installation,
+  and passed dependency consistency checks on macOS 26.6.1 arm64 / Python 3.11.9.
+- Prior-state rehearsal used an archive of main `9584b25`, whose commit identity was
+  verified from the Git archive. The archive lacks `.git`, so its snapshot correctly
+  records a null source commit; the separate archive identity is retained in evidence.
+- Current code rebuilt research, replayed news, recovered close output and advanced
+  monitoring from 10 to 11 cycles. Snapshot rollback restored 10 cycles without
+  changing the backup. The prior code then read that state and recovered identical
+  Agent 4 saved JSON. No financial schema migration was introduced.
+- Controlled CLI smoke returned the expected review-required result; inspection
+  confirmed its evidence location and zero paid requests.
+
+Package downloads were the only new external retrieval for these checks. No paid
+model call, new live financial/news retrieval, external backup or device change was
+performed. Temporary installation/previous-release files remain local test artifacts,
+not independent backups. Final production candidate sign-off and the outstanding
+matrix dependencies remain open.

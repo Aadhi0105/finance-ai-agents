@@ -45,3 +45,11 @@ is implemented, including Agent 2 audit-origin preservation and Agent 3 index-pa
 relocation with original evidence retained. Local rehearsal is supporting evidence;
 V1-DAT-001 and independent-device V1-STO-002 remain open. Do not label all Batch 2
 release conditions passed merely because its local implementation tests succeed.
+
+## Batch 3 local implementation — 10 October 2026
+
+[Controlled-operation guide](batch3-operation.md) documents the supervised wrapper,
+checkout-wide CLI lease, durable operation IDs, selected usage/deadline limits, safe
+control receipts, diagnostics, hash-pinned local installation and additive upgrade/
+rollback rehearsal. Production gates remain in progress; independent protection,
+source approval and final release/capacity acceptance are not silently waived.

@@ -159,11 +159,18 @@ def execute(attempt):
 
 def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
     """Kill the worker group; the guarded MCP server detects parent loss separately."""
+    from keystone.maintenance import inherited_fds
     process = None
+    supervised = os.environ.get('KEYSTONE_SUPERVISED') == '1'
+    def stop_worker():
+        if supervised:
+            process.kill()
+        else:
+            os.killpg(process.pid, signal.SIGKILL)
     try:
         process = subprocess.Popen([sys.executable, '-m', worker_module, str(attempt.path)],
                                    cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                   start_new_session=True)
+                                   start_new_session=not supervised, pass_fds=inherited_fds())
         process.wait(timeout=timeout)
         attempt.record = read_record(attempt.path)
         if attempt.record.get('status') not in EXIT_CODES or process.returncode != EXIT_CODES.get(attempt.record.get('status')):
@@ -171,7 +178,7 @@ def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
     except (subprocess.TimeoutExpired, KeyboardInterrupt) as exc:
         if process is not None:
             try:
-                os.killpg(process.pid, signal.SIGKILL)
+                stop_worker()
             except ProcessLookupError:
                 pass
             process.wait()
@@ -179,7 +186,7 @@ def run_bounded(attempt, timeout, *, worker_module='agent3.execution'):
         attempt.finish('unavailable', 'run_deadline_exceeded' if isinstance(exc, subprocess.TimeoutExpired) else 'interrupted')
     except Exception as exc:
         if process is not None and process.poll() is None:
-            os.killpg(process.pid, signal.SIGKILL)
+            stop_worker()
             process.wait()
         attempt.finish('failed', 'worker_launch_or_record_failure', type(exc).__name__)
     from agent3.bundles import seal

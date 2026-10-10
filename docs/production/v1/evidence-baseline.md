@@ -16,6 +16,7 @@ been verified as accessible, complete, or backed up during this batch.
 | E07 | [CI workflow](../../../.github/workflows/ci.yml), [requirements](../../../requirements.txt) | Existing regression workflow on Python 3.11/3.12; historical latest closure count 930 | Frozen release dependencies, clean macOS installation, release/upgrade/rollback evidence; no current rerun claimed |
 | E08 | [Agent manuals](../../../README.md), PR #26 documentation validation | Commands, 117 link checks and offline starter/replay/recovery checks from preceding session | Production operating runbook and independent operator tasks; documentation checks are not financial approval |
 | E09 | [Agent 1 execution](../../agent1-execution-reporting.md), [Agent 2 state](../../agent2-state-recovery.md), [Agent 3 execution](../../agent3-batch2.md), [Agent 4 close](../../agent4-close-recovery.md) | Agent-specific checkpoints, locks, versioning and interruption controls | Platform-wide concurrency policy, cancellation/duplicate failure matrix and selected recovery objectives |
+| E10 | [Batch 3 operating controls](batch3-operation.md), [local verification](../../../references/acceptance/production-operations-2026-10-10.json) | Serialized CLI admission, controlled execution, mocked usage limits, same-Mac frozen installation and prior-state rollback | Permission-scoped live acceptance, final candidate/deployment review, independent recovery and workload capacity |
 
 ## Evidence handling rules
 

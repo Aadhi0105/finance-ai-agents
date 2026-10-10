@@ -2,12 +2,17 @@
 
 Status: **scope baseline; production release not accepted**. Batch 1 of 5.
 Baseline completed: 10 October 2026. Repository inspected at `15502439d6d0527ebb45beadc2431f9dfac0ed80`.
-The user authorised proceeding with the supervised local defaults. Recovery targets are selected in D-02; cost/performance targets, data permissions,
+The user authorised proceeding with the supervised local defaults. Recovery targets are selected in D-02; final workload/performance targets, data permissions,
 and real-company acceptance remain open where
 explicitly identified below. Historical “agent v1” acceptance is not platform
 Production v1 acceptance.
 
 ## Document map
+
+- [Batch 3 controlled operation](batch3-operation.md): admission, operation IDs, limits, frozen installation and rollback.
+
+- [Dependency closure preparation](dependency-closure.md): deferred external backup, key recovery and disaster drill.
+- [Source-use review](source-use-review.md): preliminary rights evidence and unresolved permissions.
 
 - [Batch 2 local storage implementation](batch2-storage.md): commands, relocation and boundaries.
 - [Acceptance matrix](acceptance-matrix.md): mandatory gates and evidence status.
@@ -41,14 +46,14 @@ approval. Review-required results are valid outcomes, not defects to suppress.
 | Interface | Existing CLIs and generated HTML; no new browser application required |
 | Access | Trusted OS account and protected local files; no externally exposed application |
 | Initiation | Manual; no promise of scheduled monitoring or delivered notifications |
-| Concurrency | Proposed single active mutating workflow; enforcement and conflicting invocation tests required in Batch 3 |
+| Concurrency | Single active supported CLI workflow per checkout; direct API/other-checkout writers excluded |
 | State | Existing stores remain baseline; storage technology change requires a recorded decision |
-| Paid calls | Explicit live mode and visible configuration; cost limits must be agreed and enforced before released live-model use |
+| Paid calls | Wrapper default disables paid calls; opt-in request/output/runtime limits selected in D-04; currency billing unpriced |
 | Release unit | Capability-specific acceptance; release manifest lists exactly which agent modes are production accepted |
 
-No runtime changes are made by this specification. Current code does not acquire
-a platform-wide concurrency guard, backup service, access controls, or cost cap
-merely because these are requirements.
+The specification itself does not implement controls. Batch 2 and Batch 3 add the
+scoped local implementations linked above; they do not establish independent backup,
+authenticated multi-user approvals or a currency spending cap.
 
 ## Released capability candidates
 
