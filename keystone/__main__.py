@@ -10,6 +10,8 @@ from keystone.storage import snapshot, verify, restore
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     sub=parser.add_subparsers(dest='action',required=True)
+    sub.add_parser('doctor')
+    p=sub.add_parser('inspect-operation');p.add_argument('operation_id')
     p=sub.add_parser('validate-plan');p.add_argument('plan')
     p=sub.add_parser('snapshot');p.add_argument('plan');p.add_argument('--destination',required=True)
     p.add_argument('--quiescent',action='store_true',help='confirm direct API/other-checkout writers are stopped')
@@ -17,7 +19,14 @@ def main(argv=None):
     p=sub.add_parser('restore');p.add_argument('snapshot');p.add_argument('--destination',required=True)
     args=parser.parse_args(argv)
     try:
-        if args.action in {'validate-plan','snapshot'}:
+        if args.action=='doctor':
+            from keystone.environment import inspect_environment
+            result=inspect_environment();print(json.dumps(result,indent=2))
+            return 0 if result['status']=='ready_for_local_checks' else 3
+        elif args.action=='inspect-operation':
+            from keystone.environment import inspect_operation
+            print(json.dumps(inspect_operation(args.operation_id),indent=2))
+        elif args.action in {'validate-plan','snapshot'}:
             plan=validate_plan(json.loads(Path(args.plan).read_text()))
             if args.action=='validate-plan':
                 print(json.dumps({'valid_inventory':True,'release_approved':False,'permission_holds':release_holds(plan)}))

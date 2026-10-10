@@ -110,10 +110,12 @@ class AnthropicModel(ModelClient):
             # 60s timeout: a bad model / network stall FAILS FAST with a clear error
             # instead of hanging silently.
             self._client = anthropic.Anthropic(
-                api_key=os.environ["ANTHROPIC_API_KEY"], timeout=60.0)
+                api_key=os.environ["ANTHROPIC_API_KEY"], timeout=60.0, max_retries=0)
         return self._client
 
     def respond(self, system: str, messages: list, tools: list) -> ModelResponse:
+        from keystone.budget import reserve, report
+        reservation = reserve(self.model, self.max_tokens, system, messages, tools)
         client = self._lazy_client()
         resp = client.messages.create(
             model=self.model,
@@ -122,6 +124,7 @@ class AnthropicModel(ModelClient):
             tools=tools,
             messages=messages,
         )
+        report(reservation, resp.usage.model_dump() if resp.usage else {})
         # The real SDK blocks already expose .type/.id/.name/.input/.text, so we
         # can hand them straight to the loop. We normalise into our own dataclasses
         # to keep a single, explicit shape the loop depends on.

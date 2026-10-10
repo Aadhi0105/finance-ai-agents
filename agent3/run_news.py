@@ -10,7 +10,7 @@ from tools.event_contracts import ticker
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('ticker')
     parser.add_argument('--alias', action='append', default=[], help='explicit issuer headline alias, repeatable')
     parser.add_argument('--news-query', help='explicit provider search query (default: ticker); does not establish relevance')

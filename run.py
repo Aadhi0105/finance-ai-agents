@@ -344,7 +344,7 @@ def main(argv=None):
             raise argparse.ArgumentTypeError('invalid ticker')
         return value.upper()
 
-    parser = argparse.ArgumentParser(description='Agent 1 equity research. Exit: 0 approved, 1 failure, 2 usage, 3 review, 4 incomplete, 130 interrupted.')
+    parser = argparse.ArgumentParser(allow_abbrev=False, description='Agent 1 equity research. Exit: 0 approved, 1 failure, 2 usage, 3 review, 4 incomplete, 130 interrupted.')
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--live', metavar='TICKER', type=ticker)
     modes.add_argument('--offline', metavar='TICKER', type=ticker, help='explicit offline ticker (default ASML.AS)')

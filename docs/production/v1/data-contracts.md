@@ -78,3 +78,6 @@ Thresholds and sample coverage are open in D-05; do not invent pass rates after 
 Confidential D09 inputs and raw model/provider records must not be committed by
 default. Store permission-scoped manifests and redacted evidence references in the
 release register; keep sensitive artifacts in the protected storage design.
+
+See [preliminary source-use review](source-use-review.md) for current terms evidence
+and unresolved access, retention, model-processing and sharing permissions.

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "status": "local_engineering_checks_passed",
+  "base_commit": "9584b25a804d907c66f28d993ebc27bb28616988",
+  "candidate_committed": false,
+  "environment": {
+    "schema_version": 1,
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "os_version": "26.6.1",
+    "python": "3.11.9",
+    "pilot_platform_matches": true,
+    "dependency_mismatches": [],
+    "lock_sha256": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349",
+    "code_commit": "9584b25a804d907c66f28d993ebc27bb28616988",
+    "worktree_dirty": true,
+    "selected_path_checks": [
+      {
+        "name": "state/operations",
+        "private": true
+      }
+    ],
+    "status": "ready_for_local_checks",
+    "production_release_approved": false,
+    "limitations": [
+      "Existing reports/inputs and network exposure require separate deployment review.",
+      "Version matching does not prove installed bytes match wheel hashes.",
+      "Clean virtual environment is not clean-machine disaster recovery."
+    ]
+  },
+  "source_sha256": {
+    "keystone/operation.py": "6b80f12f52137f4281bbd47d374b4d6a6b7eafb867bebe16589ef02d2785526f",
+    "keystone/budget.py": "6acd2a9b7fe007b058dff22b88ced5ca7251e1550e71d01f06fcd75aaa962960",
+    "keystone/environment.py": "87879340de275436bb85a18edf381375d0b9edb0303c8f467eb20ebc517093bd",
+    "keystone/maintenance.py": "8d57b160b353bea9397130e7da8ab1a5bc63639688705f56d85072f055b8f705",
+    "keystone/__main__.py": "22e27c1cca87c1ca3500bd7ad733a94cda37c1a83f344300a44e5ac5ef1e6438",
+    "agent/models.py": "5eaa0110d96788f64cf0ba526ad42285673bc0ede84bd7096e060d9a5c9aafb3",
+    "agent3/execution.py": "233e5abab7d47bb0127e128aec12af01a267f9e37edf511ced5ac01eaad7689e",
+    "agent3/run_news.py": "89021ee3d2b9db7be5cf627b6cb4c926aaf3ed1ec2c2348b6abbca36e96f7c0a",
+    "run.py": "39c5754ac9047476194864d3d51045c5180f565a0c86060f25a7804484fecd3d",
+    "scripts/check_keystone_upgrade.py": "05c2e2eabce1f7a9ceecc2780a669ddc93d99912e5c9e6eca41b4c895262d7a2",
+    "tests/test_production_operations.py": "7ff7dabd09e8da5d10db27b4c237f45377552c92ab6a71c9a64f2f166a69e558",
+    "requirements-macos-arm64-py311.lock": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349"
+  },
+  "tests": {
+    "full_suite": {
+      "passed": 984,
+      "seconds": 112.35,
+      "runtime": "fresh hash-verified local environment"
+    },
+    "final_operation_regressions": {
+      "passed": 26,
+      "seconds": 23.03,
+      "note": "After final directory durability and evidence-location updates; includes one additional regression beyond the full suite."
+    },
+    "clean_storage_and_operation_checks": {
+      "passed": 50,
+      "note": "Earlier serialized clean-environment run; later operation additions checked separately."
+    }
+  },
+  "installation": {
+    "method": "fresh venv; offline wheel installation with --require-hashes; pip check passed",
+    "network_used_for": "public package downloads only",
+    "new_machine": false
+  },
+  "upgrade": {
+    "status": "passed",
+    "scope": "same-device prior-state additive upgrade and snapshot rollback",
+    "snapshot_id": "6bb2b4ac43e641eaaea197d435a65e5c",
+    "source_commit": null,
+    "checks": {
+      "rebuild": "review_required",
+      "new-cycle": "completed",
+      "agent3-retained-replay": "matched",
+      "close-report": "completed"
+    },
+    "rollback_cycles": 10,
+    "upgraded_cycles": 11,
+    "original_snapshot_unchanged": true,
+    "schema_migration_introduced": false,
+    "clean_machine_tested": false,
+    "production_release_approved": false
+  },
+  "prior_release_source": {
+    "commit_verified_from_git_archive": "9584b25a804d907c66f28d993ebc27bb28616988",
+    "archive_sha256": "114e7c5f9d46d0090a52fa2f210a982bc8c520c72c60bad9d15b3203ec351217",
+    "note": "Archived checkout has no .git, so the snapshot source_commit is null; archive commit identity was checked separately."
+  },
+  "old_code_rollback_check": {
+    "monitor_cycles": 10,
+    "agent4_saved_json": "byte_identical",
+    "passed": true
+  },
+  "controlled_cli_smoke": {
+    "operation_id": "batch3-smoke-20261010",
+    "status": "review_required",
+    "requests_reserved": 0,
+    "receipt_inspection": "passed"
+  },
+  "limits": {
+    "paid_calls_default": false,
+    "live_data_default": false,
+    "max_requests": 12,
+    "max_reserved_output_tokens": 48000,
+    "max_seconds": 600,
+    "max_input_bytes_per_request": 100000,
+    "currency_cost": "unpriced"
+  },
+  "local_artifacts": {
+    "upgrade": "output/production-operations/upgrade-verified-20261010/acceptance.json",
+    "smoke": "state/operations/batch3-smoke-20261010/operation.json"
+  },
+  "limitations": [
+    "Independent backup deferred by user.",
+    "Only current Mac tested; no clean-machine disaster recovery.",
+    "Source-use permissions unresolved; no live provider/model acceptance performed.",
+    "Cooperative one-checkout CLI boundary; direct APIs and other checkouts excluded.",
+    "Final workload/capacity and production deployment review pending.",
+    "Agent 4 authorised company dataset unavailable.",
+    "No production gate sign-off."
+  ],
+  "production_release_approved": false
+}
