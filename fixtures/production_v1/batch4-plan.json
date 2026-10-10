@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "plan_id": "production-v1-batch4-offline-v1",
+  "frozen_on": "2026-10-10",
+  "as_of": "2026-10-10T12:00:00Z",
+  "production_release_approved": false,
+  "scope": "retained historical evidence plus new synthetic boundary cases; no new provider/model calls",
+  "thresholds": {
+    "issuer_asml_base_eur": 100000,
+    "issuer_stadler_base_chf": 1000,
+    "fcff_base_currency": 0.01,
+    "rounded_ratio": 5.1e-05,
+    "unrounded_ratio": 1e-12,
+    "rounded_ev_currency": 0.51,
+    "rounded_per_share_currency": 0.0051,
+    "event_rtol": 1e-10,
+    "event_atol": 1e-12,
+    "synthetic_contract_match_rate": 1.0,
+    "agent4_cents": 0
+  },
+  "dcf_cases": [
+    {
+      "id": "one-year",
+      "horizon_years": 1,
+      "discount_rate": 0.08,
+      "terminal_growth": 0.02,
+      "high_growth": 0.1
+    },
+    {
+      "id": "five-year",
+      "horizon_years": 5,
+      "discount_rate": 0.1,
+      "terminal_growth": 0.02,
+      "high_growth": 0.15
+    },
+    {
+      "id": "default-shape",
+      "horizon_years": 10,
+      "discount_rate": 0.09,
+      "terminal_growth": 0.025,
+      "high_growth": 0.12
+    },
+    {
+      "id": "thirty-year",
+      "horizon_years": 30,
+      "discount_rate": 0.12,
+      "terminal_growth": 0.0,
+      "high_growth": 0.03
+    }
+  ],
+  "source_hashes": {
+    "references/issuer/ASML.AS-2025-12-31.json": "cf234c6d0cb3886c4afbf6fbe373d7c06ed887776f1a832c0bc69a60dc3c6ebc",
+    "references/issuer/ASML.AS-provider-2026-09-26.json": "96c6a8242503ba66b28f279d0cc965f833703d855848382b98f80c60dd70d9f6",
+    "references/monitoring/SRAIL.SW-2025-12-31.json": "f2a2daac407dbeff3ca749f3b6a7383c0c284556811f4acefe4d66b44a3d013b",
+    "watchlists/stadler-annual.json": "19e9482c5edf3514a7962c935c6ce743d0fbc41f6fcf8825a84d4997cf245e36",
+    "fixtures/agent4/closure/control-ledger.json": "0b764ab3c5096f058eb7e5d47e4094e2fdce7cc0b7d6af84e960309d734786ef",
+    "fixtures/agent3_closure/asml-as-source-plan.json": "0bd8c0b348e4f36db9d7ab70b016fa564ed484027c3f6db6dff35f21ae156fb6",
+    "fixtures/agent3_closure/nvda-source-plan.json": "fc4f9d7be59edf3995ae05de3f10a468f41713663157977c252c7d9d5acb7ca2",
+    "tests/test_agent1_financial_correctness.py": "c267ad50cdf233e7e5c98fad82516960f68b7127b799910be752dcaad3400429",
+    "tests/test_agent1_issuer_claims.py": "25bf0fc69c1dc25ee3e932da547f8dc675711cbd6ced4d49bd096f72f9687486",
+    "tests/test_agent1_closure.py": "40c996ee0f607984914d8cae4f3a0c9376b0e0a39ed68653fcd4a044302615e8",
+    "tests/test_agent2_live_data.py": "621ace92ae1e1bb58488edb13d8c77f2e694c5b994a344291b64b27b009b57e5",
+    "tests/test_agent2_recovery.py": "6ca96ab5af0978016f6439fc38ed18ea9f15f3225d793aebbb91ab2fd9669f36",
+    "tests/test_agent2_checks.py": "deb3bd625b0ee5b9b7a8ae69882cff7a9705b9b65686bc0e12d8b4d6f4ff472d",
+    "tests/test_agent3_closure.py": "1214f2e95aaf9e4b3dc944ac12edfa77002fd9245796043658d97fed4889d750",
+    "tests/test_agent3_news_recovery.py": "a586ba79d698f402866b4ca38f56771244e9822bef1381dc82f368b5e669a723",
+    "tests/test_agent3_batch1.py": "2d9ed7285fbc96c2058f6c78098d1f74dff37e3a70d05f621de2e44b604e10a7",
+    "tests/test_agent4_closure_acceptance.py": "2da9cd86f4c1c0f51ba83a4d61a5a9012671c6ce47c41f6e6bb593cb5415a2a5",
+    "tests/test_agent4_batch4.py": "b6f40201beff870bcb840c7373599c0dd4e371c1e30c347972fa12672bbefcee"
+  },
+  "retained_event_bundles": [
+    {
+      "path": "output/agent3-closure-validation/asml-issuer/aa5e7fcbc2c349c8be2f3aeca78b6be0/bundle.json",
+      "sha256": "160269b60fe5355d911f26958f504f10fd8349a7b74d936be2eea4a8e0870925",
+      "scope": "retained historical prices and source-checked dates; no new issuer verification"
+    },
+    {
+      "path": "output/agent3-closure-validation/nvda-issuer/e37a88e1e9ee499583792c80d8c9a631/bundle.json",
+      "sha256": "3a8c9341a3bde7514773939e1e133f0b0272fee08c5c0c6c7136c6fad9add777",
+      "scope": "retained historical prices and source-checked dates; no new issuer verification"
+    }
+  ],
+  "news": {
+    "label_author": "assistant-authored synthetic contract expectations, not human-reviewed real-feed labels",
+    "aliases": {
+      "ASML.AS": [
+        "ASML"
+      ],
+      "NVDA": [
+        "NVIDIA"
+      ]
+    },
+    "relevance": [
+      {
+        "id": "relevance-01",
+        "headline": "ASML raises its annual outlook",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-02",
+        "headline": "NVIDIA announces a new accelerator",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "NVDA"
+        ]
+      },
+      {
+        "id": "relevance-03",
+        "headline": "$NVDA reports quarterly revenue",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "NVDA"
+        ]
+      },
+      {
+        "id": "relevance-04",
+        "headline": "ASML and NVIDIA discuss supply chains",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS",
+          "NVDA"
+        ]
+      },
+      {
+        "id": "relevance-05",
+        "headline": "asml reports a factory update",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-06",
+        "headline": "ASML.AS shares trade higher",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-07",
+        "headline": "NVIDIA: order update",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "NVDA"
+        ]
+      },
+      {
+        "id": "relevance-08",
+        "headline": "Orders rise at (ASML)",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-09",
+        "headline": "ASMLabs opens a laboratory",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-10",
+        "headline": "An investor discusses $NVDAA",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-11",
+        "headline": "Chipmakers report mixed results",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-12",
+        "headline": "Market index closes higher",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-13",
+        "headline": "NVDAA expands a factory",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-14",
+        "headline": "ASMLX shares decline",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-15",
+        "headline": "NVIDIAX releases software",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-16",
+        "headline": "Rail manufacturer reports revenue",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": []
+      },
+      {
+        "id": "relevance-17",
+        "headline": "Analysts debate whether ASML will meet guidance",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-18",
+        "headline": "NVIDIA denies acquisition rumours",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "NVDA"
+        ]
+      },
+      {
+        "id": "relevance-19",
+        "headline": "No change to ASML guidance",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "ASML.AS"
+        ]
+      },
+      {
+        "id": "relevance-20",
+        "headline": "Competitors respond to NVIDIA launch",
+        "body": "ASML and NVIDIA are mentioned only in this background text.",
+        "provider_entities": [
+          "ASML.AS",
+          "NVDA"
+        ],
+        "expected_entities": [
+          "NVDA"
+        ]
+      }
+    ],
+    "freshness": [
+      {
+        "id": "inside",
+        "published_at": "2026-10-09T12:00:00Z",
+        "expected": "accepted"
+      },
+      {
+        "id": "boundary",
+        "published_at": "2026-10-03T12:00:00Z",
+        "expected": "accepted"
+      },
+      {
+        "id": "stale",
+        "published_at": "2026-10-03T11:59:59Z",
+        "expected": "stale_publication"
+      },
+      {
+        "id": "future",
+        "published_at": "2026-10-10T12:00:01Z",
+        "expected": "future_publication"
+      },
+      {
+        "id": "missing",
+        "published_at": null,
+        "expected": "invalid_timestamp_or_record"
+      },
+      {
+        "id": "invalid",
+        "published_at": "not-a-date",
+        "expected": "invalid_timestamp_or_record"
+      }
+    ],
+    "dedup": [
+      {
+        "id": "punctuation",
+        "a": "ASML raises guidance.",
+        "b": "ASML raises guidance!",
+        "clusters": 1
+      },
+      {
+        "id": "case-space",
+        "a": "ASML raises guidance",
+        "b": "asml   raises guidance",
+        "clusters": 1
+      },
+      {
+        "id": "negation",
+        "a": "ASML raises guidance",
+        "b": "ASML does not raise guidance",
+        "clusters": 2
+      },
+      {
+        "id": "numbers",
+        "a": "ASML revenue rises 5%",
+        "b": "ASML revenue rises 6%",
+        "clusters": 2
+      },
+      {
+        "id": "reordered",
+        "a": "ASML raises guidance today",
+        "b": "Today ASML raises guidance",
+        "clusters": 2
+      },
+      {
+        "id": "aged-copy",
+        "a": "ASML raises guidance",
+        "b": "ASML raises guidance",
+        "second_at": "2026-10-10T12:00:00Z",
+        "first_at": "2026-10-09T11:59:59Z",
+        "clusters": 2
+      }
+    ],
+    "production_quality_thresholds": "Pending representative human-labelled sample; no live accuracy claim."
+  },
+  "regression_modules": [
+    "tests/test_agent1_financial_correctness.py",
+    "tests/test_agent1_issuer_claims.py",
+    "tests/test_agent1_closure.py",
+    "tests/test_agent2_live_data.py",
+    "tests/test_agent2_recovery.py",
+    "tests/test_agent2_checks.py",
+    "tests/test_agent3_closure.py",
+    "tests/test_agent3_news_recovery.py",
+    "tests/test_agent3_batch1.py",
+    "tests/test_agent4_closure_acceptance.py",
+    "tests/test_agent4_batch4.py"
+  ],
+  "blocked": [
+    "Authorised Agent 4 company dataset and controller review",
+    "Source-use permission for production live acceptance",
+    "Human-labelled representative news quality evaluation",
+    "Independent backup and clean-machine recovery"
+  ],
+  "agent1_boundaries": [
+    "negative_fcff",
+    "financial_sector",
+    "missing_debt",
+    "currency_mismatch",
+    "missing_capex",
+    "unsupported_qualitative_claim"
+  ],
+  "agent2_scenarios": [
+    "retained_ratios",
+    "baseline",
+    "duplicate",
+    "outage_preserves_state",
+    "stale",
+    "future",
+    "currency",
+    "units",
+    "period",
+    "unreviewed_period",
+    "issuer_mismatch",
+    "controlled_correction_approval",
+    "controlled_correction_rejection",
+    "replay"
+  ],
+  "agent4_expected_closes": 14
+}

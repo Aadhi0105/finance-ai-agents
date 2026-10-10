@@ -26,7 +26,7 @@ Until then release/environment = **unassigned**, sign-off = **none** for every r
 | ID | Priority / batch | Requirement and acceptance procedure | Pass condition | Existing evidence / owner | Status |
 | --- | --- | --- | --- | --- | --- |
 | V1-DAT-001 | M / 2 | Inventory access, retention, model processing and sharing permissions for every released source | Documented permitted use; unresolved sources excluded from release | [Data inventory](data-contracts.md), [rights review](source-use-review.md); analyst | blocked |
-| V1-DAT-002 | M / 2,4 | Exercise missing/stale inputs, incompatible units/currency/periods, changed definitions and source failures | Explicit refusal/hold; no silent substitution or apparently current result | E01,E02,E04,E05; implementation + financial reviewer | not assessed |
+| V1-DAT-002 | M / 2,4 | Exercise missing/stale inputs, incompatible units/currency/periods, changed definitions and source failures | Explicit refusal/hold; no silent substitution or apparently current result | E01,E02,E04,E05; implementation + financial reviewer | in progress |
 | V1-DAT-003 | M / 2 | Trace normalized values to retained input and transformation version | Required provenance complete or explicitly unknown; source-specific tolerances declared before tests | E01–E06; implementation | in progress |
 | V1-EXE-001 | M / 3 | Repeat submissions and attempt conflicting writes under the selected concurrency policy | No duplicate consequential state; conflict/replay rules visible; single mutator enforced | E09,E10; implementation | in progress |
 | V1-EXE-002 | M / 3 | Interrupt/cancel at model, provider, persistence and delivery boundaries | Known terminal/recoverable state; no unexplained commit or silent refresh on recovery | E09,E10; implementation | in progress |
@@ -48,16 +48,16 @@ Until then release/environment = **unassigned**, sign-off = **none** for every r
 
 | ID | Priority / batch | Requirement and procedure | Pass condition | Existing evidence / owner | Status |
 | --- | --- | --- | --- | --- | --- |
-| V1-A1-001 | C: Agent 1 / 4 | Reconcile selected issuer/period matrix against filings and independent calculations | Source-resolution tolerances met; negative/missing/sector cases held correctly; share/currency assumptions reviewed | E01, D-05; financial reviewer | not assessed |
-| V1-A1-002 | C: Agent 1 / 4 | Inspect desktop/narrow/print output, rebuild and adversarial draft cases | Financial statements remain traceable; unsupported claims withheld; no loss of required evidence through layout | E01,E08; analyst + implementation | not assessed |
-| V1-A2-001 | C: Agent 2 / 4 | Supervised trial with unchanged/new/stale observations, correction, rejection and restart | Original/effective state preserved; baseline breaches visible; no false compliance/freshness claim | E02,E03, D-05; analyst + financial reviewer | not assessed |
-| V1-A2-002 | C: Agent 2 / 4 | Independently check diagnostic history and evaluated alert cases | Arithmetic matches; limits explicit; no calibrated-risk claim without separate evidence | E02; financial reviewer | not assessed |
-| V1-A3-001 | C: events / 4 | Independently verify dates, sessions, return bases/windows and dependence refusals | Arithmetic reconciles; uncertain design cannot become approved inference; descriptive scope preserved | E04; financial reviewer | not assessed |
+| V1-A1-001 | C: Agent 1 / 4 | Reconcile selected issuer/period matrix against filings and independent calculations | Source-resolution tolerances met; negative/missing/sector cases held correctly; share/currency assumptions reviewed | E01, D-05; financial reviewer | in progress |
+| V1-A1-002 | C: Agent 1 / 4 | Inspect desktop/narrow/print output, rebuild and adversarial draft cases | Financial statements remain traceable; unsupported claims withheld; no loss of required evidence through layout | E01,E08; analyst + implementation | in progress |
+| V1-A2-001 | C: Agent 2 / 4 | Supervised trial with unchanged/new/stale observations, correction, rejection and restart | Original/effective state preserved; baseline breaches visible; no false compliance/freshness claim | E02,E03, D-05; analyst + financial reviewer | in progress |
+| V1-A2-002 | C: Agent 2 / 4 | Independently check diagnostic history and evaluated alert cases | Arithmetic matches; limits explicit; no calibrated-risk claim without separate evidence | E02; financial reviewer | in progress |
+| V1-A3-001 | C: events / 4 | Independently verify dates, sessions, return bases/windows and dependence refusals | Arithmetic reconciles; uncertain design cannot become approved inference; descriptive scope preserved | E04; financial reviewer | in progress |
 | V1-A3-002 | C: news / 4 | Evaluate frozen labelled relevance/dedup/freshness set and failure-versus-empty cases | Meets predeclared D-05 thresholds; held tone and replay limits preserved | E05; analyst + implementation | blocked |
 | V1-A4-001 | C: Agent 4 production / 4 | Reproduce authorised company closes, correction and budget revision against approved controls | Exact-cent arithmetic and agreed source mapping reconcile; controller accepts results and boundaries | E06 synthetic only; authorised finance reviewer | blocked |
-| V1-A4-002 | C: Agent 4 / 4 | Validate version conflicts, late correction, failed delivery and restored report history | No lost original evidence; effective lineage correct; identical saved JSON where promised; HTML derivative limits visible | E06; implementation + financial reviewer | not assessed |
+| V1-A4-002 | C: Agent 4 / 4 | Validate version conflicts, late correction, failed delivery and restored report history | No lost original evidence; effective lineage correct; identical saved JSON where promised; HTML derivative limits visible | E06; implementation + financial reviewer | in progress |
 
-E01–E10 are defined in [evidence baseline](evidence-baseline.md). D-01–D-07 are
+E01–E11 are defined in [evidence baseline](evidence-baseline.md). D-01–D-07 are
 [decisions](../decisions/0001-production-v1-boundary.md). Blocked rows identify
 concrete unresolved inputs, not a reason to stop unrelated foundation work.
 
@@ -85,3 +85,9 @@ for admission, explicit duplicate IDs, cancellation, usage limits, private contr
 records and same-Mac frozen installation/rollback. D-04 usage limits were selected
 by the user. Final candidate sign-off, permission-scoped live checks, deployment
 review and full workload/capacity acceptance remain outstanding; no gate is passed.
+
+Batch 4 [bounded offline evaluation](batch4-financial-acceptance.md), E11, supports
+financial and data rows marked in progress. It does not pass production gates.
+V1-A3-002 remains blocked on human-labelled representative quality evaluation;
+V1-A4-001 remains blocked on authorised company data/controller review. Retained
+issuer/event evidence is not fresh source verification or approval of wider coverage.

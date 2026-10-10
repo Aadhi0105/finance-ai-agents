@@ -119,3 +119,37 @@ model call, new live financial/news retrieval, external backup or device change 
 performed. Temporary installation/previous-release files remain local test artifacts,
 not independent backups. Final production candidate sign-off and the outstanding
 matrix dependencies remain open.
+
+## Batch 4 bounded financial checks — 10 October 2026
+
+The [frozen plan](../../../fixtures/production_v1/batch4-plan.json),
+[scope and tolerances](batch4-financial-acceptance.md) and
+[committable result](../../../references/acceptance/production-financial-2026-10-10.json)
+record this offline evaluation against application main `53aa8fd874f7b9340e59bc85cb80feecf7dd9aa2`.
+The evaluator and new harness tests are uncommitted candidate additions identified
+by source hashes. No production financial logic was modified.
+
+- All five evaluation sections passed their scoped offline checks.
+- ASML retained issuer arithmetic and three margins reconciled. Four independent
+  Decimal DCF cases cover twelve scenario valuations and six negative boundaries.
+- Stadler's three ratios and fourteen declared workflow/contract scenarios passed,
+  including controlled correction approval/rejection and unchanged original replay.
+- Two retained event bundles passed independent raw-price/OLS validation across
+  10 event windows and 10 control windows; held exports remained held.
+- All 32 synthetic news cases matched. Across 40 entity decisions: 13 true positives,
+  27 true negatives, zero false inclusions and zero false exclusions. These are
+  assistant-authored contract labels, not real-feed accuracy results.
+- Agent 4's 14 synthetic closes and auxiliary gap case passed the existing independent
+  exact-cent controls, including corrections, rebudget, delivery recovery and history.
+- Selected regression suite: **309 passed in 32.76 seconds**, including **8 new
+  acceptance-harness tests**. Injected wrong DCF values and false news inclusions
+  were detected by the evaluator. This was not a new full-repository test run.
+- A separate 40-headline retained-data pack is awaiting human labels. Predictions
+  are hidden and raw headlines remain in ignored local output, not this evidence file.
+
+No new financial/news retrieval or paid model call was made. The unchanged frozen
+plan passed its final run after adding an explicit close-count assertion and dirty
+worktree provenance. Historical source checks, synthetic corrections and synthetic
+company data do not substitute for source permissions or human financial approval.
+V1-A3-002 and V1-A4-001 remain blocked; other supported financial/data rows remain
+in progress. No production gate or release is marked passed.

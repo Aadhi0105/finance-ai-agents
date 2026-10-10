@@ -9,6 +9,8 @@ Production v1 acceptance.
 
 ## Document map
 
+- [Batch 4 financial acceptance](batch4-financial-acceptance.md): frozen offline cases, independent oracles and pending human review.
+
 - [Batch 3 controlled operation](batch3-operation.md): admission, operation IDs, limits, frozen installation and rollback.
 
 - [Dependency closure preparation](dependency-closure.md): deferred external backup, key recovery and disaster drill.

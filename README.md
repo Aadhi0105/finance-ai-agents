@@ -253,3 +253,8 @@ one active CLI workflow, durable operation IDs, opt-in model limits, cancellatio
 receipts, environment diagnostics and a hash-pinned macOS installation. Use that
 guide for the supervised operating scope; older direct commands retain their
 agent-specific behaviour and do not supply all wrapper controls.
+
+Batch 4 adds [bounded financial acceptance](docs/production/v1/batch4-financial-acceptance.md)
+with a frozen offline benchmark, independent arithmetic checks and a local news
+labelling pack. Human financial/news review and real-company FP&A acceptance remain
+open; passing synthetic cases is not a Production v1 release approval.
