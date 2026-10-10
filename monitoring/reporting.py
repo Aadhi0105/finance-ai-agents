@@ -69,6 +69,11 @@ def load_snapshot(db_path, cycle=None, audit_dir=None):
         selected = next((r for r in runs if r['cycle'] == cycle), None) if cycle else (runs[-1] if runs else None)
         if cycle and selected is None:
             raise ValueError('Requested saved cycle is unavailable.')
+        origins_row = store.con.execute("SELECT value FROM monitor_metadata WHERE key='restored_audit_origins'").fetchone()
+        origins = json.loads(origins_row[0]) if origins_row else []
+        if not isinstance(origins, list) or any(not isinstance(x, str) for x in origins):
+            raise ValueError('Invalid restored audit provenance')
+        accepted_paths = {str(path), *origins}
         current = []
         for row in store.full_state():
             detail = store.get_observation_evidence(row['item_id'], row['data_ts']) or {}
@@ -84,7 +89,7 @@ def load_snapshot(db_path, cycle=None, audit_dir=None):
             try:
                 record = json.loads(audit.read_text())
                 context = record.get('retry_context') or record.get('evidence_context') or {}
-                if context.get('db_path') != str(path) or context.get('cycle_digest') != digest(selected):
+                if context.get('db_path') not in accepted_paths or context.get('cycle_digest') != digest(selected):
                     continue
                 attempts.append({'artifact': str(audit), **record})
             except (OSError, ValueError, TypeError, AttributeError):

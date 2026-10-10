@@ -287,4 +287,6 @@ def write_text_once(path, content):
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    from keystone.maintenance import gate
+    with gate():
+        raise SystemExit(main())

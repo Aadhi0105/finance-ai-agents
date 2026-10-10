@@ -371,4 +371,6 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    from keystone.maintenance import gate
+    with gate():
+        sys.exit(main())

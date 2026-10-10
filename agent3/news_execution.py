@@ -41,5 +41,7 @@ def execute(attempt):
 
 
 if __name__ == '__main__':
-    path = sys.argv[1]
-    raise SystemExit(execute(Attempt(path, read_record(path))))
+    from keystone.maintenance import gate
+    with gate():
+        path = sys.argv[1]
+        raise SystemExit(execute(Attempt(path, read_record(path))))

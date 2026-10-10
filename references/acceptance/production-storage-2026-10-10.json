@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "scope": "same-device local fixture rehearsal; existing runtime",
+  "snapshot": "output/production-storage/acceptance-lh6xzuw4/run/snapshots/53a9365f42ed46bbbd22cbbd5ce5a13f",
+  "restored": "output/production-storage/acceptance-lh6xzuw4/run/restored",
+  "files": 67,
+  "capture_seconds": 0.239,
+  "restore_seconds": 0.163,
+  "checks": [
+    "Agent 1 review-preserving rebuild",
+    "Agent 2 state/audit export",
+    "Agent 3 calendar/revisions/index/replay",
+    "Agent 4 14 closes plus gap, exact JSON and HTML recovery"
+  ],
+  "independent_device_tested": false,
+  "source_permissions_approved": false,
+  "production_release_approved": false,
+  "html": "output/production-storage/acceptance-lh6xzuw4/run/restored-reports/reports-d2cac6482fbc9652b8e3/close-12.html",
+  "date": "2026-10-10",
+  "full_suite_tests": 959,
+  "new_storage_tests": 29,
+  "code_state": "uncommitted candidate; see source hashes in snapshot manifest"
+}

@@ -30,3 +30,6 @@ waterfall_demo.svg
 
 # Interprocess monitor lock (never remove while another process may be using it)
 *.duckdb.lock
+
+# Cooperative local CLI maintenance gate (never remove while active)
+state/.keystone-maintenance.lock

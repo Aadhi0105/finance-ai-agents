@@ -22,6 +22,7 @@ universal company coverage or unattended production readiness.
 - [Shared tools and MCP](#shared-tools-and-mcp)
 - [Validation and current scope](#validation-and-current-scope)
 - [Repository map](#repository-map)
+- [Production v1 planning](#production-v1-planning)
 
 ## Choose an agent
 
@@ -234,3 +235,15 @@ Start with an [agent guide](#choose-an-agent), then follow its evidence links fo
 the detailed calculation and validation boundaries. Earlier batch documents
 remain historical records; statements about work planned for a later batch should
 be read alongside the current guide and subsequent acceptance record.
+
+## Production v1 planning
+
+[Production v1 specification](docs/production/v1/specification.md) and
+[acceptance matrix](docs/production/v1/acceptance-matrix.md) define the staged path
+to a supervised local analyst tool. Batch 1 establishes requirements and evidence
+gaps; it does not grant production acceptance. The
+[delivery plan](docs/production/v1/delivery-plan.md) covers Batches 2–5.
+
+Batch 2 adds [local snapshot and restore commands](docs/production/v1/batch2-storage.md)
+with explicit inventories and evidence-preserving relocation. Independent-device
+backup and Production v1 release acceptance remain pending.
