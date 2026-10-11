@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "scope": "Batch 5 offline preparation; not completed analyst UAT or production release",
+  "candidate_commit": "1da562cabcf788982cf315ff7fed5d98701b40e8",
+  "worktree_dirty_at_measurement": true,
+  "source_hashes": {
+    "scripts/check_keystone_pilot.py": "c92c150df186a148be0bc8cf114b78c831831a388a139c82fd22021ef24d6666",
+    "scripts/check_keystone_storage.py": "48d34561b985575c028a788d27c7a33e60f6c3c52f3fcaa27e3ca5d744d52d1e",
+    "scripts/check_keystone_upgrade.py": "05c2e2eabce1f7a9ceecc2780a669ddc93d99912e5c9e6eca41b4c895262d7a2",
+    "requirements-macos-arm64-py311.lock": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349",
+    "docs/production/v1/acceptance-matrix.md": "d42737b514389fe09690ea87604e6fb01abad3eebd439832cbb38157b5408b45",
+    "tests/test_production_pilot.py": "32d75c6c80d0a6be601ecbf535c0dbe5c859efbdd6577308e74f8decdd70118f"
+  },
+  "environment": {
+    "schema_version": 1,
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "os_version": "26.6.1",
+    "python": "3.11.9",
+    "pilot_platform_matches": true,
+    "dependency_mismatches": [],
+    "lock_sha256": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349",
+    "code_commit": "1da562cabcf788982cf315ff7fed5d98701b40e8",
+    "worktree_dirty": true,
+    "selected_path_checks": [
+      {
+        "name": "state/operations",
+        "private": true
+      }
+    ],
+    "status": "ready_for_local_checks",
+    "production_release_approved": false,
+    "limitations": [
+      "Existing reports/inputs and network exposure require separate deployment review.",
+      "Version matching does not prove installed bytes match wheel hashes.",
+      "Clean virtual environment is not clean-machine disaster recovery."
+    ]
+  },
+  "rehearsal": {
+    "status": "passed",
+    "steps": [
+      {
+        "name": "storage",
+        "status": "passed",
+        "seconds": 34.409,
+        "size": {
+          "files": 269,
+          "bytes": 65787558
+        }
+      },
+      {
+        "name": "same_candidate_recovery",
+        "status": "passed",
+        "seconds": 18.863,
+        "size": {
+          "files": 195,
+          "bytes": 45570467
+        }
+      }
+    ],
+    "workload": "one storage/recovery preparation run",
+    "human_uat_completed": false,
+    "capacity_accepted": false,
+    "operation_receipts_restored": 3,
+    "paid_requests_reserved": 0,
+    "live_retrieval_requested": false,
+    "seconds": 53.549,
+    "generated_size": {
+      "files": 563,
+      "bytes": 133680693
+    },
+    "measurement_limits": "One run; includes duplicate recovery copies, excludes install/cache space and human time. Not capacity, RPO or disaster RTO acceptance."
+  },
+  "fresh_installation": {
+    "same_mac": true,
+    "offline_wheel_installation": true,
+    "require_hashes": true,
+    "pip_check": "passed",
+    "doctor": {
+      "schema_version": 1,
+      "platform": "Darwin",
+      "architecture": "arm64",
+      "os_version": "26.6.1",
+      "python": "3.11.9",
+      "pilot_platform_matches": true,
+      "dependency_mismatches": [],
+      "lock_sha256": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349",
+      "code_commit": "1da562cabcf788982cf315ff7fed5d98701b40e8",
+      "worktree_dirty": true,
+      "selected_path_checks": [
+        {
+          "name": "state/operations",
+          "private": true
+        }
+      ],
+      "status": "ready_for_local_checks",
+      "production_release_approved": false,
+      "limitations": [
+        "Existing reports/inputs and network exposure require separate deployment review.",
+        "Version matching does not prove installed bytes match wheel hashes.",
+        "Clean virtual environment is not clean-machine disaster recovery."
+      ]
+    }
+  },
+  "full_regression": {
+    "passed": 997,
+    "environment": "fresh pinned macOS arm64 Python 3.11.9 virtual environment"
+  },
+  "developer_command_smoke": {
+    "checks": [
+      {
+        "id": "UAT-01",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.255,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-02",
+        "exit_code": 3,
+        "expected_exit_code": 3,
+        "seconds": 15.59,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-03",
+        "exit_code": 2,
+        "expected_exit_code": 2,
+        "seconds": 0.041,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-04",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.116,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-05",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 1.41,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-06",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.757,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-07",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 1.117,
+        "status": "passed"
+      },
+      {
+        "id": "UAT-08",
+        "exit_code": 0,
+        "expected_exit_code": 0,
+        "seconds": 0.537,
+        "status": "passed"
+      }
+    ],
+    "human_uat_completed": false,
+    "duplicate_receipt_unchanged": true,
+    "conflicting_restore_refused": true
+  },
+  "human_task_count": 8,
+  "human_tasks_completed": 0,
+  "candidate_gates": {
+    "count": 26,
+    "passed": 0,
+    "reviewer": null
+  },
+  "local_artifacts": {
+    "manifest": "output/production-pilot/batch5-ready-20261011/pilot.json",
+    "tasks": "output/production-pilot/batch5-ready-20261011/analyst-tasks.md",
+    "results": "output/production-pilot/batch5-ready-20261011/analyst-results.json"
+  },
+  "release_dependencies": [
+    "independent backup and encryption/key recovery",
+    "clean-machine restoration",
+    "source permissions",
+    "human financial review",
+    "representative human-labelled news evaluation",
+    "authorised company FP&A and controller acceptance",
+    "analyst UAT",
+    "accepted workload/capacity targets and deployment review",
+    "exact clean candidate and final sign-off"
+  ],
+  "production_release_approved": false,
+  "release_signoff": null
+}

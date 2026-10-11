@@ -258,3 +258,8 @@ Batch 4 adds [bounded financial acceptance](docs/production/v1/batch4-financial-
 with a frozen offline benchmark, independent arithmetic checks and a local news
 labelling pack. Human financial/news review and real-company FP&A acceptance remain
 open; passing synthetic cases is not a Production v1 release approval.
+
+Batch 5 adds [offline pilot preparation and analyst tasks](docs/production/v1/batch5-pilot.md),
+with an isolated four-agent rehearsal, measured local artifacts and a pending release
+manifest. Human acceptance, permissions, independent recovery and financial sign-off
+remain outstanding; Keystone Production v1 is not released.

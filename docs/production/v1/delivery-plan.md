@@ -61,3 +61,11 @@ synthetic cases, independent calculation tolerances and explicit negative outcom
 Human news labels, source permissions, company FP&A data and financial reviewer
 sign-off remain dependencies. Engineering evidence can be completed without falsely
 claiming those release conditions are satisfied.
+
+## Batch 5 preparation — 11 October 2026
+
+User selected the offline four-agent rehearsal. [Pilot preparation](batch5-pilot.md)
+adds isolated working copies, exact operator tasks, local measurements and a pending
+26-gate candidate manifest. Automated rehearsal is supporting evidence only. Analyst
+UAT and final release sign-off remain unperformed; independent protection, clean-machine
+recovery, source rights, human financial/news review and company FP&A remain open.

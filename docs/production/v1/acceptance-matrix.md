@@ -57,7 +57,7 @@ Until then release/environment = **unassigned**, sign-off = **none** for every r
 | V1-A4-001 | C: Agent 4 production / 4 | Reproduce authorised company closes, correction and budget revision against approved controls | Exact-cent arithmetic and agreed source mapping reconcile; controller accepts results and boundaries | E06 synthetic only; authorised finance reviewer | blocked |
 | V1-A4-002 | C: Agent 4 / 4 | Validate version conflicts, late correction, failed delivery and restored report history | No lost original evidence; effective lineage correct; identical saved JSON where promised; HTML derivative limits visible | E06; implementation + financial reviewer | in progress |
 
-E01–E11 are defined in [evidence baseline](evidence-baseline.md). D-01–D-07 are
+E01–E12 are defined in [evidence baseline](evidence-baseline.md). D-01–D-07 are
 [decisions](../decisions/0001-production-v1-boundary.md). Blocked rows identify
 concrete unresolved inputs, not a reason to stop unrelated foundation work.
 
@@ -91,3 +91,9 @@ financial and data rows marked in progress. It does not pass production gates.
 V1-A3-002 remains blocked on human-labelled representative quality evaluation;
 V1-A4-001 remains blocked on authorised company data/controller review. Retained
 issuer/event evidence is not fresh source verification or approval of wider coverage.
+
+Batch 5 [pilot preparation](batch5-pilot.md), E12, adds local engineering evidence
+and an unfilled analyst task record. No human task or release gate is marked passed.
+V1-UAT-001 and V1-REL-003 remain not assessed; V1-OPS-002 remains blocked on accepted
+capacity targets and deployment workload. Fresh same-Mac installation and local
+restore do not satisfy independent-device V1-STO-002.

@@ -36,3 +36,11 @@ Record date, rationale, user direction and affected acceptance IDs when changing
 decision. Requirements cannot be weakened after an observed failure merely to mark
 it passed. Source permission, confidentiality and real-company approval cannot be
 inferred from possession of a file. Open decisions block only their dependent work.
+
+## Batch 5 workload selection — 11 October 2026
+
+User selected an offline single-session rehearsal across all four agents using
+synthetic inputs and saved evidence. This resolves the preparation scope under D-04,
+not final workload/capacity thresholds or live-source permissions. Timing, generated
+storage and analyst observations will inform those later decisions. Existing paid
+call limits and deferred independent protection remain unchanged.
