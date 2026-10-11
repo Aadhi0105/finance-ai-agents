@@ -153,3 +153,40 @@ worktree provenance. Historical source checks, synthetic corrections and synthet
 company data do not substitute for source permissions or human financial approval.
 V1-A3-002 and V1-A4-001 remain blocked; other supported financial/data rows remain
 in progress. No production gate or release is marked passed.
+
+## Batch 5 preparation and local rehearsal — 11 October 2026
+
+[Procedure and analyst tasks](batch5-pilot.md) and
+[machine-readable evidence](../../../references/acceptance/production-pilot-2026-10-11.json)
+identify the engineering candidate against merged application commit
+`1da562cabcf788982cf315ff7fed5d98701b40e8`. New harness sources remain uncommitted
+and are identified by hashes; this is not a clean signed release candidate.
+
+- User selected the offline four-agent rehearsal. Final preparation passed in
+  **53.549 seconds**, measuring **133,680,693 bytes across 563 files**, including
+  duplicate recovery copies and the untouched analyst working copy. This single
+  measurement excludes install/cache space and human time; it does not pass capacity
+  or device-loss RPO/RTO requirements.
+- All-agent local restoration preserved research holds, monitoring history/audits,
+  news/calendar evidence and synthetic close results. Same-candidate recovery then
+  exercised research rebuild, one additional monitoring cycle, news replay and
+  close-report recovery. This was not a new prior-version upgrade test.
+- Three controlled operation receipts and their JSON companions survived a separate
+  local snapshot/restore unchanged, with zero reserved paid requests.
+- A fresh same-Mac environment was installed offline from local wheels using the
+  pinned hashes. Dependency consistency and doctor checks passed. The full suite
+  passed **997 tests**, including four new pilot-harness tests. This does not establish
+  clean-machine disaster recovery.
+- All eight generated analyst commands passed a separate developer smoke test.
+  Duplicate-operation refusal preserved the original receipt; conflicting restore
+  preserved the destination. These are command checks, not human comprehension or
+  financial acceptance. The user's separate result sheet remains completely unfilled.
+- The pending manifest lists all 26 gates as unassessed for the candidate, preserving
+  historical baseline statuses separately. Accepted capabilities are empty, with no
+  analyst, financial or release sign-off. No production gate is advanced.
+
+No live-data retrieval or paid model use was requested. Source permissions,
+independent protection/key recovery, clean-machine recovery, human financial/news
+review, authorised company FP&A, full analyst UAT and accepted workload limits remain
+open. Batch 5 preparation is implemented; the supervised pilot and release decision
+are not complete.

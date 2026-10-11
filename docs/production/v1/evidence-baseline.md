@@ -19,6 +19,8 @@ been verified as accessible, complete, or backed up during this batch.
 | E10 | [Batch 3 operating controls](batch3-operation.md), [local verification](../../../references/acceptance/production-operations-2026-10-10.json) | Serialized CLI admission, controlled execution, mocked usage limits, same-Mac frozen installation and prior-state rollback | Permission-scoped live acceptance, final candidate/deployment review, independent recovery and workload capacity |
 | E11 | [Batch 4 financial acceptance](batch4-financial-acceptance.md), [frozen plan](../../../fixtures/production_v1/batch4-plan.json), [results](../../../references/acceptance/production-financial-2026-10-10.json) | Retained issuer arithmetic, Decimal DCF oracle, monitoring corrections, retained event oracle, synthetic news contracts and exact-cent closes | Human financial approval, representative news labels, source rights and authorised company FP&A data |
 
+| E12 | [Batch 5 pilot preparation](batch5-pilot.md), [results](../../../references/acceptance/production-pilot-2026-10-11.json) | Isolated four-agent recovery, receipt restoration, fresh same-Mac installation, measured preparation and operator task pack | Independent analyst trial, final workload limits, source/financial approval and clean-machine disaster recovery |
+
 ## Evidence handling rules
 
 Historical counts/dates remain historical. Reuse tests and oracles, but run the

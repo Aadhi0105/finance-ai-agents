@@ -63,3 +63,10 @@ is available. Procedures are prepared, not executed acceptance evidence.
    deciding on a new operation. Recover committed delivery by its original identity.
 5. Include `state/operations` in the reviewed snapshot inventory as role `logs`.
    Never delete a lock or receipt to force a retry.
+
+## Supervised trial
+
+Use [Batch 5 preparation and operator tasks](batch5-pilot.md) for the selected offline
+four-agent rehearsal. Run generated tasks separately and record actual observations,
+assistance and elapsed time. Do not treat a developer rehearsal as analyst UAT or
+use local snapshots to claim independent protection.
