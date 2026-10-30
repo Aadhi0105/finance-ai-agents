@@ -18,6 +18,7 @@ universal company coverage or unattended production readiness.
 - [How the project fits together](#how-the-project-fits-together)
 - [Install and configure](#install-and-configure)
 - [Try each agent offline](#try-each-agent-offline)
+- [Browse the local report workspace](#browse-the-local-report-workspace)
 - [Read the result before acting on it](#read-the-result-before-acting-on-it)
 - [Shared tools and MCP](#shared-tools-and-mcp)
 - [Validation and current scope](#validation-and-current-scope)
@@ -145,6 +146,37 @@ Commits the synthetic June close, exports `close-june.json`, and prints the HTML
 location. Keep the entire generated `reports-<fingerprint>/` folder for working
 history links and evidence downloads. A valid close can contain a held forecast.
 
+## Browse the local report workspace
+
+The React/TypeScript workspace provides one read-only browser interface for all
+four agents. It displays five saved synthetic examples, separate execution and
+financial-review statuses, original HTML reports, charts, and registered JSON
+evidence. FastAPI serves an explicit file inventory; browsing starts no agent work.
+
+Requires Python 3.11/3.12, Node.js 24 and pnpm 11.25.0. From the repository root:
+
+```bash
+.venv/bin/python -m pip install -r requirements-web.txt
+cd web
+pnpm install --frozen-lockfile
+pnpm run build
+cd ..
+.venv/bin/python -m keystone.workspace prepare --destination output/workspace-demo
+.venv/bin/python -m keystone.workspace serve --workspace output/workspace-demo --port 8765
+```
+
+Open **http://127.0.0.1:8765/** while the server is running; stop it with Ctrl+C.
+Preparation needs a new destination name and generates examples offline using the
+existing agent engines. Existing destinations are preserved. Provider credentials
+are unnecessary. Dependencies must be installed before offline use.
+
+This first batch is a local synthetic workspace. Live data, browser execution,
+uploads, authenticated approvals, shared access and production hosting remain
+outside its scope. It does not change the pilot's source-permission or independent
+backup dependencies. See the [workspace guide](docs/webapp/batch1-report-workspace.md)
+for architecture, setup, boundaries, and acceptance evidence; the earlier
+[showcase](keystone-showcase/README.md) remains a separate illustrative prototype.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source
@@ -196,7 +228,8 @@ a promise that every future checkout has the same count. CI runs Python 3.11 and
 | [3 closure](docs/agent3-closure-validation.md) and [news acceptance](docs/agent3-live-news-recovery.md) | Issuer-dated ASML/NVIDIA event checks; populated news, saved replay and reports | Real FinBERT validation, sentiment benchmark, stronger dependence-aware inference |
 | [4 closure](docs/agent4-closure-validation.md) | Synthetic year of EUR/calendar-year amount closes, corrections, re-budget, recovery and MCP parity | Authorized internal-company pilot, forecast calibration, ERP, fiscal/multi-currency support |
 
-Run deterministic regression tests after installing development dependencies:
+Run deterministic regression tests after installing development dependencies.
+These include the CLI and optional web runtime needed to collect the full suite:
 
 ```bash
 python -m pip install -r requirements-dev.txt

@@ -38,3 +38,9 @@ state/operations/
 
 # Frozen local pilot environment
 .venv-pilot/
+
+# Local report workspace frontend
+web/node_modules/
+web/dist/
+web/.openai/
+web/.pnpm-store/
