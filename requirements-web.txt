@@ -1,0 +1,4 @@
+# Optional local browser workspace; separate from the frozen CLI pilot lock.
+-r requirements.txt
+fastapi==0.162.0
+uvicorn==0.54.0

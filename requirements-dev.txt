@@ -1,2 +1,5 @@
-# Dev/test dependencies (not needed at runtime).
+# Development setup for the complete test suite.
+# Include the optional web runtime so the complete suite collects in a fresh environment.
+-r requirements-web.txt
 pytest>=7.0
+httpx==0.28.1
