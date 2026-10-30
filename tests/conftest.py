@@ -13,6 +13,21 @@ def offline_environment(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
 
 
+@pytest.fixture(autouse=True)
+def stable_frozen_publication_run_id(request, monkeypatch):
+    """Keep incidental path digits out of a byte-frozen legacy assertion.
+
+    The financial plan pins test_agent3_batch1.py, including its broad '999'
+    output assertion. Preserve that file and its expectations. The additional
+    publication-output test separately exercises an ID containing '999'.
+    """
+    if (request.node.path.name == 'test_agent3_batch1.py' and request.node.name ==
+            'test_cli_and_renderers_cannot_publish_a_held_forward_distribution'):
+        from uuid import UUID
+        from agent3 import execution
+        monkeypatch.setattr(execution, 'uuid4', lambda: UUID('a' * 32))
+
+
 from agent.state import RunState
 
 
