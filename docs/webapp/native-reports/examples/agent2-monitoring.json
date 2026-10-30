@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.report-view",
+  "report_id": "monitoring-example-native-v1",
+  "agent": "agent2",
+  "workflow": "monitoring",
+  "identity": {
+    "title": "Financial monitoring",
+    "entity": "Example company watchlist",
+    "ticker": null,
+    "source_run_id": "9",
+    "period_label": "2026-01-09 · cycle 9",
+    "period_end": null,
+    "prepared_at": "2026-10-30T14:58:30.667085+00:00"
+  },
+  "state": {
+    "execution": "completed",
+    "evidence_gate": "held_for_review",
+    "financial_approval": false,
+    "data_classification": "synthetic",
+    "integrity": "matched",
+    "review_refs": [
+      "synthetic-basis",
+      "observation-basis"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "file-1",
+      "name": "snapshot.json",
+      "sha256": "560886bc556858c347e795d5ace31407da3c284d7223b9659b51c08d9e9d520e",
+      "source_schema": "agent2.snapshot/unversioned"
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-source",
+      "label": "Saved synthetic demonstration evidence",
+      "source_type": "fixture",
+      "observed_at": null,
+      "published_at": null,
+      "retrieved_at": null,
+      "date_reason": "Synthetic saved inputs; publication/market-observation timestamps are not established. Preparation time is not an observation date.",
+      "url": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "source-record",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "",
+      "label": "Original saved result",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "coverage-value-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/current/0/value",
+      "label": "Interest coverage",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "coverage-floor-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/current/0/threshold",
+      "label": "Policy floor",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "coverage-row",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/current/0",
+      "label": "Original saved monitoring row",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "item-count",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/current",
+      "label": "Saved monitored items",
+      "transform": "count",
+      "method": null
+    }
+  ],
+  "summary": {
+    "text": "Synthetic saved-result example. Financial review remains required.",
+    "template_id": "synthetic-summary-v1",
+    "metric_refs": [],
+    "evidence_refs": [
+      "source-record"
+    ],
+    "review_refs": [
+      "synthetic-basis"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "coverage-value",
+      "label": "Interest coverage",
+      "value": "2.1",
+      "unit": "multiple",
+      "currency": null,
+      "period_label": "2026-01-09 · cycle 9",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "coverage-value-source"
+      ]
+    },
+    {
+      "id": "coverage-floor",
+      "label": "Policy floor",
+      "value": "3.0",
+      "unit": "multiple",
+      "currency": null,
+      "period_label": "2026-01-09 · cycle 9",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "coverage-floor-source"
+      ]
+    },
+    {
+      "id": "monitored-items",
+      "label": "Monitored items",
+      "value": "5",
+      "unit": "count",
+      "currency": null,
+      "period_label": "2026-01-09 · cycle 9",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "item-count"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "coverage-observation",
+      "kind": "observed_fact",
+      "visibility": "main",
+      "content": {
+        "text": "The illustrative Acme interest-coverage observation is 2.1× against a 3.0× floor.",
+        "template_id": "coverage-observation-v1",
+        "metric_refs": [
+          "coverage-value",
+          "coverage-floor"
+        ],
+        "evidence_refs": [
+          "coverage-row"
+        ],
+        "review_refs": []
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "exceptions",
+      "title": "Selected monitoring exception",
+      "purpose": "Read a saved exception and its original policy basis.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "coverage-value",
+        "coverage-floor",
+        "monitored-items"
+      ],
+      "finding_refs": [
+        "coverage-observation"
+      ],
+      "chart_refs": [],
+      "table_refs": [],
+      "review_refs": [
+        "observation-basis"
+      ]
+    }
+  ],
+  "charts": [],
+  "tables": [],
+  "review_items": [
+    {
+      "id": "synthetic-basis",
+      "category": "data_basis",
+      "impact": "publication_block",
+      "title": "Synthetic demonstration",
+      "explanation": "These saved inputs are illustrative and do not establish verified company facts.",
+      "action": "Use for interface evaluation; verify authorised real sources before business use.",
+      "section_refs": [
+        "exceptions"
+      ],
+      "source_check_refs": [
+        "policy:synthetic-local-review/v1"
+      ],
+      "evidence_refs": [
+        "source-record"
+      ]
+    },
+    {
+      "id": "observation-basis",
+      "category": "observation_dates",
+      "impact": "section_restriction",
+      "title": "Saved observation, not a fresh compliance check",
+      "explanation": "The selected observation is dated 2026-01-09. The threshold is a synthetic analyst policy, not an authenticated contractual covenant.",
+      "action": "Inspect original cycle evidence and any later correction separately.",
+      "section_refs": [
+        "exceptions"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/current/0/data_ts",
+        "artifact:file-1#/data_mode"
+      ],
+      "evidence_refs": [
+        "coverage-row"
+      ]
+    }
+  ],
+  "analyst_content": {
+    "keystone_scope": "not_applicable",
+    "market_consensus": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    },
+    "external_research": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    }
+  },
+  "glossary": [
+    {
+      "term": "Interest coverage",
+      "definition": "The saved measure of earnings coverage of interest expense; the applicable formula and policy must be inspected in its source evidence."
+    }
+  ]
+}

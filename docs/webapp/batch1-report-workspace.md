@@ -219,6 +219,12 @@ extend the existing clean-environment recovery evidence to a deployed service.
 
 ## What remains for later batches
 
+The [native report refinement](native-reports/README.md) specifies direct report
+sections and interactive charts. [Part 2A](native-reports/part2a-data-layer.md)
+implements registered native JSON and a read-only endpoint for all five synthetic
+workflows. Native frontend rendering remains pending; the current saved-HTML
+reader is unchanged.
+
 This batch supplies the viewing layer and a narrow read API. Running agents from
 the browser, persistent multi-user application state, uploads, authenticated
 approvals, provider integration and hosting remain future work. The existing

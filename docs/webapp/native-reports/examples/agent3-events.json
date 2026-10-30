@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.report-view",
+  "report_id": "events-example-native-v1",
+  "agent": "agent3",
+  "workflow": "events",
+  "identity": {
+    "title": "Historical event study",
+    "entity": "Semiconductor peers · fixture",
+    "ticker": null,
+    "source_run_id": "57f6963ae35a494eae90b6bd09bf4b06",
+    "period_label": "Retained synthetic event windows",
+    "period_end": null,
+    "prepared_at": "2026-10-30T14:58:30.667085+00:00"
+  },
+  "state": {
+    "execution": "held",
+    "evidence_gate": "held_for_review",
+    "financial_approval": false,
+    "data_classification": "synthetic",
+    "integrity": "matched",
+    "review_refs": [
+      "synthetic-basis",
+      "study-eligibility"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "file-1",
+      "name": "bundle.json",
+      "sha256": "d77b99d95f5de42b54ba75b65687cf3a60188e87fdd18e84a2fc6239a96ea95e",
+      "source_schema": "agent3.run_bundle/1"
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-source",
+      "label": "Saved synthetic demonstration evidence",
+      "source_type": "fixture",
+      "observed_at": null,
+      "published_at": null,
+      "retrieved_at": null,
+      "date_reason": "Synthetic saved inputs; publication/market-observation timestamps are not established. Preparation time is not an observation date.",
+      "url": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "source-record",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "",
+      "label": "Original saved result",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-count-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/n_events",
+      "label": "Historical event cases",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "issuer-count-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/n_issuers",
+      "label": "Distinct issuers",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "mean-car-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/caar",
+      "label": "Diagnostic mean abnormal return",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "gate-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/gate",
+      "label": "Original event-study gate",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "p-value-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/p_value",
+      "label": "Unavailable inference value",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-0",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/0/car",
+      "label": "ASML.AS diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-1",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/1/car",
+      "label": "ASM.AS diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-2",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/2/car",
+      "label": "BESI.AS diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-3",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/3/car",
+      "label": "LRCX diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-4",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/4/car",
+      "label": "AMAT diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-5",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/5/car",
+      "label": "KLAC diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-6",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/6/car",
+      "label": "TER diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "event-7",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/study/per_event/7/car",
+      "label": "NVMI diagnostic CAR",
+      "transform": "identity",
+      "method": null
+    }
+  ],
+  "summary": {
+    "text": "Eight synthetic earnings-event cases are retained. Their diagnostic mean abnormal return is about +2.25%; the study remains held for review and supplies no forward-return forecast.",
+    "template_id": "event-summary-v1",
+    "metric_refs": [
+      "event-count",
+      "mean-car"
+    ],
+    "evidence_refs": [
+      "event-count-source",
+      "mean-car-source",
+      "gate-source"
+    ],
+    "review_refs": [
+      "synthetic-basis",
+      "study-eligibility"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "event-count",
+      "label": "Historical event cases",
+      "value": "8",
+      "unit": "count",
+      "currency": null,
+      "period_label": "Retained synthetic event windows",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "event-count-source"
+      ]
+    },
+    {
+      "id": "issuer-count",
+      "label": "Distinct issuers",
+      "value": "8",
+      "unit": "count",
+      "currency": null,
+      "period_label": "Retained synthetic event windows",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "issuer-count-source"
+      ]
+    },
+    {
+      "id": "mean-car",
+      "label": "Diagnostic mean abnormal return",
+      "value": "0.022526137090729214",
+      "unit": "fraction",
+      "currency": null,
+      "period_label": "Retained synthetic event windows",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "diagnostic",
+      "reason_codes": [],
+      "evidence_refs": [
+        "mean-car-source"
+      ]
+    },
+    {
+      "id": "p-value",
+      "label": "Statistical inference",
+      "value": null,
+      "unit": "p_value",
+      "currency": null,
+      "period_label": "Retained synthetic event windows",
+      "as_of": null,
+      "availability": "unavailable",
+      "visibility": "main",
+      "reason_codes": [
+        "inference_unavailable"
+      ],
+      "evidence_refs": [
+        "p-value-source"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "event-observation",
+      "kind": "observed_fact",
+      "visibility": "diagnostic",
+      "content": {
+        "text": "Eight synthetic cases have a diagnostic mean accumulated abnormal return of approximately +2.25%. Statistical inference remains unavailable.",
+        "template_id": "event-observation-v1",
+        "metric_refs": [
+          "event-count",
+          "mean-car"
+        ],
+        "evidence_refs": [
+          "event-count-source",
+          "mean-car-source",
+          "gate-source"
+        ],
+        "review_refs": [
+          "study-eligibility"
+        ]
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "historical-findings",
+      "title": "Past event reactions",
+      "purpose": "Understand the retained sample and its restrictions.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "event-count",
+        "issuer-count",
+        "mean-car",
+        "p-value"
+      ],
+      "finding_refs": [
+        "event-observation"
+      ],
+      "chart_refs": [
+        "event-returns",
+        "event-path"
+      ],
+      "table_refs": [],
+      "review_refs": [
+        "study-eligibility"
+      ]
+    }
+  ],
+  "charts": [
+    {
+      "id": "event-returns",
+      "title": "Synthetic per-event abnormal returns",
+      "purpose": "Inspect individual historical diagnostics; these are not predicted next-event returns.",
+      "type": "bar",
+      "availability": "available",
+      "visibility": "diagnostic",
+      "reason_codes": [],
+      "x_axis": {
+        "kind": "category",
+        "label": "Historical case / issuer"
+      },
+      "y_axis": {
+        "unit": "fraction",
+        "currency": null,
+        "label": "fraction"
+      },
+      "series": [
+        {
+          "id": "event-car-series",
+          "label": "Diagnostic CAR",
+          "points": [
+            {
+              "id": "event-0",
+              "x": "ASML.AS",
+              "label": "ASML.AS",
+              "y": "0.03422036567006792",
+              "evidence_refs": [
+                "event-0"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-1",
+              "x": "ASM.AS",
+              "label": "ASM.AS",
+              "y": "0.027629110996841552",
+              "evidence_refs": [
+                "event-1"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-2",
+              "x": "BESI.AS",
+              "label": "BESI.AS",
+              "y": "0.009051243741634202",
+              "evidence_refs": [
+                "event-2"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-3",
+              "x": "LRCX",
+              "label": "LRCX",
+              "y": "0.036394467897952205",
+              "evidence_refs": [
+                "event-3"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-4",
+              "x": "AMAT",
+              "label": "AMAT",
+              "y": "0.0334704179372535",
+              "evidence_refs": [
+                "event-4"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-5",
+              "x": "KLAC",
+              "label": "KLAC",
+              "y": "-0.005234465308581956",
+              "evidence_refs": [
+                "event-5"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-6",
+              "x": "TER",
+              "label": "TER",
+              "y": "0.028287175109063745",
+              "evidence_refs": [
+                "event-6"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "event-7",
+              "x": "NVMI",
+              "label": "NVMI",
+              "y": "0.01639078068160255",
+              "evidence_refs": [
+                "event-7"
+              ],
+              "reason_codes": []
+            }
+          ]
+        }
+      ],
+      "review_refs": [
+        "study-eligibility"
+      ]
+    },
+    {
+      "id": "event-path",
+      "title": "Event-window path",
+      "purpose": "A dated or relative-session path requires verified observation alignment.",
+      "type": "line",
+      "availability": "withheld",
+      "visibility": "diagnostic",
+      "reason_codes": [
+        "window_timing_unverified"
+      ],
+      "x_axis": {
+        "kind": "relative_session",
+        "label": "Session relative to confirmed event"
+      },
+      "y_axis": {
+        "unit": "fraction",
+        "currency": null,
+        "label": "fraction"
+      },
+      "series": [],
+      "review_refs": [
+        "study-eligibility"
+      ]
+    }
+  ],
+  "tables": [],
+  "review_items": [
+    {
+      "id": "synthetic-basis",
+      "category": "data_basis",
+      "impact": "publication_block",
+      "title": "Synthetic demonstration",
+      "explanation": "These saved inputs are illustrative and do not establish verified company facts.",
+      "action": "Use for interface evaluation; verify authorised real sources before business use.",
+      "section_refs": [
+        "historical-findings"
+      ],
+      "source_check_refs": [
+        "policy:synthetic-local-review/v1"
+      ],
+      "evidence_refs": [
+        "source-record"
+      ]
+    },
+    {
+      "id": "study-eligibility",
+      "category": "statistical_eligibility",
+      "impact": "section_restriction",
+      "title": "Statistical and source review remain incomplete",
+      "explanation": "The saved gate cites sample, timing, benchmark, comparability, hypothesis-family and control-inference limitations.",
+      "action": "Review every original gate item; reaching a minimum sample count alone does not resolve the study.",
+      "section_refs": [
+        "historical-findings"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/record/result/gate/checks/0",
+        "artifact:file-1#/record/result/gate/checks/1",
+        "artifact:file-1#/record/result/gate/checks/2",
+        "artifact:file-1#/record/result/gate/checks/3",
+        "artifact:file-1#/record/result/gate/checks/4"
+      ],
+      "evidence_refs": [
+        "gate-source"
+      ]
+    }
+  ],
+  "analyst_content": {
+    "keystone_scope": "not_applicable",
+    "market_consensus": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    },
+    "external_research": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    }
+  },
+  "glossary": [
+    {
+      "term": "Abnormal return",
+      "definition": "The stock return minus the return estimated by the study’s market model."
+    },
+    {
+      "term": "CAR",
+      "definition": "The sum of abnormal returns over the supplied event window. A historical diagnostic, not a next-event forecast."
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.report-view",
+  "report_id": "news-example-native-v1",
+  "agent": "agent3",
+  "workflow": "news",
+  "identity": {
+    "title": "News evidence review",
+    "entity": "Example Rail · fictional company",
+    "ticker": null,
+    "source_run_id": "f0a5c160fca240f6a0988d208f0fe6af",
+    "period_label": "2026-01-28 · saved cutoff",
+    "period_end": null,
+    "prepared_at": "2026-10-30T14:58:30.667085+00:00"
+  },
+  "state": {
+    "execution": "held",
+    "evidence_gate": "held_for_review",
+    "financial_approval": false,
+    "data_classification": "synthetic",
+    "integrity": "matched",
+    "review_refs": [
+      "synthetic-basis",
+      "tone-review"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "file-1",
+      "name": "bundle.json",
+      "sha256": "8b2523975cfda3d3d444482e663beb0b560f9f2e4bb5429474538905be8cf7d2",
+      "source_schema": "agent3.run_bundle/1"
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-source",
+      "label": "Saved synthetic demonstration evidence",
+      "source_type": "fixture",
+      "observed_at": null,
+      "published_at": null,
+      "retrieved_at": null,
+      "date_reason": "Synthetic saved inputs; publication/market-observation timestamps are not established. Preparation time is not an observation date.",
+      "url": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "source-record",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "",
+      "label": "Original saved result",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "retained-clusters-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/funnel/after_dedup",
+      "label": "Retained headline clusters",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "diagnostic-tone-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/signals/0/diagnostic_level",
+      "label": "Illustrative diagnostic tone",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "published-tone-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/signals/0/level",
+      "label": "Withheld published tone",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "headline-0",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/scored_items/0",
+      "label": "Retained synthetic headline",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "headline-1",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/record/result/scored_items/1",
+      "label": "Retained synthetic headline",
+      "transform": "identity",
+      "method": null
+    }
+  ],
+  "summary": {
+    "text": "Synthetic saved-result example. Financial review remains required.",
+    "template_id": "synthetic-summary-v1",
+    "metric_refs": [],
+    "evidence_refs": [
+      "source-record"
+    ],
+    "review_refs": [
+      "synthetic-basis"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "retained-clusters",
+      "label": "Retained headline clusters",
+      "value": "2",
+      "unit": "count",
+      "currency": null,
+      "period_label": "2026-01-28 · saved cutoff",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "retained-clusters-source"
+      ]
+    },
+    {
+      "id": "diagnostic-tone",
+      "label": "Illustrative diagnostic tone",
+      "value": "0.0",
+      "unit": "score",
+      "currency": null,
+      "period_label": "2026-01-28 · saved cutoff",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "diagnostic",
+      "reason_codes": [],
+      "evidence_refs": [
+        "diagnostic-tone-source"
+      ]
+    },
+    {
+      "id": "published-tone",
+      "label": "Published tone",
+      "value": null,
+      "unit": "score",
+      "currency": null,
+      "period_label": "2026-01-28 · saved cutoff",
+      "as_of": null,
+      "availability": "withheld",
+      "visibility": "main",
+      "reason_codes": [
+        "synthetic_demo_score"
+      ],
+      "evidence_refs": [
+        "published-tone-source"
+      ]
+    }
+  ],
+  "findings": [],
+  "sections": [
+    {
+      "id": "news-evidence",
+      "title": "Company news",
+      "purpose": "Read retained stories and understand coverage and tone limits.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "retained-clusters",
+        "published-tone",
+        "diagnostic-tone"
+      ],
+      "finding_refs": [],
+      "chart_refs": [],
+      "table_refs": [
+        "headlines"
+      ],
+      "review_refs": [
+        "tone-review"
+      ]
+    }
+  ],
+  "charts": [],
+  "tables": [
+    {
+      "id": "headlines",
+      "title": "Retained synthetic headlines",
+      "columns": [
+        {
+          "id": "headline",
+          "label": "Retained headline"
+        },
+        {
+          "id": "publisher",
+          "label": "Source"
+        },
+        {
+          "id": "published",
+          "label": "Published at (UTC)"
+        }
+      ],
+      "rows": [
+        {
+          "id": "headline-0",
+          "cells": [
+            {
+              "column_id": "headline",
+              "kind": "text",
+              "text": "Example Rail opens a fictional maintenance facility"
+            },
+            {
+              "column_id": "publisher",
+              "kind": "text",
+              "text": "Synthetic bulletin"
+            },
+            {
+              "column_id": "published",
+              "kind": "text",
+              "text": "2026-01-28T12:00:00+00:00"
+            }
+          ],
+          "evidence_refs": [
+            "headline-0"
+          ]
+        },
+        {
+          "id": "headline-1",
+          "cells": [
+            {
+              "column_id": "headline",
+              "kind": "text",
+              "text": "Example Rail reports a fictional delivery delay"
+            },
+            {
+              "column_id": "publisher",
+              "kind": "text",
+              "text": "Synthetic bulletin"
+            },
+            {
+              "column_id": "published",
+              "kind": "text",
+              "text": "2026-01-28T14:00:00+00:00"
+            }
+          ],
+          "evidence_refs": [
+            "headline-1"
+          ]
+        }
+      ],
+      "review_refs": [
+        "tone-review"
+      ]
+    }
+  ],
+  "review_items": [
+    {
+      "id": "synthetic-basis",
+      "category": "data_basis",
+      "impact": "publication_block",
+      "title": "Synthetic demonstration",
+      "explanation": "These saved inputs are illustrative and do not establish verified company facts.",
+      "action": "Use for interface evaluation; verify authorised real sources before business use.",
+      "section_refs": [
+        "news-evidence"
+      ],
+      "source_check_refs": [
+        "policy:synthetic-local-review/v1"
+      ],
+      "evidence_refs": [
+        "source-record"
+      ]
+    },
+    {
+      "id": "tone-review",
+      "category": "narrative_support",
+      "impact": "section_restriction",
+      "title": "Published tone is withheld",
+      "explanation": "The saved published level is null. A demonstration diagnostic of 0.0 does not establish a neutral market or investment conclusion.",
+      "action": "Read retained text and the original scorer restrictions.",
+      "section_refs": [
+        "news-evidence"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/record/result/review_reasons/0",
+        "artifact:file-1#/record/result/review_reasons/1"
+      ],
+      "evidence_refs": [
+        "published-tone-source",
+        "diagnostic-tone-source"
+      ]
+    }
+  ],
+  "analyst_content": {
+    "keystone_scope": "not_applicable",
+    "market_consensus": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    },
+    "external_research": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    }
+  },
+  "glossary": [
+    {
+      "term": "Headline cluster",
+      "definition": "A heuristic grouping of related text records; it is not proof of independent stories."
+    }
+  ]
+}

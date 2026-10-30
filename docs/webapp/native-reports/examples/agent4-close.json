@@ -1,0 +1,404 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.report-view",
+  "report_id": "close-example-native-v1",
+  "agent": "agent4",
+  "workflow": "close",
+  "identity": {
+    "title": "Monthly financial close",
+    "entity": "Example Ltd · fictional company",
+    "ticker": null,
+    "source_run_id": "close-june",
+    "period_label": "2026-06-30",
+    "period_end": "2026-06-30",
+    "prepared_at": "2026-10-30T14:58:30.667085+00:00"
+  },
+  "state": {
+    "execution": "completed",
+    "evidence_gate": "held_for_review",
+    "financial_approval": false,
+    "data_classification": "synthetic",
+    "integrity": "matched",
+    "review_refs": [
+      "synthetic-basis",
+      "forecast-review"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "file-1",
+      "name": "close-june.json",
+      "sha256": "2f5922c7b2ad8b58fb1bc558f7d32a8f7617cad94d957c6f25eedb09a3cdca18",
+      "source_schema": "agent4.close/1"
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-source",
+      "label": "Saved synthetic demonstration evidence",
+      "source_type": "fixture",
+      "observed_at": null,
+      "published_at": null,
+      "retrieved_at": null,
+      "date_reason": "Synthetic saved inputs; publication/market-observation timestamps are not established. Preparation time is not an observation date.",
+      "url": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "source-record",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "",
+      "label": "Original saved result",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "budget-profit-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/full_hierarchy/budget_cents",
+      "label": "Budget profit",
+      "transform": "minor_to_major",
+      "method": "Exact decimal conversion of integer cents to EUR major units."
+    },
+    {
+      "id": "actual-profit-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/full_hierarchy/actual_cents",
+      "label": "Actual profit",
+      "transform": "minor_to_major",
+      "method": "Exact decimal conversion of integer cents to EUR major units."
+    },
+    {
+      "id": "variance-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/full_hierarchy/total_variance_cents",
+      "label": "Actual less budget",
+      "transform": "minor_to_major",
+      "method": "Exact decimal conversion of integer cents to EUR major units."
+    },
+    {
+      "id": "bridge-sales",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/full_hierarchy/children/0/profit_impact_cents",
+      "label": "Sales impact on profit",
+      "transform": "minor_to_major",
+      "method": "Exact decimal conversion of integer cents to EUR major units."
+    },
+    {
+      "id": "bridge-cost",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/full_hierarchy/children/1/profit_impact_cents",
+      "label": "Cost impact on profit",
+      "transform": "minor_to_major",
+      "method": "Exact decimal conversion of integer cents to EUR major units."
+    },
+    {
+      "id": "forecast-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/reforecasts/profit",
+      "label": "Saved provisional forecast",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "forecast-band-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/report/reforecasts/profit/band_cents",
+      "label": "Saved unavailable forecast interval",
+      "transform": "identity",
+      "method": null
+    }
+  ],
+  "summary": {
+    "text": "Synthetic saved-result example. Financial review remains required.",
+    "template_id": "synthetic-summary-v1",
+    "metric_refs": [],
+    "evidence_refs": [
+      "source-record"
+    ],
+    "review_refs": [
+      "synthetic-basis"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "budget-profit",
+      "label": "Budget profit",
+      "value": "60",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_label": "2026-06-30",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "budget-profit-source"
+      ]
+    },
+    {
+      "id": "actual-profit",
+      "label": "Actual profit",
+      "value": "65",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_label": "2026-06-30",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "actual-profit-source"
+      ]
+    },
+    {
+      "id": "variance",
+      "label": "Actual less budget",
+      "value": "5",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_label": "2026-06-30",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "variance-source"
+      ]
+    },
+    {
+      "id": "forecast-range",
+      "label": "Forecast interval",
+      "value": null,
+      "unit": "currency",
+      "currency": "EUR",
+      "period_label": "FY2026 forecast from June close",
+      "as_of": null,
+      "availability": "unavailable",
+      "visibility": "main",
+      "reason_codes": [
+        "forecast_interval_unavailable"
+      ],
+      "evidence_refs": [
+        "forecast-band-source"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "close-observation",
+      "kind": "observed_fact",
+      "visibility": "main",
+      "content": {
+        "text": "The synthetic close records €65.00 actual profit against a €60.00 budget: a favourable €5.00 difference.",
+        "template_id": "close-observation-v1",
+        "metric_refs": [
+          "budget-profit",
+          "actual-profit",
+          "variance"
+        ],
+        "evidence_refs": [
+          "budget-profit-source",
+          "actual-profit-source",
+          "variance-source"
+        ],
+        "review_refs": []
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "close-results",
+      "title": "Monthly close",
+      "purpose": "Inspect reconciled saved amounts.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "budget-profit",
+        "actual-profit",
+        "variance"
+      ],
+      "finding_refs": [
+        "close-observation"
+      ],
+      "chart_refs": [
+        "profit-bridge"
+      ],
+      "table_refs": [],
+      "review_refs": []
+    },
+    {
+      "id": "forecast-interval",
+      "title": "Forecast interval",
+      "purpose": "Understand what the saved forecast can and cannot establish.",
+      "availability": "unavailable",
+      "reason_codes": [
+        "forecast_interval_unavailable"
+      ],
+      "metric_refs": [
+        "forecast-range"
+      ],
+      "finding_refs": [],
+      "chart_refs": [],
+      "table_refs": [],
+      "review_refs": [
+        "forecast-review"
+      ]
+    }
+  ],
+  "charts": [
+    {
+      "id": "profit-bridge",
+      "title": "Budget to actual profit",
+      "purpose": "Inspect exact account impacts on the saved close.",
+      "type": "waterfall",
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "x_axis": {
+        "kind": "category",
+        "label": "Anchor / account"
+      },
+      "y_axis": {
+        "unit": "currency",
+        "currency": "EUR",
+        "label": "currency"
+      },
+      "series": [
+        {
+          "id": "bridge-series",
+          "label": "EUR profit bridge",
+          "points": [
+            {
+              "id": "budget-anchor",
+              "x": "budget",
+              "label": "Budget",
+              "y": "60",
+              "evidence_refs": [
+                "budget-profit-source"
+              ],
+              "reason_codes": [],
+              "start": "0",
+              "end": "60",
+              "assessment": "anchor"
+            },
+            {
+              "id": "bridge-sales",
+              "x": "sales",
+              "label": "Sales",
+              "y": "10",
+              "evidence_refs": [
+                "bridge-sales"
+              ],
+              "reason_codes": [],
+              "start": "60",
+              "end": "70",
+              "assessment": "favourable"
+            },
+            {
+              "id": "bridge-cost",
+              "x": "cost",
+              "label": "Cost",
+              "y": "-5",
+              "evidence_refs": [
+                "bridge-cost"
+              ],
+              "reason_codes": [],
+              "start": "70",
+              "end": "65",
+              "assessment": "adverse"
+            },
+            {
+              "id": "actual-anchor",
+              "x": "actual",
+              "label": "Actual",
+              "y": "65",
+              "evidence_refs": [
+                "actual-profit-source"
+              ],
+              "reason_codes": [],
+              "start": "0",
+              "end": "65",
+              "assessment": "anchor"
+            }
+          ]
+        }
+      ],
+      "review_refs": [
+        "synthetic-basis"
+      ]
+    }
+  ],
+  "tables": [],
+  "review_items": [
+    {
+      "id": "synthetic-basis",
+      "category": "data_basis",
+      "impact": "publication_block",
+      "title": "Synthetic demonstration",
+      "explanation": "These saved inputs are illustrative and do not establish verified company facts.",
+      "action": "Use for interface evaluation; verify authorised real sources before business use.",
+      "section_refs": [
+        "close-results",
+        "forecast-interval"
+      ],
+      "source_check_refs": [
+        "policy:synthetic-local-review/v1"
+      ],
+      "evidence_refs": [
+        "source-record"
+      ]
+    },
+    {
+      "id": "forecast-review",
+      "category": "statistical_eligibility",
+      "impact": "section_restriction",
+      "title": "No eligible forecast interval",
+      "explanation": "The saved forecast band is null. No interval or probability guarantee is inferred from reconciliation.",
+      "action": "Inspect the retained forecast inputs and statistical limitations.",
+      "section_refs": [
+        "forecast-interval"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/report/reforecasts/profit/band_cents"
+      ],
+      "evidence_refs": [
+        "forecast-source"
+      ]
+    }
+  ],
+  "analyst_content": {
+    "keystone_scope": "not_applicable",
+    "market_consensus": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    },
+    "external_research": {
+      "availability": "not_applicable",
+      "reason_codes": [
+        "workflow_not_research"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    }
+  },
+  "glossary": [
+    {
+      "term": "Favourable variance",
+      "definition": "A change favourable to the saved reported result. Its meaning depends on the account and profit-impact convention."
+    }
+  ]
+}

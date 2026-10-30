@@ -36,7 +36,7 @@ def metric(label, value, basis):
     return dict(label=label, value=str(value), basis=basis)
 
 
-def prepare_workspace(destination):
+def prepare_workspace(destination, *, native=False):
     from keystone.maintenance import gate
     destination = Path(destination).absolute()
     old_mask = os.umask(0o077)
@@ -47,7 +47,10 @@ def prepare_workspace(destination):
             os.environ.update(AGENT_DATA_SOURCE='fixture', AGENT_STATS_VIA_MCP='0',
                               LM_DICTIONARY_CSV='', MPLBACKEND='Agg')
             with redirect_stdout(io.StringIO()):
-                _generate(destination)
+                manifest = _generate(destination, publish=not native)
+                if native:
+                    from .report_views.publish import register_views
+                    register_views(destination, manifest)
             Catalog(destination).load()
         return destination
     finally:
@@ -59,7 +62,7 @@ def prepare_workspace(destination):
                 os.environ[key] = value
 
 
-def _generate(destination):
+def _generate(destination, *, publish=True):
     created = datetime.now(timezone.utc).isoformat()
     private = destination / '_private'
     private.mkdir()
@@ -234,4 +237,6 @@ def _generate(destination):
         preparer_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         production_release_approved=False, runs=runs))
     # Publish the catalogue only after every engine/export completed successfully.
-    save_json(destination / 'catalog.json', manifest.model_dump())
+    if publish:
+        save_json(destination / 'catalog.json', manifest.model_dump())
+    return manifest
