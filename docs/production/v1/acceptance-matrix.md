@@ -97,3 +97,10 @@ and an unfilled analyst task record. No human task or release gate is marked pas
 V1-UAT-001 and V1-REL-003 remain not assessed; V1-OPS-002 remains blocked on accepted
 capacity targets and deployment workload. Fresh same-Mac installation and local
 restore do not satisfy independent-device V1-STO-002.
+
+13 October source review: user selected private personal evaluation with local
+outputs and no external sharing. [Public terms and data-flow assessment](source-use-personal-pilot.md)
+and its structured register identify limited personal-copy evidence and unresolved
+automated access, retention and processing rights. V1-DAT-001 stays blocked.
+The eight starter tasks have execution evidence locally; interpretation review is
+deferred by the user, not passed or waived.

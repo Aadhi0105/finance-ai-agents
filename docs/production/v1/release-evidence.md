@@ -190,3 +190,46 @@ independent protection/key recovery, clean-machine recovery, human financial/new
 review, authorised company FP&A, full analyst UAT and accepted workload limits remain
 open. Batch 5 preparation is implemented; the supervised pilot and release decision
 are not complete.
+
+## Source-use assessment — 13 October 2026
+
+Completed the [bounded private-personal review](source-use-personal-pilot.md) with
+a [13-entry permission register](../../../references/acceptance/source-permissions-2026-10-13.json).
+User selected private personal evaluation only. Published terms were inspected;
+Yahoo regional access limitations and missing host/account grants are explicit.
+All nine inventory dataset IDs are covered, with exact existing issuer/event URLs
+and source-code/reference hashes retained. No live financial/news retrieval, paid
+model calls, provider contact, new account, permission-metadata changes or release
+approval occurred. Terms-page research is distinct from financial-data retrieval.
+
+Stadler and NVIDIA limited personal-copy evidence does not approve automated feeds.
+Yahoo automated access, publisher text rights and retention/backup terms remain
+unresolved. External model transfer and sharing are excluded from the recommended
+local workflow. This documentation does not enforce a new runtime restriction.
+V1-DAT-001 remains blocked; analyst interpretation review remains deferred.
+
+### Yahoo dependency assessment
+
+The user confirmed no existing data licence. The [resolution plan](yahoo-dependency-resolution.md) compares the official Yahoo developer enquiry route, EODHD and Twelve Data, and defines coverage, retention and adapter acceptance requirements. A [provider enquiry](provider-permission-enquiry.md) is ready for review but has not been sent. No financial feed was fetched, provider purchased, adapter changed or release gate advanced. Written entitlement, approved cost and coverage validation remain necessary.
+
+## Yahoo enquiry preparation — 30 October 2026
+
+Finalised the [Yahoo enquiry and contact-route record](yahoo-finance-enquiry.md).
+Browser inspection verified Finance Help's Contact Us entry point and its required
+Yahoo ID step. A direct Finance developer/API form was not exposed in the live
+pages inspected, despite the invitation remaining in search results. The footer
+licensing destination concerns content reuse/awards and was not established as an
+API-data route. No account identifier or enquiry was entered or sent. Direct
+API-team routing remains pending the account/contact flow. No runtime change,
+financial-data retrieval, purchase, permission approval or release occurred;
+V1-DAT-001 remains blocked. Historical evidence dates and hashes are preserved.
+
+### User-reported Yahoo routing submission
+
+Follow-up recorded 30 October: the user supplied a prepared Finance Email form
+screenshot and then reported receiving a case number after submission. The case
+number was not retained and no confirmation email was reported. Record this as a
+user-reported routing request, not independently verified delivery or an API grant.
+The [enquiry record](yahoo-finance-enquiry.md) distinguishes the screenshot from
+submission evidence and retains the detailed draft for a suitable referral. No
+duplicate request was sent; no data permission or release gate is advanced.

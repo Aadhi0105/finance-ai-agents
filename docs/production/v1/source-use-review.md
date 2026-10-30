@@ -1,5 +1,9 @@
 # Preliminary source-use permission review
 
+**Follow-up:** [13 October personal-pilot assessment](source-use-personal-pilot.md)
+records the user-selected private scope, updated public evidence, actual data flows
+and a structured permission register. The 10 October assessment below is historical.
+
 Reviewed 10 October 2026. **Engineering evidence review, not legal approval.**
 Public availability, a successful download, a software licence or an issuer fact-check
 does not establish all rights needed for a production workflow. Actual account terms,
@@ -45,3 +49,8 @@ required report sharing. Do not assume that paying for a provider automatically
 includes these rights. Private pilot use and customer-facing redistribution require
 separate assessments. Existing live acceptance remains historical technical evidence,
 not a newly approved production data entitlement.
+
+See the [Yahoo dependency resolution plan](yahoo-dependency-resolution.md) for the subsequent provider assessment and prepared enquiry.
+
+The [30 October final Yahoo enquiry and route verification](yahoo-finance-enquiry.md)
+updates the contact route without changing the source-permission assessment or release gate.

@@ -81,3 +81,7 @@ release register; keep sensitive artifacts in the protected storage design.
 
 See [preliminary source-use review](source-use-review.md) for current terms evidence
 and unresolved access, retention, model-processing and sharing permissions.
+
+The [13 October personal-pilot review](source-use-personal-pilot.md) maps D01–D09
+to separate access, retention, local-processing, model-transfer and sharing decisions.
+No runtime permission metadata is promoted to reviewed; live rights remain unresolved.

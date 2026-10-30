@@ -263,3 +263,7 @@ Batch 5 adds [offline pilot preparation and analyst tasks](docs/production/v1/ba
 with an isolated four-agent rehearsal, measured local artifacts and a pending release
 manifest. Human acceptance, permissions, independent recovery and financial sign-off
 remain outstanding; Keystone Production v1 is not released.
+
+The [private personal source-use review](docs/production/v1/source-use-personal-pilot.md)
+records provider restrictions and unresolved permissions. Personal evaluation does
+not by itself approve automated data access, backup retention or external model use.

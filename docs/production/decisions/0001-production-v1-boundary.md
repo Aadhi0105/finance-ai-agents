@@ -44,3 +44,12 @@ synthetic inputs and saved evidence. This resolves the preparation scope under D
 not final workload/capacity thresholds or live-source permissions. Timing, generated
 storage and analyst observations will inform those later decisions. Existing paid
 call limits and deferred independent protection remain unchanged.
+
+## Personal evaluation scope — 13 October 2026
+
+User selected private personal evaluation only, one analyst with local outputs and
+no external sharing, for the source-use review. Employer/client/customer use requires
+a fresh assessment. [Permission findings](../v1/source-use-personal-pilot.md) retain
+source-specific holds; this scope decision is not provider consent. External-model
+transfer is excluded from the recommended local workflow until separately assessed.
+The user deferred interpretation review; its absence is not an acceptance waiver.

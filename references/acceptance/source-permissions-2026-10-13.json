@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-13",
+  "candidate_commit": "78504efeffa043cf485d58106b8503c7fe456989",
+  "intended_use": "private personal evaluation; one analyst; local outputs; no external sharing",
+  "scope_selected_by": "user in this conversation",
+  "jurisdiction_and_account_region": "not established; not inferred from timezone",
+  "assessment": "public terms review, not provider consent or legal sign-off",
+  "gate": "V1-DAT-001",
+  "gate_status": "blocked",
+  "production_release_approved": false,
+  "runtime_enforcement_added": false,
+  "entries": [
+    {
+      "id": "yahoo",
+      "dataset_ids": [
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06"
+      ],
+      "evidence_url": "https://github.com/ranaroussi/yfinance",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "README does not grant Yahoo automated access; indexed Yahoo restriction; regional terms direct retrieval HTTP 999.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "news_publishers",
+      "dataset_ids": [
+        "D06"
+      ],
+      "evidence_url": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html?ncid=mbr_idnedulnk00000001",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Yahoo and publisher text rights unresolved; 40 retained records have Yahoo-hosted links; summaries may be retained.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "asml",
+      "dataset_ids": [
+        "D02",
+        "D05"
+      ],
+      "evidence_url": "https://www.asml.com/en/terms-of-use",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "No explicit grant established for the proposed automated workflow; factual extraction and text copying must be distinguished.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "stadler",
+      "dataset_ids": [
+        "D04"
+      ],
+      "evidence_url": "https://www.stadlerrail.com/api/docs/x/9c55debd67/website-privacy-notice-2024-en.pdf",
+      "access": "supported_limited",
+      "retention_backup": "supported_limited",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Section 16 supports personal duplication/printing only; applicability to exact filing and automated/backup workflow unresolved.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "nvidia",
+      "dataset_ids": [
+        "D05"
+      ],
+      "evidence_url": "https://www.nvidia.com/en-eu/about-nvidia/terms-of-service/",
+      "access": "supported_limited",
+      "retention_backup": "supported_limited",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Single-computer personal download option; automated extraction restricted; verify investor-host applicability; extra copies not approved.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "globenewswire",
+      "dataset_ids": [
+        "D05"
+      ],
+      "evidence_url": "https://www.globenewswire.com/",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Applicable reader/feed terms not established; marketing distribution descriptions are not a grant.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "euronext",
+      "dataset_ids": [
+        "D05"
+      ],
+      "evidence_url": "https://www.euronext.com/en/data/real-time-data/pricing-specs-agreements/market-data-pricing-policies",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Benchmark identity page only; price series via Yahoo. Free-of-charge internal delayed data does not settle licences.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "spglobal",
+      "dataset_ids": [
+        "D05"
+      ],
+      "evidence_url": "https://www.spglobal.com/en/terms-of-use",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Personal-use language qualified by other restrictions; benchmark identity distinct from Yahoo price-series rights.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "anthropic",
+      "dataset_ids": [
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D09"
+      ],
+      "evidence_url": "https://www.anthropic.com/legal/commercial-terms",
+      "access": "excluded_scope",
+      "retention_backup": "excluded_scope",
+      "local_processing": "excluded_scope",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Actual API account agreement/settings unverified; cloud inference excluded from recommended local workflow.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "external_lm_dictionary",
+      "dataset_ids": [
+        "D06"
+      ],
+      "evidence_url": "https://sraf.nd.edu/loughranmcdonald-master-dictionary/",
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Academic permission is not automatically personal permission. Curated local subset provenance separately unresolved.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "finbert",
+      "dataset_ids": [
+        "D06"
+      ],
+      "evidence_url": "https://huggingface.co/ProsusAI/finbert",
+      "access": "excluded_scope",
+      "retention_backup": "excluded_scope",
+      "local_processing": "excluded_scope",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Previously deferred; exact artifact licence chain not newly reviewed.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "company_fp_and_a",
+      "dataset_ids": [
+        "D09"
+      ],
+      "evidence_url": null,
+      "access": "unresolved",
+      "retention_backup": "unresolved",
+      "local_processing": "unresolved",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Authorised company dataset unavailable; personal purpose does not authorise confidential company data.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    },
+    {
+      "id": "synthetic_fixtures",
+      "dataset_ids": [
+        "D01",
+        "D07",
+        "D08"
+      ],
+      "evidence_url": null,
+      "access": "engineering_only",
+      "retention_backup": "engineering_only",
+      "local_processing": "engineering_only",
+      "external_model_processing": "excluded_scope",
+      "sharing": "excluded_scope",
+      "conditions": "Existing illustrative offline validation scope; no blanket third-party text or public redistribution grant.",
+      "reviewer": null,
+      "approved_at": null,
+      "full_workflow_approved": false
+    }
+  ],
+  "source_code_and_reference_hashes": {
+    "tools/data.py": "0957b2c669363f94a216fb31cc9bd0f97168d7537c95babaf99f76296234e553",
+    "agent3/news_live.py": "e37ebe089db678d323efd998284052ee62fb2bbbfc3ba2e5621efd61d7462673",
+    "agent3/track_a_live.py": "2414819549d50a3e7f37c047893cbb22250ccdbee392be54dc6d272fd4bd8ac8",
+    "agent/loop.py": "0add4a3c125d6d180395909321739cf64ab705d7c2acc671ad59f729ba78e5f0",
+    "agent/models.py": "5eaa0110d96788f64cf0ba526ad42285673bc0ede84bd7096e060d9a5c9aafb3",
+    "agent3/lm_lexicon.py": "cfdcb81edeadc7896f4ab74e6e5be6e54da3a3a222aff0e37ac48e8e8ea3436b",
+    "keystone/storage.py": "2c5e84ed6050e5526c7e8f9bf04f0489262728fdceabf4fd5f639fef23e31b5d",
+    "references/issuer/ASML.AS-2025-12-31.json": "cf234c6d0cb3886c4afbf6fbe373d7c06ed887776f1a832c0bc69a60dc3c6ebc",
+    "references/monitoring/SRAIL.SW-2025-12-31.json": "f2a2daac407dbeff3ca749f3b6a7383c0c284556811f4acefe4d66b44a3d013b",
+    "fixtures/agent3_closure/asml-as-source-plan.json": "0bd8c0b348e4f36db9d7ab70b016fa564ed484027c3f6db6dff35f21ae156fb6",
+    "fixtures/agent3_closure/nvda-source-plan.json": "fc4f9d7be59edf3995ae05de3f10a468f41713663157977c252c7d9d5acb7ca2"
+  },
+  "retained_reference_urls": [
+    {
+      "file": "references/issuer/ASML.AS-2025-12-31.json",
+      "url": "https://ourbrand.asml.com/m/71076aaad607de4d/original/asml-2025-annual-report-based-on-us-gaap.pdf"
+    },
+    {
+      "file": "references/monitoring/SRAIL.SW-2025-12-31.json",
+      "url": "https://www.stadlerrail.com/api/docs/x/518f589306/annual-report_2025_en.pdf"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://live.euronext.com/fr/product/indices/NL0000000107-XAMS"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/01/29/3016895/0/en/ASML-reports-28-3-billion-total-net-sales-and-7-6-billion-net-income-in-2024.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/04/16/3062264/0/en/ASML-reports-7-7-billion-total-net-sales-and-2-4-billion-net-income-in-Q1-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/07/16/3116126/0/en/ASML-reports-7-7-billion-total-net-sales-and-2-3-billion-net-income-in-Q2-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/10/15/3166781/0/en/ASML-reports-7-5-billion-total-net-sales-and-2-1-billion-net-income-in-Q3-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2026/01/28/3227191/0/en/asml-reports-32-7-billion-total-net-sales-and-9-6-billion-net-income-in-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://investor.asml.com/quarterly-results"
+    },
+    {
+      "file": "fixtures/agent3_closure/asml-as-source-plan.json",
+      "url": "https://investor.asml.com/quarterly-results"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2024/08/28/2937384/0/en/nvidia-announces-financial-results-for-second-quarter-fiscal-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2024/11/20/2984778/0/en/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/02/26/3033384/0/en/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/05/28/3089944/0/en/nvidia-announces-financial-results-for-first-quarter-fiscal-2026.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://www.globenewswire.com/news-release/2025/08/27/3140390/0/en/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2026.html"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2025/default.aspx"
+    },
+    {
+      "file": "fixtures/agent3_closure/nvda-source-plan.json",
+      "url": "https://investor.nvidia.com/news/press-release-details/2025/NVIDIA-Announces-Financial-Results-for-Fourth-Quarter-and-Fiscal-2025/default.aspx"
+    }
+  ],
+  "supplemental_evidence": [
+    {
+      "url": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html?ncid=mbr_idnedulnk00000001",
+      "access": "official search-index excerpt only; direct HTTP 999",
+      "finding": "Automated collection requires express prior permission in indexed US terms; actual regional applicability unresolved."
+    },
+    {
+      "url": "https://legal.yahoo.com/ie/en/yahoo/terms/otos/index.html",
+      "access": "direct HTTP 999",
+      "finding": "No affirmative regional determination."
+    },
+    {
+      "url": "https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data",
+      "access": "official page read",
+      "finding": "Standard API deletion within 30 days subject to exceptions; actual account settings not checked."
+    }
+  ],
+  "open_actions": [
+    "Applicable account/region terms and automated API entitlement",
+    "Exact filing/host permission and exceptions assessment",
+    "News feed/publisher headline and summary rights",
+    "Retention/copies/deletion and expiry conditions",
+    "Named reviewer decisions before inventory permission changes"
+  ],
+  "analyst_interpretation_review": "deferred by user"
+}
