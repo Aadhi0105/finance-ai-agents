@@ -1,0 +1,585 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.report-view",
+  "report_id": "research-example-native-v1",
+  "agent": "agent1",
+  "workflow": "research",
+  "identity": {
+    "title": "Annual research",
+    "entity": "ASML · fixture",
+    "ticker": "ASML.AS",
+    "source_run_id": "ASML.AS_20261030T145830.793209+0000_89176f2e43fe",
+    "period_label": "2025-12-31",
+    "period_end": "2025-12-31",
+    "prepared_at": "2026-10-30T14:58:30.667085+00:00"
+  },
+  "state": {
+    "execution": "completed",
+    "evidence_gate": "held_for_review",
+    "financial_approval": false,
+    "data_classification": "synthetic",
+    "integrity": "matched",
+    "review_refs": [
+      "synthetic-basis",
+      "valuation-review",
+      "consensus-missing"
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "file-1",
+      "name": "model.json",
+      "sha256": "0bdd2ccf76a525d2fc649494f88cfd59e254d2f597606627bf92c76660d8d98f",
+      "source_schema": "agent1.model/2"
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-source",
+      "label": "Saved synthetic demonstration evidence",
+      "source_type": "fixture",
+      "observed_at": null,
+      "published_at": null,
+      "retrieved_at": null,
+      "date_reason": "Synthetic saved inputs; publication/market-observation timestamps are not established. Preparation time is not an observation date.",
+      "url": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "source-record",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "",
+      "label": "Original saved result",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "revenue-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_financials/financials/revenue",
+      "label": "Annual revenue",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "operating-margin-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/compute_ratios/ratios/operating_margin",
+      "label": "Operating margin",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "historical-growth-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_historical_trend/revenue_cagr",
+      "label": "Historical revenue CAGR",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "weighted-valuation-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/run_dcf/scenario_weighted_per_share",
+      "label": "Scenario-weighted equity value per share",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "revenue-2022",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_historical_trend/revenue_by_year/2022",
+      "label": "Annual revenue 2022",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "revenue-2023",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_historical_trend/revenue_by_year/2023",
+      "label": "Annual revenue 2023",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "revenue-2024",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_historical_trend/revenue_by_year/2024",
+      "label": "Annual revenue 2024",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "revenue-2025",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_historical_trend/revenue_by_year/2025",
+      "label": "Annual revenue 2025",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "valuation-assumptions",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/run_dcf/assumptions",
+      "label": "Saved valuation assumptions",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "valuation-bear",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/run_dcf/value_per_share/bear",
+      "label": "Bear per-share valuation",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "valuation-base",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/run_dcf/value_per_share/base",
+      "label": "Base per-share valuation",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "valuation-bull",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/run_dcf/value_per_share/bull",
+      "label": "Bull per-share valuation",
+      "transform": "identity",
+      "method": null
+    },
+    {
+      "id": "consensus-source",
+      "artifact_id": "file-1",
+      "source_id": "fixture-source",
+      "pointer": "/analysis/get_consensus",
+      "label": "Saved analyst-estimate availability",
+      "transform": "identity",
+      "method": null
+    }
+  ],
+  "summary": {
+    "text": "Synthetic ASML evidence shows annual revenue of €32.67bn and an operating margin of 34.60%. Valuation assumptions require review; external analyst estimates were unavailable.",
+    "template_id": "research-summary-v1",
+    "metric_refs": [
+      "revenue",
+      "operating-margin"
+    ],
+    "evidence_refs": [
+      "revenue-source",
+      "operating-margin-source",
+      "consensus-source"
+    ],
+    "review_refs": [
+      "synthetic-basis",
+      "valuation-review",
+      "consensus-missing"
+    ]
+  },
+  "metrics": [
+    {
+      "id": "revenue",
+      "label": "Annual revenue",
+      "value": "32667300000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_label": "2025-12-31",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "revenue-source"
+      ]
+    },
+    {
+      "id": "operating-margin",
+      "label": "Operating margin",
+      "value": "0.346",
+      "unit": "fraction",
+      "currency": null,
+      "period_label": "2025-12-31",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "operating-margin-source"
+      ]
+    },
+    {
+      "id": "historical-growth",
+      "label": "Historical revenue CAGR",
+      "value": "0.1555",
+      "unit": "fraction",
+      "currency": null,
+      "period_label": "2022–2025",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "evidence_refs": [
+        "historical-growth-source"
+      ]
+    },
+    {
+      "id": "weighted-valuation",
+      "label": "Scenario-weighted equity value per share",
+      "value": "624.63",
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_label": "2025-12-31",
+      "as_of": null,
+      "availability": "available",
+      "visibility": "diagnostic",
+      "reason_codes": [],
+      "evidence_refs": [
+        "weighted-valuation-source"
+      ]
+    },
+    {
+      "id": "analyst-target",
+      "label": "External analyst mean target",
+      "value": null,
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_label": "Estimate horizon unavailable",
+      "as_of": null,
+      "availability": "unavailable",
+      "visibility": "main",
+      "reason_codes": [
+        "no_usable_analyst_estimates"
+      ],
+      "evidence_refs": [
+        "consensus-source"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "margin-observation",
+      "kind": "observed_fact",
+      "visibility": "main",
+      "content": {
+        "text": "The saved annual inputs show an operating margin of 34.60%.",
+        "template_id": "margin-observation-v1",
+        "metric_refs": [
+          "operating-margin"
+        ],
+        "evidence_refs": [
+          "operating-margin-source"
+        ],
+        "review_refs": []
+      }
+    },
+    {
+      "id": "growth-observation",
+      "kind": "observed_fact",
+      "visibility": "main",
+      "content": {
+        "text": "The saved 2022–2025 revenue observations imply historical annual growth of 15.55%. This is not an analyst forecast.",
+        "template_id": "growth-observation-v1",
+        "metric_refs": [
+          "historical-growth"
+        ],
+        "evidence_refs": [
+          "historical-growth-source"
+        ],
+        "review_refs": []
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "performance",
+      "title": "Business performance",
+      "purpose": "Understand saved annual performance.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "revenue",
+        "operating-margin",
+        "historical-growth"
+      ],
+      "finding_refs": [
+        "margin-observation",
+        "growth-observation"
+      ],
+      "chart_refs": [
+        "revenue-history"
+      ],
+      "table_refs": [],
+      "review_refs": [
+        "synthetic-basis"
+      ]
+    },
+    {
+      "id": "valuation",
+      "title": "Valuation and assumptions",
+      "purpose": "Inspect conditional per-share values and the saved assumptions.",
+      "availability": "available",
+      "reason_codes": [],
+      "metric_refs": [
+        "weighted-valuation"
+      ],
+      "finding_refs": [],
+      "chart_refs": [
+        "valuation-scenarios"
+      ],
+      "table_refs": [],
+      "review_refs": [
+        "valuation-review"
+      ]
+    },
+    {
+      "id": "consensus",
+      "title": "Market consensus",
+      "purpose": "Distinguish external estimates from Keystone valuation.",
+      "availability": "unavailable",
+      "reason_codes": [
+        "no_usable_analyst_estimates"
+      ],
+      "metric_refs": [
+        "analyst-target"
+      ],
+      "finding_refs": [],
+      "chart_refs": [],
+      "table_refs": [],
+      "review_refs": [
+        "consensus-missing"
+      ]
+    }
+  ],
+  "charts": [
+    {
+      "id": "revenue-history",
+      "title": "Annual revenue",
+      "purpose": "Inspect the saved historical observations; no forecast series is added.",
+      "type": "bar",
+      "availability": "available",
+      "visibility": "main",
+      "reason_codes": [],
+      "x_axis": {
+        "kind": "category",
+        "label": "Financial year"
+      },
+      "y_axis": {
+        "unit": "currency",
+        "currency": "EUR",
+        "label": "currency"
+      },
+      "series": [
+        {
+          "id": "revenue-series",
+          "label": "Revenue",
+          "points": [
+            {
+              "id": "revenue-2022",
+              "x": "2022",
+              "label": "2022",
+              "y": "21173000000.0",
+              "evidence_refs": [
+                "revenue-2022"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "revenue-2023",
+              "x": "2023",
+              "label": "2023",
+              "y": "27558500000.0",
+              "evidence_refs": [
+                "revenue-2023"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "revenue-2024",
+              "x": "2024",
+              "label": "2024",
+              "y": "28262900000.0",
+              "evidence_refs": [
+                "revenue-2024"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "revenue-2025",
+              "x": "2025",
+              "label": "2025",
+              "y": "32667300000.0",
+              "evidence_refs": [
+                "revenue-2025"
+              ],
+              "reason_codes": []
+            }
+          ]
+        }
+      ],
+      "review_refs": []
+    },
+    {
+      "id": "valuation-scenarios",
+      "title": "Illustrative valuation scenarios",
+      "purpose": "Compare saved assumptions; these are not measured outcome probabilities.",
+      "type": "scenario_range",
+      "availability": "available",
+      "visibility": "diagnostic",
+      "reason_codes": [],
+      "x_axis": {
+        "kind": "category",
+        "label": "Scenario"
+      },
+      "y_axis": {
+        "unit": "currency_per_share",
+        "currency": "EUR",
+        "label": "currency_per_share"
+      },
+      "series": [
+        {
+          "id": "valuation-series",
+          "label": "Equity value per share",
+          "points": [
+            {
+              "id": "valuation-bear",
+              "x": "bear",
+              "label": "Bear",
+              "y": "530.89",
+              "evidence_refs": [
+                "valuation-bear"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "valuation-base",
+              "x": "base",
+              "label": "Base",
+              "y": "621.11",
+              "evidence_refs": [
+                "valuation-base"
+              ],
+              "reason_codes": []
+            },
+            {
+              "id": "valuation-bull",
+              "x": "bull",
+              "label": "Bull",
+              "y": "725.42",
+              "evidence_refs": [
+                "valuation-bull"
+              ],
+              "reason_codes": []
+            }
+          ]
+        }
+      ],
+      "review_refs": [
+        "valuation-review"
+      ]
+    }
+  ],
+  "tables": [],
+  "review_items": [
+    {
+      "id": "synthetic-basis",
+      "category": "data_basis",
+      "impact": "publication_block",
+      "title": "Synthetic demonstration",
+      "explanation": "These saved inputs are illustrative and do not establish verified company facts.",
+      "action": "Use for interface evaluation; verify authorised real sources before business use.",
+      "section_refs": [
+        "performance",
+        "valuation",
+        "consensus"
+      ],
+      "source_check_refs": [
+        "policy:synthetic-local-review/v1"
+      ],
+      "evidence_refs": [
+        "source-record"
+      ]
+    },
+    {
+      "id": "valuation-review",
+      "category": "valuation_assumptions",
+      "impact": "section_restriction",
+      "title": "Model defaults require review",
+      "explanation": "The saved discount rate, growth assumptions, horizon and weights include model defaults.",
+      "action": "Review the saved parameters before interpreting valuation.",
+      "section_refs": [
+        "valuation"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/validation/checks/10"
+      ],
+      "evidence_refs": [
+        "valuation-assumptions"
+      ]
+    },
+    {
+      "id": "consensus-missing",
+      "category": "data_basis",
+      "impact": "section_restriction",
+      "title": "Analyst estimates unavailable",
+      "explanation": "This run returned no usable analyst consensus. Historical company growth remains historical.",
+      "action": "Inspect authorised estimate coverage in a future separately scoped data run.",
+      "section_refs": [
+        "consensus"
+      ],
+      "source_check_refs": [
+        "artifact:file-1#/analysis/get_consensus/available"
+      ],
+      "evidence_refs": [
+        "consensus-source"
+      ]
+    }
+  ],
+  "analyst_content": {
+    "keystone_scope": "supported_facts_only",
+    "market_consensus": {
+      "availability": "unavailable",
+      "reason_codes": [
+        "no_usable_analyst_estimates"
+      ],
+      "metric_refs": [
+        "analyst-target"
+      ],
+      "evidence_refs": [
+        "consensus-source"
+      ]
+    },
+    "external_research": {
+      "availability": "unavailable",
+      "reason_codes": [
+        "broker_reports_not_collected"
+      ],
+      "metric_refs": [],
+      "evidence_refs": []
+    }
+  },
+  "glossary": [
+    {
+      "term": "Operating margin",
+      "definition": "Operating income divided by revenue for the stated period."
+    },
+    {
+      "term": "Scenario-weighted valuation",
+      "definition": "A conditional model result using assigned weights; it is not an external analyst target or a probability forecast."
+    }
+  ]
+}

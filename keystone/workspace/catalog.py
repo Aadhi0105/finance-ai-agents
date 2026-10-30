@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -77,6 +78,28 @@ class Manifest(Record):
     runs: list[Run] = Field(max_length=100)
 
 
+class ArtifactV2(Artifact):
+    kind: Literal['report', 'evidence', 'chart', 'input', 'report_view']
+
+
+class NativeViewRegistration(Record):
+    artifact_id: str = Field(pattern=ID)
+    view_schema_version: int = Field(ge=1)
+    adapter_id: str = Field(pattern=ID)
+    adapter_version: str = Field(min_length=1, max_length=40)
+    source_artifact_ids: list[str] = Field(min_length=2, max_length=2)
+
+
+class RunV2(Run):
+    artifacts: list[ArtifactV2] = Field(min_length=1, max_length=40)
+    native_view: NativeViewRegistration | None = None
+
+
+class ManifestV2(Manifest):
+    schema_version: Literal[2]
+    runs: list[RunV2] = Field(max_length=100)
+
+
 def safe_relative(value):
     if (not isinstance(value, str) or not value or len(value) > 240
             or '\\' in value or '%' in value or '\x00' in value
@@ -125,8 +148,13 @@ def read_json(data):
                 raise CatalogError('Duplicate JSON field.')
             result[key] = value
         return result
+    def finite_number(value):
+        number = float(value)
+        if not math.isfinite(number):
+            raise CatalogError('Nonfinite JSON value.')
+        return number
     try:
-        return json.loads(data, object_pairs_hook=unique, parse_constant=lambda _: (
+        return json.loads(data, object_pairs_hook=unique, parse_float=finite_number, parse_constant=lambda _: (
             _ for _ in ()).throw(CatalogError('Nonfinite JSON value.')))
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise CatalogError('Invalid workspace JSON.') from exc
@@ -139,7 +167,11 @@ class Catalog:
 
     def load(self):
         try:
-            manifest = Manifest.model_validate(read_json(read_confined(self.root, 'catalog.json', 2_000_000)))
+            raw = read_json(read_confined(self.root, 'catalog.json', 2_000_000))
+            if not isinstance(raw, dict) or type(raw.get('schema_version')) is not int or raw['schema_version'] not in {1, 2}:
+                raise CatalogError('Unsupported workspace inventory version.')
+            model = ManifestV2 if isinstance(raw, dict) and type(raw.get('schema_version')) is int and raw['schema_version'] == 2 else Manifest
+            manifest = model.model_validate(raw)
             if len({r.id for r in manifest.runs}) != len(manifest.runs):
                 raise CatalogError('Duplicate run identity.')
             expected = {'agent1': {'research'}, 'agent2': {'monitoring'},
@@ -158,8 +190,16 @@ class Catalog:
                 # Fail closed rather than showing trusted summaries beside changed evidence.
                 for artifact in run.artifacts:
                     self.read(run.id, artifact)
+                if isinstance(run, RunV2):
+                    from .report_views.delivery import validate_registration, load_view
+                    validate_registration(run)
+                    if run.native_view:
+                        load_view(self, run)
             return manifest
         except (ValueError, TypeError, RecursionError) as exc:
+            from .report_views.errors import NativeViewError
+            if isinstance(exc, NativeViewError):
+                raise
             raise CatalogError('Workspace inventory or evidence is invalid.') from exc
 
     def read(self, run_id, artifact):

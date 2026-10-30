@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 
 from .catalog import Catalog, CatalogError, read_confined
+from .report_views.errors import NativeViewError
 
 ROOT = Path(__file__).resolve().parents[2]
 APP_CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
@@ -20,6 +21,7 @@ def create_app(workspace, frontend=None):
 
     @app.middleware('http')
     async def local_read_boundary(request: Request, call_next):
+        native_request = request.url.path.endswith('/report-view')
         host = request.headers.get('host', '')
         origin = request.headers.get('origin')
         valid_host = bool(re.fullmatch(r'(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?', host))
@@ -28,9 +30,14 @@ def create_app(workspace, frontend=None):
                 (request.url.path.startswith('/api/') and '/files/' not in request.url.path
                  and request.headers.get('sec-fetch-site') == 'cross-site')):
             response = JSONResponse({'detail': 'Local same-origin access required.'}, status_code=403)
+            if native_request:
+                response = JSONResponse(NativeViewError('local_access_required').envelope(), status_code=403)
         elif request.method not in {'GET', 'HEAD'}:
             response = JSONResponse({'detail': 'This workspace is read-only.'}, status_code=405,
                                     headers={'Allow': 'GET, HEAD'})
+            if native_request:
+                response = JSONResponse(NativeViewError('read_only_workspace').envelope(), status_code=405,
+                                        headers={'Allow': 'GET, HEAD'})
         else:
             response = await call_next(request)
         response.headers.setdefault('Content-Security-Policy', APP_CSP)
@@ -44,7 +51,13 @@ def create_app(workspace, frontend=None):
 
     @app.exception_handler(CatalogError)
     async def inventory_error(request, error):
+        if request.url.path.endswith('/report-view'):
+            return JSONResponse(NativeViewError().envelope(), status_code=503)
         return JSONResponse({'detail': 'Saved evidence is missing, changed or invalid. Prepare a fresh synthetic workspace.'}, status_code=503)
+
+    @app.exception_handler(NativeViewError)
+    async def native_error(request, error):
+        return JSONResponse(error.envelope(), status_code=error.status)
 
     @app.api_route('/api/workspace', methods=['GET', 'HEAD'])
     def workspace_info():
@@ -68,6 +81,14 @@ def create_app(workspace, frontend=None):
     @app.api_route('/api/runs/{run_id}', methods=['GET', 'HEAD'])
     def get_run(run_id: str):
         return catalog.public_run(registered_run(run_id))
+
+    @app.api_route('/api/runs/{run_id}/report-view', methods=['GET', 'HEAD'])
+    def report_view(run_id: str):
+        from .report_views.delivery import load_view
+        run = next((r for r in catalog.load().runs if r.id == run_id), None)
+        if run is None:
+            raise NativeViewError('saved_run_not_found')
+        return load_view(catalog, run)
 
     @app.api_route('/api/runs/{run_id}/files/{name:path}', methods=['GET', 'HEAD'])
     def get_file(run_id: str, name: str):

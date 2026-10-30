@@ -9,13 +9,21 @@ def main(argv=None):
     commands = parser.add_subparsers(dest='command', required=True)
     prepare = commands.add_parser('prepare', help='Generate a new offline synthetic workspace')
     prepare.add_argument('--destination', type=Path, default=Path('output/workspace-demo'))
+    prepare.add_argument('--native', action='store_true', help='Register native report data (catalogue v2)')
+    project = commands.add_parser('project', help='Project registered synthetic evidence into a new native workspace')
+    project.add_argument('--workspace', type=Path, required=True)
+    project.add_argument('--destination', type=Path, required=True)
     serve = commands.add_parser('serve', help='Serve the explicit workspace on loopback only')
     serve.add_argument('--workspace', type=Path, default=Path('output/workspace-demo'))
     serve.add_argument('--port', type=int, default=8765)
     args = parser.parse_args(argv)
     if args.command == 'prepare':
         from .prepare import prepare_workspace
-        result = prepare_workspace(args.destination)
+        result = prepare_workspace(args.destination, native=args.native)
+        print(json.dumps({'workspace': str(result), 'classification': 'synthetic', 'production_release_approved': False}))
+    elif args.command == 'project':
+        from .report_views.publish import project_workspace
+        result = project_workspace(args.workspace, args.destination)
         print(json.dumps({'workspace': str(result), 'classification': 'synthetic', 'production_release_approved': False}))
     else:
         if not 1024 <= args.port <= 65535:

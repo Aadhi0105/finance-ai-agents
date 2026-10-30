@@ -177,6 +177,13 @@ backup dependencies. See the [workspace guide](docs/webapp/batch1-report-workspa
 for architecture, setup, boundaries, and acceptance evidence; the earlier
 [showcase](keystone-showcase/README.md) remains a separate illustrative prototype.
 
+The [native report refinement](docs/webapp/native-reports/README.md) defines the
+reading structure, interactive chart rules and acceptance criteria.
+[Part 2A](docs/webapp/native-reports/part2a-data-layer.md) adds versioned native
+report data and a read-only API for all five synthetic workflows. The current
+browser still displays original saved HTML; native screens and interactive charts
+remain the next frontend work.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source
