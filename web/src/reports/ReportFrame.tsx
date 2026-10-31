@@ -40,12 +40,12 @@ export function SectionNavigation({ sections, active, onSelect, children }: {
   </nav>{children}</aside>;
 }
 
-export function MetricCard({ metric, onInspect }: { metric: Metric; onInspect: () => void }) {
+export function MetricCard({ metric, onInspect, diagnosticLabel = 'Diagnostic model output' }: { metric: Metric; onInspect: () => void; diagnosticLabel?: string }) {
   const monetary = metric.unit === 'currency' || metric.unit === 'currency_per_share';
   const formatted = formatMetric(metric, true);
   const available = metric.availability === 'available';
   return <section className={'nr-metric-card' + (available ? '' : ' nr-metric-unavailable')} aria-label={metric.label}>
-    {metric.visibility === 'diagnostic' && <span className="nr-diagnostic-label">Diagnostic model output</span>}
+    {metric.visibility === 'diagnostic' && <span className="nr-diagnostic-label">{diagnosticLabel}</span>}
     <dl><dt>{metric.label}</dt><dd title={formatMetric(metric)}>{monetary && available && <span>{metric.currency}{' '}</span>}{monetary && available ? formatted.slice(4) : formatted}</dd></dl>
     <p className="nr-metric-period">{calendarDate(metric.period_label)}</p>
     {!available && <p className="nr-metric-reason">{metric.availability === 'withheld' ? 'Saved restrictions prevent publication of this figure.' : 'No usable value was saved for this figure.'}</p>}

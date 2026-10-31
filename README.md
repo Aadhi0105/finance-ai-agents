@@ -187,7 +187,13 @@ key figures, review notes and source controls directly inside Keystone.
 valuation/assumptions, peers, dated market tables and separate consensus/research
 availability. [Part 2C](docs/webapp/native-reports/part2c-charts.md) adds interactive
 Agent 1 graphs with exact point/source inspection, keyboard controls and retained
-numerical tables. The other agents retain their saved-HTML reader.
+numerical tables. [Part 3A](docs/webapp/native-reports/part3a-events.md) adds Agent 3's
+native past-event report: sample details, interactive historical return bars,
+plain-language review requirements and source evidence.
+[Part 3B](docs/webapp/native-reports/part3b-news.md) adds native company news with
+headline cards, coverage/exclusions and separate diagnostic text scores. Agents
+2/4 retain their saved-HTML reader. Verified event-relative paths and authorised
+live-source integration remain later work.
 
 ## Read the result before acting on it
 

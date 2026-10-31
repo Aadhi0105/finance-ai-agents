@@ -96,6 +96,7 @@ export function InteractiveChart({ chart, rows, onInspect }: {
         <title>{chart.title}</title>
         {geometry.ticks.map(tick => <g key={tick.value}><line x1={geometry.left} x2={geometry.right} y1={tick.y} y2={tick.y} className="nr-grid-line"/><text x={geometry.left-10} y={tick.y+4} textAnchor="end" className="nr-axis-text">{axisLabel(chart,tick.value)}</text></g>)}
         <line x1={geometry.left} x2={geometry.right} y1={geometry.bottom} y2={geometry.bottom} className="nr-axis-line"/>
+        {geometry.kind === 'bar' && <line x1={geometry.left} x2={geometry.right} y1={geometry.zero} y2={geometry.zero} className="nr-zero-line"/>}
         {tickIndices(geometry.xs, width).map(i => <g key={i}><line x1={geometry.xs[i]} x2={geometry.xs[i]} y1={geometry.bottom} y2={geometry.bottom+5} className="nr-axis-line"/><text x={geometry.xs[i]} y={geometry.bottom+20} textAnchor={i===0 && chart.x_axis.kind==='date' ? 'start' : i===rows.length-1 && chart.x_axis.kind==='date' ? 'end' : 'middle'} className="nr-axis-text">{chart.x_axis.kind==='date' ? shortDate(rows[i].x) : rows[i].x.length>12 ? rows[i].x.slice(0,11)+'…' : rows[i].x}</text></g>)}
         <text x={(geometry.left+geometry.right)/2} y={geometry.height-4} textAnchor="middle" className="nr-axis-title">{chart.x_axis.label}</text>
         {geometry.series.map(({index,segments}, visibleIndex) => <g key={chart.series[index].id}>
@@ -130,6 +131,6 @@ export function InteractiveChart({ chart, rows, onInspect }: {
       <div className="nr-chart-selection-heading"><strong>{rowLabel(chart,row)}</strong><span>Observation {selected+1} of {rows.length}</span>{chart.visibility==='diagnostic' && <span className="nr-diagnostic-label">Diagnostic · review required</span>}</div>
       <dl>{chart.series.map((series,i)=><div key={series.id}><dt>{series.label}{hidden.includes(series.id) && <small>Hidden in plot</small>}</dt><dd>{value(i)}</dd><button className="nr-source-button" disabled={!row.points[i]?.evidence_refs.length} onClick={()=>onInspect(row.points[i]!.evidence_refs)} aria-label={'Inspect source for '+series.label}><Icon name="evidence" size={13}/>Source</button></div>)}</dl>
     </div>
-    <p className="nr-chart-scale-note">Axes use compact display labels; selection and the exact table retain saved precision. {chart.type==='bar' ? 'Bars start at zero.' : 'The vertical scale follows the visible saved values.'} {chart.type==='scenario_range' ? 'Each point is a separate conditional scenario, not a probability interval.' : chart.type==='dot_plot' ? 'Companies are separate screening observations, not a trend.' : ''}</p>
+    <p className="nr-chart-scale-note">Axes use compact display labels; selection and the exact table retain saved precision. {chart.type==='bar' ? 'Bars start at zero.' : 'The vertical scale follows the visible saved values.'} {chart.id==='news-story-tone' ? 'Text scores use the fixed −1 to +1 range.' : ''} {chart.type==='scenario_range' ? 'Each point is a separate conditional scenario, not a probability interval.' : chart.type==='dot_plot' ? 'Companies are separate screening observations, not a trend.' : ''}</p>
   </div>;
 }

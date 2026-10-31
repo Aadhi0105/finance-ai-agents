@@ -49,6 +49,7 @@ test('bar geometry uses a genuine zero baseline for positive, negative and mixed
   for(const values of [['2','4'],['-2','-4'],['-2','4']]) {
     const c=custom('bar',values),g=plotGeometry(c,datasetRows(c),500);
     assert.equal(g.kind,'bar');
+    assert(g.ticks.some(t=>t.value==='0'));
     for(const p of g.series[0].segments.flat())assert(Number(values[p.row])<0?p.y>g.zero:p.y<g.zero);
   }
 });

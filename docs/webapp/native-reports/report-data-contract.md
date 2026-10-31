@@ -2,7 +2,9 @@
 
 Contract version 1 · 30 October 2026 · Part 2A backend implemented for synthetic evidence.
 Agent 1 frontend consumption is implemented in Parts 2B and [2C](part2c-charts.md);
-other native workflow readers remain later work. See [data-layer scope](part2a-data-layer.md).
+[Part 3A](part3a-events.md) adds Agent 3 event consumption and [Part 3B](part3b-news.md)
+adds company news. Monitoring and close native readers remain later work.
+See [data-layer scope](part2a-data-layer.md).
 
 ## 1. Ownership and lifecycle
 
@@ -31,6 +33,18 @@ Existing source directories are not migrated in place. An operator prepares a
 new registered presentation revision/workspace when applying a new adapter.
 Rebuilding a presentation must record its adapter/version and source identities
 in the runtime registration; it does not imply new market observations.
+
+Research, event and news adapters support 1.0.0/1.1.0 as separate retained recipes.
+Event 1.1.0 adds source-linked context tables and the closed
+`event-study-summary-v1` template. The browser admits that template only for the
+event 1.1.0 family. Event-case charts are categorical diagnostic CAR bars; both
+event versions withhold the relative-session path. Populated paths require a
+future supported projection, not browser inference from dates or array positions.
+News 1.1.0 adds the closed `news-study-summary-v1` template, retained context
+tables, a count chart and a separate diagnostic score chart. Synthetic published
+tone remains withheld; the browser refuses populated published levels or scores
+relabeled as probabilities, percentages or return paths. Recorded URLs in
+synthetic story details remain unverified display text rather than active links.
 
 ## 2. Read interface
 

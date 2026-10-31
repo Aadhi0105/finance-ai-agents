@@ -16,7 +16,7 @@ export type ReviewItem = {
   section_refs: string[]; source_check_refs: string[]; evidence_refs: string[];
 };
 export type NativeReport = {
-  schema_version: 1; kind: 'keystone.report-view'; report_id: string; agent: 'agent1'; workflow: 'research';
+  schema_version: 1; kind: 'keystone.report-view'; report_id: string; agent: 'agent1' | 'agent3'; workflow: 'research' | 'events' | 'news';
   identity: { title: string; entity: string; ticker: string | null; source_run_id: string; period_label: string; period_end: string | null; prepared_at: string };
   state: { execution: string; evidence_gate: string; financial_approval: false; data_classification: 'synthetic'; integrity: 'matched'; review_refs: string[] };
   artifacts: { id: string; name: string; sha256: string; source_schema: string }[];
@@ -58,11 +58,15 @@ const unique = (rows: { id: string }[]) => { if (new Set(rows.map(r => r.id)).si
  */
 export function parseReport(value: unknown, run: Run): NativeReport {
   const raw = object(value), reg = run.native_view;
+  const events = run.agent === 'agent3' && run.workflow === 'events';
+  const news = run.agent === 'agent3' && run.workflow === 'news';
+  const family = run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
+    : events ? 'agent3-event-report' : news ? 'agent3-news-report' : null;
   if (raw.schema_version !== 1 || raw.kind !== 'keystone.report-view'
-      || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== 'agent1-native-report' || !['1.0.0', '1.1.0'].includes(reg.adapter_version)) {
+      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !['1.0.0', '1.1.0'].includes(reg.adapter_version)) {
     throw new ReportFailure('unsupported_report_schema');
   }
-  if (raw.agent !== 'agent1' || raw.workflow !== 'research' || run.agent !== 'agent1' || run.workflow !== 'research') fail();
+  if (raw.agent !== run.agent || raw.workflow !== run.workflow) fail();
   const identity = object(raw.identity), state = object(raw.state);
   for (const [field, expected] of Object.entries({ title: run.title, entity: run.entity, source_run_id: run.source_run_id,
     period_label: run.period, prepared_at: run.prepared_at })) if (identity[field] !== expected) fail();
@@ -75,7 +79,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   if (artifacts.length !== 2 || reg.source_artifact_ids.length !== 2
       || artifacts.some((a, i) => a.id !== reg.source_artifact_ids[i])
-      || artifacts[0].source_schema !== 'agent1.model/2' || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
+      || artifacts[0].source_schema !== (events || news ? 'agent3.run_bundle/1' : 'agent1.model/2') || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
   const native = run.artifacts.find(a => a.id === reg.artifact_id);
   if (!native || native.kind !== 'report_view') fail();
   const sources = array(raw.sources, 40).map(value => {
@@ -105,7 +109,9 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   const block = (value: unknown): TextBlock => {
     const b = object(value);
-    if (!['saved-summary-v1', 'metric-observation-v1'].includes(String(b.template_id))) throw new ReportFailure('unsupported_report_schema');
+    const templates = ['saved-summary-v1', 'metric-observation-v1', ...(events && reg.adapter_version === '1.1.0' ? ['event-study-summary-v1'] : []),
+      ...(news && reg.adapter_version === '1.1.0' ? ['news-study-summary-v1'] : [])];
+    if (!templates.includes(String(b.template_id))) throw new ReportFailure('unsupported_report_schema');
     return { text: text(b.text, 4000), template_id: text(b.template_id, 80), metric_refs: strings(b.metric_refs), evidence_refs: strings(b.evidence_refs), review_refs: strings(b.review_refs) };
   };
   const summary = block(raw.summary);
@@ -218,9 +224,42 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   if (analyst_content.market_consensus.availability === 'available'
       && !analyst_content.market_consensus.metric_refs.some(id => metrics.some(m => m.id === id && m.availability === 'available'))) fail();
   if (metrics.some(m => m.id === 'weighted-valuation' && m.visibility !== 'diagnostic')) fail();
+  if (events || news) {
+    if (analyst_content.keystone_scope !== 'not_applicable'
+        || [analyst_content.market_consensus, analyst_content.external_research].some(a => a.availability !== 'not_applicable' || a.metric_refs.length)) fail();
+  }
+  if (events) {
+    if (metrics.some(m => !['event-count', 'issuer-count'].includes(m.id) && m.visibility !== 'diagnostic')) fail();
+    for (const c of charts) {
+      if (!['event-cases', 'event-path'].includes(c.id) || c.visibility !== 'diagnostic' || c.y_axis.unit !== 'fraction') fail();
+      if (c.id === 'event-path' && (c.availability === 'available' || c.series.length)) throw new ReportFailure('unsupported_report_schema');
+      if (c.id === 'event-cases' && (c.type !== 'bar' || c.x_axis.kind !== 'category')) fail();
+    }
+    if (metrics.some(m => m.id === 'p-value' && (m.unit !== 'p_value' || m.value !== null && !/^(?:0(?:\.[0-9]+)?|1(?:\.0+)?)$/.test(m.value)))) fail();
+  }
+  if (news) {
+    const scoreInRange = (value: string) => /^-?(?:0(?:\.[0-9]+)?|1(?:\.0+)?)$/.test(value);
+    for (const m of metrics) {
+      if (/^coverage-(raw|ingested|after-relevance|after-dedup)$/.test(m.id)) {
+        if (m.unit !== 'count') fail();
+      } else if (/^published-tone(?:-[0-9]+)?$/.test(m.id)) {
+        if (m.unit !== 'score' || m.availability !== 'withheld' || m.value !== null) fail();
+      } else if (/^diagnostic-tone-[0-9]+$/.test(m.id)) {
+        if (m.unit !== 'score' || m.visibility !== 'diagnostic' || m.value !== null && !scoreInRange(m.value)) fail();
+      } else fail();
+    }
+    for (const c of charts) {
+      if (c.type !== 'bar' || c.x_axis.kind !== 'category') fail();
+      if (c.id === 'news-coverage') {
+        if (c.y_axis.unit !== 'count' || c.series.some(s=>s.points.some(p=>p.y !== null && !/^(?:0|[1-9][0-9]*)$/.test(p.y)))) fail();
+      } else if (c.id === 'news-story-tone') {
+        if (c.y_axis.unit !== 'score' || c.visibility !== 'diagnostic' || c.series.some(s=>s.points.some(p=>p.y !== null && !scoreInRange(p.y)))) fail();
+      } else fail();
+    }
+  }
   evidence.forEach(e => { if (!artifacts.some(a => a.id === e.artifact_id) || !sources.some(s => s.id === e.source_id)) fail(); });
   const review_refs = strings(state.review_refs); references(review_refs, ids.reviews);
-  return { schema_version: 1, kind: 'keystone.report-view', report_id: text(raw.report_id, 80), agent: 'agent1', workflow: 'research',
+  return { schema_version: 1, kind: 'keystone.report-view', report_id: text(raw.report_id, 80), agent: events || news ? 'agent3' : 'agent1', workflow: events ? 'events' : news ? 'news' : 'research',
     identity: { title: run.title, entity: run.entity, ticker: nullable(identity.ticker, 80), source_run_id: run.source_run_id,
       period_label: run.period, period_end: nullable(identity.period_end, 10), prepared_at: run.prepared_at },
     state: { execution: run.execution_status, evidence_gate: member(state.evidence_gate, ['passed_evidence_checks', 'held_for_review', 'unavailable']),
@@ -315,7 +354,10 @@ export function datasetRows(chart: ChartData) {
 
 const labels: Record<string, string> = { model_default: 'Saved model default; analyst review required', equity_value: 'Equity value',
   positive_fcff_model: 'Positive-FCFF model', complete: 'Complete', screening_only: 'Screening diagnostics',
-  trim_invalid_trailing_observations_only: 'Only invalid trailing observations may be trimmed' };
+  trim_invalid_trailing_observations_only: 'Only invalid trailing observations may be trimmed',
+  unverified: 'Unverified', unavailable: 'Unavailable', available: 'Recorded as available; review still applies',
+  human_reviewed: 'Recorded human review; identity is not authenticated here', HELD_FOR_REVIEW: 'Held for review',
+  HISTORICAL: 'Historical description only' };
 
 export function displaySourceText(value: string) {
   if (labels[value]) return labels[value];

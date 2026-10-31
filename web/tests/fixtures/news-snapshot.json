@@ -1,0 +1,1842 @@
+{
+  "note": "Saved synthetic news reader boundary capture. Not independent market evidence or a registered runtime workspace.",
+  "run": {
+    "id": "news-example",
+    "agent": "agent3",
+    "workflow": "news",
+    "title": "News evidence review",
+    "entity": "Example Rail \u00b7 fictional company",
+    "period": "2026-01-28 \u00b7 saved cutoff",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "held",
+    "review_status": "review_required",
+    "summary": "Invented headlines demonstrate relevance, saved evidence and held diagnostic tone. No live feed is connected.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "News timestamps describe the saved cutoff, not current freshness.",
+      "Stub scores are not accepted financial sentiment or a trading signal."
+    ],
+    "checks": [
+      "Bundle integrity checked",
+      "Offline replay matched"
+    ],
+    "metrics": [
+      {
+        "label": "Input items",
+        "value": "2",
+        "basis": "Invented headlines"
+      },
+      {
+        "label": "Replay",
+        "value": "Matched",
+        "basis": "Saved fixture scores; no new inference"
+      },
+      {
+        "label": "Tone",
+        "value": "Withheld",
+        "basis": "Stub scores are demonstration-only"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "News evidence report",
+        "kind": "report",
+        "sha256": "691132ea233f011acd5807fa2cc7f2cb1146adfca5d96fb2092d85889389c06d",
+        "bytes": 1797,
+        "url": "/api/runs/news-example/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "label": "Sealed news evidence",
+        "kind": "evidence",
+        "sha256": "d27a742bd0ba1edf57c29f6fc1edadf68c05a85a9b10021c787c32ab1b7186fe",
+        "bytes": 19752,
+        "url": "/api/runs/news-example/files/bundle.json"
+      },
+      {
+        "id": "file-2",
+        "name": "input.json",
+        "label": "Invented headline inputs",
+        "kind": "input",
+        "sha256": "848838a44999a28be3f5428e27dd6d8d2b3969263f817d6d55af36af7f7921c7",
+        "bytes": 1004,
+        "url": "/api/runs/news-example/files/input.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "e8e76042704de0f3357e24d8959eae8d9de2774cb96403a1264361382718b653",
+        "bytes": 243,
+        "url": "/api/runs/news-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "b53a20386c9b6490de6015ec81fd1b53fa87cffebe9c219d55c846c8bd0c9cd2",
+        "bytes": 29761,
+        "url": "/api/runs/news-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "eaa29c15cac24b48a300cf3ed3eb2641",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent3-news-report",
+      "adapter_version": "1.1.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "sha256": "d27a742bd0ba1edf57c29f6fc1edadf68c05a85a9b10021c787c32ab1b7186fe",
+        "source_schema": "agent3.run_bundle/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "e8e76042704de0f3357e24d8959eae8d9de2774cb96403a1264361382718b653",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "news-coverage",
+        "purpose": "Counts at saved processing stages; clusters are not demonstrated independent stories.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "coverage-counts",
+            "label": "Saved record count",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-d8463a102a7492f5499776"
+                ],
+                "id": "coverage-raw",
+                "label": "Input records",
+                "reason_codes": [],
+                "x": "Input records",
+                "y": "2"
+              },
+              {
+                "evidence_refs": [
+                  "e-0b3b862181255b32221694"
+                ],
+                "id": "coverage-ingested",
+                "label": "Parsed records",
+                "reason_codes": [],
+                "x": "Parsed records",
+                "y": "2"
+              },
+              {
+                "evidence_refs": [
+                  "e-da32c13feb580b28ab1728"
+                ],
+                "id": "coverage-after_relevance",
+                "label": "Relevant records",
+                "reason_codes": [],
+                "x": "Relevant records",
+                "y": "2"
+              },
+              {
+                "evidence_refs": [
+                  "e-c2a17125484d7a1fef561f"
+                ],
+                "id": "coverage-after_dedup",
+                "label": "Retained clusters",
+                "reason_codes": [],
+                "x": "Retained clusters",
+                "y": "2"
+              }
+            ]
+          }
+        ],
+        "title": "Saved news coverage",
+        "type": "bar",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "category",
+          "label": "Saved processing stage"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "count",
+          "unit": "count"
+        }
+      },
+      {
+        "availability": "available",
+        "id": "news-story-tone",
+        "purpose": "Diagnostic scores for retained document text on a -1 to +1 scale; not calibrated reliability, published company sentiment or return probabilities.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "story-tone",
+            "label": "Diagnostic text score",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-5a9cc8037ba9733cdf6be1"
+                ],
+                "id": "story-0",
+                "label": "Example Rail opens a fictional maintenance facility",
+                "reason_codes": [],
+                "x": "Story 1",
+                "y": "0.3"
+              },
+              {
+                "evidence_refs": [
+                  "e-d963ce9cdb4a548c210198"
+                ],
+                "id": "story-1",
+                "label": "Example Rail reports a fictional delivery delay",
+                "reason_codes": [],
+                "x": "Story 2",
+                "y": "-0.3"
+              }
+            ]
+          }
+        ],
+        "title": "Saved story tone diagnostics",
+        "type": "bar",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "category",
+          "label": "Retained cluster representative"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "score",
+          "unit": "score"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d8463a102a7492f5499776",
+        "label": "Input records",
+        "method": null,
+        "pointer": "/record/result/funnel/raw",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-da32c13feb580b28ab1728",
+        "label": "Relevant records",
+        "method": null,
+        "pointer": "/record/result/funnel/after_relevance",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c2a17125484d7a1fef561f",
+        "label": "Retained headline clusters",
+        "method": null,
+        "pointer": "/record/result/funnel/after_dedup",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0dd15b8ce1d299d982d741",
+        "label": "Published tone \u00b7 DEMO",
+        "method": null,
+        "pointer": "/record/result/signals/0/level",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5f8e9c5b21183cd6417fe0",
+        "label": "Saved diagnostic tone \u00b7 DEMO",
+        "method": null,
+        "pointer": "/record/result/signals/0/diagnostic_level",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-099235b333a6bb795fb780",
+        "label": "Retained news evidence",
+        "method": null,
+        "pointer": "/record/result/scored_items/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4336b2aa70106eb24d290f",
+        "label": "Retained news evidence",
+        "method": null,
+        "pointer": "/record/result/scored_items/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-47feadd3a0f2daf7f4a377",
+        "label": "Original news publication and exclusion evidence",
+        "method": null,
+        "pointer": "/record/result",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0b3b862181255b32221694",
+        "label": "Parsed input records",
+        "method": null,
+        "pointer": "/record/result/funnel/ingested",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2a64d8d1f2b05327b4af1f",
+        "label": "Saved coverage state",
+        "method": null,
+        "pointer": "/record/result/funnel",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ad11c19e3d9a43c8fdc71b",
+        "label": "Saved cutoff",
+        "method": null,
+        "pointer": "/record/result/as_of",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ec41a38be99d65e48edf70",
+        "label": "Maximum publication age (days)",
+        "method": null,
+        "pointer": "/record/result/max_age_days",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-40802d42a70d560e752cb2",
+        "label": "Input basis",
+        "method": null,
+        "pointer": "/record/result/data_mode",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-bf818df0905b388e0dbc78",
+        "label": "Original publication state",
+        "method": null,
+        "pointer": "/record/result/publication_state",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2fe43adbfedf4744ce3ac0",
+        "label": "Original scope note",
+        "method": null,
+        "pointer": "/record/result/scope_note",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-04c4c577fcb170e91d7d4c",
+        "label": "Original scorer metadata",
+        "method": null,
+        "pointer": "/record/result/scored_items/0/score_evidence",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1c121decb9b58051cb6558",
+        "label": "Retained cluster member",
+        "method": null,
+        "pointer": "/record/result/scored_items/0/members/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5a9cc8037ba9733cdf6be1",
+        "label": "Example Rail opens a fictional maintenance facility",
+        "method": null,
+        "pointer": "/record/result/scored_items/0/sentiment",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ed54222fd0c2479dcd508d",
+        "label": "Original scorer metadata",
+        "method": null,
+        "pointer": "/record/result/scored_items/1/score_evidence",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4a865828cc2d4a31a15fde",
+        "label": "Retained cluster member",
+        "method": null,
+        "pointer": "/record/result/scored_items/1/members/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d963ce9cdb4a548c210198",
+        "label": "Example Rail reports a fictional delivery delay",
+        "method": null,
+        "pointer": "/record/result/scored_items/1/sentiment",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-797b4a1b2b49c63bb7f7c0",
+        "label": "Original daily document-tone record",
+        "method": null,
+        "pointer": "/record/result/signals/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-098ffd222d57f82fb143f9",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/scored_items/0/score_evidence/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b2ae72738d5b23af0534bf",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/scored_items/0/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f5e182d40b89ac30e0c3f6",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/scored_items/1/score_evidence/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-42a49bec304d36daadd0fd",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/scored_items/1/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-317ee3120fa646f175b984",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/signals/0/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-35a6d9f0d14cae51ab1348",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/signals/0/review_reasons/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-230d86d6294944b19e72eb",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/review_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4f3e6d996d7e4f89505c38",
+        "label": "Original news review reason",
+        "method": null,
+        "pointer": "/record/result/review_reasons/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-d8463a102a7492f5499776"
+          ],
+          "metric_refs": [
+            "coverage-raw"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved input records: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-raw",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-da32c13feb580b28ab1728"
+          ],
+          "metric_refs": [
+            "coverage-after-relevance"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved relevant records: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-after-relevance",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-c2a17125484d7a1fef561f"
+          ],
+          "metric_refs": [
+            "coverage-after-dedup"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved retained headline clusters: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-after-dedup",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "A heuristic text grouping, not proof of independent stories.",
+        "term": "Headline cluster"
+      },
+      {
+        "definition": "A descriptive score for supplied text; a null published level remains withheld.",
+        "term": "Diagnostic tone"
+      },
+      {
+        "definition": "The recorded as-of instant used to screen publication times. Opening a saved report does not refresh that cutoff.",
+        "term": "Saved cutoff"
+      },
+      {
+        "definition": "A description of retained text. It is not entity-specific sentiment, a return forecast or a recommendation.",
+        "term": "Document tone"
+      },
+      {
+        "definition": "A saved model or lexical diagnostic. Class probabilities and confidence fields are not calibrated reliability or return probabilities.",
+        "term": "Scorer output"
+      }
+    ],
+    "identity": {
+      "entity": "Example Rail \u00b7 fictional company",
+      "period_end": null,
+      "period_label": "2026-01-28 \u00b7 saved cutoff",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "eaa29c15cac24b48a300cf3ed3eb2641",
+      "ticker": "DEMO",
+      "title": "News evidence review"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-d8463a102a7492f5499776"
+        ],
+        "id": "coverage-raw",
+        "label": "Input records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-da32c13feb580b28ab1728"
+        ],
+        "id": "coverage-after-relevance",
+        "label": "Relevant records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c2a17125484d7a1fef561f"
+        ],
+        "id": "coverage-after-dedup",
+        "label": "Retained headline clusters",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-0dd15b8ce1d299d982d741"
+        ],
+        "id": "published-tone-0",
+        "label": "Published tone \u00b7 DEMO",
+        "period_label": "2026-01-28",
+        "reason_codes": [
+          "synthetic_published_tone_withheld"
+        ],
+        "unit": "score",
+        "value": null,
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5f8e9c5b21183cd6417fe0"
+        ],
+        "id": "diagnostic-tone-0",
+        "label": "Saved diagnostic tone \u00b7 DEMO",
+        "period_label": "2026-01-28",
+        "reason_codes": [],
+        "unit": "score",
+        "value": "0.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-0b3b862181255b32221694"
+        ],
+        "id": "coverage-ingested",
+        "label": "Parsed input records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      }
+    ],
+    "report_id": "report-0497f6f100d81c62169cab62",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone",
+          "news-context",
+          "news-review"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Read scorer restrictions, relevance, duplicates, exclusions and the original publication state.",
+        "category": "narrative_support",
+        "evidence_refs": [
+          "e-47feadd3a0f2daf7f4a377"
+        ],
+        "explanation": "Published tone is withheld in this synthetic workspace. Diagnostic tone concerns retained document text, not a verified company-specific investment conclusion.",
+        "id": "review-826bb05e4ff5df7f3501",
+        "impact": "section_restriction",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "Tone and relevance limitations"
+      },
+      {
+        "action": "Inspect the original text, scorer evidence and every linked saved restriction.",
+        "category": "narrative_support",
+        "evidence_refs": [
+          "e-098ffd222d57f82fb143f9",
+          "e-b2ae72738d5b23af0534bf",
+          "e-f5e182d40b89ac30e0c3f6",
+          "e-42a49bec304d36daadd0fd",
+          "e-317ee3120fa646f175b984",
+          "e-35a6d9f0d14cae51ab1348",
+          "e-230d86d6294944b19e72eb",
+          "e-4f3e6d996d7e4f89505c38"
+        ],
+        "explanation": "Saved scorer outputs are descriptive text diagnostics. Synthetic, lexical, ambiguous or conflicting scores do not establish calibrated reliability or a market outcome.",
+        "id": "review-3f81b0d17601b3a1fd3f",
+        "impact": "publication_block",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone",
+          "news-context",
+          "news-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/scored_items/0/score_evidence/review_reasons/0",
+          "artifact:file-1#/record/result/scored_items/0/review_reasons/0",
+          "artifact:file-1#/record/result/scored_items/1/score_evidence/review_reasons/0",
+          "artifact:file-1#/record/result/scored_items/1/review_reasons/0",
+          "artifact:file-1#/record/result/signals/0/review_reasons/0",
+          "artifact:file-1#/record/result/signals/0/review_reasons/1",
+          "artifact:file-1#/record/result/review_reasons/0",
+          "artifact:file-1#/record/result/review_reasons/1"
+        ],
+        "title": "Scorer and diagnostic limits"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "news-coverage"
+        ],
+        "finding_refs": [
+          "finding-coverage-raw",
+          "finding-coverage-after-relevance",
+          "finding-coverage-after-dedup"
+        ],
+        "id": "coverage",
+        "metric_refs": [
+          "coverage-raw",
+          "coverage-after-relevance",
+          "coverage-after-dedup",
+          "coverage-ingested"
+        ],
+        "purpose": "Coverage counts are distinct from independent stories or a market conclusion.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-3f81b0d17601b3a1fd3f"
+        ],
+        "table_refs": [
+          "news-exclusions"
+        ],
+        "title": "News coverage"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "retained-news",
+        "metric_refs": [],
+        "purpose": "Inspect the retained text, timestamps and source basis.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-3f81b0d17601b3a1fd3f"
+        ],
+        "table_refs": [
+          "retained-headlines",
+          "news-story-details",
+          "news-cluster-members"
+        ],
+        "title": "Retained stories"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "news-story-tone"
+        ],
+        "finding_refs": [],
+        "id": "tone",
+        "metric_refs": [
+          "published-tone-0",
+          "diagnostic-tone-0"
+        ],
+        "purpose": "A withheld published level is not neutral, zero or a trading signal.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-3f81b0d17601b3a1fd3f"
+        ],
+        "table_refs": [
+          "news-scorer-details",
+          "news-tone-records"
+        ],
+        "title": "Text-tone evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "news-context",
+        "metric_refs": [],
+        "purpose": "Recorded cutoff, input basis and retrieval evidence.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-3f81b0d17601b3a1fd3f"
+        ],
+        "table_refs": [
+          "news-basis"
+        ],
+        "title": "Saved coverage basis"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "news-review",
+        "metric_refs": [],
+        "purpose": "Every original reason remains attached to the saved text.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-3f81b0d17601b3a1fd3f"
+        ],
+        "table_refs": [
+          "news-review-reasons"
+        ],
+        "title": "News review evidence"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "held",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501",
+        "review-3f81b0d17601b3a1fd3f"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-47feadd3a0f2daf7f4a377"
+      ],
+      "metric_refs": [
+        "coverage-after-dedup"
+      ],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501",
+        "review-3f81b0d17601b3a1fd3f"
+      ],
+      "template_id": "news-study-summary-v1",
+      "text": "The saved synthetic news run retains 2 headline clusters. Published document tone is withheld. The retained text does not establish company-specific sentiment or a future return."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "headline",
+            "label": "Headline"
+          },
+          {
+            "id": "publisher",
+            "label": "Source"
+          },
+          {
+            "id": "published",
+            "label": "Published at (original timezone)"
+          },
+          {
+            "id": "scope",
+            "label": "Text scope"
+          }
+        ],
+        "id": "retained-headlines",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail opens a fictional maintenance facility"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T12:00:00+00:00"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline and supplied text; original scope unspecified"
+              }
+            ],
+            "evidence_refs": [
+              "e-099235b333a6bb795fb780"
+            ],
+            "id": "headline-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail reports a fictional delivery delay"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T14:00:00+00:00"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline and supplied text; original scope unspecified"
+              }
+            ],
+            "evidence_refs": [
+              "e-4336b2aa70106eb24d290f"
+            ],
+            "id": "headline-1"
+          }
+        ],
+        "title": "Retained news evidence"
+      },
+      {
+        "columns": [
+          {
+            "id": "field",
+            "label": "Basis"
+          },
+          {
+            "id": "value",
+            "label": "Saved description"
+          }
+        ],
+        "id": "news-basis",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved coverage state"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "retained_records"
+              }
+            ],
+            "evidence_refs": [
+              "e-2a64d8d1f2b05327b4af1f"
+            ],
+            "id": "coverage-state"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved cutoff"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "2026-01-28T23:59:00+00:00"
+              }
+            ],
+            "evidence_refs": [
+              "e-ad11c19e3d9a43c8fdc71b"
+            ],
+            "id": "cutoff"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Maximum publication age (days)"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "7"
+              }
+            ],
+            "evidence_refs": [
+              "e-ec41a38be99d65e48edf70"
+            ],
+            "id": "max-age"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Input basis"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Saved synthetic input; no live retrieval is established"
+              }
+            ],
+            "evidence_refs": [
+              "e-40802d42a70d560e752cb2"
+            ],
+            "id": "input-basis"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Original publication state"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "HELD_FOR_REVIEW"
+              }
+            ],
+            "evidence_refs": [
+              "e-bf818df0905b388e0dbc78"
+            ],
+            "id": "publication"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Original scope note"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Current retrieved news only; not a historical point-in-time archive or return forecast"
+              }
+            ],
+            "evidence_refs": [
+              "e-2fe43adbfedf4744ce3ac0"
+            ],
+            "id": "scope"
+          }
+        ],
+        "title": "Saved news basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "record",
+            "label": "Input reference"
+          },
+          {
+            "id": "stage",
+            "label": "Stage"
+          },
+          {
+            "id": "reason",
+            "label": "Saved reason"
+          }
+        ],
+        "id": "news-exclusions",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Excluded input evidence"
+      },
+      {
+        "columns": [
+          {
+            "id": "retrieved",
+            "label": "Retrieved at"
+          },
+          {
+            "id": "language",
+            "label": "Language"
+          },
+          {
+            "id": "scope",
+            "label": "Text scope"
+          },
+          {
+            "id": "relevance",
+            "label": "Relevance method"
+          },
+          {
+            "id": "matches",
+            "label": "Recorded headline matches"
+          },
+          {
+            "id": "cluster",
+            "label": "Cluster identity"
+          },
+          {
+            "id": "size",
+            "label": "Recorded cluster size"
+          },
+          {
+            "id": "scorer",
+            "label": "Scorer"
+          },
+          {
+            "id": "url",
+            "label": "Recorded address (unverified)"
+          },
+          {
+            "id": "excerpt",
+            "label": "Saved text excerpt"
+          }
+        ],
+        "id": "news-story-details",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "retrieved",
+                "kind": "text",
+                "text": "2026-01-28T23:59:00+00:00"
+              },
+              {
+                "column_id": "language",
+                "kind": "text",
+                "text": "en"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline and supplied text; original scope unspecified"
+              },
+              {
+                "column_id": "relevance",
+                "kind": "text",
+                "text": "headline_alias_or_cashtag"
+              },
+              {
+                "column_id": "matches",
+                "kind": "text",
+                "text": "{'DEMO': ['Example Rail']}"
+              },
+              {
+                "column_id": "cluster",
+                "kind": "text",
+                "text": "045c39783cffd3adc6f4578a8944c69cda1d031160c64458da36659206f8302f"
+              },
+              {
+                "column_id": "size",
+                "kind": "text",
+                "text": "1"
+              },
+              {
+                "column_id": "scorer",
+                "kind": "text",
+                "text": "stub"
+              },
+              {
+                "column_id": "url",
+                "kind": "text",
+                "text": "https://example.org/synthetic-1"
+              },
+              {
+                "column_id": "excerpt",
+                "kind": "text",
+                "text": "Synthetic exercise text: growth and investment."
+              }
+            ],
+            "evidence_refs": [
+              "e-099235b333a6bb795fb780"
+            ],
+            "id": "story-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "retrieved",
+                "kind": "text",
+                "text": "2026-01-28T23:59:00+00:00"
+              },
+              {
+                "column_id": "language",
+                "kind": "text",
+                "text": "en"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline and supplied text; original scope unspecified"
+              },
+              {
+                "column_id": "relevance",
+                "kind": "text",
+                "text": "headline_alias_or_cashtag"
+              },
+              {
+                "column_id": "matches",
+                "kind": "text",
+                "text": "{'DEMO': ['Example Rail']}"
+              },
+              {
+                "column_id": "cluster",
+                "kind": "text",
+                "text": "719ddc9186323735e4d4c160b1c4f121fd1a349195a8c978416569e9a6198d63"
+              },
+              {
+                "column_id": "size",
+                "kind": "text",
+                "text": "1"
+              },
+              {
+                "column_id": "scorer",
+                "kind": "text",
+                "text": "stub"
+              },
+              {
+                "column_id": "url",
+                "kind": "text",
+                "text": "https://example.org/synthetic-2"
+              },
+              {
+                "column_id": "excerpt",
+                "kind": "text",
+                "text": "Synthetic exercise text: uncertainty and delay."
+              }
+            ],
+            "evidence_refs": [
+              "e-4336b2aa70106eb24d290f"
+            ],
+            "id": "story-1"
+          }
+        ],
+        "title": "Retained text and grouping basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "story",
+            "label": "Representative"
+          },
+          {
+            "id": "headline",
+            "label": "Member headline"
+          },
+          {
+            "id": "publisher",
+            "label": "Source"
+          },
+          {
+            "id": "published",
+            "label": "Publication time"
+          },
+          {
+            "id": "relevance",
+            "label": "Recorded relevance"
+          }
+        ],
+        "id": "news-cluster-members",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "story",
+                "kind": "text",
+                "text": "Story 1"
+              },
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail opens a fictional maintenance facility"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T12:00:00+00:00"
+              },
+              {
+                "column_id": "relevance",
+                "kind": "text",
+                "text": "{'matches': {'DEMO': ['Example Rail']}, 'method': 'headline_alias_or_cashtag', 'scope': 'document-level tone associated with a headline mention; not entity-specific'}"
+              }
+            ],
+            "evidence_refs": [
+              "e-1c121decb9b58051cb6558"
+            ],
+            "id": "member-0-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "story",
+                "kind": "text",
+                "text": "Story 2"
+              },
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail reports a fictional delivery delay"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T14:00:00+00:00"
+              },
+              {
+                "column_id": "relevance",
+                "kind": "text",
+                "text": "{'matches': {'DEMO': ['Example Rail']}, 'method': 'headline_alias_or_cashtag', 'scope': 'document-level tone associated with a headline mention; not entity-specific'}"
+              }
+            ],
+            "evidence_refs": [
+              "e-4a865828cc2d4a31a15fde"
+            ],
+            "id": "member-1-0"
+          }
+        ],
+        "title": "Retained cluster members"
+      },
+      {
+        "columns": [
+          {
+            "id": "story",
+            "label": "Representative"
+          },
+          {
+            "id": "scorer",
+            "label": "Scorer"
+          },
+          {
+            "id": "model",
+            "label": "Recorded model"
+          },
+          {
+            "id": "revision",
+            "label": "Recorded revision"
+          },
+          {
+            "id": "token_count",
+            "label": "Original tokens"
+          },
+          {
+            "id": "token_limit",
+            "label": "Token limit"
+          },
+          {
+            "id": "truncated",
+            "label": "Truncated"
+          },
+          {
+            "id": "probability_note",
+            "label": "Probability limitation"
+          }
+        ],
+        "id": "news-scorer-details",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "story",
+                "kind": "text",
+                "text": "Story 1"
+              },
+              {
+                "column_id": "scorer",
+                "kind": "text",
+                "text": "stub"
+              },
+              {
+                "column_id": "model",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "revision",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "token_count",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "token_limit",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "truncated",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "probability_note",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-04c4c577fcb170e91d7d4c"
+            ],
+            "id": "scorer-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "story",
+                "kind": "text",
+                "text": "Story 2"
+              },
+              {
+                "column_id": "scorer",
+                "kind": "text",
+                "text": "stub"
+              },
+              {
+                "column_id": "model",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "revision",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "token_count",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "token_limit",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "truncated",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "probability_note",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-ed54222fd0c2479dcd508d"
+            ],
+            "id": "scorer-1"
+          }
+        ],
+        "title": "Saved scorer metadata"
+      },
+      {
+        "columns": [
+          {
+            "id": "entity",
+            "label": "Company association"
+          },
+          {
+            "id": "day",
+            "label": "Saved date / timezone"
+          },
+          {
+            "id": "published",
+            "label": "Published tone"
+          },
+          {
+            "id": "diagnostic",
+            "label": "Diagnostic text average"
+          },
+          {
+            "id": "scorers",
+            "label": "Scorers"
+          },
+          {
+            "id": "scope",
+            "label": "Tone scope"
+          }
+        ],
+        "id": "news-tone-records",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "DEMO"
+              },
+              {
+                "column_id": "day",
+                "kind": "text",
+                "text": "2026-01-28 \u00b7 UTC"
+              },
+              {
+                "column_id": "published",
+                "kind": "metric_ref",
+                "metric_id": "published-tone-0"
+              },
+              {
+                "column_id": "diagnostic",
+                "kind": "metric_ref",
+                "metric_id": "diagnostic-tone-0"
+              },
+              {
+                "column_id": "scorers",
+                "kind": "text",
+                "text": "['stub']"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "document-level; not entity-specific sentiment"
+              }
+            ],
+            "evidence_refs": [
+              "e-797b4a1b2b49c63bb7f7c0"
+            ],
+            "id": "signal-0"
+          }
+        ],
+        "title": "Saved daily text-tone records"
+      },
+      {
+        "columns": [
+          {
+            "id": "topic",
+            "label": "Review topic"
+          },
+          {
+            "id": "code",
+            "label": "Original identifier"
+          }
+        ],
+        "id": "news-review-reasons",
+        "review_refs": [
+          "review-3f81b0d17601b3a1fd3f",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-098ffd222d57f82fb143f9"
+            ],
+            "id": "reason-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-b2ae72738d5b23af0534bf"
+            ],
+            "id": "reason-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-f5e182d40b89ac30e0c3f6"
+            ],
+            "id": "reason-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-42a49bec304d36daadd0fd"
+            ],
+            "id": "reason-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "illustrative_fixture"
+              }
+            ],
+            "evidence_refs": [
+              "e-317ee3120fa646f175b984"
+            ],
+            "id": "reason-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-35a6d9f0d14cae51ab1348"
+            ],
+            "id": "reason-5"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "illustrative_fixture"
+              }
+            ],
+            "evidence_refs": [
+              "e-230d86d6294944b19e72eb"
+            ],
+            "id": "reason-6"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Scorer and diagnostic limits"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "synthetic_demo_score"
+              }
+            ],
+            "evidence_refs": [
+              "e-4f3e6d996d7e4f89505c38"
+            ],
+            "id": "reason-7"
+          }
+        ],
+        "title": "Original news review reasons"
+      }
+    ],
+    "workflow": "news"
+  }
+}

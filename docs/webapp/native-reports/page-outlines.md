@@ -4,7 +4,8 @@ Design outlines · 30 October 2026. [Part 2B.1](part2b1-reader.md) implements th
 Agent 1 summary/key-figure foundation. [Part 2B.2](part2b2-research.md) implements
 supporting sections and exact tables. [Part 2C](part2c-charts.md) adds Agent 1
 interactive plots. These outlines still describe the broader finished reports:
-other-agent native screens and wider reader/export acceptance remain later work.
+[Parts 3A](part3a-events.md) and [3B](part3b-news.md) implement event/news reports. Agents 2/4,
+eligible event-path projection and wider reader/export acceptance remain later work.
 
 These outlines describe reading order and content, not final pixel measurements.
 Every page stays within Keystone's existing shell. The primary report consists
@@ -112,6 +113,10 @@ performance, Keystone's assumptions and external analysts' expectations?
 
 ## Agent 3A — past event reactions
 
+Implemented for registered synthetic studies in [Part 3A](part3a-events.md), with
+adapter 1.1.0 context tables and compatibility for 1.0.0. The event-relative path
+remains withheld; projection of an eligible verified path is not yet implemented.
+
 **Question:** What happened in the retained historical event cases, and what can
 the study support?
 
@@ -161,6 +166,10 @@ timing, dependence, benchmark, peer and control-study restrictions.
 is different from a statistical conclusion or a future-return forecast?
 
 ## Agent 3B — company news
+
+Implemented for registered synthetic news in [Part 3B](part3b-news.md), with
+adapter 1.1.0 context and 1.0.0 compatibility. Real-source published-tone acceptance
+remains separate; synthetic tone stays withheld.
 
 **Question:** Which relevant stories were retained, what was excluded, and what
 text-tone conclusion, if any, is supported?
