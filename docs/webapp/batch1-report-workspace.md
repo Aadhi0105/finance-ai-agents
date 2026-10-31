@@ -222,8 +222,10 @@ extend the existing clean-environment recovery evidence to a deployed service.
 The [native report refinement](native-reports/README.md) specifies direct report
 sections and interactive charts. [Part 2A](native-reports/part2a-data-layer.md)
 implements registered native JSON and a read-only endpoint for all five synthetic
-workflows. Native frontend rendering remains pending; the current saved-HTML
-reader is unchanged.
+workflows. [Part 2B.1](native-reports/part2b1-reader.md) adds a native Agent 1
+summary/key-figure reader. [Part 2B.2](native-reports/part2b2-research.md) adds Agent 1
+supporting analysis and exact numerical tables. Interactive plots remain pending;
+Agents 2–4 retain their existing saved-HTML reader.
 
 This batch supplies the viewing layer and a narrow read API. Running agents from
 the browser, persistent multi-user application state, uploads, authenticated

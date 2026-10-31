@@ -1,8 +1,14 @@
 # Part 2A — native report data layer
 
 30 October 2026. Implemented for **explicitly registered synthetic workspaces**.
-The browser still displays the original saved HTML. Native layouts and interactive
-charts are the next implementation work; this part supplies their data.
+This part supplies native reader data. [Part 2B.1](part2b1-reader.md) now renders
+Agent 1's summary and key figures; [Part 2B.2](part2b2-research.md) adds supporting
+layouts and saved-context detail. Interactive plots remain subsequent work.
+
+Research adapter 1.1.0 extends saved detail through the same schema. Registered
+1.0.0 research views retain their original recipe and remain readable; fresh
+projection into a new destination is required for richer detail. Other adapters
+remain at 1.0.0. See Part 2B.2 for compatibility and gating evidence.
 
 ## What is available
 

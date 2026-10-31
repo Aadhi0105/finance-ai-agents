@@ -2,7 +2,9 @@
 
 Prepared: **30 October 2026**. Part 1 defines the report structure and data contract.
 **Part 2A implements the native data layer and read-only API for registered
-synthetic evidence.** Native screens and interactive charts remain pending.
+synthetic evidence.** [Part 2B.1](part2b1-reader.md) adds the native Agent 1 summary
+and key-figure reader. [Part 2B.2](part2b2-research.md) implements Agent 1 supporting
+sections and saved-data tables. Interactive plots remain pending.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -12,8 +14,9 @@ what was examined, the main observations, supporting charts, limitations, and
 evidence. Graphs respond to pointer, keyboard and touch interaction. Original
 saved evidence and export files remain accessible.
 
-The current application continues to embed saved HTML. The native API is ready
-for the subsequent frontend work; opening the app still uses the existing reader.
+Agent 1 now opens in the native reader with its summary, key figures, supporting
+analysis, review notes and evidence controls. Consensus and broker research have
+separate availability. The other agents retain the existing saved-HTML reader.
 
 ## Read this pack
 
@@ -58,11 +61,14 @@ These are explicit design recommendations, not user approval or financial sign-o
 ## Work sequence after this specification
 
 1. Part 2A: shared native data adapters, registration and API — implemented.
-2. Remaining Part 2: native Agent 1 presentation, supported narrative and interactive charts.
-3. Part 3: native Agent 3 event and news reports.
-4. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
+2. Part 2B.1: shared native reader and Agent 1 summary/key figures — implemented.
+3. Part 2B.2: Agent 1 supporting sections and browser layout review — implemented;
+   human interpretation acceptance remains open.
+4. Part 2C: interactive charts over the saved series and exact numerical tables.
+5. Part 3: native Agent 3 event and news reports.
+6. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
    browser, accessibility, interpretation and export acceptance.
-5. Webapp Batch 2: controlled execution, using the same report contract for newly
+7. Webapp Batch 2: controlled execution, using the same report contract for newly
    completed runs.
 
 External broker research, free-form investment theses, real-data permissions,

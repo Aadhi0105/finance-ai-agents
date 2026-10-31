@@ -180,9 +180,13 @@ for architecture, setup, boundaries, and acceptance evidence; the earlier
 The [native report refinement](docs/webapp/native-reports/README.md) defines the
 reading structure, interactive chart rules and acceptance criteria.
 [Part 2A](docs/webapp/native-reports/part2a-data-layer.md) adds versioned native
-report data and a read-only API for all five synthetic workflows. The current
-browser still displays original saved HTML; native screens and interactive charts
-remain the next frontend work.
+report data and a read-only API for all five synthetic workflows.
+[Part 2B.1](docs/webapp/native-reports/part2b1-reader.md) renders Agent 1's summary,
+key figures, review notes and source controls directly inside Keystone.
+[Part 2B.2](docs/webapp/native-reports/part2b2-research.md) adds performance,
+valuation/assumptions, peers, dated market tables and separate consensus/research
+availability. Interactive plots remain Part 2C; the other agents retain their
+saved-HTML reader.
 
 ## Read the result before acting on it
 
