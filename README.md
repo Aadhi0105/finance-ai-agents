@@ -185,8 +185,9 @@ report data and a read-only API for all five synthetic workflows.
 key figures, review notes and source controls directly inside Keystone.
 [Part 2B.2](docs/webapp/native-reports/part2b2-research.md) adds performance,
 valuation/assumptions, peers, dated market tables and separate consensus/research
-availability. Interactive plots remain Part 2C; the other agents retain their
-saved-HTML reader.
+availability. [Part 2C](docs/webapp/native-reports/part2c-charts.md) adds interactive
+Agent 1 graphs with exact point/source inspection, keyboard controls and retained
+numerical tables. The other agents retain their saved-HTML reader.
 
 ## Read the result before acting on it
 

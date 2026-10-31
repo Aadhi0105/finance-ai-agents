@@ -105,8 +105,10 @@ richer evidence presentation now render natively. Its separate record describes
 versioned saved-data detail, numerical tables and browser checks. Human
 interpretation acceptance remains open.
 
-**Part 2C** supplies interactive graphs and hover/focus/touch inspection over the
-saved series and numerical tables. Native Agent 3 pages, other-agent native readers, full print/export
+**[Part 2C](part2c-charts.md) is implemented:** interactive Agent 1 graphs and
+point/source inspection over saved series and numerical tables. Its record
+distinguishes browser checks from remaining physical-device/user acceptance.
+Native Agent 3 pages, other-agent native readers, full print/export
 acceptance and cross-agent browser/reader acceptance remain later work. No live
 data access, browser execution, financial approvals, backup or deployment change
 is included.

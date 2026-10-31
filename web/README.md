@@ -9,8 +9,10 @@ sections through the registered report-view API. Consensus and broker research
 have separate availability. Other agents retain the original saved-report reader.
 See [Part 2B.1](../docs/webapp/native-reports/part2b1-reader.md) for the shared reader
 and [Part 2B.2](../docs/webapp/native-reports/part2b2-research.md) for supporting
-sections, research adapter compatibility and verification. Part 2C adds plots;
-the current numerical tables already preserve exact values, gaps and sources.
+sections, research adapter compatibility and verification.
+[Part 2C](../docs/webapp/native-reports/part2c-charts.md) implements eight interactive
+Agent 1 plots with point/source inspection, keyboard controls and mobile layouts;
+the retained numerical tables preserve exact values and missing observations.
 
 See the [complete setup and acceptance guide](../docs/webapp/batch1-report-workspace.md).
 

@@ -3,7 +3,8 @@
 30 October 2026. Implemented for **explicitly registered synthetic workspaces**.
 This part supplies native reader data. [Part 2B.1](part2b1-reader.md) now renders
 Agent 1's summary and key figures; [Part 2B.2](part2b2-research.md) adds supporting
-layouts and saved-context detail. Interactive plots remain subsequent work.
+layouts and saved-context detail. [Part 2C](part2c-charts.md) implements interactive
+Agent 1 plots over the same registered series.
 
 Research adapter 1.1.0 extends saved detail through the same schema. Registered
 1.0.0 research views retain their original recipe and remain readable; fresh
@@ -135,5 +136,6 @@ independently rerun their financial calculations.
 All five outputs remain synthetic, held for review and financially unapproved.
 No live provider/LLM integration, browser execution, authentication, multi-user
 storage, approval actions or deployment is added. Backup and source-permission
-dependencies remain unchanged. Browser layout, accessibility, print and analyst
-interpretation acceptance remain pending.
+dependencies remain unchanged. Parts 2B/2C record bounded Agent 1 browser checks;
+cross-agent layout, wider accessibility, print and analyst interpretation
+acceptance remain pending.

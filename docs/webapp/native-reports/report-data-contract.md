@@ -1,7 +1,8 @@
 # Native report data contract
 
 Contract version 1 · 30 October 2026 · Part 2A backend implemented for synthetic evidence.
-Frontend consumption remains pending; see [implementation scope](part2a-data-layer.md).
+Agent 1 frontend consumption is implemented in Parts 2B and [2C](part2c-charts.md);
+other native workflow readers remain later work. See [data-layer scope](part2a-data-layer.md).
 
 ## 1. Ownership and lifecycle
 

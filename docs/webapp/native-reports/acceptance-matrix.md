@@ -4,7 +4,8 @@ Updated 31 October 2026 · implementation and remaining acceptance criteria.
 
 **Part 1:** specification, outlines, schema and examples are reviewable design
 artifacts. **Part 2A backend checks and bounded Agent 1 browser checks are recorded
-below. Wider chart, cross-agent and human reader acceptance remains pending.**
+below, including [Part 2C chart checks](part2c-charts.md). Wider physical-device,
+cross-agent and human reader acceptance remains pending.**
 The earlier Batch 1 iframe/browser acceptance does not satisfy native-report rows.
 
 ## Part 1 design acceptance
@@ -38,7 +39,7 @@ regression tests. These checks establish saved-data delivery, not source truth.
 | Existing chart definitions and exact cents conversion retained | Implemented; SMA, volatility, drawdown, common-date rebasing and exact close bridge parity |
 | Original/effective monitoring state; consensus/valuation; withheld/diagnostic tone stay separate | Implemented; controlled saved-source variations |
 | Partial projection never publishes a catalogue; source workspace unchanged | Implemented; interrupted adapter and fresh-destination tests |
-| Native screens, hover/focus/touch charts, print and reader acceptance | Pending subsequent frontend work |
+| Native screens, interactive charts, print and reader acceptance | Agent 1 implemented in Parts 2B/2C; other readers and wider acceptance pending |
 
 The broader rows below intentionally remain pending where they require browser
 review or additional workflow cases beyond this bounded synthetic data layer.
@@ -47,7 +48,7 @@ review or additional workflow cases beyond this bounded synthetic data layer.
 
 Part 2B.1 supplies the shared native Agent 1 summary/key-figure screen.
 [Part 2B.2](part2b2-research.md) adds supporting sections and numerical tables.
-Chart, cross-agent and human interpretation rows remain pending where their wider
+Cross-agent, physical-device and human interpretation rows remain pending where their wider
 scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 
 | Part 2B.1 check | Result |
@@ -59,7 +60,7 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | Evidence downloads agree with the loaded inventory; failed reads invalidate the reader | SHA-256/size tests and actual browser download/refusal/recovery passed |
 | Keyboard source return and 320px/390px layouts retain access to the result | Browser verified; no outer horizontal overflow in inspected states |
 | Agent 1 supporting sections and numerical tables | Implemented in Part 2B.2; browser layout/navigation reviewed |
-| Interactive charts | Pending Part 2C |
+| Interactive Agent 1 charts | Implemented in Part 2C; bounded browser checks below |
 
 | Part 2B.2 check | Result |
 | --- | --- |
@@ -71,6 +72,18 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | Populated and unavailable consensus remain distinct from DCF and broker research | Default browser plus separate controlled synthetic case verified: EUR 650.00/share, 12 analysts, unknown horizon |
 | Human interpretation acceptance | Remains a separate review |
 
+| Part 2C check | Result |
+| --- | --- |
+| All eight Agent 1 charts use saved numerical series, with exact tables and sources | Implemented; browser inspected, zero report iframes/raster images |
+| Null gaps, actual zero, signed bars, flat/single points, large close decimal amounts and date spacing | 13 new frontend cases passed; 51 frontend tests total |
+| Pointer selection and keyboard arrows/Home/End expose exact values; Escape dismisses floating label | Browser checked; source/table values agree and focus returns |
+| Diagnostic scenarios/peers stay discrete; restricted equity/peer results are not plotted | Default and separate controlled withheld browser cases passed |
+| Legend filters retain table data and financial state | Browser checked; all-hidden explanation also implemented |
+| Research adapter 1.0.0 and 1.1.0; 390px/320px layouts | Browser checked; eight graphs in both versions, no outer overflow in inspected states |
+| 5,000 points per series and 20,000 aggregate points retained; 20,001 refused | Automated parser/geometry checks passed; maximum-payload browser timing remains pending |
+| Touch and screen-reader user acceptance | Touch pointer-down/native range controls implemented; physical-device/screen-reader sessions pending |
+| Native backend and frontend production checks | 83 workspace/backend tests, 51 frontend tests, TypeScript and build passed |
+
 | ID | Criterion | Verification required | Status |
 | --- | --- | --- | --- |
 | NATIVE-01 | Primary reports render as native components within Keystone | Inspect all five workflow pages; no primary report iframe or raw HTML injection | Pending |
@@ -78,15 +91,15 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | NATIVE-03 | Execution, evidence gate, integrity and financial approval remain distinct | Gate-mapping tests and visual review; financial approval stays false | Pending |
 | NATIVE-04 | Warning grouping preserves all original findings and their impacts | Compare source checks to grouped reasons; inspect local and report-level notices | Pending |
 | NATIVE-05 | Main summaries use only explicitly supported templates/references | Grounding and unsupported-prose refusal checks; no hidden model publication path | Pending |
-| NATIVE-06 | Every chart uses supplied numerical data, with matching exact tables | Reconcile axes/points/tooltips/table values and chart-specific restrictions | Pending |
-| NATIVE-07 | Pointer, keyboard and touch expose equivalent information | Browser input checks; visible focus; readable labels; colour-independent meaning | Pending |
-| NATIVE-08 | Narrow layouts preserve the report and evidence | Review at 320px and 390px widths; outer page stays within viewport; table scrolling contained | Pending |
+| NATIVE-06 | Every chart uses supplied numerical data, with matching exact tables | Reconcile axes/points/tooltips/table values and chart-specific restrictions | Agent 1 implemented/browser checked in Part 2C; other workflows pending |
+| NATIVE-07 | Pointer, keyboard and touch expose equivalent information | Browser input checks; visible focus; readable labels; colour-independent meaning | Agent 1 pointer/keyboard checked; physical touch, screen-reader and cross-agent acceptance pending |
+| NATIVE-08 | Narrow layouts preserve the report and evidence | Review at 320px and 390px widths; outer page stays within viewport; table scrolling contained | Agent 1 sections/charts/source detail checked; other native readers pending |
 | NATIVE-09 | Invalid, oversized, unsupported and missing views have truthful load states | Error-response and browser tests; no partial/stale verified view or path leakage | Pending |
 | NATIVE-10 | Opening a report does not mutate evidence or trigger execution/network acquisition | Before/after hashes; provider/model calls blocked; no mutation endpoints added | Pending |
 | NATIVE-11 | Old supported/unsupported saved records are handled explicitly | Compatibility cases; no guessing from arbitrary JSON or source HTML | Pending |
 | NATIVE-12 | Source/view versions cannot be mixed | Tamper/version/concurrent-delivery checks; registration published last | Pending |
 | NATIVE-13 | Print/export and original downloads preserve values and restrictions | Inspect print output and download hashes; original report sandbox remains in force | Pending |
-| NATIVE-14 | Bounded payloads render without freezing or silently dropping content | Largest allowed fixture and over-limit refusal; documented aggregate bounds | Pending |
+| NATIVE-14 | Bounded payloads render without freezing or silently dropping content | Largest allowed fixture and over-limit refusal; documented aggregate bounds | Agent 1 data/geometry bounds checked; largest-payload browser timing and other workflows pending |
 
 ## Workflow implementation
 
@@ -95,7 +108,7 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | A1-01 | Performance, valuation, peers and market context are readable sections | Original eligible fields represented or explicitly unavailable; no invented business background | Part 2B.2 implemented; browser reviewed, human interpretation pending |
 | A1-02 | Keystone assessment, external consensus and external research are distinguishable | Correct attribution/availability; no broker ratings or reports invented | Native attribution implemented; automated boundary and default browser checks passed |
 | A1-03 | Unavailable consensus does not become a forecast or DCF target | Current ASML fixture plus a separate controlled populated-consensus fixture | Default/controlled browser and data tests passed for bounded synthetic scope |
-| A1-04 | Price/benchmark and derived charts preserve existing financial definitions | Exact date alignment, SMA windows, volatility annualisation and drawdown parity | Pending |
+| A1-04 | Price/benchmark and derived charts preserve existing financial definitions | Exact date alignment, SMA windows, volatility annualisation and drawdown parity | Part 2C uses existing backend series; parity tests and bounded source/table/browser checks passed |
 | A1-05 | Valuation assumptions, eligibility and peer restrictions remain visible | Missing bridge, excluded sector, small peer set, incompatible period/currency cases | Part 2B.2 data gates and default browser checks passed; broader reader cases pending |
 | A3A-01 | Event diagnostics are understandable without raw gate codes | Reader explains sample, abnormal return, window and major review requirements | Pending |
 | A3A-02 | Historical observations do not become predicted returns | Held, inference-unavailable and repeated/overlapping-event cases | Pending |

@@ -4,7 +4,8 @@ Prepared: **30 October 2026**. Part 1 defines the report structure and data cont
 **Part 2A implements the native data layer and read-only API for registered
 synthetic evidence.** [Part 2B.1](part2b1-reader.md) adds the native Agent 1 summary
 and key-figure reader. [Part 2B.2](part2b2-research.md) implements Agent 1 supporting
-sections and saved-data tables. Interactive plots remain pending.
+sections and saved-data tables. [Part 2C](part2c-charts.md) implements interactive
+Agent 1 plots with exact point/source inspection and keyboard controls.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -64,7 +65,8 @@ These are explicit design recommendations, not user approval or financial sign-o
 2. Part 2B.1: shared native reader and Agent 1 summary/key figures — implemented.
 3. Part 2B.2: Agent 1 supporting sections and browser layout review — implemented;
    human interpretation acceptance remains open.
-4. Part 2C: interactive charts over the saved series and exact numerical tables.
+4. Part 2C: Agent 1 interactive charts over saved series and exact tables —
+   implemented; physical-device/accessibility and human acceptance remain open.
 5. Part 3: native Agent 3 event and news reports.
 6. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
    browser, accessibility, interpretation and export acceptance.

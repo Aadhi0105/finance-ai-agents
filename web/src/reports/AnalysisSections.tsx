@@ -5,6 +5,7 @@ import type { Metric, NativeReport } from './report-data';
 import type { ChartData, SavedSection, TableData } from './analysis-types';
 import { calendarDate, formatMetric } from './format';
 import { MetricCard, ReportSection } from './ReportFrame';
+import { InteractiveChart } from './InteractiveChart';
 
 type Inspect = (refs: string[]) => void;
 type Context = { report: NativeReport; onInspect: Inspect; onReviews: Inspect };
@@ -58,7 +59,7 @@ export function SavedTable({ table, report, onInspect }: Pick<Context, 'report' 
   </div><Pager page={page} count={table.rows.length} onPage={go} label={table.title} /></div>;
 }
 
-export function DatasetTable({ chart, onInspect, collapsed = false }: { chart: ChartData; onInspect: Inspect; collapsed?: boolean }) {
+export function DatasetTable({ chart, onInspect, review }: { chart: ChartData; onInspect: Inspect; review?: React.ReactNode }) {
   const [page, setPage] = useState(0);
   const id = useId(), rows = datasetRows(chart);
   const unit = chart.y_axis.currency || ({ fraction: 'percent', multiple: 'multiple', index: 'index points' } as Record<string, string>)[chart.y_axis.unit] || chart.y_axis.unit;
@@ -70,7 +71,8 @@ export function DatasetTable({ chart, onInspect, collapsed = false }: { chart: C
     {chart.series.some(s => s.points.some(p => p.y === null)) && <p className="nr-table-note">Unavailable points remain missing. A moving-average or volatility window may not yet contain enough observations; no zero or interpolated value is supplied.</p>}</>
     : <Missing title={chart.availability === 'withheld' ? 'Values withheld' : 'Numerical series unavailable'}>The saved evidence does not support displaying this series. Review the linked restrictions before relying on it.</Missing>;
   return <article className="nr-dataset"><div className="nr-dataset-heading"><h3>{chart.title}</h3>{chart.visibility === 'diagnostic' && <span className="nr-diagnostic-label">Diagnostic · review required</span>}</div><p>{chart.purpose}</p>
-    {collapsed && rows.length ? <details className="nr-data-disclosure"><summary>Inspect {rows.length} saved observations <span>Numerical table</span></summary>{table}</details> : table}</article>;
+    {review}<InteractiveChart chart={chart} rows={rows} onInspect={onInspect} />
+    {rows.length ? <details className="nr-data-disclosure"><summary>Inspect {rows.length} saved observations <span>Exact numerical table</span></summary>{table}</details> : table}</article>;
 }
 
 function sectionMetrics(report: NativeReport, section: SavedSection | undefined) {
@@ -83,6 +85,8 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
   const tables = (id: string) => (section(id)?.table_refs || []).flatMap(ref => report.tables.filter(t => t.id === ref));
   const charts = (id: string) => (section(id)?.chart_refs || []).flatMap(ref => report.charts.filter(c => c.id === ref));
   const reviews = (id: string) => <LocalReviews refs={section(id)?.review_refs || []} report={report} onReviews={onReviews} />;
+  const figure = (chart: ChartData) => <DatasetTable key={chart.id} chart={chart} onInspect={onInspect}
+    review={<LocalReviews refs={chart.review_refs} report={report} onReviews={onReviews} />} />;
   const isAvailable = (id: string) => section(id)?.availability === 'available';
   const renderTables = (id: string) => tables(id).map(t => <SavedTable key={t.id} table={t} report={report} onInspect={onInspect} />);
   const valuationMetrics = metrics('valuation').filter(m => ['weighted-valuation', 'fcff-base'].includes(m.id));
@@ -91,14 +95,14 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
   return <>
     <ReportSection id="performance" eyebrow="03 / THE FINANCIAL RECORD" title="Business performance">
       <p className="nr-section-intro">Saved annual measures and their historical context. Growth describes the retained periods; it does not identify a business cause or forecast the next year.</p>{reviews('performance')}
-      {isAvailable('performance') ? <><MetricTable metrics={metrics('performance')} onInspect={onInspect} /><div className="nr-history-grid">{charts('performance').map(c => <DatasetTable key={c.id} chart={c} onInspect={onInspect} />)}</div></> : <Missing>The saved performance section is unavailable or restricted.</Missing>}
+      {isAvailable('performance') ? <><MetricTable metrics={metrics('performance')} onInspect={onInspect} /><div className="nr-history-grid">{charts('performance').map(figure)}</div></> : <Missing>The saved performance section is unavailable or restricted.</Missing>}
     </ReportSection>
 
     <ReportSection id="valuation" eyebrow="04 / CONDITIONAL MODEL OUTPUT" title="Valuation & assumptions">
       <p className="nr-section-intro">Keystone’s saved valuation is a model result conditional on its inputs and assumptions. External analyst estimates appear separately in Market consensus.</p>{reviews('valuation')}
       {isAvailable('valuation') ? <><div className="nr-valuation-cards">{valuationMetrics.map(m => <MetricCard key={m.id} metric={m} onInspect={() => onInspect(m.evidence_refs)} />)}</div>
         <p className="nr-analysis-note">The reported free-cash-flow measure and the model’s unlevered FCFF input have different definitions. Assigned scenario weights are assumptions, not measured outcome probabilities.</p>
-        {charts('valuation').map(c => <DatasetTable key={c.id} chart={c} onInspect={onInspect} />)}
+        {charts('valuation').map(figure)}
         {renderTables('valuation')}
         {!tables('valuation').some(t => t.id === 'equity-bridge') && <Missing title="Detailed equity bridge not retained">This saved presentation does not include the enterprise, net-debt and equity bridge table. Its original model evidence remains available; no bridge has been reconstructed in the browser.</Missing>}
       </> : <Missing>The saved valuation section cannot be displayed. No price target is inferred.</Missing>}
@@ -106,7 +110,7 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
 
     <ReportSection id="peers" eyebrow="05 / A COMPARISON TO REVIEW" title="Peer comparison">
       <p className="nr-section-intro">Retained P/E observations are screening diagnostics. Check financial periods, quote dates, exclusions and business comparability before drawing a comparison.</p>{reviews('peers')}
-      {isAvailable('peers') ? <>{charts('peers').map(c => <DatasetTable key={c.id} chart={c} onInspect={onInspect} />)}{renderTables('peers')}
+      {isAvailable('peers') ? <>{charts('peers').map(figure)}{renderTables('peers')}
         {!tables('peers').some(t => t.id === 'peer-evidence') && <Missing title="Peer dates and exclusions not retained here">The original evidence contains the saved screening record. This presentation does not establish a common fiscal period or an economically approved peer group.</Missing>}
       </> : <Missing>The peer comparison is unavailable or withheld in the saved report.</Missing>}
     </ReportSection>
@@ -115,7 +119,7 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
       <p className="nr-section-intro">Saved quotes and historical observations retain their original dates. Opening this report does not refresh the market data.</p>{reviews('market')}
       {isAvailable('market') ? <>{metrics('market').length ? <MetricTable metrics={metrics('market')} title="Saved quote observations" onInspect={onInspect} /> : <Missing title="Separate quote not retained here">The saved historical series below remain available. This presentation does not include a separately dated quote.</Missing>}{renderTables('market')}
         <div className="nr-method-note"><h3>Reading these series</h3><p>Moving averages use saved 50- and 200-observation windows. The benchmark comparison uses common dates rebased to 100. Volatility uses the retained 30-observation annualised definition; drawdown measures decline from a prior peak. All series were prepared in Python from saved evidence.</p></div>
-        {charts('market').map(c => <DatasetTable key={c.id} chart={c} onInspect={onInspect} collapsed />)}
+        {charts('market').map(figure)}
       </> : <Missing>No usable saved market context is available.</Missing>}
     </ReportSection>
 

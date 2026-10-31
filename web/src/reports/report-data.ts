@@ -309,7 +309,8 @@ export function datasetRows(chart: ChartData) {
     row.points[i] = point;
     rows.set(point.x, row);
   }));
-  return [...rows.values()];
+  const result = [...rows.values()];
+  return chart.x_axis.kind === 'date' ? result.sort((a, b) => a.x.localeCompare(b.x)) : result;
 }
 
 const labels: Record<string, string> = { model_default: 'Saved model default; analyst review required', equity_value: 'Equity value',

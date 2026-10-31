@@ -2,7 +2,7 @@
 
 Implemented 31 October 2026 for registered saved synthetic workspaces. This
 extends [Part 2B.1](part2b1-reader.md) with native supporting sections inside the
-existing Keystone shell. Interactive plots remain Part 2C.
+existing Keystone shell. [Part 2C](part2c-charts.md) subsequently adds interactive plots.
 
 ## Delivered sections
 
@@ -97,7 +97,8 @@ claim a completed human interpretation trial or live market acceptance.
 Frontend fixtures are reduced boundary captures, not complete
 registered workspaces or independently verified company evidence.
 
-Part 2C still supplies pointer/keyboard/touch interactive plots. Native readers
+Part 2C implements pointer/keyboard chart inspection and touch-capable controls;
+physical-device acceptance is recorded separately in its guide. Native readers
 for the other agents, cross-agent reader acceptance and print/export acceptance
 remain later work. No provider/model calls, execution/approval controls, source-use
 permissions, deployment or independent-backup capability were added.
