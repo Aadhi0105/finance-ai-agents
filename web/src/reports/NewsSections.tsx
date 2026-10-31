@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { NativeReport } from './report-data';
 import { DatasetTable, LocalReviews, SavedTable } from './AnalysisSections';
 import { MetricCard, ReportSection } from './ReportFrame';
@@ -11,7 +11,9 @@ const PAGE_SIZE=10;
 
 export function NewsSections({report,onInspect,onReviews}:Props) {
   const [query,setQuery]=useState(''),[page,setPage]=useState(0);
+  const pageStart=useRef<HTMLDivElement>(null);
   const stories=newsStories(report), filtered=filterNewsStories(stories,query), coverage=newsCoverage(report);
+  function go(next:number){setPage(next);requestAnimationFrame(()=>{pageStart.current?.scrollIntoView({block:'start'});pageStart.current?.focus({preventScroll:true});});}
   const table=(id:string)=>report.tables.find(t=>t.id===id);
   const local=(section:string)=><LocalReviews refs={report.sections.find(s=>s.id===section)?.review_refs || []} report={report} onReviews={onReviews}/>;
   const plot=(id:string)=>report.charts.filter(c=>c.id===id).map(c=><DatasetTable key={c.id} chart={c} onInspect={onInspect} review={<LocalReviews refs={c.review_refs} report={report} onReviews={onReviews}/>}/>);
@@ -28,7 +30,8 @@ export function NewsSections({report,onInspect,onReviews}:Props) {
       <p className="nr-section-intro">Read each retained cluster representative with its own publisher, publication time and text scope. These are fictional demonstration records. Grouping does not verify a source or establish independent stories.</p>
       {local('retained-news')}
       {stories.length>0 ? <>
-        <div className="nr-news-search"><label htmlFor="news-story-search">Search saved headlines or publishers</label><input id="news-story-search" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}} placeholder="Filter retained records…"/><p role="status">{filtered.length} of {stories.length} retained representatives shown by this filter. Filtering changes only this list.</p></div>
+        <div className="nr-news-search"><label htmlFor="news-story-search">Search saved headlines or publishers</label><input id="news-story-search" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}} placeholder="Filter retained records…"/><p role="status">{filtered.length} matches from {stories.length} saved representatives. {filtered.length>0?`Showing ${page*PAGE_SIZE+1}–${Math.min((page+1)*PAGE_SIZE,filtered.length)}.`:'No matching headlines shown.'} Filtering changes only this list.</p></div>
+        <div ref={pageStart} role="region" aria-label="Retained headline page" tabIndex={-1}>
         {filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE).map(story=><article className="nr-news-story" key={story.id}>
           <div className="nr-news-story-meta"><span>Story {story.index+1} · synthetic evidence</span><span>{story.publisher}</span></div><h3>{story.headline}</h3>
           <dl className="nr-news-story-basis"><div><dt>Published</dt><dd>{savedInstant(story.published)}</dd></div><div><dt>Retained scope</dt><dd>{story.scope}</dd></div></dl>
@@ -39,8 +42,8 @@ export function NewsSections({report,onInspect,onReviews}:Props) {
               : <p className="nr-analysis-note">This older presentation did not retain these display details. Inspect its original registered evidence; no text scope, cluster members or scorer metadata have been reconstructed here.</p>}
           </details>
         </article>)}
-        {!filtered.length && <div className="nr-empty"><h3>No matching retained headlines</h3><p>The filter matched no saved headline or publisher. This does not change the study’s coverage or publication state.</p><button className="nr-source-button" onClick={()=>setQuery('')}>Clear headline filter</button></div>}
-        {filtered.length>PAGE_SIZE && <nav className="nr-table-pager" aria-label="Retained stories pages"><span>Page {page+1} of {Math.ceil(filtered.length/PAGE_SIZE)}</span><div><button className="nr-page-button" onClick={()=>setPage(p=>p-1)} disabled={!page}>Previous</button><button className="nr-page-button" onClick={()=>setPage(p=>p+1)} disabled={(page+1)*PAGE_SIZE>=filtered.length}>Next</button></div></nav>}
+        </div>{!filtered.length && <div className="nr-empty"><h3>No matching retained headlines</h3><p>The filter matched no saved headline or publisher. This does not change the study’s coverage or publication state.</p><button className="nr-source-button" onClick={()=>setQuery('')}>Clear headline filter</button></div>}
+        {filtered.length>PAGE_SIZE && <nav className="nr-table-pager" aria-label="Retained stories pages"><span>Page {page+1} of {Math.ceil(filtered.length/PAGE_SIZE)}</span><div><button className="nr-page-button" aria-label="Previous story page" onClick={()=>go(page-1)} disabled={!page}>Previous</button><button className="nr-page-button" aria-label="Next story page" onClick={()=>go(page+1)} disabled={(page+1)*PAGE_SIZE>=filtered.length}>Next</button></div></nav>}
       </> : <div className="nr-empty"><h3>No retained representatives</h3><p>{coverage.description} No substitute headlines or neutral tone have been supplied.</p></div>}
       {table('news-cluster-members') && <details className="nr-method-glossary"><summary>Inspect retained cluster members</summary><p className="nr-analysis-note">These are the recorded members, including duplicates. Their inclusion does not demonstrate independent reporting.</p><SavedTable table={table('news-cluster-members')!} report={report} onInspect={onInspect}/></details>}
     </ReportSection>

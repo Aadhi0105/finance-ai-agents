@@ -1,5 +1,6 @@
 /** Display-only extraction from the validated news projection. Never infer relevance or tone. */
 import type { NativeReport } from './report-data';
+import { displaySourceText } from './report-data.ts';
 import type { TableData } from './analysis-types';
 
 export function newsCell(row: TableData['rows'][number] | undefined, column: string): string {
@@ -25,7 +26,7 @@ export function newsStories(report: NativeReport) {
   return (report.tables.find(t=>t.id==='retained-headlines')?.rows || []).map((row,index)=>{
     const detail=details?.rows.find(r=>r.id==='story-'+index);
     return {id:row.id,index,headline:newsCell(row,'headline'),publisher:newsCell(row,'publisher'),published:newsCell(row,'published'),
-      scope:detail ? newsCell(detail,'scope') : newsCell(row,'scope'),retrieved:newsCell(detail,'retrieved'),language:newsCell(detail,'language'),
+      scope:displaySourceText(detail ? newsCell(detail,'scope') : newsCell(row,'scope')),retrieved:newsCell(detail,'retrieved'),language:newsCell(detail,'language'),
       relevance:newsCell(detail,'relevance'),matches:newsCell(detail,'matches'),cluster:newsCell(detail,'cluster'),size:newsCell(detail,'size'),
       scorer:newsCell(detail,'scorer'),url:newsCell(detail,'url'),excerpt:newsCell(detail,'excerpt'),hasDetail:!!detail,
       refs:[...new Set([...row.evidence_refs,...(detail?.evidence_refs || [])])]};

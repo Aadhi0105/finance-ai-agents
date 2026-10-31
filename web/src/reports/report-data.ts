@@ -63,7 +63,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   const family = run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
     : events ? 'agent3-event-report' : news ? 'agent3-news-report' : null;
   if (raw.schema_version !== 1 || raw.kind !== 'keystone.report-view'
-      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !['1.0.0', '1.1.0'].includes(reg.adapter_version)) {
+      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !(news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
     throw new ReportFailure('unsupported_report_schema');
   }
   if (raw.agent !== run.agent || raw.workflow !== run.workflow) fail();
@@ -110,7 +110,8 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   const block = (value: unknown): TextBlock => {
     const b = object(value);
     const templates = ['saved-summary-v1', 'metric-observation-v1', ...(events && reg.adapter_version === '1.1.0' ? ['event-study-summary-v1'] : []),
-      ...(news && reg.adapter_version === '1.1.0' ? ['news-study-summary-v1'] : [])];
+      ...(news && ['1.1.0','1.2.0'].includes(reg.adapter_version) ? ['news-study-summary-v1'] : []),
+      ...(news && reg.adapter_version === '1.2.0' ? ['news-retrieval-summary-v1'] : [])];
     if (!templates.includes(String(b.template_id))) throw new ReportFailure('unsupported_report_schema');
     return { text: text(b.text, 4000), template_id: text(b.template_id, 80), metric_refs: strings(b.metric_refs), evidence_refs: strings(b.evidence_refs), review_refs: strings(b.review_refs) };
   };
@@ -239,6 +240,9 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   }
   if (news) {
     const scoreInRange = (value: string) => /^-?(?:0(?:\.[0-9]+)?|1(?:\.0+)?)$/.test(value);
+    if(summary.template_id==='news-retrieval-summary-v1' && (!['failed','unavailable','refused'].includes(run.execution_status)
+        || metrics.some(m=>m.value!==null) || charts.some(c=>c.availability==='available')
+        || tables.some(t=>t.id==='retained-headlines'&&t.rows.length))) fail();
     for (const m of metrics) {
       if (/^coverage-(raw|ingested|after-relevance|after-dedup)$/.test(m.id)) {
         if (m.unit !== 'count') fail();
@@ -354,6 +358,7 @@ export function datasetRows(chart: ChartData) {
 
 const labels: Record<string, string> = { model_default: 'Saved model default; analyst review required', equity_value: 'Equity value',
   positive_fcff_model: 'Positive-FCFF model', complete: 'Complete', screening_only: 'Screening diagnostics',
+  headline_only: 'Headline only', headline_and_provider_summary: 'Headline and provider summary',
   trim_invalid_trailing_observations_only: 'Only invalid trailing observations may be trimmed',
   unverified: 'Unverified', unavailable: 'Unavailable', available: 'Recorded as available; review still applies',
   human_reviewed: 'Recorded human review; identity is not authenticated here', HELD_FOR_REVIEW: 'Held for review',

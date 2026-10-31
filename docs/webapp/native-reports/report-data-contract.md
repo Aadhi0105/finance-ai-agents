@@ -45,6 +45,12 @@ tables, a count chart and a separate diagnostic score chart. Synthetic published
 tone remains withheld; the browser refuses populated published levels or scores
 relabeled as probabilities, percentages or return paths. Recorded URLs in
 synthetic story details remain unverified display text rather than active links.
+News 1.2.0 additionally supports an early failed/unavailable/refused attempt with
+no result, using `news-retrieval-summary-v1`. That template cannot accompany a
+completed state or populated analytical figures. Prior recipes remain unchanged.
+Agent 3 complete reading/print copies use the same validated data, independently
+of display filters and pagination, and reread the registered endpoint before
+opening and before requesting printing. No new data/export route is introduced.
 
 ## 2. Read interface
 

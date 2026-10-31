@@ -6,7 +6,7 @@ ADAPTERS = {
     'research': ('agent1-native-report', '1.1.0', 'agent1.model/2'),
     'monitoring': ('agent2-native-report', '1.0.0', 'agent2.snapshot/unversioned'),
     'events': ('agent3-event-report', '1.1.0', 'agent3.run_bundle/1'),
-    'news': ('agent3-news-report', '1.1.0', 'agent3.run_bundle/1'),
+    'news': ('agent3-news-report', '1.2.0', 'agent3.run_bundle/1'),
     'close': ('agent4-native-report', '1.0.0', 'agent4.close/1'),
 }
 
@@ -17,6 +17,7 @@ def adapter_for(run):
         registration = getattr(run, 'native_view', None)
         version = registration.adapter_version if registration else latest
         supported = {'1.0.0', '1.1.0'} if run.workflow in {'research', 'events', 'news'} else {latest}
+        if run.workflow == 'news': supported.add('1.2.0')
         if version not in supported:
             raise NativeViewError('unsupported_report_schema')
         return ident, version, schema

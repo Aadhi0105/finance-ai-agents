@@ -170,27 +170,54 @@ def test_news_text_language_truncation_and_unknown_reasons_remain_source_linked(
     assert 'artifact:file-1#/record/result/scored_items/0/score_evidence/review_reasons/0' in refs
 
 
-def test_news_1_0_delivery_and_fresh_1_1_projection_preserve_original_sources(native, tmp_path):
+@pytest.mark.parametrize('version',['1.0.0','1.1.0'])
+def test_news_prior_versions_and_fresh_projection_preserve_original_sources(native, tmp_path,version):
     root = tmp_path / 'old-news'
     shutil.copytree(native, root)
     run = next(r for r in Catalog(root).load().runs if r.workflow == 'news')
     primary = next(a for a in run.artifacts if a.id == run.native_view.source_artifact_ids[0])
     source = json.loads(Catalog(root).read(run.id, primary))
-    old = run.model_copy(update={'native_view': run.native_view.model_copy(update={'adapter_version': '1.0.0'})})
+    old = run.model_copy(update={'native_view': run.native_view.model_copy(update={'adapter_version': version})})
     series = prepare_series(old, source, primary)
     rewrite_artifact(root, run.id, 'native-series', lambda value: (value.clear(), value.update(series)))
     manifest = json.loads((root / 'catalog.json').read_text())
     raw = next(r for r in manifest['runs'] if r['id'] == run.id)
-    raw['native_view']['adapter_version'] = '1.0.0'
+    raw['native_view']['adapter_version'] = version
     (root / 'catalog.json').write_bytes(canonical(manifest))
     old = RunV2.model_validate(raw)
     artifacts = {a.id: a for a in old.artifacts}
     view = build_view(old, source, series, [primary, artifacts['native-series']])
     rewrite_artifact(root, run.id, 'native-view', lambda value: (value.clear(), value.update(view)))
     response = client(root).get('/api/runs/news-example/report-view')
-    assert response.status_code == 200 and response.json()['charts'] == []
+    assert response.status_code == 200
+    assert len(response.json()['charts']) == (0 if version=='1.0.0' else 2)
     before = hashes(root)
     upgraded = project_workspace(root, tmp_path / 'new-news')
     response = client(upgraded).get('/api/runs/news-example/report-view')
     assert response.status_code == 200 and len(response.json()['charts']) == 2
     assert hashes(root) == before
+
+
+@pytest.mark.parametrize('status',['failed','unavailable','refused','completed','held'])
+def test_news_missing_result_is_an_incomplete_attempt_not_a_successful_empty_feed(native,status):
+    import hashlib
+    from keystone.workspace.report_views.validation import validate_view
+    catalog=Catalog(native);run=next(r for r in catalog.load().runs if r.workflow=='news')
+    artifacts={a.id:a for a in run.artifacts};primary=artifacts[run.native_view.source_artifact_ids[0]]
+    source=json.loads(catalog.read(run.id,primary));source['record'].pop('result')
+    source['record'].update(status=status,reason='controlled_retrieval_failure')
+    source['inputs'].pop('saved_scores');source['content_fingerprint']=digest(source['inputs'])
+    source['bundle_sha256']=digest({k:v for k,v in source.items() if k!='bundle_sha256'})
+    run=run.model_copy(update={'execution_status':status})
+    primary=primary.model_copy(update={'sha256':hashlib.sha256(canonical(source)).hexdigest()})
+    series=prepare_series(run,source,primary)
+    secondary=artifacts[run.native_view.source_artifact_ids[1]].model_copy(update={'sha256':hashlib.sha256(canonical(series)).hexdigest()})
+    if status in {'completed','held'}:
+        with pytest.raises(ValueError):build_view(run,source,series,[primary,secondary])
+        return
+    view=build_view(run,source,series,[primary,secondary]);validate_view(view,run,source,series,[primary,secondary])
+    assert view['summary']['template_id']=='news-retrieval-summary-v1'
+    assert view['state']['execution']==status and view['state']['financial_approval'] is False
+    assert all(m['value'] is None for m in view['metrics'])
+    assert cell(view,'news-basis',0,'value')=='retrieval_failed'
+    assert chart(view,'news-coverage')['availability']=='withheld'

@@ -13,6 +13,7 @@
 .nr-news-search input { width:100%; border:1px solid #ccd7c2; background:#fff; color:#3b5933; border-radius:5px; padding:12px 14px; font:inherit; font-size:12px; }
 .nr-news-search input:focus-visible { outline:2px solid #647d54; outline-offset:3px; }
 .nr-news-search p { font-size:10px; color:#738469; margin-top:9px; line-height:1.8; }
+.nr-news-search + [role="region"]:focus-visible { outline:2px solid #8a713b; outline-offset:5px; }
 .nr-news-story { border:1px solid #dfe6d7; background:#fff; border-radius:7px; padding:22px; margin-bottom:16px; overflow-wrap:anywhere; }
 .nr-news-story-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 20px; color:#7b896e; font-size:10px; }
 .nr-news-story > h3 { font-family:Georgia,serif; font-weight:400; font-size:22px; line-height:1.4; color:#3b5933; margin:15px 0 18px; }

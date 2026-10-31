@@ -15,6 +15,10 @@ adds event adapter 1.1.0 while retaining the 1.0.0 recipe; Part 3B does the same
 for news. Monitoring and close remain at 1.0.0. See Parts 2B.2, 3A and 3B for
 compatibility and gating evidence.
 
+[Part 3C](part3c-validation.md) adds news 1.2.0 for early terminal attempts without
+an analytical result. News 1.0.0/1.1.0 retain their original recipes. Complete
+reading/print copies reread the same registered endpoint; no export API is added.
+
 ## What is available
 
 The backend prepares five native report views: Agent 1 research, Agent 2 monitoring,
