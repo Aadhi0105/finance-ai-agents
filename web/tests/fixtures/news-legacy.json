@@ -1,0 +1,603 @@
+{
+  "note": "Saved synthetic news reader boundary capture. Not independent market evidence or a registered runtime workspace.",
+  "run": {
+    "id": "news-example",
+    "agent": "agent3",
+    "workflow": "news",
+    "title": "News evidence review",
+    "entity": "Example Rail \u00b7 fictional company",
+    "period": "2026-01-28 \u00b7 saved cutoff",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "held",
+    "review_status": "review_required",
+    "summary": "Invented headlines demonstrate relevance, saved evidence and held diagnostic tone. No live feed is connected.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "News timestamps describe the saved cutoff, not current freshness.",
+      "Stub scores are not accepted financial sentiment or a trading signal."
+    ],
+    "checks": [
+      "Bundle integrity checked",
+      "Offline replay matched"
+    ],
+    "metrics": [
+      {
+        "label": "Input items",
+        "value": "2",
+        "basis": "Invented headlines"
+      },
+      {
+        "label": "Replay",
+        "value": "Matched",
+        "basis": "Saved fixture scores; no new inference"
+      },
+      {
+        "label": "Tone",
+        "value": "Withheld",
+        "basis": "Stub scores are demonstration-only"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "News evidence report",
+        "kind": "report",
+        "sha256": "691132ea233f011acd5807fa2cc7f2cb1146adfca5d96fb2092d85889389c06d",
+        "bytes": 1797,
+        "url": "/api/runs/news-example/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "label": "Sealed news evidence",
+        "kind": "evidence",
+        "sha256": "d27a742bd0ba1edf57c29f6fc1edadf68c05a85a9b10021c787c32ab1b7186fe",
+        "bytes": 19752,
+        "url": "/api/runs/news-example/files/bundle.json"
+      },
+      {
+        "id": "file-2",
+        "name": "input.json",
+        "label": "Invented headline inputs",
+        "kind": "input",
+        "sha256": "848838a44999a28be3f5428e27dd6d8d2b3969263f817d6d55af36af7f7921c7",
+        "bytes": 1004,
+        "url": "/api/runs/news-example/files/input.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "f40489c9e9f8f4cbaeb3ff2958dbee2982de795f3d0895b3f0e55f07531d9b7e",
+        "bytes": 243,
+        "url": "/api/runs/news-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "dcd251b08f0a230bb306c0eae7e6f4ffa49a0693890202d2aedc8ebb3c08c253",
+        "bytes": 9691,
+        "url": "/api/runs/news-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "eaa29c15cac24b48a300cf3ed3eb2641",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent3-news-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "sha256": "d27a742bd0ba1edf57c29f6fc1edadf68c05a85a9b10021c787c32ab1b7186fe",
+        "source_schema": "agent3.run_bundle/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "f40489c9e9f8f4cbaeb3ff2958dbee2982de795f3d0895b3f0e55f07531d9b7e",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d8463a102a7492f5499776",
+        "label": "Input records",
+        "method": null,
+        "pointer": "/record/result/funnel/raw",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-da32c13feb580b28ab1728",
+        "label": "Relevant records",
+        "method": null,
+        "pointer": "/record/result/funnel/after_relevance",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c2a17125484d7a1fef561f",
+        "label": "Retained headline clusters",
+        "method": null,
+        "pointer": "/record/result/funnel/after_dedup",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0dd15b8ce1d299d982d741",
+        "label": "Published tone \u00b7 DEMO",
+        "method": null,
+        "pointer": "/record/result/signals/0/level",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5f8e9c5b21183cd6417fe0",
+        "label": "Saved diagnostic tone \u00b7 DEMO",
+        "method": null,
+        "pointer": "/record/result/signals/0/diagnostic_level",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-099235b333a6bb795fb780",
+        "label": "Retained news evidence",
+        "method": null,
+        "pointer": "/record/result/scored_items/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4336b2aa70106eb24d290f",
+        "label": "Retained news evidence",
+        "method": null,
+        "pointer": "/record/result/scored_items/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-47feadd3a0f2daf7f4a377",
+        "label": "Original news publication and exclusion evidence",
+        "method": null,
+        "pointer": "/record/result",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-d8463a102a7492f5499776"
+          ],
+          "metric_refs": [
+            "coverage-raw"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved input records: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-raw",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-da32c13feb580b28ab1728"
+          ],
+          "metric_refs": [
+            "coverage-after-relevance"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved relevant records: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-after-relevance",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-c2a17125484d7a1fef561f"
+          ],
+          "metric_refs": [
+            "coverage-after-dedup"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved retained headline clusters: 2 (2026-01-28 \u00b7 saved cutoff)."
+        },
+        "id": "finding-coverage-after-dedup",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "A heuristic text grouping, not proof of independent stories.",
+        "term": "Headline cluster"
+      },
+      {
+        "definition": "A descriptive score for supplied text; a null published level remains withheld.",
+        "term": "Diagnostic tone"
+      }
+    ],
+    "identity": {
+      "entity": "Example Rail \u00b7 fictional company",
+      "period_end": null,
+      "period_label": "2026-01-28 \u00b7 saved cutoff",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "eaa29c15cac24b48a300cf3ed3eb2641",
+      "ticker": "DEMO",
+      "title": "News evidence review"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-d8463a102a7492f5499776"
+        ],
+        "id": "coverage-raw",
+        "label": "Input records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-da32c13feb580b28ab1728"
+        ],
+        "id": "coverage-after-relevance",
+        "label": "Relevant records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c2a17125484d7a1fef561f"
+        ],
+        "id": "coverage-after-dedup",
+        "label": "Retained headline clusters",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-0dd15b8ce1d299d982d741"
+        ],
+        "id": "published-tone-0",
+        "label": "Published tone \u00b7 DEMO",
+        "period_label": "2026-01-28",
+        "reason_codes": [
+          "synthetic_published_tone_withheld"
+        ],
+        "unit": "score",
+        "value": null,
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5f8e9c5b21183cd6417fe0"
+        ],
+        "id": "diagnostic-tone-0",
+        "label": "Saved diagnostic tone \u00b7 DEMO",
+        "period_label": "2026-01-28",
+        "reason_codes": [],
+        "unit": "score",
+        "value": "0.0",
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-c393e66a6701446408b82df0",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Read scorer restrictions, relevance, duplicates, exclusions and the original publication state.",
+        "category": "narrative_support",
+        "evidence_refs": [
+          "e-47feadd3a0f2daf7f4a377"
+        ],
+        "explanation": "Published tone is withheld in this synthetic workspace. Diagnostic tone concerns retained document text, not a verified company-specific investment conclusion.",
+        "id": "review-826bb05e4ff5df7f3501",
+        "impact": "section_restriction",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "Tone and relevance limitations"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [
+          "finding-coverage-raw",
+          "finding-coverage-after-relevance",
+          "finding-coverage-after-dedup"
+        ],
+        "id": "coverage",
+        "metric_refs": [
+          "coverage-raw",
+          "coverage-after-relevance",
+          "coverage-after-dedup"
+        ],
+        "purpose": "Coverage counts are distinct from independent stories or a market conclusion.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501"
+        ],
+        "table_refs": [],
+        "title": "News coverage"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "retained-news",
+        "metric_refs": [],
+        "purpose": "Inspect the retained text, timestamps and source basis.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501"
+        ],
+        "table_refs": [
+          "retained-headlines"
+        ],
+        "title": "Retained stories"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "tone",
+        "metric_refs": [
+          "published-tone-0",
+          "diagnostic-tone-0"
+        ],
+        "purpose": "A withheld published level is not neutral, zero or a trading signal.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501"
+        ],
+        "table_refs": [],
+        "title": "Text-tone evidence"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "held",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-1525c34937377ece6c46a6"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501"
+      ],
+      "template_id": "saved-summary-v1",
+      "text": "Saved synthetic news evidence for Example Rail \u00b7 fictional company. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "headline",
+            "label": "Headline"
+          },
+          {
+            "id": "publisher",
+            "label": "Source"
+          },
+          {
+            "id": "published",
+            "label": "Published at (original timezone)"
+          },
+          {
+            "id": "scope",
+            "label": "Text scope"
+          }
+        ],
+        "id": "retained-headlines",
+        "review_refs": [
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail opens a fictional maintenance facility"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T12:00:00+00:00"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline/text only"
+              }
+            ],
+            "evidence_refs": [
+              "e-099235b333a6bb795fb780"
+            ],
+            "id": "headline-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "headline",
+                "kind": "text",
+                "text": "Example Rail reports a fictional delivery delay"
+              },
+              {
+                "column_id": "publisher",
+                "kind": "text",
+                "text": "Synthetic bulletin"
+              },
+              {
+                "column_id": "published",
+                "kind": "text",
+                "text": "2026-01-28T14:00:00+00:00"
+              },
+              {
+                "column_id": "scope",
+                "kind": "text",
+                "text": "Retained headline/text only"
+              }
+            ],
+            "evidence_refs": [
+              "e-4336b2aa70106eb24d290f"
+            ],
+            "id": "headline-1"
+          }
+        ],
+        "title": "Retained news evidence"
+      }
+    ],
+    "workflow": "news"
+  }
+}

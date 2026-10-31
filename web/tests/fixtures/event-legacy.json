@@ -1,0 +1,724 @@
+{
+  "note": "Saved synthetic event reader boundary capture. Not independent market evidence or a registered runtime workspace.",
+  "run": {
+    "id": "events-example",
+    "agent": "agent3",
+    "workflow": "events",
+    "title": "Historical event study",
+    "entity": "Semiconductor peers \u00b7 fixture",
+    "period": "Retained synthetic event windows",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "held",
+    "review_status": "review_required",
+    "summary": "A replay-checked historical study. Descriptive diagnostics remain separate from publication approval.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Synthetic price windows are not observed market returns.",
+      "No interpolated event path, forward probability or accepted predictive calibration."
+    ],
+    "checks": [
+      "Bundle integrity checked",
+      "Offline replay matched"
+    ],
+    "metrics": [
+      {
+        "label": "Historical events",
+        "value": "8",
+        "basis": "Count from the saved study"
+      },
+      {
+        "label": "Replay",
+        "value": "Matched",
+        "basis": "Retained inputs and saved deterministic stages"
+      },
+      {
+        "label": "Publication",
+        "value": "Held for review",
+        "basis": "No forward-return forecast"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "Event-study report",
+        "kind": "report",
+        "sha256": "e1ddfbeae7300efc41ce6f6b442dd5b8c7ea4cdae7a878c4d5d062ace0b7a022",
+        "bytes": 1922,
+        "url": "/api/runs/events-example/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "label": "Sealed event evidence",
+        "kind": "evidence",
+        "sha256": "cfc69859bd078ba38344b4a9e94004d310c2a83ec49af5b2dba8012573407aeb",
+        "bytes": 367560,
+        "url": "/api/runs/events-example/files/bundle.json"
+      },
+      {
+        "id": "file-2",
+        "name": "replay.json",
+        "label": "Replay verification",
+        "kind": "evidence",
+        "sha256": "328b71fdc5d52c550cc1717a743aeef7367363ae8d548bf2aebd9802e5ed5ef3",
+        "bytes": 12669,
+        "url": "/api/runs/events-example/files/replay.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "9a5205118ba6fac066524666b8573cc6556b56e6ffbcde90c8e2d47f821cd38e",
+        "bytes": 244,
+        "url": "/api/runs/events-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "f9f9365475bf56316ab0e405a75b9aca7c0661e30260cdc065a19e2c5e5a0110",
+        "bytes": 12516,
+        "url": "/api/runs/events-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "c3a6c0593f24439187f83a027f56e64a",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent3-event-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "sha256": "cfc69859bd078ba38344b4a9e94004d310c2a83ec49af5b2dba8012573407aeb",
+        "source_schema": "agent3.run_bundle/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "9a5205118ba6fac066524666b8573cc6556b56e6ffbcde90c8e2d47f821cd38e",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "event-cases",
+        "purpose": "Saved CAR observations, not next-event predictions. Publication restrictions remain in force.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-cb201f3653ec9767a75c"
+        ],
+        "series": [
+          {
+            "id": "car-series",
+            "label": "Diagnostic CAR",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-c3a34844087440e463252b"
+                ],
+                "id": "case-0",
+                "label": "ASML.AS",
+                "reason_codes": [],
+                "x": "0",
+                "y": "0.03422036567006792"
+              },
+              {
+                "evidence_refs": [
+                  "e-3349bc31344ee25f1f7afb"
+                ],
+                "id": "case-1",
+                "label": "ASM.AS",
+                "reason_codes": [],
+                "x": "1",
+                "y": "0.027629110996841552"
+              },
+              {
+                "evidence_refs": [
+                  "e-eebf332fb98856806886ff"
+                ],
+                "id": "case-2",
+                "label": "BESI.AS",
+                "reason_codes": [],
+                "x": "2",
+                "y": "0.009051243741634202"
+              },
+              {
+                "evidence_refs": [
+                  "e-cb493e034c5c3d2d62d6e0"
+                ],
+                "id": "case-3",
+                "label": "LRCX",
+                "reason_codes": [],
+                "x": "3",
+                "y": "0.036394467897952205"
+              },
+              {
+                "evidence_refs": [
+                  "e-ee08a69c771e5c420a799b"
+                ],
+                "id": "case-4",
+                "label": "AMAT",
+                "reason_codes": [],
+                "x": "4",
+                "y": "0.0334704179372535"
+              },
+              {
+                "evidence_refs": [
+                  "e-8993d02dec90204e0761ee"
+                ],
+                "id": "case-5",
+                "label": "KLAC",
+                "reason_codes": [],
+                "x": "5",
+                "y": "-0.005234465308581956"
+              },
+              {
+                "evidence_refs": [
+                  "e-3f07cb1cc9baab640f0279"
+                ],
+                "id": "case-6",
+                "label": "TER",
+                "reason_codes": [],
+                "x": "6",
+                "y": "0.028287175109063745"
+              },
+              {
+                "evidence_refs": [
+                  "e-89dbe6f5996ffdedcf2f62"
+                ],
+                "id": "case-7",
+                "label": "NVMI",
+                "reason_codes": [],
+                "x": "7",
+                "y": "0.01639078068160255"
+              }
+            ]
+          }
+        ],
+        "title": "Historical per-event diagnostics",
+        "type": "bar",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "category",
+          "label": "Retained historical case"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "fraction",
+          "unit": "fraction"
+        }
+      },
+      {
+        "availability": "withheld",
+        "id": "event-path",
+        "purpose": "A verified date/session path requires a separately supported alignment projection.",
+        "reason_codes": [
+          "verified_event_path_not_projected"
+        ],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-cb201f3653ec9767a75c"
+        ],
+        "series": [],
+        "title": "Event-window path",
+        "type": "line",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "relative_session",
+          "label": "Confirmed event-relative session"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "fraction",
+          "unit": "fraction"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-92bc328c932327e9eb83fe",
+        "label": "Historical event cases",
+        "method": null,
+        "pointer": "/record/result/study/n_events",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b66954ce67be25f10f4bbe",
+        "label": "Distinct issuers",
+        "method": null,
+        "pointer": "/record/result/study/n_issuers",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1cd95d10e34175311e44d9",
+        "label": "Diagnostic mean accumulated abnormal return",
+        "method": null,
+        "pointer": "/record/result/study/caar",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d69084c42abf5822c67567",
+        "label": "Statistical inference p-value",
+        "method": null,
+        "pointer": "/record/result/study/p_value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c3a34844087440e463252b",
+        "label": "ASML.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/0/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3349bc31344ee25f1f7afb",
+        "label": "ASM.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/1/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-eebf332fb98856806886ff",
+        "label": "BESI.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/2/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cb493e034c5c3d2d62d6e0",
+        "label": "LRCX",
+        "method": null,
+        "pointer": "/record/result/study/per_event/3/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ee08a69c771e5c420a799b",
+        "label": "AMAT",
+        "method": null,
+        "pointer": "/record/result/study/per_event/4/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8993d02dec90204e0761ee",
+        "label": "KLAC",
+        "method": null,
+        "pointer": "/record/result/study/per_event/5/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3f07cb1cc9baab640f0279",
+        "label": "TER",
+        "method": null,
+        "pointer": "/record/result/study/per_event/6/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-89dbe6f5996ffdedcf2f62",
+        "label": "NVMI",
+        "method": null,
+        "pointer": "/record/result/study/per_event/7/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-534ebd89fd724c31b88f57",
+        "label": "inference",
+        "method": null,
+        "pointer": "/record/result/gate/checks/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-843b3a629c104c608abb48",
+        "label": "thin_data",
+        "method": null,
+        "pointer": "/record/result/gate/checks/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-113cbe9daa3db92461922f",
+        "label": "comparability",
+        "method": null,
+        "pointer": "/record/result/gate/checks/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-298f677b71a758ee453da1",
+        "label": "multiple_testing",
+        "method": null,
+        "pointer": "/record/result/gate/checks/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6ebe41a797dab7030f8ca9",
+        "label": "placebo",
+        "method": null,
+        "pointer": "/record/result/gate/checks/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-121470ccee63c65ade7aff",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/record",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-92bc328c932327e9eb83fe"
+          ],
+          "metric_refs": [
+            "event-count"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved historical event cases: 8 (Retained synthetic event windows)."
+        },
+        "id": "finding-event-count",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-b66954ce67be25f10f4bbe"
+          ],
+          "metric_refs": [
+            "issuer-count"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved distinct issuers: 8 (Retained synthetic event windows)."
+        },
+        "id": "finding-issuer-count",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-1cd95d10e34175311e44d9"
+          ],
+          "metric_refs": [
+            "mean-car"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved diagnostic mean accumulated abnormal return: 2.25% (Retained synthetic event windows)."
+        },
+        "id": "finding-mean-car",
+        "kind": "observed_fact",
+        "visibility": "diagnostic"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "Stock return minus the return estimated by the saved market model.",
+        "term": "Abnormal return"
+      },
+      {
+        "definition": "Sum of abnormal returns over the supplied historical event window; not a prediction.",
+        "term": "CAR"
+      }
+    ],
+    "identity": {
+      "entity": "Semiconductor peers \u00b7 fixture",
+      "period_end": null,
+      "period_label": "Retained synthetic event windows",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "c3a6c0593f24439187f83a027f56e64a",
+      "ticker": null,
+      "title": "Historical event study"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-92bc328c932327e9eb83fe"
+        ],
+        "id": "event-count",
+        "label": "Historical event cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "8",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-b66954ce67be25f10f4bbe"
+        ],
+        "id": "issuer-count",
+        "label": "Distinct issuers",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "8",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-1cd95d10e34175311e44d9"
+        ],
+        "id": "mean-car",
+        "label": "Diagnostic mean accumulated abnormal return",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.022526137090729214",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-d69084c42abf5822c67567"
+        ],
+        "id": "p-value",
+        "label": "Statistical inference p-value",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [
+          "inference_unavailable"
+        ],
+        "unit": "p_value",
+        "value": null,
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-0c26fc8e008207a63c46e53d",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect all referenced source findings before relying on this section.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-534ebd89fd724c31b88f57",
+          "e-843b3a629c104c608abb48",
+          "e-113cbe9daa3db92461922f",
+          "e-298f677b71a758ee453da1",
+          "e-6ebe41a797dab7030f8ca9"
+        ],
+        "explanation": "Saved findings restrict this part of the report. Original details and every contributing check remain in the linked evidence.",
+        "id": "review-cb201f3653ec9767a75c",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/0",
+          "artifact:file-1#/record/result/gate/checks/1",
+          "artifact:file-1#/record/result/gate/checks/2",
+          "artifact:file-1#/record/result/gate/checks/3",
+          "artifact:file-1#/record/result/gate/checks/4"
+        ],
+        "title": "Statistical Eligibility requires review"
+      },
+      {
+        "action": "Inspect every original gate and scenario restriction.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-121470ccee63c65ade7aff"
+        ],
+        "explanation": "Historical descriptions do not establish a future-return forecast. A minimum sample count alone does not resolve timing, dependence, comparability or control checks.",
+        "id": "review-ca1558f601de33896d5b",
+        "impact": "section_restriction",
+        "section_refs": [
+          "historical-findings"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "Historical scope and review requirements"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "event-cases",
+          "event-path"
+        ],
+        "finding_refs": [
+          "finding-event-count",
+          "finding-issuer-count",
+          "finding-mean-car"
+        ],
+        "id": "historical-findings",
+        "metric_refs": [
+          "event-count",
+          "issuer-count",
+          "mean-car",
+          "p-value"
+        ],
+        "purpose": "Inspect the retained sample and its diagnostic observations; no forward-return scenario is introduced.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cb201f3653ec9767a75c",
+          "review-ca1558f601de33896d5b"
+        ],
+        "table_refs": [],
+        "title": "Past event reactions"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "held",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cb201f3653ec9767a75c",
+        "review-ca1558f601de33896d5b"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-1525c34937377ece6c46a6"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cb201f3653ec9767a75c",
+        "review-ca1558f601de33896d5b"
+      ],
+      "template_id": "saved-summary-v1",
+      "text": "Saved synthetic historical event evidence for Semiconductor peers \u00b7 fixture. Financial review is required."
+    },
+    "tables": [],
+    "workflow": "events"
+  }
+}

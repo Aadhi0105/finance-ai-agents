@@ -6,6 +6,10 @@ synthetic evidence.** [Part 2B.1](part2b1-reader.md) adds the native Agent 1 sum
 and key-figure reader. [Part 2B.2](part2b2-research.md) implements Agent 1 supporting
 sections and saved-data tables. [Part 2C](part2c-charts.md) implements interactive
 Agent 1 plots with exact point/source inspection and keyboard controls.
+[Part 3A](part3a-events.md) adds the native Agent 3 past-event report, including
+sample metadata, historical diagnostic bars and plain-language review requirements.
+[Part 3B](part3b-news.md) adds native company-news cards, coverage/exclusion evidence
+and separate diagnostic text-tone graphs.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -17,7 +21,9 @@ saved evidence and export files remain accessible.
 
 Agent 1 now opens in the native reader with its summary, key figures, supporting
 analysis, review notes and evidence controls. Consensus and broker research have
-separate availability. The other agents retain the existing saved-HTML reader.
+separate availability. Agent 3 events also open natively, with source-linked sample
+and review details. Company news opens natively with explicit text scope and
+withheld published tone. Agents 2/4 retain the saved-HTML reader.
 
 ## Read this pack
 
@@ -67,7 +73,10 @@ These are explicit design recommendations, not user approval or financial sign-o
    human interpretation acceptance remains open.
 4. Part 2C: Agent 1 interactive charts over saved series and exact tables —
    implemented; physical-device/accessibility and human acceptance remain open.
-5. Part 3: native Agent 3 event and news reports.
+5. Part 3A: native Agent 3 event report — implemented for saved synthetic evidence;
+   eligible event-path projection and wider acceptance remain open. Part 3B:
+   native company news — implemented for saved synthetic inputs; wider reader and
+   real-source published-tone acceptance remain open.
 6. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
    browser, accessibility, interpretation and export acceptance.
 7. Webapp Batch 2: controlled execution, using the same report contract for newly

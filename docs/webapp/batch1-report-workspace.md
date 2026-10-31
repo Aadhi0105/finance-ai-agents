@@ -226,7 +226,12 @@ workflows. [Part 2B.1](native-reports/part2b1-reader.md) adds a native Agent 1
 summary/key-figure reader. [Part 2B.2](native-reports/part2b2-research.md) adds Agent 1
 supporting analysis and exact numerical tables. [Part 2C](native-reports/part2c-charts.md)
 adds interactive Agent 1 graphs with point/source inspection and keyboard controls.
-Agents 2–4 retain their existing saved-HTML reader.
+[Part 3A](native-reports/part3a-events.md) adds Agent 3's native past-event report
+with sample metadata, interactive diagnostic bars and readable review requirements.
+[Part 3B](native-reports/part3b-news.md) adds native news cards, saved coverage and
+separate diagnostic text-tone graphs. Agents 2/4 retain their existing saved-HTML
+reader. Verified event-relative path projection and authorised live-source
+integration remain later work.
 
 This batch supplies the viewing layer and a narrow read API. Running agents from
 the browser, persistent multi-user application state, uploads, authenticated

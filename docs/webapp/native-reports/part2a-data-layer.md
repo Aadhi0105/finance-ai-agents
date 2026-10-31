@@ -4,12 +4,16 @@
 This part supplies native reader data. [Part 2B.1](part2b1-reader.md) now renders
 Agent 1's summary and key figures; [Part 2B.2](part2b2-research.md) adds supporting
 layouts and saved-context detail. [Part 2C](part2c-charts.md) implements interactive
-Agent 1 plots over the same registered series.
+Agent 1 plots over the same registered series. [Part 3A](part3a-events.md) adds the
+native event reader and source-linked event context. [Part 3B](part3b-news.md) adds
+the native company-news reader and retained coverage/text/scorer detail.
 
 Research adapter 1.1.0 extends saved detail through the same schema. Registered
 1.0.0 research views retain their original recipe and remain readable; fresh
-projection into a new destination is required for richer detail. Other adapters
-remain at 1.0.0. See Part 2B.2 for compatibility and gating evidence.
+projection into a new destination is required for richer detail. Part 3A likewise
+adds event adapter 1.1.0 while retaining the 1.0.0 recipe; Part 3B does the same
+for news. Monitoring and close remain at 1.0.0. See Parts 2B.2, 3A and 3B for
+compatibility and gating evidence.
 
 ## What is available
 
@@ -31,8 +35,10 @@ or cycle count never becomes an invented history. Correction references remain
 saved local attribution, not authenticated approval.
 
 Agent 3 supplies diagnostic historical CAR observations and original gate evidence.
-The event-relative path is explicitly withheld in this first adapter version;
-verified timing/session projection remains later work. News coverage, retained
+The event-relative path is explicitly withheld in both supported event adapters;
+verified timing/session projection remains later work. Adapter 1.1.0 adds case
+dates/basis, selection, exclusions, descriptive spread and readable review topics.
+News coverage, retained
 headlines, withheld published tone and diagnostic text scores stay distinct.
 
 Agent 4 supplies exact major-unit amounts, account evidence, a retained budget to

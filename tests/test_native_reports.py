@@ -477,3 +477,164 @@ def test_research_1_0_delivery_stays_compatible_and_reprojection_is_explicit(nat
     assert upgraded.native_view.adapter_version == '1.1.0'
     assert client(new).get('/api/runs/research-example/report-view').status_code == 200
     assert hashes(root) == before
+
+
+def expanded_event_case(native, edit=lambda result: None):
+    from keystone.workspace.report_views.values import digest
+    def update(source):
+        edit(source['record']['result'])
+        source['bundle_sha256'] = digest({k: v for k, v in source.items() if k != 'bundle_sha256'})
+    return case(native, 'events', update)
+
+
+def expanded_ten_events(result):
+    import statistics
+    study = result['study']
+    for i in range(2):
+        row = copy.deepcopy(study['per_event'][i])
+        row.update(ticker='CASE' + str(i), issuer_id='CASE' + str(i))
+        study['per_event'].append(row)
+    study.update(n_events=10, n_issuers=10, caar=statistics.mean(c['car'] for c in study['per_event']),
+                 inference_status='available', inference_reasons=[], p_value=.2, caar_significant=False)
+    result['gate']['checks'][0].update(status='pass', detail='Saved eligible inference check')
+    result['scenario']['n_events'] = 10
+
+
+def test_expanded_event_context_retains_cases_methods_and_every_original_gate(native):
+    view, source, *_ = expanded_event_case(native)
+    assert '8 historical cases from 8 issuers' in view['summary']['text']
+    assert view['summary']['template_id'] == 'event-study-summary-v1'
+    assert metric(view, 'mean-car')['visibility'] == 'diagnostic'
+    assert metric(view, 'p-value')['value'] is None
+    tables = {t['id']: t for t in view['tables']}
+    assert len(tables['event-case-metadata']['rows']) == 8
+    assert tables['event-case-metadata']['rows'][0]['cells'][2]['text'] == '2026-01-28'
+    assert tables['event-case-metadata']['rows'][0]['cells'][3]['text'] == 'Unverified or not retained'
+    checks = source['record']['result']['gate']['checks']
+    assert [r['cells'][3]['text'] for r in tables['event-gates']['rows']] == [c['detail'] for c in checks]
+    refs = {ref for r in view['review_items'] for ref in r['source_check_refs']}
+    assert {f'artifact:file-1#/record/result/gate/checks/{i}' for i in range(len(checks))} <= refs
+    reasons = source['record']['result']['study']['inference_reasons']
+    assert {f'artifact:file-1#/record/result/study/inference_reasons/{i}' for i in range(len(reasons))} <= refs
+    assert chart(view, 'event-path')['availability'] == 'withheld'
+    assert chart(view, 'event-path')['series'] == []
+
+
+def test_expanded_event_repeated_issuers_remain_separate_cases_not_independent_evidence(native):
+    def edit(result):
+        result['study']['per_event'][1].update(ticker='ASML.AS', issuer_id='ASML.AS', event_date='2026-04-28')
+        result['study']['n_issuers'] = 7
+        result['study']['inference_reasons'].append('repeated_issuer_dependence')
+    view, *_ = expanded_event_case(native, edit)
+    points = chart(view, 'event-cases')['series'][0]['points']
+    assert [p['x'] for p in points[:2]] == ['ASML.AS #1', 'ASML.AS #2']
+    assert len({p['x'] for p in points}) == 8
+    assert metric(view, 'issuer-count')['value'] == '7'
+    assert metric(view, 'mean-car')['availability'] == 'available'
+    assert metric(view, 'p-value')['value'] is None
+    assert any(r['title'] == 'Sample and independence' for r in view['review_items'])
+
+
+@pytest.mark.parametrize('missing', [False, True])
+def test_expanded_event_missing_car_never_becomes_zero_or_disappears_from_the_case_axis(native, missing):
+    def edit(result):
+        if missing: result['study']['per_event'][1].pop('car')
+        else: result['study']['per_event'][1]['car'] = None
+    view, *_ = expanded_event_case(native, edit)
+    points = chart(view, 'event-cases')['series'][0]['points']
+    assert len(points) == 8 and points[1]['y'] is None
+    assert points[1]['x'] == 'ASM.AS #2'
+    assert metric(view, 'mean-car')['value'] is None
+    assert metric(view, 'p-value')['value'] is None
+
+
+def test_expanded_event_inconsistent_declared_counts_withhold_aggregates_without_recalculation(native):
+    def edit(result): result['study'].update(n_events=99, n_issuers=99)
+    view, *_ = expanded_event_case(native, edit)
+    for ident in ('event-count', 'issuer-count', 'mean-car', 'p-value'):
+        assert metric(view, ident)['value'] is None
+    assert len(chart(view, 'event-cases')['series'][0]['points']) == 8
+
+
+def test_expanded_event_unknown_reasons_and_exclusions_keep_their_source_evidence(native):
+    def edit(result):
+        result['gate']['checks'].append(dict(check='unrecognised_check', status='fail', detail='Saved additional restriction'))
+        result['study']['inference_reasons'].append('unrecognised_reason')
+        result['study']['rejected_events'].append(dict(index=9, reason='Invalid measurement window'))
+        result['excluded_peers'] = ['BAD']
+        result['per_peer_report'] = [dict(ticker='BAD', excluded=True, reason='No price history')]
+    view, *_ = expanded_event_case(native, edit)
+    tables = {t['id']: t for t in view['tables']}
+    assert tables['event-gates']['rows'][-1]['cells'][3]['text'] == 'Saved additional restriction'
+    assert [r['cells'][2]['text'] for r in tables['event-exclusions']['rows']] == ['Invalid measurement window', 'No price history']
+    assert any(r['cells'][0]['text'] == 'BAD' and r['cells'][1]['text'] == 'Recorded exclusion' for r in tables['event-peer-selection']['rows'])
+    refs = {ref for r in view['review_items'] for ref in r['source_check_refs']}
+    assert 'artifact:file-1#/record/result/gate/checks/5' in refs
+    assert 'artifact:file-1#/record/result/study/inference_reasons/7' in refs
+
+
+def test_expanded_event_ten_cases_and_available_test_do_not_override_other_failed_checks(native):
+    view, *_ = expanded_event_case(native, expanded_ten_events)
+    assert metric(view, 'event-count')['value'] == '10'
+    assert metric(view, 'p-value')['value'] == '0.2'
+    assert metric(view, 'p-value')['visibility'] == 'diagnostic'
+    assert view['state']['execution'] == 'held'
+    assert view['state']['evidence_gate'] == 'held_for_review'
+    assert view['state']['financial_approval'] is False
+    assert any(r['title'] == 'Comparison basis' for r in view['review_items'])
+    assert 'predict the next event' in view['summary']['text']
+    assert chart(view, 'event-path')['series'] == []
+
+
+@pytest.mark.parametrize('value', [True, -0.1, 2])
+def test_expanded_event_invalid_p_values_stay_withheld(native, value):
+    def edit(result):
+        expanded_ten_events(result)
+        result['study']['p_value'] = value
+    view, *_ = expanded_event_case(native, edit)
+    assert metric(view, 'p-value')['value'] is None
+
+
+def test_expanded_event_real_zero_p_value_is_retained_only_as_a_diagnostic(native):
+    def edit(result):
+        expanded_ten_events(result)
+        result['study'].update(p_value=0, caar_significant=True)
+    view, *_ = expanded_event_case(native, edit)
+    assert metric(view, 'p-value')['value'] == '0'
+    assert view['state']['financial_approval'] is False
+
+
+def test_expanded_event_spread_from_a_different_sample_is_withheld(native):
+    def edit(result): result['scenario']['n_events'] = 9
+    view, *_ = expanded_event_case(native, edit)
+    assert metric(view, 'mean-car')['availability'] == 'available'
+    assert metric(view, 'event-median-car')['value'] is None
+
+
+def test_expanded_event_1_0_delivery_and_explicit_1_1_reprojection(native, tmp_path):
+    from keystone.workspace.catalog import RunV2
+    root = tmp_path / 'old-events'
+    shutil.copytree(native, root)
+    run = next(r for r in Catalog(root).load().runs if r.workflow == 'events')
+    primary = next(a for a in run.artifacts if a.id == run.native_view.source_artifact_ids[0])
+    source = json.loads(Catalog(root).read(run.id, primary))
+    old_run = run.model_copy(update={'native_view': run.native_view.model_copy(update={'adapter_version': '1.0.0'})})
+    retained = prepare_series(old_run, source, primary)
+    rewrite_artifact(root, run.id, 'native-series', lambda value: (value.clear(), value.update(retained)))
+    path = root / 'catalog.json'
+    manifest = json.loads(path.read_text())
+    raw_run = next(r for r in manifest['runs'] if r['id'] == run.id)
+    raw_run['native_view']['adapter_version'] = '1.0.0'
+    path.write_bytes(canonical(manifest))
+    old_run = RunV2.model_validate(raw_run)
+    by_id = {a.id: a for a in old_run.artifacts}
+    view = build_view(old_run, source, retained, [primary, by_id['native-series']])
+    rewrite_artifact(root, run.id, 'native-view', lambda value: (value.clear(), value.update(view)))
+    response = client(root).get('/api/runs/events-example/report-view')
+    assert response.status_code == 200 and response.json()['tables'] == []
+    before = hashes(root)
+    upgraded = project_workspace(root, tmp_path / 'new-events')
+    response = client(upgraded).get('/api/runs/events-example/report-view')
+    assert response.status_code == 200
+    assert any(t['id'] == 'event-case-metadata' for t in response.json()['tables'])
+    assert hashes(root) == before

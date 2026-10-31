@@ -4,7 +4,7 @@ import './styles.css';
 
 import type { Artifact, Run, Workspace } from './workspace-types';
 import { Icon, type IconName } from './icons';
-import { ResearchReader } from './reports/ResearchReader';
+import { NativeReportReader } from './reports/NativeReportReader';
 import { responseFailure } from './reports/report-data';
 const agents = [
   { id: 'agent1', name: 'Research', icon: 'research' as IconName, number: '01' },
@@ -12,7 +12,7 @@ const agents = [
   { id: 'agent3', name: 'Market & news', icon: 'events' as IconName, number: '03' },
   { id: 'agent4', name: 'Financial close', icon: 'close' as IconName, number: '04' },
 ];
-const workflowName: Record<string, string> = { research: 'Equity research', monitoring: 'Financial monitoring', events: 'Historical events', news: 'News evidence', close: 'Financial close' };
+const workflowName: Record<string, string> = { research: 'Equity research', monitoring: 'Financial monitoring', events: 'Past event reactions', news: 'Company news', close: 'Financial close' };
 const stateName: Record<string, string> = { completed: 'Completed', held: 'Held for review', failed: 'Failed', refused: 'Refused', unavailable: 'Unavailable' };
 const date = (value: string) => new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 const runHref = (run: Run) => `#/runs/${encodeURIComponent(run.id)}`;
@@ -106,7 +106,7 @@ function App() {
         <div className="scope-banner"><span className="synthetic-label">SYNTHETIC DATA</span><span>This workspace uses saved demonstration inputs. Results require review and are not verified company facts.</span></div>
         {loading ? <div className="loading-state" role="status"><span className="spinner" />Loading saved workspace…</div>
           : error ? <div className="error-state" role="alert"><Icon name="info" size={28} /><h1>Workspace unavailable</h1><p>{error}</p><button className="primary-button" onClick={() => setAttempt(attempt + 1)}>Try loading again</button></div>
-          : selectedId ? selected ? selected.agent === 'agent1' && selected.workflow === 'research' ? <ResearchReader key={selected.id} run={selected} onReloadWorkspace={() => setAttempt(value => value + 1)} /> : <RunDetail key={selected.id} run={selected} /> : <div className="empty-state"><h1>Saved run not found</h1><p>This run is not registered in the workspace.</p><a className="primary-button" href="#/">Back to overview</a></div>
+          : selectedId ? selected ? (selected.agent === 'agent1' && selected.workflow === 'research') || (selected.agent === 'agent3' && ['events','news'].includes(selected.workflow)) ? <NativeReportReader key={selected.id} run={selected} onReloadWorkspace={() => setAttempt(value => value + 1)} /> : <RunDetail key={selected.id} run={selected} /> : <div className="empty-state"><h1>Saved run not found</h1><p>This run is not registered in the workspace.</p><a className="primary-button" href="#/">Back to overview</a></div>
           : isEvidence ? <EvidenceLibrary runs={runs} />
           : <>
             <div className="page-heading"><div><p className="eyebrow">{agent ? `AGENT ${agent.number} / SAVED WORK` : isHistory ? 'YOUR ANALYTICAL RECORD' : 'THE ANALYST DESK'}</p><h1>{agent ? agent.name : isHistory ? 'Every run, in one place.' : 'A clearer view of your work.'}</h1><p>{agent ? 'Inspect saved results, review restrictions and the evidence behind them.' : 'Research, monitoring, intelligence and close — connected by evidence.'}</p></div><div className="heading-stamp"><span className="stamp-icon"><Icon name="evidence" size={22} /></span><strong>Read-only workspace</strong><small>Browsing never starts an analysis</small></div></div>

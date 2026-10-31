@@ -1,0 +1,2612 @@
+{
+  "note": "Saved synthetic event reader boundary capture. Not independent market evidence or a registered runtime workspace.",
+  "run": {
+    "id": "events-example",
+    "agent": "agent3",
+    "workflow": "events",
+    "title": "Historical event study",
+    "entity": "Semiconductor peers \u00b7 fixture",
+    "period": "Retained synthetic event windows",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "held",
+    "review_status": "review_required",
+    "summary": "A replay-checked historical study. Descriptive diagnostics remain separate from publication approval.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Synthetic price windows are not observed market returns.",
+      "No interpolated event path, forward probability or accepted predictive calibration."
+    ],
+    "checks": [
+      "Bundle integrity checked",
+      "Offline replay matched"
+    ],
+    "metrics": [
+      {
+        "label": "Historical events",
+        "value": "8",
+        "basis": "Count from the saved study"
+      },
+      {
+        "label": "Replay",
+        "value": "Matched",
+        "basis": "Retained inputs and saved deterministic stages"
+      },
+      {
+        "label": "Publication",
+        "value": "Held for review",
+        "basis": "No forward-return forecast"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "Event-study report",
+        "kind": "report",
+        "sha256": "e1ddfbeae7300efc41ce6f6b442dd5b8c7ea4cdae7a878c4d5d062ace0b7a022",
+        "bytes": 1922,
+        "url": "/api/runs/events-example/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "label": "Sealed event evidence",
+        "kind": "evidence",
+        "sha256": "cfc69859bd078ba38344b4a9e94004d310c2a83ec49af5b2dba8012573407aeb",
+        "bytes": 367560,
+        "url": "/api/runs/events-example/files/bundle.json"
+      },
+      {
+        "id": "file-2",
+        "name": "replay.json",
+        "label": "Replay verification",
+        "kind": "evidence",
+        "sha256": "328b71fdc5d52c550cc1717a743aeef7367363ae8d548bf2aebd9802e5ed5ef3",
+        "bytes": 12669,
+        "url": "/api/runs/events-example/files/replay.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "3566660a2ee17ce3fb8df06947fbf0a876905a7417025c916d18d2a52a4f9123",
+        "bytes": 244,
+        "url": "/api/runs/events-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "7a2c418613585770ba43e1b610159db2974132f35014cd40edd576f03f8e468f",
+        "bytes": 44444,
+        "url": "/api/runs/events-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "c3a6c0593f24439187f83a027f56e64a",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent3-event-report",
+      "adapter_version": "1.1.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "sha256": "cfc69859bd078ba38344b4a9e94004d310c2a83ec49af5b2dba8012573407aeb",
+        "source_schema": "agent3.run_bundle/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "3566660a2ee17ce3fb8df06947fbf0a876905a7417025c916d18d2a52a4f9123",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "event-cases",
+        "purpose": "Saved CAR observations, not next-event predictions. Publication restrictions remain in force.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "series": [
+          {
+            "id": "car-series",
+            "label": "Diagnostic CAR",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-c3a34844087440e463252b"
+                ],
+                "id": "case-0",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "ASML.AS #1",
+                "y": "0.03422036567006792"
+              },
+              {
+                "evidence_refs": [
+                  "e-3349bc31344ee25f1f7afb"
+                ],
+                "id": "case-1",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "ASM.AS #2",
+                "y": "0.027629110996841552"
+              },
+              {
+                "evidence_refs": [
+                  "e-eebf332fb98856806886ff"
+                ],
+                "id": "case-2",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "BESI.AS #3",
+                "y": "0.009051243741634202"
+              },
+              {
+                "evidence_refs": [
+                  "e-cb493e034c5c3d2d62d6e0"
+                ],
+                "id": "case-3",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "LRCX #4",
+                "y": "0.036394467897952205"
+              },
+              {
+                "evidence_refs": [
+                  "e-ee08a69c771e5c420a799b"
+                ],
+                "id": "case-4",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "AMAT #5",
+                "y": "0.0334704179372535"
+              },
+              {
+                "evidence_refs": [
+                  "e-8993d02dec90204e0761ee"
+                ],
+                "id": "case-5",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "KLAC #6",
+                "y": "-0.005234465308581956"
+              },
+              {
+                "evidence_refs": [
+                  "e-3f07cb1cc9baab640f0279"
+                ],
+                "id": "case-6",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "TER #7",
+                "y": "0.028287175109063745"
+              },
+              {
+                "evidence_refs": [
+                  "e-89dbe6f5996ffdedcf2f62"
+                ],
+                "id": "case-7",
+                "label": "Recorded event: 2026-01-28 \u00b7 timing requires review",
+                "reason_codes": [],
+                "x": "NVMI #8",
+                "y": "0.01639078068160255"
+              }
+            ]
+          }
+        ],
+        "title": "Historical per-event diagnostics",
+        "type": "bar",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "category",
+          "label": "Retained issuer / case"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "fraction",
+          "unit": "fraction"
+        }
+      },
+      {
+        "availability": "withheld",
+        "id": "event-path",
+        "purpose": "A verified date/session path requires a separately supported alignment projection.",
+        "reason_codes": [
+          "verified_event_path_not_projected"
+        ],
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "series": [],
+        "title": "Event-window path",
+        "type": "line",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "relative_session",
+          "label": "Confirmed event-relative session"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "fraction",
+          "unit": "fraction"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-92bc328c932327e9eb83fe",
+        "label": "Historical event cases",
+        "method": null,
+        "pointer": "/record/result/study/n_events",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b66954ce67be25f10f4bbe",
+        "label": "Distinct issuers",
+        "method": null,
+        "pointer": "/record/result/study/n_issuers",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1cd95d10e34175311e44d9",
+        "label": "Diagnostic mean accumulated abnormal return",
+        "method": null,
+        "pointer": "/record/result/study/caar",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d69084c42abf5822c67567",
+        "label": "Statistical inference p-value",
+        "method": null,
+        "pointer": "/record/result/study/p_value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c3a34844087440e463252b",
+        "label": "ASML.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/0/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3349bc31344ee25f1f7afb",
+        "label": "ASM.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/1/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-eebf332fb98856806886ff",
+        "label": "BESI.AS",
+        "method": null,
+        "pointer": "/record/result/study/per_event/2/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cb493e034c5c3d2d62d6e0",
+        "label": "LRCX",
+        "method": null,
+        "pointer": "/record/result/study/per_event/3/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ee08a69c771e5c420a799b",
+        "label": "AMAT",
+        "method": null,
+        "pointer": "/record/result/study/per_event/4/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8993d02dec90204e0761ee",
+        "label": "KLAC",
+        "method": null,
+        "pointer": "/record/result/study/per_event/5/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3f07cb1cc9baab640f0279",
+        "label": "TER",
+        "method": null,
+        "pointer": "/record/result/study/per_event/6/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-89dbe6f5996ffdedcf2f62",
+        "label": "NVMI",
+        "method": null,
+        "pointer": "/record/result/study/per_event/7/car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-534ebd89fd724c31b88f57",
+        "label": "inference",
+        "method": null,
+        "pointer": "/record/result/gate/checks/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-843b3a629c104c608abb48",
+        "label": "thin_data",
+        "method": null,
+        "pointer": "/record/result/gate/checks/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-113cbe9daa3db92461922f",
+        "label": "comparability",
+        "method": null,
+        "pointer": "/record/result/gate/checks/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-298f677b71a758ee453da1",
+        "label": "multiple_testing",
+        "method": null,
+        "pointer": "/record/result/gate/checks/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6ebe41a797dab7030f8ca9",
+        "label": "placebo",
+        "method": null,
+        "pointer": "/record/result/gate/checks/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-121470ccee63c65ade7aff",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/record",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f0ab04be10ef173053cede",
+        "label": "Event category",
+        "method": null,
+        "pointer": "/record/result/event_class",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-89af7c1eea3cd6591f9662",
+        "label": "Saved study label",
+        "method": null,
+        "pointer": "/record/result/event_type",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e564e024d343b6fc5b5c1f",
+        "label": "Saved method",
+        "method": null,
+        "pointer": "/record/result/study/method",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d7f05bd43a70f97f70c820",
+        "label": "Saved weighting",
+        "method": null,
+        "pointer": "/record/result/study/weighting",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8bd310ddfae53efa16ad40",
+        "label": "Peer comparability status",
+        "method": null,
+        "pointer": "/record/result/comparability_status",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0559d18ce6c92f7374257c",
+        "label": "Recorded inference status",
+        "method": null,
+        "pointer": "/record/result/study/inference_status",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c6e4e250596d3a138992b9",
+        "label": "Recorded publication state",
+        "method": null,
+        "pointer": "/record/result/scenario/publication_state",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-20ee8439d32825440dee43",
+        "label": "Sample-size limitation",
+        "method": null,
+        "pointer": "/record/result/study/power_note",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9bb0bf62f186e1583c4137",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5b36002fc0d3fa96e38241",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4f344d96067b172995474c",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ea8d9c4bc4622da62fdc25",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7234af7501ff7778da9f63",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cf15700b90ceef796177ec",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-13de09a972d1f5efd21023",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/6",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8ff91e534bcbdcebcda6f4",
+        "label": "Saved case metadata",
+        "method": null,
+        "pointer": "/record/result/study/per_event/7",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-841d26a52a850f479c46dd",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2ea10fb07e939b02475516",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-baf2c148abe13fb941d1c0",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2323ca026b94f172b6f294",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-42bcb4d420bc9da0e32e32",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-023287225e52c99f2ea765",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-663358685417dc24903462",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/6",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c758c19fc63745c859f43f",
+        "label": "Requested / pinned peer",
+        "method": null,
+        "pointer": "/record/result/pinned_peers/7",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7c6704e918c434fb8540fe",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5e19350559f57d343a1a3d",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8c0e571afa63ca41312b1e",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ac559ddd9240ff73064311",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-11250049d9080d439f558f",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-796f16317fdb07a19332e3",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-68c13a9ebb8510dd24b5ec",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/6",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c51cab68fb8771c7079e96",
+        "label": "Recorded contributor",
+        "method": null,
+        "pointer": "/record/result/contributing_peers/7",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-df1321170104b1c152ed72",
+        "label": "Sample and independence",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6ea68fedfde1bfb7be6f4a",
+        "label": "Comparison basis",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d2b315309e1ad94be57d41",
+        "label": "Study design and review evidence",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b64322f3275ae9915b3ebf",
+        "label": "Study design and review evidence",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/6",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c47ced6d42d8300f4a3e25",
+        "label": "Event dates and timing",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-44e47ef0b44a05bee2e34d",
+        "label": "Event dates and timing",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c554b1b13b879a63c9127a",
+        "label": "Event dates and timing",
+        "method": null,
+        "pointer": "/record/result/study/inference_reasons/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cac16caca48c0c90d5d135",
+        "label": "Median retained case",
+        "method": null,
+        "pointer": "/record/result/scenario/diagnostic_distribution/median_car",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c7e3023e8ddaa9958e0d31",
+        "label": "10th percentile of retained cases",
+        "method": null,
+        "pointer": "/record/result/scenario/diagnostic_distribution/p10",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ad823553afe33ea5ad808d",
+        "label": "25th percentile of retained cases",
+        "method": null,
+        "pointer": "/record/result/scenario/diagnostic_distribution/p25",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e4ecdeda2f199115b83f4e",
+        "label": "75th percentile of retained cases",
+        "method": null,
+        "pointer": "/record/result/scenario/diagnostic_distribution/p75",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b636f1ce907ecc2a1eacb4",
+        "label": "90th percentile of retained cases",
+        "method": null,
+        "pointer": "/record/result/scenario/diagnostic_distribution/p90",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-92bc328c932327e9eb83fe"
+          ],
+          "metric_refs": [
+            "event-count"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved historical event cases: 8 (Retained synthetic event windows)."
+        },
+        "id": "finding-event-count",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-b66954ce67be25f10f4bbe"
+          ],
+          "metric_refs": [
+            "issuer-count"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved distinct issuers: 8 (Retained synthetic event windows)."
+        },
+        "id": "finding-issuer-count",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-1cd95d10e34175311e44d9"
+          ],
+          "metric_refs": [
+            "mean-car"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved historical mean abnormal return (car): 2.25% (Retained synthetic event windows)."
+        },
+        "id": "finding-mean-car",
+        "kind": "observed_fact",
+        "visibility": "diagnostic"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "Stock return minus the return estimated by the saved market model.",
+        "term": "Abnormal return"
+      },
+      {
+        "definition": "Sum of abnormal returns over the supplied historical event window; not a prediction.",
+        "term": "CAR"
+      },
+      {
+        "definition": "Each accepted historical case has the same weight in the saved mean. Multiple cases from one issuer are not automatically independent.",
+        "term": "Equal-event weighting"
+      },
+      {
+        "definition": "A conclusion about a broader process requires eligible assumptions and a valid test. A descriptive mean alone does not provide it.",
+        "term": "Statistical inference"
+      },
+      {
+        "definition": "A comparison using separate control observations. An unresolved control check weakens interpretation; it does not establish causality.",
+        "term": "Control study"
+      }
+    ],
+    "identity": {
+      "entity": "Semiconductor peers \u00b7 fixture",
+      "period_end": null,
+      "period_label": "Retained synthetic event windows",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "c3a6c0593f24439187f83a027f56e64a",
+      "ticker": null,
+      "title": "Historical event study"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-92bc328c932327e9eb83fe"
+        ],
+        "id": "event-count",
+        "label": "Historical event cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "8",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-b66954ce67be25f10f4bbe"
+        ],
+        "id": "issuer-count",
+        "label": "Distinct issuers",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "8",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-1cd95d10e34175311e44d9"
+        ],
+        "id": "mean-car",
+        "label": "Historical mean abnormal return (CAR)",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.022526137090729214",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-d69084c42abf5822c67567"
+        ],
+        "id": "p-value",
+        "label": "Statistical inference p-value",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [
+          "inference_unavailable_or_invalid"
+        ],
+        "unit": "p_value",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-cac16caca48c0c90d5d135"
+        ],
+        "id": "event-median-car",
+        "label": "Median retained case",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.027958143052952647",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c7e3023e8ddaa9958e0d31"
+        ],
+        "id": "event-p10",
+        "label": "10th percentile of retained cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.004765531026569356",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-ad823553afe33ea5ad808d"
+        ],
+        "id": "event-p25",
+        "label": "25th percentile of retained cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.014555896446610463",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-e4ecdeda2f199115b83f4e"
+        ],
+        "id": "event-p75",
+        "label": "75th percentile of retained cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.033657904870457105",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-b636f1ce907ecc2a1eacb4"
+        ],
+        "id": "event-p90",
+        "label": "90th percentile of retained cases",
+        "period_label": "Retained synthetic event windows",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.034872596338433204",
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-90af745d08a200e2bfa0b7a1",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect every original gate and scenario restriction.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-121470ccee63c65ade7aff"
+        ],
+        "explanation": "Historical descriptions do not establish a future-return forecast. A minimum sample count alone does not resolve timing, dependence, comparability or control checks.",
+        "id": "review-ca1558f601de33896d5b",
+        "impact": "section_restriction",
+        "section_refs": [
+          "historical-findings"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "Historical scope and review requirements"
+      },
+      {
+        "action": "Inspect all original statistical checks; a finite mean or larger sample does not itself resolve them.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-534ebd89fd724c31b88f57"
+        ],
+        "explanation": "The saved statistical test is unavailable, invalid or subject to an additional restriction.",
+        "id": "review-91b8befdfb93b79f6af6",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/0"
+        ],
+        "title": "Statistical inference"
+      },
+      {
+        "action": "Review the required sample, issuer dependence, overlaps and rejected cases.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-843b3a629c104c608abb48",
+          "e-df1321170104b1c152ed72"
+        ],
+        "explanation": "The retained sample does not establish independent evidence. Repeated issuers or overlapping windows can share influences.",
+        "id": "review-7dbbb0e3d8e95771ba36",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/1",
+          "artifact:file-1#/record/result/study/inference_reasons/0"
+        ],
+        "title": "Sample and independence"
+      },
+      {
+        "action": "Check economic comparability, return bases, benchmark evidence and missing observations.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-113cbe9daa3db92461922f",
+          "e-6ea68fedfde1bfb7be6f4a"
+        ],
+        "explanation": "Peer comparability, benchmark return definitions or price-calendar quality still require review.",
+        "id": "review-12a914d30847601dd73b",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/2",
+          "artifact:file-1#/record/result/study/inference_reasons/4"
+        ],
+        "title": "Comparison basis"
+      },
+      {
+        "action": "Inspect sampling decisions, predeclared tests, adjustments and the saved review evidence.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-298f677b71a758ee453da1",
+          "e-d2b315309e1ad94be57d41",
+          "e-b64322f3275ae9915b3ebf"
+        ],
+        "explanation": "The retained study design or review record does not resolve the original research requirements.",
+        "id": "review-d7fb3f57cd00fe435a70",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/3",
+          "artifact:file-1#/record/result/study/inference_reasons/5",
+          "artifact:file-1#/record/result/study/inference_reasons/6"
+        ],
+        "title": "Study design and review evidence"
+      },
+      {
+        "action": "Review the control sample, its inference and any overlap with real events.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-6ebe41a797dab7030f8ca9"
+        ],
+        "explanation": "The control study has an unresolved or adverse check. It cannot establish that the event result is reliable or causal.",
+        "id": "review-08b268d55ad6e85df9ae",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/gate/checks/4"
+        ],
+        "title": "Control comparison"
+      },
+      {
+        "action": "Review issuer release evidence, exchange sessions and the actual measurement dates.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-c47ced6d42d8300f4a3e25",
+          "e-44e47ef0b44a05bee2e34d",
+          "e-c554b1b13b879a63c9127a"
+        ],
+        "explanation": "The saved record does not establish all release times, source provenance or measurement-window dates needed for a dated event interpretation.",
+        "id": "review-0018b2c35dc0005b70f3",
+        "impact": "publication_block",
+        "section_refs": [
+          "historical-findings",
+          "event-context",
+          "event-sample",
+          "event-review"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record/result/study/inference_reasons/1",
+          "artifact:file-1#/record/result/study/inference_reasons/2",
+          "artifact:file-1#/record/result/study/inference_reasons/3"
+        ],
+        "title": "Event dates and timing"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "event-cases",
+          "event-path"
+        ],
+        "finding_refs": [
+          "finding-event-count",
+          "finding-issuer-count",
+          "finding-mean-car"
+        ],
+        "id": "historical-findings",
+        "metric_refs": [
+          "event-count",
+          "issuer-count",
+          "mean-car",
+          "p-value",
+          "event-median-car",
+          "event-p10",
+          "event-p25",
+          "event-p75",
+          "event-p90"
+        ],
+        "purpose": "Inspect the retained sample and its diagnostic observations; no forward-return scenario is introduced.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-91b8befdfb93b79f6af6",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-12a914d30847601dd73b",
+          "review-d7fb3f57cd00fe435a70",
+          "review-08b268d55ad6e85df9ae",
+          "review-0018b2c35dc0005b70f3"
+        ],
+        "table_refs": [
+          "event-spread"
+        ],
+        "title": "Past event reactions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "event-context",
+        "metric_refs": [],
+        "purpose": "Retained method and scope; no new study or source acquisition.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-91b8befdfb93b79f6af6",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-12a914d30847601dd73b",
+          "review-d7fb3f57cd00fe435a70",
+          "review-08b268d55ad6e85df9ae",
+          "review-0018b2c35dc0005b70f3"
+        ],
+        "table_refs": [
+          "event-basis"
+        ],
+        "title": "Study basis"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "event-sample",
+        "metric_refs": [],
+        "purpose": "Inspect the actual retained cases, requested peers and exclusions.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-91b8befdfb93b79f6af6",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-12a914d30847601dd73b",
+          "review-d7fb3f57cd00fe435a70",
+          "review-08b268d55ad6e85df9ae",
+          "review-0018b2c35dc0005b70f3"
+        ],
+        "table_refs": [
+          "event-case-metadata",
+          "event-peer-selection",
+          "event-exclusions"
+        ],
+        "title": "Sample and exclusions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "event-review",
+        "metric_refs": [],
+        "purpose": "Readable topics retain every original finding and its source reference.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-91b8befdfb93b79f6af6",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-12a914d30847601dd73b",
+          "review-d7fb3f57cd00fe435a70",
+          "review-08b268d55ad6e85df9ae",
+          "review-0018b2c35dc0005b70f3"
+        ],
+        "table_refs": [
+          "event-gates"
+        ],
+        "title": "Statistical review"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "held",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-ca1558f601de33896d5b",
+        "review-91b8befdfb93b79f6af6",
+        "review-7dbbb0e3d8e95771ba36",
+        "review-12a914d30847601dd73b",
+        "review-d7fb3f57cd00fe435a70",
+        "review-08b268d55ad6e85df9ae",
+        "review-0018b2c35dc0005b70f3"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-92bc328c932327e9eb83fe",
+        "e-b66954ce67be25f10f4bbe",
+        "e-1cd95d10e34175311e44d9"
+      ],
+      "metric_refs": [
+        "event-count",
+        "issuer-count",
+        "mean-car"
+      ],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-ca1558f601de33896d5b",
+        "review-91b8befdfb93b79f6af6",
+        "review-7dbbb0e3d8e95771ba36",
+        "review-12a914d30847601dd73b",
+        "review-d7fb3f57cd00fe435a70",
+        "review-08b268d55ad6e85df9ae",
+        "review-0018b2c35dc0005b70f3"
+      ],
+      "template_id": "event-study-summary-v1",
+      "text": "The saved synthetic study records 8 historical cases from 8 issuers. Its mean accumulated abnormal return is 2.25%, a description of the retained sample. This does not predict the next event or establish that an announcement caused the observed move."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "field",
+            "label": "Basis"
+          },
+          {
+            "id": "value",
+            "label": "Saved description"
+          }
+        ],
+        "id": "event-basis",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Event category"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Earnings announcements"
+              }
+            ],
+            "evidence_refs": [
+              "e-f0ab04be10ef173053cede"
+            ],
+            "id": "category"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved study label"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "semicap_earnings"
+              }
+            ],
+            "evidence_refs": [
+              "e-89af7c1eea3cd6591f9662"
+            ],
+            "id": "event-type"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved method"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "OLS market model; historical equal-event CAR mean; independent-event Student-t only when eligible"
+              }
+            ],
+            "evidence_refs": [
+              "e-e564e024d343b6fc5b5c1f"
+            ],
+            "id": "method"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved weighting"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "equal weight per accepted event"
+              }
+            ],
+            "evidence_refs": [
+              "e-d7f05bd43a70f97f70c820"
+            ],
+            "id": "weighting"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Peer comparability status"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "unverified"
+              }
+            ],
+            "evidence_refs": [
+              "e-8bd310ddfae53efa16ad40"
+            ],
+            "id": "comparability"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Recorded inference status"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "unavailable"
+              }
+            ],
+            "evidence_refs": [
+              "e-0559d18ce6c92f7374257c"
+            ],
+            "id": "inference"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Recorded publication state"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "HELD_FOR_REVIEW"
+              }
+            ],
+            "evidence_refs": [
+              "e-c6e4e250596d3a138992b9"
+            ],
+            "id": "publication"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Sample-size limitation"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Sample size alone does not establish statistical power."
+              }
+            ],
+            "evidence_refs": [
+              "e-20ee8439d32825440dee43"
+            ],
+            "id": "power"
+          }
+        ],
+        "title": "Saved study basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "case",
+            "label": "Historical case"
+          },
+          {
+            "id": "issuer",
+            "label": "Issuer identity"
+          },
+          {
+            "id": "event-date",
+            "label": "Recorded event date"
+          },
+          {
+            "id": "timing",
+            "label": "Timing review"
+          },
+          {
+            "id": "window",
+            "label": "Measurement dates"
+          },
+          {
+            "id": "benchmark",
+            "label": "Benchmark"
+          },
+          {
+            "id": "benchmark-review",
+            "label": "Benchmark review"
+          }
+        ],
+        "id": "event-case-metadata",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "ASML.AS #1"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "ASML.AS"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-9bb0bf62f186e1583c4137"
+            ],
+            "id": "case-metadata-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "ASM.AS #2"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "ASM.AS"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-5b36002fc0d3fa96e38241"
+            ],
+            "id": "case-metadata-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "BESI.AS #3"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "BESI.AS"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-4f344d96067b172995474c"
+            ],
+            "id": "case-metadata-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "LRCX #4"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "LRCX"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-ea8d9c4bc4622da62fdc25"
+            ],
+            "id": "case-metadata-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "AMAT #5"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "AMAT"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-7234af7501ff7778da9f63"
+            ],
+            "id": "case-metadata-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "KLAC #6"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "KLAC"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-cf15700b90ceef796177ec"
+            ],
+            "id": "case-metadata-5"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "TER #7"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "TER"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-13de09a972d1f5efd21023"
+            ],
+            "id": "case-metadata-6"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "case",
+                "kind": "text",
+                "text": "NVMI #8"
+              },
+              {
+                "column_id": "issuer",
+                "kind": "text",
+                "text": "NVMI"
+              },
+              {
+                "column_id": "event-date",
+                "kind": "text",
+                "text": "2026-01-28"
+              },
+              {
+                "column_id": "timing",
+                "kind": "text",
+                "text": "Unverified or not retained"
+              },
+              {
+                "column_id": "window",
+                "kind": "text",
+                "text": "Dates not retained"
+              },
+              {
+                "column_id": "benchmark",
+                "kind": "text",
+                "text": "Not retained"
+              },
+              {
+                "column_id": "benchmark-review",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-8ff91e534bcbdcebcda6f4"
+            ],
+            "id": "case-metadata-7"
+          }
+        ],
+        "title": "Retained case dates and basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "company",
+            "label": "Company"
+          },
+          {
+            "id": "role",
+            "label": "Saved role"
+          }
+        ],
+        "id": "event-peer-selection",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "ASML.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-841d26a52a850f479c46dd"
+            ],
+            "id": "pinned_peers-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "ASM.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-2ea10fb07e939b02475516"
+            ],
+            "id": "pinned_peers-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "BESI.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-baf2c148abe13fb941d1c0"
+            ],
+            "id": "pinned_peers-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "LRCX"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-2323ca026b94f172b6f294"
+            ],
+            "id": "pinned_peers-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "AMAT"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-42bcb4d420bc9da0e32e32"
+            ],
+            "id": "pinned_peers-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "KLAC"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-023287225e52c99f2ea765"
+            ],
+            "id": "pinned_peers-5"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "TER"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-663358685417dc24903462"
+            ],
+            "id": "pinned_peers-6"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "NVMI"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Requested / pinned peer"
+              }
+            ],
+            "evidence_refs": [
+              "e-c758c19fc63745c859f43f"
+            ],
+            "id": "pinned_peers-7"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "AMAT"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-7c6704e918c434fb8540fe"
+            ],
+            "id": "contributing_peers-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "ASM.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-5e19350559f57d343a1a3d"
+            ],
+            "id": "contributing_peers-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "ASML.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-8c0e571afa63ca41312b1e"
+            ],
+            "id": "contributing_peers-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "BESI.AS"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-ac559ddd9240ff73064311"
+            ],
+            "id": "contributing_peers-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "KLAC"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-11250049d9080d439f558f"
+            ],
+            "id": "contributing_peers-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "LRCX"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-796f16317fdb07a19332e3"
+            ],
+            "id": "contributing_peers-5"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "NVMI"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-68c13a9ebb8510dd24b5ec"
+            ],
+            "id": "contributing_peers-6"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "company",
+                "kind": "text",
+                "text": "TER"
+              },
+              {
+                "column_id": "role",
+                "kind": "text",
+                "text": "Recorded contributor"
+              }
+            ],
+            "evidence_refs": [
+              "e-c51cab68fb8771c7079e96"
+            ],
+            "id": "contributing_peers-7"
+          }
+        ],
+        "title": "Recorded peer selection"
+      },
+      {
+        "columns": [
+          {
+            "id": "record",
+            "label": "Record"
+          },
+          {
+            "id": "stage",
+            "label": "Scope"
+          },
+          {
+            "id": "reason",
+            "label": "Saved reason"
+          }
+        ],
+        "id": "event-exclusions",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [],
+        "title": "Rejected or unresolved records"
+      },
+      {
+        "columns": [
+          {
+            "id": "topic",
+            "label": "Review topic"
+          },
+          {
+            "id": "status",
+            "label": "Saved check result"
+          },
+          {
+            "id": "code",
+            "label": "Original identifier"
+          },
+          {
+            "id": "detail",
+            "label": "Original detail"
+          }
+        ],
+        "id": "event-gates",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Statistical inference"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Requires review"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "inference"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "Unavailable or invalid inference: fewer_than_10_independent_events, missing_window_dates, unverified_event_dates, missing_or_inconsistent_release_provenance, unverified_benchmark_basis, unreviewed_sampling_assumptions, missing_review_evidence"
+              }
+            ],
+            "evidence_refs": [
+              "e-534ebd89fd724c31b88f57"
+            ],
+            "id": "gate-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Sample and independence"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Requires review"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "thin_data"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "8 events; 8 distinct issuers; minimum 10 independent issuers for this bounded method"
+              }
+            ],
+            "evidence_refs": [
+              "e-843b3a629c104c608abb48"
+            ],
+            "id": "gate-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Comparison basis"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Requires review"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "comparability"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "Peer economic comparability has not been reviewed"
+              }
+            ],
+            "evidence_refs": [
+              "e-113cbe9daa3db92461922f"
+            ],
+            "id": "gate-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Study design and review evidence"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Requires review"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "multiple_testing"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "No valid predeclared hypothesis family; exploratory result"
+              }
+            ],
+            "evidence_refs": [
+              "e-298f677b71a758ee453da1"
+            ],
+            "id": "gate-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "topic",
+                "kind": "text",
+                "text": "Control comparison"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Requires review"
+              },
+              {
+                "column_id": "code",
+                "kind": "text",
+                "text": "placebo"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "Control inference is missing, invalid or unresolved"
+              }
+            ],
+            "evidence_refs": [
+              "e-6ebe41a797dab7030f8ca9"
+            ],
+            "id": "gate-4"
+          }
+        ],
+        "title": "Original study checks"
+      },
+      {
+        "columns": [
+          {
+            "id": "measure",
+            "label": "Sample description"
+          },
+          {
+            "id": "value",
+            "label": "Diagnostic value"
+          }
+        ],
+        "id": "event-spread",
+        "review_refs": [
+          "review-0018b2c35dc0005b70f3",
+          "review-08b268d55ad6e85df9ae",
+          "review-12a914d30847601dd73b",
+          "review-7dbbb0e3d8e95771ba36",
+          "review-91b8befdfb93b79f6af6",
+          "review-ab79cafa28f6aa55b41b",
+          "review-ca1558f601de33896d5b",
+          "review-d7fb3f57cd00fe435a70"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Median retained case"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "event-median-car"
+              }
+            ],
+            "evidence_refs": [
+              "e-cac16caca48c0c90d5d135"
+            ],
+            "id": "median_car"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "10th percentile of retained cases"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "event-p10"
+              }
+            ],
+            "evidence_refs": [
+              "e-c7e3023e8ddaa9958e0d31"
+            ],
+            "id": "p10"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "25th percentile of retained cases"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "event-p25"
+              }
+            ],
+            "evidence_refs": [
+              "e-ad823553afe33ea5ad808d"
+            ],
+            "id": "p25"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "75th percentile of retained cases"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "event-p75"
+              }
+            ],
+            "evidence_refs": [
+              "e-e4ecdeda2f199115b83f4e"
+            ],
+            "id": "p75"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "90th percentile of retained cases"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "event-p90"
+              }
+            ],
+            "evidence_refs": [
+              "e-b636f1ce907ecc2a1eacb4"
+            ],
+            "id": "p90"
+          }
+        ],
+        "title": "Saved descriptive sample spread"
+      }
+    ],
+    "workflow": "events"
+  }
+}

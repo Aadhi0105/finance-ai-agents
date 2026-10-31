@@ -53,13 +53,24 @@ export function plotGeometry(chart: ChartData, rows: ChartRow[], width: number, 
     if (geometry.kind !== 'bar' || low < 0n) low -= pad;
     if (geometry.kind !== 'bar' || high > 0n) high += pad;
   }
+  if (chart.id === 'news-story-tone' && chart.y_axis.unit === 'score') {
+    low = -(10n ** BigInt(places)); high = 10n ** BigInt(places);
+  }
+  const countAxis = chart.id === 'news-coverage' && chart.y_axis.unit === 'count';
+  const unit = 10n ** BigInt(places);
+  if (countAxis) { low = 0n; high = ((high + unit - 1n) / unit || 1n) * unit; }
   const y = (value: bigint) => geometry.bottom - Number((value - low) * 1_000_000_000n / (high - low)) / 1_000_000_000 * (geometry.bottom - geometry.top);
   geometry.zero = Math.max(geometry.top, Math.min(geometry.bottom, y(0n)));
   const ticks = Array.from({length: 5}, (_, i) => {
-    const value = low + (high - low) * BigInt(i) / 4n;
+    const raw = low + (high - low) * BigInt(i) / 4n;
+    const value = countAxis ? raw / unit * unit : raw;
     return {value: decimal(value, places), y: y(value)};
   });
   geometry.ticks = [...new Map(ticks.map(t => [t.value, t])).values()];
+  if (geometry.kind === 'bar' && !geometry.ticks.some(t => t.value === '0')) {
+    geometry.ticks = [...geometry.ticks.filter(t => Math.abs(t.y - geometry.zero) >= 16), {value: '0', y: geometry.zero}]
+      .sort((a, b) => b.y - a.y);
+  }
   const start = chart.x_axis.kind === 'date' ? Date.parse(rows[0].x + 'T12:00:00Z') : 0;
   const end = chart.x_axis.kind === 'date' ? Date.parse(rows[rows.length - 1].x + 'T12:00:00Z') : rows.length - 1;
   geometry.xs = rows.map((r, i) => {
