@@ -388,3 +388,92 @@ def test_registration_and_strict_json_fail_closed(native, tmp_path, damage):
         path.write_text(path.read_text().replace('"schema_version":2', '"schema_version":1e999'))
     response = client(root).get('/api/runs/research-example/report-view')
     assert response.status_code == 503 and response.json()['error']['code'] == 'saved_evidence_invalid'
+
+
+def test_expanded_research_bridge_retains_exact_source_values_and_signed_net_debt(native):
+    view, source, *_ = case(native, 'research')
+    assert metric(view, 'dcf-net-debt')['value'] == '-7500000000'
+    assert metric(view, 'dcf-net-debt')['currency'] == 'EUR'
+    for scenario in ('bear', 'base', 'bull'):
+        enterprise = Decimal(metric(view, 'dcf-enterprise-' + scenario)['value'])
+        equity = Decimal(metric(view, 'dcf-equity-' + scenario)['value'])
+        assert enterprise - Decimal('-7500000000') == equity
+        assert Decimal(metric(view, 'dcf-per-share-' + scenario)['value']) == Decimal(str(source['analysis']['run_dcf']['value_per_share'][scenario]))
+        assert metric(view, 'dcf-weight-' + scenario)['visibility'] == 'diagnostic'
+    assert metric(view, 'fcff-base')['value'] != metric(view, 'free-cash-flow')['value']
+
+
+@pytest.mark.parametrize('damage', ['missing-bridge', 'currency', 'enterprise-only'])
+def test_expanded_research_never_bypasses_an_ineligible_equity_bridge(native, damage):
+    def edit(source):
+        dcf = source['analysis']['run_dcf']
+        if damage == 'missing-bridge': dcf['assumptions']['net_debt_bridge_status'] = 'missing'
+        if damage == 'currency': dcf['currency'] = 'USD'
+        if damage == 'enterprise-only': dcf['value_basis'] = 'enterprise_value'
+    view, *_ = case(native, 'research', edit)
+    assert metric(view, 'weighted-valuation')['value'] is None
+    assert metric(view, 'dcf-per-share-base')['value'] is None
+    assert chart(view, 'valuation-scenarios')['series'] == []
+    assert view['state']['financial_approval'] is False
+
+
+def test_expanded_peer_evidence_retains_dates_and_exclusions(native):
+    def edit(source):
+        source['analysis']['peer_outlier_check']['excluded_peers']['BAD'] = 'No admissible earnings'
+        source['analysis']['peer_outlier_check']['peer_evidence']['ASM.AS']['prices']['currency'] = 'GBP'
+    view, *_ = case(native, 'research', edit)
+    table = next(t for t in view['tables'] if t['id'] == 'peer-evidence')
+    rows = {r['cells'][0]['text']: r for r in table['rows']}
+    assert rows['LRCX']['cells'][3]['text'] == '2025-06-30'
+    assert rows['LRCX']['cells'][5]['text'] == 'USD'
+    assert rows['ASM.AS']['cells'][5]['text'] == 'GBP'
+    assert rows['BAD']['cells'][1]['text'] == 'Excluded'
+    assert rows['BAD']['cells'][-1]['text'] == 'No admissible earnings'
+    excluded = rows['BAD']['cells'][2]['metric_id']
+    assert metric(view, excluded)['value'] is None
+
+
+@pytest.mark.parametrize('count', [12, 12.0, 0, -1, 1.5, True])
+def test_expanded_consensus_coverage_never_creates_a_usable_zero_analyst_estimate(native, count):
+    def edit(source):
+        source['analysis']['get_consensus'].update(available=True, quote_currency='EUR', reporting_currency='EUR',
+            consensus={'price_target': {'mean': 650}}, coverage={'price_target': count})
+    view, *_ = case(native, 'research', edit)
+    target = metric(view, 'consensus-price-target-mean')
+    if count in (12, 12.0) and type(count) is not bool:
+        assert target['value'] == '650'
+        assert metric(view, 'consensus-coverage-0')['value'] == '12'
+        assert view['analyst_content']['market_consensus']['availability'] == 'available'
+    else:
+        assert target['value'] is None
+        assert view['analyst_content']['market_consensus']['availability'] == 'unavailable'
+
+
+def test_research_1_0_delivery_stays_compatible_and_reprojection_is_explicit(native, tmp_path):
+    from keystone.workspace.catalog import RunV2
+    root = tmp_path / 'legacy-native'
+    shutil.copytree(native, root)
+    catalog = Catalog(root)
+    run = next(r for r in catalog.load().runs if r.workflow == 'research')
+    primary = next(a for a in run.artifacts if a.id == run.native_view.source_artifact_ids[0])
+    source = json.loads(catalog.read(run.id, primary))
+    old_run = run.model_copy(update={'native_view': run.native_view.model_copy(update={'adapter_version': '1.0.0'})})
+    retained = prepare_series(old_run, source, primary)
+    rewrite_artifact(root, run.id, 'native-series', lambda value: (value.clear(), value.update(retained)))
+    path = root / 'catalog.json'
+    manifest = json.loads(path.read_text())
+    manifest['runs'][0]['native_view']['adapter_version'] = '1.0.0'
+    path.write_bytes(canonical(manifest))
+    old_run = RunV2.model_validate(manifest['runs'][0])
+    by_id = {a.id: a for a in old_run.artifacts}
+    view = build_view(old_run, source, retained, [primary, by_id['native-series']])
+    rewrite_artifact(root, run.id, 'native-view', lambda value: (value.clear(), value.update(view)))
+    response = client(root).get('/api/runs/research-example/report-view')
+    assert response.status_code == 200
+    assert not any(t['id'] == 'equity-bridge' for t in response.json()['tables'])
+    before = hashes(root)
+    new = project_workspace(root, tmp_path / 'upgraded')
+    upgraded = Catalog(new).load().runs[0]
+    assert upgraded.native_view.adapter_version == '1.1.0'
+    assert client(new).get('/api/runs/research-example/report-view').status_code == 200
+    assert hashes(root) == before

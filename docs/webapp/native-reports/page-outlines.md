@@ -1,6 +1,9 @@
 # Native report page outlines
 
-Design outlines · 30 October 2026 · screens not implemented.
+Design outlines · 30 October 2026. [Part 2B.1](part2b1-reader.md) implements the
+Agent 1 summary/key-figure foundation. [Part 2B.2](part2b2-research.md) implements
+supporting sections and exact tables. These outlines still describe the broader
+finished reports: plots and other-agent native screens remain later work.
 
 These outlines describe reading order and content, not final pixel measurements.
 Every page stays within Keystone's existing shell. The primary report consists

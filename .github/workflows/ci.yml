@@ -42,3 +42,6 @@ jobs:
       - name: Type-check and build local workspace
         working-directory: web
         run: pnpm run build
+      - name: Test native report read boundary and exact display formatting
+        working-directory: web
+        run: pnpm test
