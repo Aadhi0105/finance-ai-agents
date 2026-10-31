@@ -1,0 +1,577 @@
+{
+  "note": "Controlled synthetic early-failure boundary capture; not independently verified news or market evidence.",
+  "run": {
+    "id": "news-failed",
+    "agent": "agent3",
+    "workflow": "news",
+    "title": "Synthetic QA \u00b7 news-failed",
+    "entity": "Example Rail \u00b7 fictional company",
+    "period": "2026-01-28 \u00b7 saved cutoff",
+    "prepared_at": "2026-10-31T17:09:22.737915+00:00",
+    "execution_status": "unavailable",
+    "review_status": "review_required",
+    "summary": "Controlled synthetic UI acceptance case; no verified company facts.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "News timestamps describe the saved cutoff, not current freshness.",
+      "Stub scores are not accepted financial sentiment or a trading signal."
+    ],
+    "checks": [
+      "Controlled synthetic acceptance fixture"
+    ],
+    "metrics": [],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "QA fixture description",
+        "kind": "report",
+        "sha256": "a0c18c305936db2b742fad32ebec0e34d6cbe333f78be885660bbb87cfbccc2b",
+        "bytes": 272,
+        "url": "/api/runs/news-failed/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "label": "Controlled synthetic evidence",
+        "kind": "evidence",
+        "sha256": "01341213e6dddae4f4d01c30b3384309e6b68699731ca27188e0908e75fd1e26",
+        "bytes": 10534,
+        "url": "/api/runs/news-failed/files/bundle.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "3eddecbe5cc3d24ae4261af70cac5e9ddd1596e48274111118f70025f74057c7",
+        "bytes": 243,
+        "url": "/api/runs/news-failed/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "d087e92908f7c1cf827090c062527b83560f1241b6881a2dae6f788373596f46",
+        "bytes": 9299,
+        "url": "/api/runs/news-failed/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "50a7402c504846f28ecbce3a26f4392a",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent3-news-report",
+      "adapter_version": "1.2.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "bundle.json",
+        "sha256": "01341213e6dddae4f4d01c30b3384309e6b68699731ca27188e0908e75fd1e26",
+        "source_schema": "agent3.run_bundle/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "3eddecbe5cc3d24ae4261af70cac5e9ddd1596e48274111118f70025f74057c7",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "withheld",
+        "id": "news-coverage",
+        "purpose": "No analytical processing counts were retained.",
+        "reason_codes": [
+          "news_attempt_incomplete"
+        ],
+        "review_refs": [
+          "review-64aff13c58c3f931ec7a",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [],
+        "title": "Saved news coverage",
+        "type": "bar",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "category",
+          "label": "Observation"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "count",
+          "unit": "count"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-121470ccee63c65ade7aff",
+        "label": "Original incomplete news attempt",
+        "method": null,
+        "pointer": "/record",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [],
+    "glossary": [
+      {
+        "definition": "A heuristic text grouping, not proof of independent stories.",
+        "term": "Headline cluster"
+      },
+      {
+        "definition": "A descriptive score for supplied text; a null published level remains withheld.",
+        "term": "Diagnostic tone"
+      }
+    ],
+    "identity": {
+      "entity": "Example Rail \u00b7 fictional company",
+      "period_end": null,
+      "period_label": "2026-01-28 \u00b7 saved cutoff",
+      "prepared_at": "2026-10-31T17:09:22.737915+00:00",
+      "source_run_id": "50a7402c504846f28ecbce3a26f4392a",
+      "ticker": "DEMO",
+      "title": "Synthetic QA \u00b7 news-failed"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": null,
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "coverage-raw",
+        "label": "Input records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "count",
+        "value": null,
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": null,
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "coverage-after-relevance",
+        "label": "Relevant records",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "count",
+        "value": null,
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": null,
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "coverage-after-dedup",
+        "label": "Retained headline clusters",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "count",
+        "value": null,
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "published-tone",
+        "label": "Published tone",
+        "period_label": "2026-01-28 \u00b7 saved cutoff",
+        "reason_codes": [
+          "published_tone_unavailable"
+        ],
+        "unit": "score",
+        "value": null,
+        "visibility": "main"
+      }
+    ],
+    "report_id": "report-722f15f86de33f39ba7cbf5b",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone",
+          "news-context"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Read scorer restrictions, relevance, duplicates, exclusions and the original publication state.",
+        "category": "narrative_support",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "Published tone is withheld in this synthetic workspace. Diagnostic tone concerns retained document text, not a verified company-specific investment conclusion.",
+        "id": "review-826bb05e4ff5df7f3501",
+        "impact": "section_restriction",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "Tone and relevance limitations"
+      },
+      {
+        "action": "Inspect the original terminal status and reason. A new controlled attempt would be separate work.",
+        "category": "delivery",
+        "evidence_refs": [
+          "e-121470ccee63c65ade7aff"
+        ],
+        "explanation": "The saved attempt stopped before retaining an analytical news result. Coverage and document tone cannot be established; this is not a valid empty feed.",
+        "id": "review-64aff13c58c3f931ec7a",
+        "impact": "publication_block",
+        "section_refs": [
+          "coverage",
+          "retained-news",
+          "tone",
+          "news-context"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/record"
+        ],
+        "title": "News attempt stopped without a result"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "news-coverage"
+        ],
+        "finding_refs": [],
+        "id": "coverage",
+        "metric_refs": [
+          "coverage-raw",
+          "coverage-after-relevance",
+          "coverage-after-dedup"
+        ],
+        "purpose": "Coverage counts are distinct from independent stories or a market conclusion.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-64aff13c58c3f931ec7a"
+        ],
+        "table_refs": [],
+        "title": "News coverage"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "retained-news",
+        "metric_refs": [],
+        "purpose": "Inspect the retained text, timestamps and source basis.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-64aff13c58c3f931ec7a"
+        ],
+        "table_refs": [
+          "retained-headlines"
+        ],
+        "title": "Retained stories"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "tone",
+        "metric_refs": [
+          "published-tone"
+        ],
+        "purpose": "A withheld published level is not neutral, zero or a trading signal.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-826bb05e4ff5df7f3501",
+          "review-64aff13c58c3f931ec7a"
+        ],
+        "table_refs": [],
+        "title": "Text-tone evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "news-context",
+        "metric_refs": [],
+        "purpose": "Execution stopped before an analytical news result was retained.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-64aff13c58c3f931ec7a"
+        ],
+        "table_refs": [
+          "news-basis"
+        ],
+        "title": "Saved attempt basis"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "unavailable",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501",
+        "review-64aff13c58c3f931ec7a"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-121470ccee63c65ade7aff"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-826bb05e4ff5df7f3501",
+        "review-64aff13c58c3f931ec7a"
+      ],
+      "template_id": "news-retrieval-summary-v1",
+      "text": "The saved synthetic news attempt stopped without an analytical result. Coverage is unavailable and published tone is withheld. No conclusion about the presence or absence of company news is supported."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "headline",
+            "label": "Headline"
+          },
+          {
+            "id": "publisher",
+            "label": "Source"
+          },
+          {
+            "id": "published",
+            "label": "Published at (original timezone)"
+          },
+          {
+            "id": "scope",
+            "label": "Text scope"
+          }
+        ],
+        "id": "retained-headlines",
+        "review_refs": [
+          "review-64aff13c58c3f931ec7a",
+          "review-826bb05e4ff5df7f3501",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Retained news evidence"
+      },
+      {
+        "columns": [
+          {
+            "id": "field",
+            "label": "Basis"
+          },
+          {
+            "id": "value",
+            "label": "Saved description"
+          }
+        ],
+        "id": "news-basis",
+        "review_refs": [
+          "review-64aff13c58c3f931ec7a",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Coverage state"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "retrieval_failed"
+              }
+            ],
+            "evidence_refs": [
+              "e-121470ccee63c65ade7aff"
+            ],
+            "id": "coverage-state"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Requested cutoff (not an observation)"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "2026-01-28T23:59:00Z"
+              }
+            ],
+            "evidence_refs": [
+              "e-121470ccee63c65ade7aff"
+            ],
+            "id": "cutoff"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Requested maximum publication age"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "7"
+              }
+            ],
+            "evidence_refs": [
+              "e-121470ccee63c65ade7aff"
+            ],
+            "id": "max-age"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Input basis"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Saved synthetic attempt; coverage not established"
+              }
+            ],
+            "evidence_refs": [
+              "e-121470ccee63c65ade7aff"
+            ],
+            "id": "input-basis"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved terminal reason"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "controlled_qa_retrieval_unavailable"
+              }
+            ],
+            "evidence_refs": [
+              "e-121470ccee63c65ade7aff"
+            ],
+            "id": "terminal-reason"
+          }
+        ],
+        "title": "Saved incomplete news attempt"
+      }
+    ],
+    "workflow": "news"
+  }
+}

@@ -7,6 +7,7 @@ import { calendarDate, formatMetric, savedInstant } from './format';
 import { AnalysisSections } from './AnalysisSections';
 import { EventSections, EventGateDetails } from './EventSections';
 import { NewsSections, NewsReviewDetails } from './NewsSections';
+import { ReadingCopy } from './ReadingCopy';
 import { MetricCard, ReportHeader, ReportSection, ReportStates, ReviewNotice, SectionNavigation } from './ReportFrame';
 import './report-reader.css';
 
@@ -35,6 +36,8 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
   const [attempt, setAttempt] = useState(0);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [downloadNotice, setDownloadNotice] = useState('');
+  const [copyOpen,setCopyOpen]=useState(false),[copyBusy,setCopyBusy]=useState(false);
+  const copyRequest=useRef<AbortController|null>(null),copyReturn=useRef<HTMLElement|null>(null);
   const activeRequest = useRef<AbortController | null>(null);
   const downloadRequest = useRef<AbortController | null>(null);
   const errorHeading = useRef<HTMLHeadingElement | null>(null);
@@ -52,7 +55,7 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
       const originalVerified = error.code === 'native_view_unavailable' && await verifyOriginal(run, controller.signal);
       if (!controller.signal.aborted) setState({ kind: 'error', error, originalVerified });
     });
-    return () => { controller.abort(); downloadRequest.current?.abort(); };
+    return () => { controller.abort(); downloadRequest.current?.abort(); copyRequest.current?.abort(); };
   }, [run, attempt]);
   useEffect(() => {
     if (state.kind === 'error') errorHeading.current?.focus();
@@ -77,7 +80,23 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
       window.scrollTo(0, 0);
     } finally { if (!controller.signal.aborted) setDownloading(null); }
   }
-  const retry = () => { activeRequest.current?.abort(); downloadRequest.current?.abort(); setState({ kind: 'loading' }); setAttempt(n => n + 1); };
+  async function openCopy(control?:HTMLElement,print=false) {
+    if(copyBusy||downloading)return;
+    const controller=new AbortController();copyRequest.current=controller;
+    if(control)copyReturn.current=control;
+    setCopyBusy(true);
+    try {
+      const report=await fetchReport(run,controller.signal);
+      if(controller.signal.aborted)return;
+      setState({kind:'ready',report});setCopyOpen(true);
+      if(print){await new Promise(requestAnimationFrame);if(!controller.signal.aborted)window.print();}
+    } catch(reason) {
+      if(controller.signal.aborted)return;
+      setCopyOpen(false);setState({kind:'error',error:reason instanceof ReportFailure?reason:new ReportFailure('connection_unavailable'),originalVerified:false});window.scrollTo(0,0);
+    } finally {if(!controller.signal.aborted)setCopyBusy(false);}
+  }
+  function closeCopy(){setCopyOpen(false);requestAnimationFrame(()=>{copyReturn.current?.scrollIntoView({block:'center'});copyReturn.current?.focus({preventScroll:true});});}
+  const retry = () => { activeRequest.current?.abort(); downloadRequest.current?.abort();copyRequest.current?.abort();setCopyOpen(false);setCopyBusy(false); setState({ kind: 'loading' }); setAttempt(n => n + 1); };
   return <div className="native-reader">
     <a href={isMarket ? '#/agent/agent3' : '#/agent/agent1'} className="back-link"><Icon name="back" size={16} />{isMarket ? 'Market & news reports' : 'Research reports'}</a>
     {state.kind === 'loading' ? <section className="nr-load" aria-busy="true" role="status"><span className="spinner" /><h1>{isNews ? 'Opening saved company news' : isEvents ? 'Opening saved event study' : 'Opening saved research'}</h1><p>Checking the report and its registered evidence…</p><div className="nr-skeleton" aria-hidden="true"><span /><span /><span /></div></section>
@@ -85,13 +104,14 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
         <div className="nr-error-actions"><button className="primary-button" onClick={retry}>Try reading again</button><button className="nr-secondary-button" onClick={onReloadWorkspace}>Reload workspace</button></div>
         {state.originalVerified && original && <div className="nr-original-available"><h2>Original saved report</h2><p>The registered original passed the workspace checks. It retains its original restrictions.</p><button className="text-button" onClick={() => download(original)} disabled={!!downloading}><Icon name="download" size={16} />{downloading ? 'Checking download…' : 'Download original HTML'}</button></div>}
       </section>
-      : <ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} />}
+      : <><div hidden={copyOpen}><ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} onReadingCopy={openCopy} copyBusy={copyBusy}/></div>
+        {copyOpen&&<ReadingCopy report={state.report} run={run} busy={copyBusy} onClose={closeCopy} onPrint={()=>openCopy(undefined,true)}/>}</>}
     <p className="nr-download-notice" role="status">{downloadNotice}</p>
   </div>;
 }
 
-function ReportContent({ report, run, downloading, onDownload, onRecheck }: {
-  report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;
+function ReportContent({ report, run, downloading, onDownload, onRecheck, onReadingCopy, copyBusy }: {
+  report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;onReadingCopy:(control:HTMLElement)=>void;copyBusy:boolean;
 }) {
   const isEvents = report.workflow === 'events';
   const isNews = report.workflow === 'news', isMarket = isEvents || isNews;
@@ -131,7 +151,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck }: {
     <ReportHeader title={isNews ? 'Company news' : isEvents ? 'Past event reactions' : report.identity.title} entity={report.identity.entity}
       eyebrow={isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
       period={<>{isMarket && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>Saved synthetic inputs</>}
-      action={<button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button>} />
+      action={<div className="nr-header-actions">{isMarket&&<button className="nr-secondary-button" onClick={event=>onReadingCopy(event.currentTarget)} disabled={copyBusy||!!downloading}>{copyBusy?'Checking saved evidence…':'Reading & print copy'}</button>}<button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading||copyBusy}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button></div>} />
     <ReportStates execution={report.state.execution} evidenceGate={report.state.evidence_gate} />
     <ReviewNotice title={isNews ? 'Synthetic news — published tone withheld' : isEvents ? 'Historical diagnostics — review required' : 'Read as illustrative research'} action={<button onClick={() => jumpTo('review')}>{isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
       {isNews ? 'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.' : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}

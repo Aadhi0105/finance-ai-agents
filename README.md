@@ -192,7 +192,9 @@ native past-event report: sample details, interactive historical return bars,
 plain-language review requirements and source evidence.
 [Part 3B](docs/webapp/native-reports/part3b-news.md) adds native company news with
 headline cards, coverage/exclusions and separate diagnostic text scores. Agents
-2/4 retain their saved-HTML reader. Verified event-relative paths and authorised
+2/4 retain their saved-HTML reader. [Part 3C](docs/webapp/native-reports/part3c-validation.md)
+adds complete Agent 3 reading/print copies, early-failure handling and controlled
+browser acceptance cases. Verified event-relative paths and authorised
 live-source integration remain later work.
 
 ## Read the result before acting on it

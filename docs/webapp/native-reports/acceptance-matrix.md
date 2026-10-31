@@ -5,7 +5,8 @@ Updated 31 October 2026 · implementation and remaining acceptance criteria.
 **Part 1:** specification, outlines, schema and examples are reviewable design
 artifacts. **Part 2A backend checks and bounded Agent 1/event/news browser checks are
 recorded below, including [Part 2C charts](part2c-charts.md) and
-[Parts 3A events](part3a-events.md) and [3B news](part3b-news.md). Wider physical-device,
+[Parts 3A events](part3a-events.md), [3B news](part3b-news.md) and
+[3C validation](part3c-validation.md). Wider physical-device,
 cross-agent and human reader acceptance remains pending.**
 The earlier Batch 1 iframe/browser acceptance does not satisfy native-report rows.
 
@@ -113,6 +114,22 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | Complete automated regression | 1,112 Python tests, 105 frontend tests, TypeScript and production build passed; no new dependencies |
 | Wider acceptance | Human interpretation, physical touch/screen reader, broad print/export, maximum-payload browser timing and saved-download completion remain open; real-source published-tone acceptance is outside this synthetic reader |
 
+| Part 3C check | Result |
+| --- | --- |
+| Early terminal news attempt without an analytical result is distinct from an empty feed | News 1.2.0 implemented; failed/unavailable/refused backend cases and actual unavailable browser case passed; completed/held missing-result states refused |
+| Existing news 1.0.0/1.1.0 recipes remain valid | Prior-version delivery/reprojection and frontend fixture checks passed; no original recipe or saved artifact rewritten |
+| Complete reading copy retains all measures, chart/table rows, restrictions and source references | Ten new frontend cases; actual forty-row copy retained all stories despite a one-card filter; no collapsed review details or pagination in the copy |
+| News pagination and return focus preserve reading context | Browser checked; page 2 announces rows 11–20 and focuses the new page; copy return retains headline filter and focus |
+| Empty, irrelevant, no-result failure, scorer failure, duplicate/excluded and limited-language/text cases | Actual controlled browser cases passed; failed/scorer-unavailable output did not become zero/neutral; headline/body markup remained text |
+| Ten-case count and repeated/missing event values preserve restrictions | Browser checked; ten-case diagnostic test stays held; repeated issuer count seven, missing CAR unavailable, mean withheld, event path withheld |
+| Large controlled reports retain every observation | Browser: 2,000 repeated event bars and two complete 2,000-row case tables; 600 news representatives and complete 600-row story/score tables; observed local ready times about 0.75–1.34s including tool/HTTP overhead, not an SLA |
+| Primary/copy 390px and 320px layouts | Browser checked; no outer overflow in inspected states; labelled plot/table scroll areas, viewport override reset |
+| Fresh evidence validation before reading/printing | Browser pre-print tamper case refused before the dialog, removed stale figures/copy and focused error; exact restoration recovered |
+| Other-agent routes and reading-copy cleanup | Browser checked: Agent 1 retains eight graphs; Agents 2/4 retain existing reader tabs; leaving a copy removes its body/print mode |
+| Source and acceptance workspace remain unchanged | Before/after hashes: 31 source files and 71 acceptance files unchanged; disposable copy restored exactly |
+| Full automated checks | 1,118 Python tests, 115 frontend tests, TypeScript and production build passed; no new dependencies |
+| Print/PDF and wider user acceptance | Complete copy and print stylesheet implemented; print paused DOM automation, automated tab closed without submitting a print job. Actual PDF pagination/reconciliation, physical printing, physical-device/screen-reader and human interpretation acceptance remain open |
+
 | ID | Criterion | Verification required | Status |
 | --- | --- | --- | --- |
 | NATIVE-01 | Primary reports render as native components within Keystone | Inspect all five workflow pages; no primary report iframe or raw HTML injection | Pending |
@@ -127,8 +144,8 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | NATIVE-10 | Opening a report does not mutate evidence or trigger execution/network acquisition | Before/after hashes; provider/model calls blocked; no mutation endpoints added | Pending |
 | NATIVE-11 | Old supported/unsupported saved records are handled explicitly | Compatibility cases; no guessing from arbitrary JSON or source HTML | Pending |
 | NATIVE-12 | Source/view versions cannot be mixed | Tamper/version/concurrent-delivery checks; registration published last | Pending |
-| NATIVE-13 | Print/export and original downloads preserve values and restrictions | Inspect print output and download hashes; original report sandbox remains in force | Pending |
-| NATIVE-14 | Bounded payloads render without freezing or silently dropping content | Largest allowed fixture and over-limit refusal; documented aggregate bounds | Agent 1 data/geometry bounds checked; largest-payload browser timing and other workflows pending |
+| NATIVE-13 | Print/export and original downloads preserve values and restrictions | Inspect print output and download hashes; original report sandbox remains in force | Agent 3 complete-copy content and pre-print integrity checks passed in 3C; actual PDF/physical-print and saved-download completion, other workflows pending |
+| NATIVE-14 | Bounded payloads render without freezing or silently dropping content | Largest allowed fixture and over-limit refusal; documented aggregate bounds | Agent 1 data/geometry bounds and Agent 3 2,000-case/600-story browser samples checked; oversized QA details refused before catalogue publication; exhaustive maximum-payload/cross-agent timing pending |
 
 ## Workflow implementation
 
@@ -142,9 +159,9 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | A3A-01 | Event diagnostics are understandable without raw gate codes | Reader explains sample, abnormal return, window and major review requirements | Part 3A implemented and browser inspected; human interpretation acceptance pending |
 | A3A-02 | Historical observations do not become predicted returns | Held, inference-unavailable and repeated/overlapping-event cases | Part 3A bounded source/refusal tests and default browser passed; broader reader acceptance pending |
 | A3A-03 | A dated/session path requires verified alignment | Current fixture withholds path; a separate eligible timing fixture supplies actual observations | Withholding/refusal implemented and checked; eligible path projection and its acceptance remain unimplemented |
-| A3A-04 | Sample minimum does not imply automatic approval | Cases that meet count but fail timing/comparability/dependence/control checks | Controlled ten-case backend test preserves held state and diagnostic-only p-value; default browser restrictions checked; human acceptance pending |
-| A3B-01 | Coverage, relevance, clusters and text scope remain distinct | Valid-empty, retrieval-failed, excluded, duplicate and truncated/language-limited cases | Part 3B controlled backend/frontend cases and default/legacy/mobile browser checks passed; broader human acceptance pending |
-| A3B-02 | Withheld tone does not become neutral, zero or a trade signal | Current null published level and 0.0 diagnostic score; separate eligible/unsupported scorer cases | Part 3B synthetic held/null/zero/unsupported scorer boundaries passed; eligible real-source published tone and human acceptance remain separate |
+| A3A-04 | Sample minimum does not imply automatic approval | Cases that meet count but fail timing/comparability/dependence/control checks | Controlled backend plus 3C ten-case browser example with count check passed and other restrictions held; human acceptance pending |
+| A3B-01 | Coverage, relevance, clusters and text scope remain distinct | Valid-empty, retrieval-failed, excluded, duplicate and truncated/language-limited cases | 3B automated cases plus 3C empty/irrelevant/early-failed/mixed browser cases passed; broader human acceptance pending |
+| A3B-02 | Withheld tone does not become neutral, zero or a trade signal | Current null published level and 0.0 diagnostic score; separate eligible/unsupported scorer cases | 3B boundaries and 3C no-result/scorer-unavailable/zero browser cases passed; eligible real-source published tone and human acceptance remain separate |
 | A2-01 | Original cycle, ongoing breach and corrected effective state remain distinct | Baseline, new issue, no-new-data and pending/approved-correction saved cases | Pending |
 | A2-02 | Observation history is actually retained, not inferred from cycles | Registered historical observations; missing history shows unavailable graph | Pending |
 | A4-01 | Bridge amounts, start/end positions and favourability reconcile exactly | €60 → +€10 → −€5 → €65 fixture and an adverse/alternative-account case | Pending |

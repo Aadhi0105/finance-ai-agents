@@ -10,6 +10,8 @@ Agent 1 plots with exact point/source inspection and keyboard controls.
 sample metadata, historical diagnostic bars and plain-language review requirements.
 [Part 3B](part3b-news.md) adds native company-news cards, coverage/exclusion evidence
 and separate diagnostic text-tone graphs.
+[Part 3C](part3c-validation.md) adds complete reading/print copies, early news
+failure handling and repeatable controlled browser acceptance cases.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -77,6 +79,8 @@ These are explicit design recommendations, not user approval or financial sign-o
    eligible event-path projection and wider acceptance remain open. Part 3B:
    native company news — implemented for saved synthetic inputs; wider reader and
    real-source published-tone acceptance remain open.
+   Part 3C: validation and polish — implemented for the controlled cases in its
+   guide; human, physical-accessibility and full print/PDF acceptance remain open.
 6. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
    browser, accessibility, interpretation and export acceptance.
 7. Webapp Batch 2: controlled execution, using the same report contract for newly

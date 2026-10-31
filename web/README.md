@@ -21,6 +21,11 @@ projected. Evidence and financial-approval boundaries remain unchanged.
 [Part 3B](../docs/webapp/native-reports/part3b-news.md) adds headline cards/search,
 saved coverage, exclusions and explicitly diagnostic text-tone graphs. News
 adapters 1.0.0/1.1.0 are supported; synthetic published tone stays withheld.
+[Part 3C](../docs/webapp/native-reports/part3c-validation.md) adds complete Agent 3
+reading/print copies, pagination focus and controlled browser acceptance cases.
+News 1.2.0 also handles an early failed attempt without an analytical result;
+news 1.0.0/1.1.0 retain their original recipes. PDF/physical-print acceptance and
+human interpretation remain open.
 
 See the [complete setup and acceptance guide](../docs/webapp/batch1-report-workspace.md).
 

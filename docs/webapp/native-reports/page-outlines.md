@@ -6,6 +6,8 @@ supporting sections and exact tables. [Part 2C](part2c-charts.md) adds Agent 1
 interactive plots. These outlines still describe the broader finished reports:
 [Parts 3A](part3a-events.md) and [3B](part3b-news.md) implement event/news reports. Agents 2/4,
 eligible event-path projection and wider reader/export acceptance remain later work.
+[Part 3C](part3c-validation.md) validates controlled Agent 3 cases and adds a
+complete reading/print copy. Actual PDF/physical-print acceptance remains open.
 
 These outlines describe reading order and content, not final pixel measurements.
 Every page stays within Keystone's existing shell. The primary report consists

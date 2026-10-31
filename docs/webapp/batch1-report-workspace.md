@@ -232,6 +232,9 @@ with sample metadata, interactive diagnostic bars and readable review requiremen
 separate diagnostic text-tone graphs. Agents 2/4 retain their existing saved-HTML
 reader. Verified event-relative path projection and authorised live-source
 integration remain later work.
+[Part 3C](native-reports/part3c-validation.md) adds Agent 3 complete reading/print
+copies, early-failure presentation and controlled large/edge-case browser checks.
+Human, physical-accessibility and full print/PDF acceptance remain separate.
 
 This batch supplies the viewing layer and a narrow read API. Running agents from
 the browser, persistent multi-user application state, uploads, authenticated
