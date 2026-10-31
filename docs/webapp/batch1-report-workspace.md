@@ -224,7 +224,8 @@ sections and interactive charts. [Part 2A](native-reports/part2a-data-layer.md)
 implements registered native JSON and a read-only endpoint for all five synthetic
 workflows. [Part 2B.1](native-reports/part2b1-reader.md) adds a native Agent 1
 summary/key-figure reader. [Part 2B.2](native-reports/part2b2-research.md) adds Agent 1
-supporting analysis and exact numerical tables. Interactive plots remain pending;
+supporting analysis and exact numerical tables. [Part 2C](native-reports/part2c-charts.md)
+adds interactive Agent 1 graphs with point/source inspection and keyboard controls.
 Agents 2–4 retain their existing saved-HTML reader.
 
 This batch supplies the viewing layer and a narrow read API. Running agents from

@@ -1,0 +1,53 @@
+.nr-chart { min-width: 0; margin-top: 17px; }
+.nr-chart-basis { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px 15px; color: #69785d; font-size: 10px; line-height: 1.8; border-bottom: 1px solid #e8ede1; padding-bottom: 11px; }
+.nr-chart-basis > span:first-child { color: #6b7756; }
+.nr-chart-legend { display: flex; flex-wrap: wrap; gap: 5px 13px; padding: 9px 0 7px; }
+.nr-chart-legend button { display: flex; align-items: center; gap: 6px; min-height: 38px; padding: 4px 0; color: #4b5f42; font-size: 10px; text-align: left; }
+.nr-chart-legend button small { font-size: 9px; color: #75816b; }
+.nr-chart-legend button[aria-pressed="false"] { opacity: .65; }
+.nr-chart-legend button:hover { text-decoration: underline; }
+.nr-chart-legend svg { flex: 0 0 29px; }
+.nr-chart-legend button:focus-visible, .nr-chart-controls button:focus-visible, .nr-chart-controls input:focus-visible, .nr-chart-selection button:focus-visible { outline: 2px solid #9c7c42; outline-offset: 3px; }
+.nr-plot { position: relative; margin: 1px 0 7px; }
+.nr-plot-svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; user-select: none; }
+.nr-grid-line { stroke: #e5ebde; stroke-width: 1; }
+.nr-axis-line { stroke: #becbb3; stroke-width: 1; }
+.nr-axis-text { font-size: 10px; fill: #64765a; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
+.nr-axis-title { font-size: 10px; fill: #66785b; }
+.nr-chart-crosshair { stroke: #72846a; stroke-width: 1; stroke-dasharray: 3 4; pointer-events: none; }
+.nr-chart-tooltip { position: absolute; top: 8px; transform: translateX(-50%); width: max-content; min-width: 175px; max-width: min(270px, 75%); padding: 13px 15px; border: 1px solid #cfdac4; background: #fffffff5; border-radius: 5px; box-shadow: 0 4px 15px #243e2714; pointer-events: none; z-index: 1; font-size: 10px; color: #3c563c; line-height: 1.7; overflow-wrap: anywhere; }
+.nr-chart-tooltip > strong { display: block; font-weight: 600; font-size: 11px; }
+.nr-chart-tooltip > small { display: block; font-size: 9px; color: #826430; margin: 3px 0; }
+.nr-chart-tooltip > div { margin-top: 8px; }
+.nr-chart-tooltip span, .nr-chart-tooltip b { display: block; }
+.nr-chart-tooltip b { font-size: 11px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.nr-chart-instructions, .nr-chart-scale-note { font-size: 10px; color: #6b7b5e; line-height: 1.9; margin: 10px 0; }
+.nr-chart-controls { border-top: 1px solid #e8ede1; padding-top: 12px; margin-top: 10px; }
+.nr-chart-controls > label { display: block; font-size: 10px; color: #526c45; margin-bottom: 9px; }
+.nr-chart-controls > div { display: flex; gap: 13px; align-items: center; }
+.nr-chart-controls input { accent-color: #315f4c; width: 100%; min-width: 0; min-height: 30px; cursor: pointer; }
+.nr-chart-controls .nr-page-button { flex: 0 0 auto; }
+.nr-chart-selection { margin-top: 15px; padding: 15px 16px 0; border-radius: 5px; background: #f3f6ee; border: 1px solid #e0e8d7; }
+.nr-chart-selection-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.nr-chart-selection-heading > strong { color: #3e5b36; font-size: 12px; font-weight: 550; }
+.nr-chart-selection-heading > span:not(.nr-diagnostic-label) { color: #718063; font-size: 10px; }
+.nr-chart-selection dl { margin: 9px 0 0; }
+.nr-chart-selection dl > div { display: grid; grid-template-columns: minmax(110px,1fr) minmax(0,1fr) auto; align-items: baseline; gap: 9px 15px; padding: 9px 0; border-top: 1px solid #e2e9d9; }
+.nr-chart-selection dt { font-size: 11px; color: #5d7350; line-height: 1.8; }
+.nr-chart-selection dt small { display: block; color: #7c816d; font-size: 9px; }
+.nr-chart-selection dd { margin: 0; color: #355a35; font-size: 12px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.nr-chart-selection button { min-height: 30px; font-size: 10px; }
+.nr-chart-unavailable { background: #f5f6ef; color: #77714e; border: 1px dashed #d7dfca; border-radius: 4px; padding: 30px 20px; font-size: 12px; line-height: 1.9; }
+@media (max-width: 650px) {
+  .nr-chart-basis { font-size: 10px; }
+  .nr-chart-tooltip { display: none; }
+  .nr-chart-selection { padding: 13px 12px 0; }
+  .nr-chart-selection dl > div { grid-template-columns: minmax(0,1fr) auto; gap: 5px 12px; padding: 11px 0; }
+  .nr-chart-selection dt { grid-column: 1 / -1; }
+  .nr-chart-selection dd { font-size: 12px; }
+  .nr-chart-selection button { min-height: 38px; }
+  .nr-chart-controls > div { gap: 10px; }
+  .nr-chart-controls input { min-height: 40px; }
+  .nr-chart-legend button { min-height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { .nr-chart * { transition: none !important; animation: none !important; } }
