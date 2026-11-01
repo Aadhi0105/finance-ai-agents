@@ -59,7 +59,7 @@ export function InteractiveChart({ chart, rows, onInspect }: {
   if (chart.availability !== 'available' || !rows.length) return null;
   const row = rows[Math.min(selected, rows.length-1)];
   const unit = chart.y_axis.currency ? chart.y_axis.currency + (chart.y_axis.unit === 'currency_per_share' ? ' per share' : '')
-    : ({fraction: 'Percent', index: 'Rebased index', multiple: 'P/E multiple'} as Record<string,string>)[chart.y_axis.unit] || chart.y_axis.label;
+    : ({fraction: 'Percent', index: 'Rebased index', multiple: 'Multiple (×)'} as Record<string,string>)[chart.y_axis.unit] || chart.y_axis.label;
   const value = (i: number) => {
     const point = row.points[i];
     if (!point) return 'Not retained';

@@ -12,6 +12,8 @@ sample metadata, historical diagnostic bars and plain-language review requiremen
 and separate diagnostic text-tone graphs.
 [Part 3C](part3c-validation.md) adds complete reading/print copies, early news
 failure handling and repeatable controlled browser acceptance cases.
+[Part 4A](part4a-monitoring.md) adds native Agent 2 monitoring, separate cycle and
+export state, correction evidence and interactive retained-history charts.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -25,7 +27,9 @@ Agent 1 now opens in the native reader with its summary, key figures, supporting
 analysis, review notes and evidence controls. Consensus and broker research have
 separate availability. Agent 3 events also open natively, with source-linked sample
 and review details. Company news opens natively with explicit text scope and
-withheld published tone. Agents 2/4 retain the saved-HTML reader.
+withheld published tone. Agent 2 opens natively with monitoring cards, policy
+thresholds, retained histories and read-only correction evidence. Agent 4 retains
+the saved-HTML reader.
 
 ## Read this pack
 
@@ -81,8 +85,9 @@ These are explicit design recommendations, not user approval or financial sign-o
    real-source published-tone acceptance remain open.
    Part 3C: validation and polish — implemented for the controlled cases in its
    guide; human, physical-accessibility and full print/PDF acceptance remain open.
-6. Part 4: apply shared components to Agents 2 and 4, then complete cross-agent
-   browser, accessibility, interpretation and export acceptance.
+6. Part 4A: native Agent 2 monitoring — implemented for saved synthetic evidence.
+   Part 4B: native Agent 4 financial close. Part 4C: complete cross-agent browser,
+   accessibility, interpretation and export acceptance. The latter two remain open.
 7. Webapp Batch 2: controlled execution, using the same report contract for newly
    completed runs.
 

@@ -269,3 +269,22 @@
   .nr-local-review > .nr-source-button { margin-left: 25px; }
 }
 @media (max-width: 360px) { .nr-metric-grid { grid-template-columns: 1fr; } .nr-metric-card dt { min-height: 0; } .nr-metric-card dd > span { display: inline; } }
+.nr-monitor-tools { display:flex; gap:18px; align-items:end; margin:22px 0 12px; flex-wrap:wrap; }
+.nr-monitor-tools label, .nr-monitor-history { display:grid; gap:8px; font-size:13px; font-weight:600; color:var(--ink); }
+.nr-monitor-tools label:first-child { flex:1; min-width:180px; }
+.nr-monitor-tools input, .nr-monitor-tools select, .nr-monitor-history select { padding:12px; border:1px solid #d4dbd1; background:#fff; border-radius:6px; color:#254134; font:inherit; max-width:100%; width:100%; min-width:0; }
+.nr-monitor-history { margin:20px 0; max-width:460px; }
+.nr-monitor-cards { display:grid; gap:16px; margin:20px 0; }
+.nr-monitor-card { padding:24px; background:#fff; border:1px solid #dbe0d6; border-radius:8px; min-width:0; }
+.nr-monitor-card-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.nr-monitor-card-top .eyebrow { margin:0; }
+.nr-monitor-breach, .nr-monitor-flag { font-size:11px; font-weight:650; padding:5px 9px; border-radius:4px; background:#f5e8d4; color:#79501f; }
+.nr-monitor-flag { background:#edf1e8; color:#38513e; }
+.nr-monitor-card h3 { font-size:21px; font-weight:500; margin:14px 0 7px; }
+.nr-monitor-item { color:#677566; font-size:12px; overflow-wrap:anywhere; }
+.nr-monitor-policy { display:grid; grid-template-columns:1fr 1.5fr; gap:20px; border-top:1px solid #e3e7de; border-bottom:1px solid #e3e7de; padding:18px 0; margin:18px 0; }
+.nr-monitor-policy small { display:block; color:#667364; font-size:11px; margin-bottom:7px; }
+.nr-monitor-policy strong { font-size:21px; font-weight:500; overflow-wrap:anywhere; }
+.nr-monitor-status { font-size:14px; overflow-wrap:anywhere; }
+.nr-monitor-card-actions { display:flex; flex-wrap:wrap; gap:18px; margin-top:18px; }
+@media(max-width:520px) { .nr-monitor-card { padding:18px; } .nr-monitor-policy { grid-template-columns:1fr; gap:14px; } .nr-monitor-tools { align-items:stretch; } .nr-monitor-tools label { width:100%; } }

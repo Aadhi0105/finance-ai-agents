@@ -1,0 +1,1918 @@
+{
+  "run": {
+    "id": "monitoring-example",
+    "agent": "agent2",
+    "workflow": "monitoring",
+    "title": "Financial monitoring",
+    "entity": "Example company watchlist",
+    "period": "2026-01-09 \u00b7 cycle 9",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "completed",
+    "review_status": "review_required",
+    "summary": "Saved monitoring observations, threshold exceptions and original history from an isolated fixture watchlist.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Synthetic thresholds do not establish contractual covenant compliance.",
+      "Report browsing does not refresh observations or decide corrections."
+    ],
+    "checks": [
+      "Saved cycle exported without a refresh"
+    ],
+    "metrics": [
+      {
+        "label": "Saved cycle",
+        "value": "9",
+        "basis": "Selected saved cycle"
+      },
+      {
+        "label": "Monitored items",
+        "value": "5",
+        "basis": "Rows in the saved snapshot"
+      },
+      {
+        "label": "Threshold breaches",
+        "value": "2",
+        "basis": "Saved classifications \u00b7 analyst policy"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "Monitoring report",
+        "kind": "report",
+        "sha256": "c5fdc78d3aee3d9de88287e14c18d7bb7d76c0459c69662af47686c981a4b7a8",
+        "bytes": 51818,
+        "url": "/api/runs/monitoring-example/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "snapshot.json",
+        "label": "Saved cycle snapshot",
+        "kind": "evidence",
+        "sha256": "875e0b2f3da882148d528e7ec703ccb84a74f63db5604e8cf8c6c1fb9e11c9ad",
+        "bytes": 27320,
+        "url": "/api/runs/monitoring-example/files/snapshot.json"
+      },
+      {
+        "id": "file-2",
+        "name": "input.json",
+        "label": "Synthetic watchlist",
+        "kind": "input",
+        "sha256": "975a962578a892fdbb0393a575799030ba6625176ae10e8a397a14f73eb86f24",
+        "bytes": 2395,
+        "url": "/api/runs/monitoring-example/files/input.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "8b5df3d2c595c575b1d20a408afea183726710a1db03158db06a42e3bfc8a46f",
+        "bytes": 245,
+        "url": "/api/runs/monitoring-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "021baf39f710a2e9cff0d04ed31ce94569bdc1f60ec92905d02419365f04685e",
+        "bytes": 31713,
+        "url": "/api/runs/monitoring-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "9",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent2-native-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent2",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "snapshot.json",
+        "sha256": "875e0b2f3da882148d528e7ec703ccb84a74f63db5604e8cf8c6c1fb9e11c9ad",
+        "source_schema": "agent2.snapshot/unversioned"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "8b5df3d2c595c575b1d20a408afea183726710a1db03158db06a42e3bfc8a46f",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "history-0",
+        "purpose": "Actual observations retained for the original cycle; not current effective-state history.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "observations-0",
+            "label": "acme_leverage",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-5280f30395c35ab2814735"
+                ],
+                "id": "observation-0",
+                "label": "2026-01-01",
+                "reason_codes": [],
+                "x": "2026-01-01",
+                "y": "2.8"
+              },
+              {
+                "evidence_refs": [
+                  "e-67f00caa409d066158c7f3"
+                ],
+                "id": "observation-1",
+                "label": "2026-01-02",
+                "reason_codes": [],
+                "x": "2026-01-02",
+                "y": "2.86"
+              },
+              {
+                "evidence_refs": [
+                  "e-a6a77196d891ffa99b6401"
+                ],
+                "id": "observation-2",
+                "label": "2026-01-03",
+                "reason_codes": [],
+                "x": "2026-01-03",
+                "y": "2.93"
+              },
+              {
+                "evidence_refs": [
+                  "e-e2b1d0cf3b12e38b60ff95"
+                ],
+                "id": "observation-3",
+                "label": "2026-01-04",
+                "reason_codes": [],
+                "x": "2026-01-04",
+                "y": "3.0"
+              },
+              {
+                "evidence_refs": [
+                  "e-e5d062043a60d09a96c47b"
+                ],
+                "id": "observation-4",
+                "label": "2026-01-05",
+                "reason_codes": [],
+                "x": "2026-01-05",
+                "y": "3.08"
+              },
+              {
+                "evidence_refs": [
+                  "e-c108ff1b0f907c4c943162"
+                ],
+                "id": "observation-5",
+                "label": "2026-01-06",
+                "reason_codes": [],
+                "x": "2026-01-06",
+                "y": "3.17"
+              },
+              {
+                "evidence_refs": [
+                  "e-9afa21f84ccda92baefc84"
+                ],
+                "id": "observation-6",
+                "label": "2026-01-07",
+                "reason_codes": [],
+                "x": "2026-01-07",
+                "y": "3.26"
+              },
+              {
+                "evidence_refs": [
+                  "e-bf8f8e040ab68f15433889"
+                ],
+                "id": "observation-7",
+                "label": "2026-01-08",
+                "reason_codes": [],
+                "x": "2026-01-08",
+                "y": "3.36"
+              },
+              {
+                "evidence_refs": [
+                  "e-20bac44870b3461b26b2f3"
+                ],
+                "id": "observation-8",
+                "label": "2026-01-09",
+                "reason_codes": [],
+                "x": "2026-01-09",
+                "y": "3.47"
+              }
+            ]
+          }
+        ],
+        "title": "Selected-cycle history \u00b7 acme_leverage",
+        "type": "line",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Saved observation date"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "multiple",
+          "unit": "multiple"
+        }
+      },
+      {
+        "availability": "available",
+        "id": "history-1",
+        "purpose": "Actual observations retained for the original cycle; not current effective-state history.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "observations-1",
+            "label": "acme_int_cover",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-7836b9b8b2e138c4e8a5bd"
+                ],
+                "id": "observation-0",
+                "label": "2026-01-01",
+                "reason_codes": [],
+                "x": "2026-01-01",
+                "y": "3.5"
+              },
+              {
+                "evidence_refs": [
+                  "e-092c74380c9e877cb7edb8"
+                ],
+                "id": "observation-1",
+                "label": "2026-01-02",
+                "reason_codes": [],
+                "x": "2026-01-02",
+                "y": "3.52"
+              },
+              {
+                "evidence_refs": [
+                  "e-00e8e122b4ea074645a362"
+                ],
+                "id": "observation-2",
+                "label": "2026-01-03",
+                "reason_codes": [],
+                "x": "2026-01-03",
+                "y": "3.48"
+              },
+              {
+                "evidence_refs": [
+                  "e-530c7c63f0587e3e807a36"
+                ],
+                "id": "observation-3",
+                "label": "2026-01-04",
+                "reason_codes": [],
+                "x": "2026-01-04",
+                "y": "3.51"
+              },
+              {
+                "evidence_refs": [
+                  "e-626d2c6b9865e2ca80d4fc"
+                ],
+                "id": "observation-4",
+                "label": "2026-01-05",
+                "reason_codes": [],
+                "x": "2026-01-05",
+                "y": "3.49"
+              },
+              {
+                "evidence_refs": [
+                  "e-a77fed34ab3c9f613d6733"
+                ],
+                "id": "observation-5",
+                "label": "2026-01-06",
+                "reason_codes": [],
+                "x": "2026-01-06",
+                "y": "3.5"
+              },
+              {
+                "evidence_refs": [
+                  "e-07d1f06e21f70de99ea6d7"
+                ],
+                "id": "observation-6",
+                "label": "2026-01-07",
+                "reason_codes": [],
+                "x": "2026-01-07",
+                "y": "3.53"
+              },
+              {
+                "evidence_refs": [
+                  "e-f4bdd905559317b3eb2b70"
+                ],
+                "id": "observation-7",
+                "label": "2026-01-08",
+                "reason_codes": [],
+                "x": "2026-01-08",
+                "y": "3.47"
+              },
+              {
+                "evidence_refs": [
+                  "e-fff76f67348f2f9c4ea43a"
+                ],
+                "id": "observation-8",
+                "label": "2026-01-09",
+                "reason_codes": [],
+                "x": "2026-01-09",
+                "y": "2.1"
+              }
+            ]
+          }
+        ],
+        "title": "Selected-cycle history \u00b7 acme_int_cover",
+        "type": "line",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Saved observation date"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "multiple",
+          "unit": "multiple"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2cf708b46205e42e7e73f2",
+        "label": "Effective-state items at export",
+        "method": null,
+        "pointer": "/current",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ff149e7c7bc3d2760fb128",
+        "label": "Selected-cycle observations",
+        "method": null,
+        "pointer": "/run/rows",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8e6871680f048ec7e2adef",
+        "label": "Selected-cycle surfaced items",
+        "method": null,
+        "pointer": "/run/surfaced",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-672bb3ef30e781746e802e",
+        "label": "Saved value \u00b7 acme_leverage",
+        "method": null,
+        "pointer": "/run/rows/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5cd5e95260c2d12e7dc8af",
+        "label": "Saved policy threshold \u00b7 acme_leverage",
+        "method": null,
+        "pointer": "/run/rows/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4057906bab67c00f9665da",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/run/rows/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-09c6deda31e663557ccbb4",
+        "label": "Saved value \u00b7 acme_int_cover",
+        "method": null,
+        "pointer": "/run/rows/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a30ade719ada9296481eef",
+        "label": "Saved policy threshold \u00b7 acme_int_cover",
+        "method": null,
+        "pointer": "/run/rows/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a2bc650a971d39a0ca16d2",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/run/rows/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b000da9965ef3edca12424",
+        "label": "Saved value \u00b7 beta_leverage",
+        "method": null,
+        "pointer": "/run/rows/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-634ab657e00cf474489ebc",
+        "label": "Saved policy threshold \u00b7 beta_leverage",
+        "method": null,
+        "pointer": "/run/rows/2/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-51ba37ffdd2b0309a00466",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/run/rows/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-98c4cc6c6a89bf9eec1f3a",
+        "label": "Saved value \u00b7 gamma_liquidity",
+        "method": null,
+        "pointer": "/run/rows/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d0b3d6ccb87bdbdd9504b6",
+        "label": "Saved policy threshold \u00b7 gamma_liquidity",
+        "method": null,
+        "pointer": "/run/rows/3/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f8d7ecdf8bdd8a52ada7b8",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/run/rows/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4a2e4f869b8db0dd88c369",
+        "label": "Saved value \u00b7 acme_int_cover",
+        "method": null,
+        "pointer": "/current/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9909c99d951c169604d0c1",
+        "label": "Saved policy threshold \u00b7 acme_int_cover",
+        "method": null,
+        "pointer": "/current/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-55007b19bab060188ac039",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9a892f6a0877feb4db08c7",
+        "label": "Saved value \u00b7 acme_leverage",
+        "method": null,
+        "pointer": "/current/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5a5cf0cca1fd78990c08b7",
+        "label": "Saved policy threshold \u00b7 acme_leverage",
+        "method": null,
+        "pointer": "/current/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d9e733f8dd1bdffad8953a",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a1f5d62a67f2303263074b",
+        "label": "Saved value \u00b7 beta_leverage",
+        "method": null,
+        "pointer": "/current/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0cd9135fb58ab37974cd96",
+        "label": "Saved policy threshold \u00b7 beta_leverage",
+        "method": null,
+        "pointer": "/current/2/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-af795fdc0752c724c8b8c4",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e0d395b741f8f03be6ebbe",
+        "label": "Saved value \u00b7 delta_leverage",
+        "method": null,
+        "pointer": "/current/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-022a5e2ede64c4ed9b2818",
+        "label": "Saved policy threshold \u00b7 delta_leverage",
+        "method": null,
+        "pointer": "/current/3/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6218d9cbbcf148a4c225d3",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-dd52a6fe50c3cd9fa40f18",
+        "label": "Saved value \u00b7 gamma_liquidity",
+        "method": null,
+        "pointer": "/current/4/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-05a28f680d30d8610165d5",
+        "label": "Saved policy threshold \u00b7 gamma_liquidity",
+        "method": null,
+        "pointer": "/current/4/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-47883a54759f609a13a7a2",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5280f30395c35ab2814735",
+        "label": "2026-01-01",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-67f00caa409d066158c7f3",
+        "label": "2026-01-02",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a6a77196d891ffa99b6401",
+        "label": "2026-01-03",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e2b1d0cf3b12e38b60ff95",
+        "label": "2026-01-04",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e5d062043a60d09a96c47b",
+        "label": "2026-01-05",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/4/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c108ff1b0f907c4c943162",
+        "label": "2026-01-06",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/5/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9afa21f84ccda92baefc84",
+        "label": "2026-01-07",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/6/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-bf8f8e040ab68f15433889",
+        "label": "2026-01-08",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/7/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-20bac44870b3461b26b2f3",
+        "label": "2026-01-09",
+        "method": null,
+        "pointer": "/run/triage_history/acme_leverage/8/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7836b9b8b2e138c4e8a5bd",
+        "label": "2026-01-01",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-092c74380c9e877cb7edb8",
+        "label": "2026-01-02",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-00e8e122b4ea074645a362",
+        "label": "2026-01-03",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-530c7c63f0587e3e807a36",
+        "label": "2026-01-04",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-626d2c6b9865e2ca80d4fc",
+        "label": "2026-01-05",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/4/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a77fed34ab3c9f613d6733",
+        "label": "2026-01-06",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/5/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-07d1f06e21f70de99ea6d7",
+        "label": "2026-01-07",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/6/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f4bdd905559317b3eb2b70",
+        "label": "2026-01-08",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/7/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-fff76f67348f2f9c4ea43a",
+        "label": "2026-01-09",
+        "method": null,
+        "pointer": "/run/triage_history/acme_int_cover/8/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6459ae4829fdaa7ed1656b",
+        "label": "Pending correction reviews",
+        "method": null,
+        "pointer": "/reviews",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6cab52fbccb4d76c47673c",
+        "label": "Saved correction decisions",
+        "method": null,
+        "pointer": "/decisions",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-189f645937ab75ac7a7a22",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/run",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-29e6fbeb149e931dd0df70",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/current",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-2cf708b46205e42e7e73f2"
+          ],
+          "metric_refs": [
+            "effective-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved effective-state items at export: 5 (2026-01-09 \u00b7 cycle 9)."
+        },
+        "id": "finding-effective-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-ff149e7c7bc3d2760fb128"
+          ],
+          "metric_refs": [
+            "cycle-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved selected-cycle observations: 4 (2026-01-09 \u00b7 cycle 9)."
+        },
+        "id": "finding-cycle-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-8e6871680f048ec7e2adef"
+          ],
+          "metric_refs": [
+            "surfaced-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved selected-cycle surfaced items: 2 (2026-01-09 \u00b7 cycle 9)."
+        },
+        "id": "finding-surfaced-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [],
+    "identity": {
+      "entity": "Example company watchlist",
+      "period_end": null,
+      "period_label": "2026-01-09 \u00b7 cycle 9",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "9",
+      "ticker": null,
+      "title": "Financial monitoring"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-2cf708b46205e42e7e73f2"
+        ],
+        "id": "effective-items",
+        "label": "Effective-state items at export",
+        "period_label": "2026-01-09 \u00b7 cycle 9",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "5",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-ff149e7c7bc3d2760fb128"
+        ],
+        "id": "cycle-items",
+        "label": "Selected-cycle observations",
+        "period_label": "2026-01-09 \u00b7 cycle 9",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "4",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-8e6871680f048ec7e2adef"
+        ],
+        "id": "surfaced-items",
+        "label": "Selected-cycle surfaced items",
+        "period_label": "2026-01-09 \u00b7 cycle 9",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-672bb3ef30e781746e802e"
+        ],
+        "id": "cycle-value-0",
+        "label": "Saved value \u00b7 acme_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.47",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5cd5e95260c2d12e7dc8af"
+        ],
+        "id": "cycle-threshold-0",
+        "label": "Saved policy threshold \u00b7 acme_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-09c6deda31e663557ccbb4"
+        ],
+        "id": "cycle-value-1",
+        "label": "Saved value \u00b7 acme_int_cover",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2.1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a30ade719ada9296481eef"
+        ],
+        "id": "cycle-threshold-1",
+        "label": "Saved policy threshold \u00b7 acme_int_cover",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-b000da9965ef3edca12424"
+        ],
+        "id": "cycle-value-2",
+        "label": "Saved value \u00b7 beta_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-634ab657e00cf474489ebc"
+        ],
+        "id": "cycle-threshold-2",
+        "label": "Saved policy threshold \u00b7 beta_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "4.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-98c4cc6c6a89bf9eec1f3a"
+        ],
+        "id": "cycle-value-3",
+        "label": "Saved value \u00b7 gamma_liquidity",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1.32",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-d0b3d6ccb87bdbdd9504b6"
+        ],
+        "id": "cycle-threshold-3",
+        "label": "Saved policy threshold \u00b7 gamma_liquidity",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1.2",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-4a2e4f869b8db0dd88c369"
+        ],
+        "id": "effective-value-0",
+        "label": "Saved value \u00b7 acme_int_cover",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2.1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-9909c99d951c169604d0c1"
+        ],
+        "id": "effective-threshold-0",
+        "label": "Saved policy threshold \u00b7 acme_int_cover",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-9a892f6a0877feb4db08c7"
+        ],
+        "id": "effective-value-1",
+        "label": "Saved value \u00b7 acme_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.47",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5a5cf0cca1fd78990c08b7"
+        ],
+        "id": "effective-threshold-1",
+        "label": "Saved policy threshold \u00b7 acme_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a1f5d62a67f2303263074b"
+        ],
+        "id": "effective-value-2",
+        "label": "Saved value \u00b7 beta_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-0cd9135fb58ab37974cd96"
+        ],
+        "id": "effective-threshold-2",
+        "label": "Saved policy threshold \u00b7 beta_leverage",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "4.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-e0d395b741f8f03be6ebbe"
+        ],
+        "id": "effective-value-3",
+        "label": "Saved value \u00b7 delta_leverage",
+        "period_label": "Observation: 2026-01-07",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "4.6",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-022a5e2ede64c4ed9b2818"
+        ],
+        "id": "effective-threshold-3",
+        "label": "Saved policy threshold \u00b7 delta_leverage",
+        "period_label": "Observation: 2026-01-07",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "4.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-dd52a6fe50c3cd9fa40f18"
+        ],
+        "id": "effective-value-4",
+        "label": "Saved value \u00b7 gamma_liquidity",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1.32",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-05a28f680d30d8610165d5"
+        ],
+        "id": "effective-threshold-4",
+        "label": "Saved policy threshold \u00b7 gamma_liquidity",
+        "period_label": "Observation: 2026-01-09",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1.2",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-6459ae4829fdaa7ed1656b"
+        ],
+        "id": "reviews-count",
+        "label": "Pending correction reviews",
+        "period_label": "2026-01-09 \u00b7 cycle 9",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "0",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-6cab52fbccb4d76c47673c"
+        ],
+        "id": "decisions-count",
+        "label": "Saved correction decisions",
+        "period_label": "2026-01-09 \u00b7 cycle 9",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "0",
+        "visibility": "main"
+      }
+    ],
+    "report_id": "report-b6141d6ea6f033ca64e1918c",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "original-cycle",
+          "effective-state",
+          "history",
+          "reviews",
+          "decisions"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect observation dates, skipped inputs and any correction evidence separately.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-189f645937ab75ac7a7a22",
+          "e-29e6fbeb149e931dd0df70"
+        ],
+        "explanation": "Thresholds are saved synthetic analyst policies. Current effective state and original-cycle state answer different questions.",
+        "id": "review-6d8963519479f3c85122",
+        "impact": "section_restriction",
+        "section_refs": [
+          "original-cycle",
+          "effective-state",
+          "history"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/run",
+          "artifact:file-1#/current"
+        ],
+        "title": "Observation and policy scope"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [
+          "finding-effective-items",
+          "finding-cycle-items",
+          "finding-surfaced-items"
+        ],
+        "id": "original-cycle",
+        "metric_refs": [
+          "effective-items",
+          "cycle-items",
+          "surfaced-items"
+        ],
+        "purpose": "Saved cycle observations and surfaced items; no fresh compliance assessment.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122"
+        ],
+        "table_refs": [
+          "cycle-observations"
+        ],
+        "title": "Original selected cycle"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "effective-state",
+        "metric_refs": [],
+        "purpose": "This snapshot may differ from the original cycle after later observations or corrections.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122"
+        ],
+        "table_refs": [
+          "effective-observations"
+        ],
+        "title": "Effective state at export"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "history-0",
+          "history-1"
+        ],
+        "finding_refs": [],
+        "id": "history",
+        "metric_refs": [],
+        "purpose": "Only actually saved histories are available.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122"
+        ],
+        "table_refs": [],
+        "title": "Retained observation history"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "reviews",
+        "metric_refs": [
+          "reviews-count"
+        ],
+        "purpose": "Read-only evidence; original cycles remain unchanged and local attribution is not authenticated approval.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [],
+        "title": "Pending correction reviews"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "decisions",
+        "metric_refs": [
+          "decisions-count"
+        ],
+        "purpose": "Read-only evidence; original cycles remain unchanged and local attribution is not authenticated approval.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [],
+        "title": "Saved correction decisions"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "completed",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-6d8963519479f3c85122"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-1525c34937377ece6c46a6"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-6d8963519479f3c85122"
+      ],
+      "template_id": "saved-summary-v1",
+      "text": "Saved synthetic monitoring evidence for Example company watchlist. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "metric",
+            "label": "Saved metric"
+          },
+          {
+            "id": "observed",
+            "label": "Observation date"
+          },
+          {
+            "id": "value",
+            "label": "Value"
+          },
+          {
+            "id": "direction",
+            "label": "Policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Threshold"
+          },
+          {
+            "id": "state",
+            "label": "Saved classification"
+          }
+        ],
+        "id": "cycle-observations",
+        "review_refs": [
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Acme Corp"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "net_debt_to_ebitda"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cycle-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "cycle-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-4057906bab67c00f9665da"
+            ],
+            "id": "cycle-row-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Acme Corp"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "interest_coverage"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cycle-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or above"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "cycle-threshold-1"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-a2bc650a971d39a0ca16d2"
+            ],
+            "id": "cycle-row-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Beta Ltd"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "net_debt_to_ebitda"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cycle-value-2"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "cycle-threshold-2"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-51ba37ffdd2b0309a00466"
+            ],
+            "id": "cycle-row-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Gamma SA"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cycle-value-3"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or above"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "cycle-threshold-3"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-f8d7ecdf8bdd8a52ada7b8"
+            ],
+            "id": "cycle-row-3"
+          }
+        ],
+        "title": "Original selected-cycle observations"
+      },
+      {
+        "columns": [
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "metric",
+            "label": "Saved metric"
+          },
+          {
+            "id": "observed",
+            "label": "Observation date"
+          },
+          {
+            "id": "value",
+            "label": "Value"
+          },
+          {
+            "id": "direction",
+            "label": "Policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Threshold"
+          },
+          {
+            "id": "state",
+            "label": "Saved classification"
+          }
+        ],
+        "id": "effective-observations",
+        "review_refs": [
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Acme Corp"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "interest_coverage"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or above"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-55007b19bab060188ac039"
+            ],
+            "id": "effective-row-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Acme Corp"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "net_debt_to_ebitda"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-1"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-d9e733f8dd1bdffad8953a"
+            ],
+            "id": "effective-row-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Beta Ltd"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "net_debt_to_ebitda"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-2"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-2"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-af795fdc0752c724c8b8c4"
+            ],
+            "id": "effective-row-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Delta GmbH"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "net_debt_to_ebitda"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-07"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-3"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-3"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-6218d9cbbcf148a4c225d3"
+            ],
+            "id": "effective-row-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Gamma SA"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-09"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-4"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or above"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-4"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-47883a54759f609a13a7a2"
+            ],
+            "id": "effective-row-4"
+          }
+        ],
+        "title": "Effective state at export"
+      }
+    ],
+    "workflow": "monitoring"
+  }
+}

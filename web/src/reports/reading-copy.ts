@@ -4,12 +4,12 @@ import type { NativeReport } from './report-data';
 import { calendarDate, formatMetric } from './format.ts';
 
 export function readingCopy(report: NativeReport) {
-  if (report.agent !== 'agent3' || !['events','news'].includes(report.workflow)) throw new ReportFailure('unsupported_report_schema');
+  if (!(report.agent === 'agent3' && ['events','news'].includes(report.workflow) || report.agent === 'agent2' && report.workflow === 'monitoring')) throw new ReportFailure('unsupported_report_schema');
   const metrics=new Map(report.metrics.map(m=>[m.id,m]));
   const labels=new Map(report.evidence.map((e,i)=>[e.id,'E'+(i+1)]));
   const references=(refs:string[])=>refs.map(ref=>labels.get(ref) || 'Unresolved reference').join(', ');
   return {
-    title:report.workflow==='news'?'Company news':'Past event reactions',
+    title:report.workflow==='monitoring'?'Financial monitoring':report.workflow==='news'?'Company news':'Past event reactions',
     references,
     metrics:report.metrics.map(m=>({...m,display:formatMetric(m),references:references(m.evidence_refs)})),
     charts:report.charts.map(chart=>({chart,rows:datasetRows(chart).map(row=>({

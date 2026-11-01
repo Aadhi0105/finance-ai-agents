@@ -130,6 +130,27 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | Full automated checks | 1,118 Python tests, 115 frontend tests, TypeScript and production build passed; no new dependencies |
 | Print/PDF and wider user acceptance | Complete copy and print stylesheet implemented; print paused DOM automation, automated tab closed without submitting a print job. Actual PDF pagination/reconciliation, physical printing, physical-device/screen-reader and human interpretation acceptance remain open |
 
+## Part 4A — monitoring evidence
+
+See [implementation and repeatable fixtures](part4a-monitoring.md). These checks
+cover saved synthetic snapshots; the earlier 3C route result above describes the
+state before 4A.
+
+| Part 4A check | Result |
+| --- | --- |
+| Original cycle, surfaced items and retained export state remain distinct | Backend and browser checked: four / one breach / two surfaced versus five retained rows / two non-retired breaches; older Delta date remains visible |
+| Baseline, quiet cycle and no new observations | Backend/browser checked; baseline suppression explicit, zero surfaced items does not clear export-state breaches, no new observations does not claim reassessment |
+| Unknown units, incomplete breach flags and unavailable history | Backend/browser checked; values/counts withheld, missing histories not inferred, saved classifications accompanied by an unavailable-assessment explanation |
+| Real correction flows | Offline engine tests cover hold, approval, rejection and definition replacement; browser checks pending 4.0× → proposed 2×, separate six-row before/after evidence, retained original classification and replacement series; no decision controls |
+| History inspection and source round trip | Browser keyboard End selects 9 January 2.1×, source pointer ends `/acme_int_cover/8/value`, return restores focus; Delta has no invented history |
+| Search, attention filters and pagination | Browser surfaced filter retains two cards, breach filter one; 32-row table pages 1–25 / 26–32, complete copy retains all 32 |
+| Complete reading copy | Browser copy contains both full nine-point line histories, original/effective tables and all source references; interactive filter and return focus preserved |
+| 390px and 320px layouts | Browser checked; no outer page overflow in inspected card/copy states; viewport override reset |
+| Fresh validation before copy | Disposable source-byte change blocks copy, removes stale figures/downloads and focuses the safe error; exact hash restoration recovers |
+| Compatibility and source preservation | Separate 1.0/1.1 recipes tested; helper refuses overwrite/child destination, original 31 source files unchanged; API integration reads all five workflow families |
+| Automated checks | 1,143 Python tests, 138 frontend tests, TypeScript and production build passed; no dependencies added |
+| Remaining acceptance | Human interpretation, physical touch/screen reader, actual PDF/physical print and browser saved-download completion remain pending; Agent 4 native reader is Part 4B |
+
 | ID | Criterion | Verification required | Status |
 | --- | --- | --- | --- |
 | NATIVE-01 | Primary reports render as native components within Keystone | Inspect all five workflow pages; no primary report iframe or raw HTML injection | Pending |
@@ -137,14 +158,14 @@ scope is not yet implemented. See [the reader evidence](part2b1-reader.md).
 | NATIVE-03 | Execution, evidence gate, integrity and financial approval remain distinct | Gate-mapping tests and visual review; financial approval stays false | Pending |
 | NATIVE-04 | Warning grouping preserves all original findings and their impacts | Compare source checks to grouped reasons; inspect local and report-level notices | Pending |
 | NATIVE-05 | Main summaries use only explicitly supported templates/references | Grounding and unsupported-prose refusal checks; no hidden model publication path | Pending |
-| NATIVE-06 | Every chart uses supplied numerical data, with matching exact tables | Reconcile axes/points/tooltips/table values and chart-specific restrictions | Agent 1, event-case bars and news coverage/diagnostics implemented/browser checked; verified event paths and monitoring/close pending |
+| NATIVE-06 | Every chart uses supplied numerical data, with matching exact tables | Reconcile axes/points/tooltips/table values and chart-specific restrictions | Agent 1, event-case bars, news coverage/diagnostics and monitoring histories implemented/browser checked; verified event paths and close pending |
 | NATIVE-07 | Pointer, keyboard and touch expose equivalent information | Browser input checks; visible focus; readable labels; colour-independent meaning | Agent 1/event/news selection and keyboard checked; physical touch, screen-reader and wider cross-agent acceptance pending |
-| NATIVE-08 | Narrow layouts preserve the report and evidence | Review at 320px and 390px widths; outer page stays within viewport; table scrolling contained | Agent 1/event/news sections and source detail checked; monitoring/close pending |
+| NATIVE-08 | Narrow layouts preserve the report and evidence | Review at 320px and 390px widths; outer page stays within viewport; table scrolling contained | Agent 1/event/news/monitoring sections checked; close and wider cross-agent acceptance pending |
 | NATIVE-09 | Invalid, oversized, unsupported and missing views have truthful load states | Error-response and browser tests; no partial/stale verified view or path leakage | Pending |
 | NATIVE-10 | Opening a report does not mutate evidence or trigger execution/network acquisition | Before/after hashes; provider/model calls blocked; no mutation endpoints added | Pending |
 | NATIVE-11 | Old supported/unsupported saved records are handled explicitly | Compatibility cases; no guessing from arbitrary JSON or source HTML | Pending |
 | NATIVE-12 | Source/view versions cannot be mixed | Tamper/version/concurrent-delivery checks; registration published last | Pending |
-| NATIVE-13 | Print/export and original downloads preserve values and restrictions | Inspect print output and download hashes; original report sandbox remains in force | Agent 3 complete-copy content and pre-print integrity checks passed in 3C; actual PDF/physical-print and saved-download completion, other workflows pending |
+| NATIVE-13 | Print/export and original downloads preserve values and restrictions | Inspect print output and download hashes; original report sandbox remains in force | Agent 2/3 complete-copy content and fresh integrity checks passed; actual PDF/physical-print, saved-download completion and other workflows pending |
 | NATIVE-14 | Bounded payloads render without freezing or silently dropping content | Largest allowed fixture and over-limit refusal; documented aggregate bounds | Agent 1 data/geometry bounds and Agent 3 2,000-case/600-story browser samples checked; oversized QA details refused before catalogue publication; exhaustive maximum-payload/cross-agent timing pending |
 
 ## Workflow implementation
