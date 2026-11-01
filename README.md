@@ -206,6 +206,15 @@ reading copies, consistent static graphs and cross-agent browser acceptance acro
 PDF/print acceptance remain open. Verified event-relative paths and authorised
 live-source integration remain later work.
 
+[Webapp Batch 2A](docs/webapp/batch2a-job-admission.md) implements opt-in,
+protected offline job admission: strict requests over registered saved inputs,
+durable job identities/source pins, duplicate-request protection and local token
+access. The default report server remains read-only. Accepted jobs wait for the
+background worker unless it is explicitly enabled.
+[Batch 2B](docs/webapp/batch2b-background-execution.md) implements supervised
+background rebuild/replay, pre-execution source checks, append-only native report
+registration and delivery-only recovery. Interface Run controls follow in 2C.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

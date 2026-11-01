@@ -10,7 +10,7 @@ import re
 import stat
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 MAX_FILE_BYTES = 20_000_000
 ID = r'^[a-z0-9][a-z0-9_-]{0,79}$'
@@ -90,9 +90,36 @@ class NativeViewRegistration(Record):
     source_artifact_ids: list[str] = Field(min_length=2, max_length=2)
 
 
+class JobOrigin(Record):
+    job_id: str = Field(pattern=r'^job-[a-f0-9]{32}$')
+    source_catalog_run_id: str = Field(pattern=ID)
+    source_run_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    request_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    profile: str = Field(pattern=r'^[a-z][a-z-]{0,59}$')
+    producer_code_commit: str = Field(pattern=r'^[a-f0-9]{40}$')
+    producer_worktree_dirty: bool
+    producer_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+
+
 class RunV2(Run):
     artifacts: list[ArtifactV2] = Field(min_length=1, max_length=40)
     native_view: NativeViewRegistration | None = None
+    job_origin: JobOrigin | None = None
+
+    @model_validator(mode='after')
+    def job_identity(self):
+        if self.job_origin and (self.id != 'result-' + self.job_origin.job_id[4:]
+                                or self.id == self.job_origin.source_catalog_run_id):
+            raise ValueError('Job result identity disagrees.')
+        return self
+
+
+def run_identity(run):
+    """Retain pre-worker fingerprints when the new optional provenance is absent."""
+    value = run.model_dump()
+    if value.get('job_origin') is None:
+        value.pop('job_origin', None)
+    return value
 
 
 class ManifestV2(Manifest):
@@ -212,7 +239,7 @@ class Catalog:
 
     @staticmethod
     def public_run(run):
-        value = run.model_dump()
+        value = run_identity(run)
         for artifact in value['artifacts']:
             artifact['url'] = f"/api/runs/{run.id}/files/{artifact['name']}"
         return value

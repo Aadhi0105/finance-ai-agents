@@ -98,7 +98,12 @@ These are explicit design recommendations, not user approval or financial sign-o
    Human interpretation, physical accessibility and actual PDF/print acceptance
    remain open; use the prepared reader trial.
 7. Webapp Batch 2: controlled execution, using the same report contract for newly
-   completed runs.
+   completed runs. [Part 2A job admission](../batch2a-job-admission.md) is implemented:
+   protected offline requests, durable identities and pinned registered evidence.
+   [Part 2B](../batch2b-background-execution.md) adds the opt-in supervised worker,
+   native report registration and delivery-only recovery. Part 2C adds the Run
+   interface and 2D the complete execution/recovery validation. Admission alone
+   continues to queue work without starting an agent.
 
 External broker research, free-form investment theses, real-data permissions,
 authenticated approvals and production deployment remain separately scoped work.
