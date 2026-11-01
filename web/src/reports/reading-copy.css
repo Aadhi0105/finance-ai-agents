@@ -19,6 +19,10 @@
 .nr-copy-plot-scroll:focus-visible { outline:2px solid #8a713b; outline-offset:3px; }
 .nr-copy-plot { display:block; width:100%; min-width:900px; height:auto; }
 .nr-copy-plot text { font:11px system-ui,sans-serif; fill:#3d533f; }
+.nr-copy-figure { margin:18px 0; min-width:0; max-width:100%; }
+.nr-reading-copy .nr-copy-chart-legend { list-style:none; display:flex; flex-wrap:wrap; gap:8px 20px; padding:0; }
+.nr-copy-chart-legend li { display:flex; align-items:center; gap:8px; }
+.nr-copy-chart-legend svg { flex:none; }
 .nr-reading-copy dt { font-weight:600; }
 .nr-reading-copy dd { margin:5px 0 14px; }
 .nr-header-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; }

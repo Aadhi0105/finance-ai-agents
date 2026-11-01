@@ -59,6 +59,9 @@ def validate_series(run, source, series, primary):
             if get(source, pointer) is None and entry['data']:
                 raise NativeViewError()
         if key == 'bridge':
+            if version == '1.1.0':
+                from .close_context import validate_bridge
+                validate_bridge(source,entry['data'])
             for row in entry['data']:
                 if (set(row) != {'label', 'value', 'start', 'end', 'assessment'} or not isinstance(row['label'], str)
                         or row['assessment'] not in {'anchor', 'favourable', 'adverse'}

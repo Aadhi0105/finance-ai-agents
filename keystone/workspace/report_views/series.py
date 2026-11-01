@@ -17,6 +17,17 @@ def prepare_series(run, source, source_artifact):
     if run.workflow == 'research':
         _research(source, result['derivations'])
     elif run.workflow == 'close':
+        if version == '1.1.0':
+            # Operator-only accounting validation against the frozen panels and
+            # canonical claims. Delivery never reruns the close or statistics.
+            from agent4.report import validate_bundle
+            from agent4.hierarchy import ReconciliationError
+            from .errors import NativeViewError
+            from .values import digest
+            try:
+                validate_bundle({'bundle': source, 'bundle_digest': digest(source)})
+            except ReconciliationError as exc:
+                raise NativeViewError() from exc
         _close(source, result['derivations'])
     return result
 

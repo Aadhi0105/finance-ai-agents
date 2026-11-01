@@ -42,8 +42,10 @@ test('reading-copy text and addresses remain data, never trusted HTML or navigab
   assert.equal(typeof copy.tables[0].rows[0].values[0],'string');
 });
 
-test('reading-copy scope does not silently admit another native reader',()=>{
-  assert.throws(()=>readingCopy(saved('research-snapshot.json')),{code:'unsupported_report_schema'});
+test('research reading copy is admitted only for its known agent/workflow pair',()=>{
+  const report=saved('research-snapshot.json');assert.equal(readingCopy(report).title,'Company research');
+  report.agent='agent3';assert.throws(()=>readingCopy(report),{code:'unsupported_report_schema'});
+  report.workflow='unknown';assert.throws(()=>readingCopy(report),{code:'unsupported_report_schema'});
 });
 
 test('only news 1.2 admits the incomplete-attempt summary template',()=>{

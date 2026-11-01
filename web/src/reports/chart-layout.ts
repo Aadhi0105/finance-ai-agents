@@ -2,12 +2,12 @@
 import type { ChartData, ChartPoint } from './analysis-types';
 
 export type ChartRow = { x: string; label: string; points: (ChartPoint | null)[] };
-export type PlotPoint = { row: number; x: number; y: number };
+export type PlotPoint = { row: number; x: number; y: number; startY?:number; assessment?:'anchor'|'favourable'|'adverse' };
 export type PlotGeometry = {
   width: number; height: number; left: number; right: number; top: number; bottom: number;
   xs: number[]; ticks: { value: string; y: number }[]; zero: number;
   series: { index: number; segments: PlotPoint[][] }[];
-  kind: 'line' | 'bar' | 'dot'; reason: string | null;
+  kind: 'line' | 'bar' | 'dot' | 'waterfall'; reason: string | null;
 };
 
 function decimalParts(value: string) {
@@ -27,14 +27,17 @@ function decimal(value: bigint, places: number) {
 export function plotGeometry(chart: ChartData, rows: ChartRow[], width: number, hidden: readonly string[] = []): PlotGeometry {
   const geometry: PlotGeometry = { width: Math.max(220, width), height: width < 480 ? 250 : 290,
     left: 66, right: Math.max(220, width) - 17, top: 20, bottom: width < 480 ? 199 : 239,
-    xs: [], ticks: [], zero: 0, series: [], kind: chart.type === 'bar' ? 'bar' : chart.type === 'line' ? 'line' : 'dot', reason: null };
+    xs: [], ticks: [], zero: 0, series: [], kind: chart.type === 'waterfall' ? 'waterfall' : chart.type === 'bar' ? 'bar' : chart.type === 'line' ? 'line' : 'dot', reason: null };
   if (chart.availability !== 'available') return { ...geometry, reason: 'This saved series is unavailable or withheld.' };
-  if (!['line', 'bar', 'dot_plot', 'scenario_range'].includes(chart.type) || !['date', 'category'].includes(chart.x_axis.kind)) {
+  if (!['line', 'bar', 'dot_plot', 'scenario_range','waterfall'].includes(chart.type) || !['date', 'category'].includes(chart.x_axis.kind)) {
     return { ...geometry, reason: 'An interactive plot is not supported for this saved chart type. Its exact table remains available.' };
   }
   const visible = chart.series.map((s, index) => ({ s, index })).filter(({s}) => !hidden.includes(s.id));
   if (!visible.length) return { ...geometry, reason: 'All series are hidden. Select a series in the legend to show it again.' };
-  const values = rows.flatMap(r => visible.flatMap(({index}) => r.points[index]?.y == null ? [] : [r.points[index]!.y!]));
+  const waterfall = geometry.kind==='waterfall';
+  if(waterfall && (chart.series.length!==1||chart.x_axis.kind!=='category'||rows.some(r=>r.points.some(p=>!p||p.y===null||typeof p.start!=='string'||typeof p.end!=='string'||![p.start,p.end].every(v=>/^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/.test(v))||!p.assessment))))
+    return {...geometry,reason:'Complete saved bridge endpoints and assessments are required.'};
+  const values = rows.flatMap(r => visible.flatMap(({index}) => r.points[index]?.y == null ? [] : waterfall ? [r.points[index]!.start!,r.points[index]!.end!] : [r.points[index]!.y!]));
   if (!values.length) return { ...geometry, reason: 'No usable saved points are available for the selected series.' };
 
   // Integer decimal alignment avoids losing small differences in large amounts.
@@ -42,7 +45,7 @@ export function plotGeometry(chart: ChartData, rows: ChartRow[], width: number, 
   const places = Math.max(2, ...values.map(v => decimalParts(v).fraction.length));
   const numbers = values.map(v => scaled(v, places));
   let low = numbers.reduce((a, b) => a < b ? a : b), high = numbers.reduce((a, b) => a > b ? a : b);
-  if (geometry.kind === 'bar') { low = low < 0n ? low : 0n; high = high > 0n ? high : 0n; }
+  if (geometry.kind === 'bar'||waterfall) { low = low < 0n ? low : 0n; high = high > 0n ? high : 0n; }
   const span = high - low;
   if (span === 0n) {
     const magnitude = low < 0n ? -low : low;
@@ -87,12 +90,17 @@ export function plotGeometry(chart: ChartData, rows: ChartRow[], width: number, 
       if (!point || point.y === null) {
         if (segment.length) segments.push(segment);
         segment = [];
-      } else segment.push({row: i, x: geometry.xs[i], y: y(scaled(point.y, places))});
+      } else segment.push(waterfall ? {row:i,x:geometry.xs[i],y:y(scaled(point.end!,places)),startY:y(scaled(point.start!,places)),assessment:point.assessment}
+        : {row: i, x: geometry.xs[i], y: y(scaled(point.y, places))});
     });
     if (segment.length) segments.push(segment);
     return {index, segments};
   });
   return geometry;
+}
+
+export function bridgeColor(assessment:string|undefined) {
+  return assessment==='anchor'?'#47616a':assessment==='adverse'?'#97512f':'#315f4c';
 }
 
 export function nearestObservation(xs: readonly number[], position: number) {
