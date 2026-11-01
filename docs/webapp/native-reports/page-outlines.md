@@ -213,6 +213,10 @@ and an investment conclusion—and identify when no published tone is available?
 
 ## Agent 2 — financial monitoring
 
+[Part 4A](part4a-monitoring.md) implements this native reader for saved synthetic
+snapshots, including a complete reading copy. Human interpretation and full
+physical-device/print acceptance remain open.
+
 **Question:** Which saved observations breach the selected policy or require
 investigation, and what changed at the selected cycle?
 

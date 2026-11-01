@@ -3,7 +3,8 @@
 Contract version 1 · 30 October 2026 · Part 2A backend implemented for synthetic evidence.
 Agent 1 frontend consumption is implemented in Parts 2B and [2C](part2c-charts.md);
 [Part 3A](part3a-events.md) adds Agent 3 event consumption and [Part 3B](part3b-news.md)
-adds company news. Monitoring and close native readers remain later work.
+adds company news. [Part 4A](part4a-monitoring.md) adds native monitoring; the close
+reader remains later work.
 See [data-layer scope](part2a-data-layer.md).
 
 ## 1. Ownership and lifecycle
@@ -34,7 +35,7 @@ new registered presentation revision/workspace when applying a new adapter.
 Rebuilding a presentation must record its adapter/version and source identities
 in the runtime registration; it does not imply new market observations.
 
-Research, event and news adapters support 1.0.0/1.1.0 as separate retained recipes.
+Research, monitoring, event and news adapters support 1.0.0/1.1.0 as separate retained recipes.
 Event 1.1.0 adds source-linked context tables and the closed
 `event-study-summary-v1` template. The browser admits that template only for the
 event 1.1.0 family. Event-case charts are categorical diagnostic CAR bars; both
@@ -48,7 +49,7 @@ synthetic story details remain unverified display text rather than active links.
 News 1.2.0 additionally supports an early failed/unavailable/refused attempt with
 no result, using `news-retrieval-summary-v1`. That template cannot accompany a
 completed state or populated analytical figures. Prior recipes remain unchanged.
-Agent 3 complete reading/print copies use the same validated data, independently
+Agent 2 and Agent 3 complete reading/print copies use the same validated data, independently
 of display filters and pagination, and reread the registered endpoint before
 opening and before requesting printing. No new data/export route is introduced.
 

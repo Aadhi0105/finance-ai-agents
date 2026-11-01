@@ -1,0 +1,2961 @@
+{
+  "run": {
+    "id": "monitor-replaced",
+    "agent": "agent2",
+    "workflow": "monitoring",
+    "title": "Synthetic QA \u00b7 monitor-replaced",
+    "entity": "Example company watchlist",
+    "period": "Synthetic selected cycle 3",
+    "prepared_at": "2026-11-01T00:58:43.674145+00:00",
+    "execution_status": "completed",
+    "review_status": "review_required",
+    "summary": "Controlled synthetic monitoring acceptance case.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Synthetic thresholds do not establish contractual covenant compliance.",
+      "Report browsing does not refresh observations or decide corrections."
+    ],
+    "checks": [
+      "Synthetic QA only"
+    ],
+    "metrics": [],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "QA fixture description",
+        "kind": "report",
+        "sha256": "5aeecd06467383912c9d4e57f3aee3d7802750a3e331c46e4da4ca2001a9a5c7",
+        "bytes": 215,
+        "url": "/api/runs/monitor-replaced/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "snapshot.json",
+        "label": "Controlled synthetic snapshot",
+        "kind": "evidence",
+        "sha256": "7b2160c12257b9438f67b916b030d55175fcf3d76d1e5b0035a9b4ad4a8d85ba",
+        "bytes": 15529,
+        "url": "/api/runs/monitor-replaced/files/snapshot.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "91ba004c5594584636be06506c3576b85164cf03413abcd8535c756f2848530b",
+        "bytes": 245,
+        "url": "/api/runs/monitor-replaced/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "41c0e80cddef4eab9df15374d567b7d84d6edf1691b4ead6cd9c3fc13959a3bc",
+        "bytes": 50206,
+        "url": "/api/runs/monitor-replaced/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "3",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent2-native-report",
+      "adapter_version": "1.1.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent2",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "snapshot.json",
+        "sha256": "7b2160c12257b9438f67b916b030d55175fcf3d76d1e5b0035a9b4ad4a8d85ba",
+        "source_schema": "agent2.snapshot/unversioned"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "91ba004c5594584636be06506c3576b85164cf03413abcd8535c756f2848530b",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "history-0",
+        "purpose": "Actual observations retained for the original cycle; not current effective-state history.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-2eb3b9b5fdb7eee7150c",
+          "review-5e1d1fd2a88d9d84690b",
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "observations-0",
+            "label": "qa_ratio",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-b3aa95487aa0ef5992c710"
+                ],
+                "id": "observation-0",
+                "label": "2026-01-01",
+                "reason_codes": [],
+                "x": "2026-01-01",
+                "y": "1.0"
+              },
+              {
+                "evidence_refs": [
+                  "e-b933ed1dfa5f4159505e8e"
+                ],
+                "id": "observation-1",
+                "label": "2026-01-02",
+                "reason_codes": [],
+                "x": "2026-01-02",
+                "y": "4.0"
+              },
+              {
+                "evidence_refs": [
+                  "e-c11dcb9f275fcdd4ab3199"
+                ],
+                "id": "observation-2",
+                "label": "2026-01-03",
+                "reason_codes": [],
+                "x": "2026-01-03",
+                "y": "5"
+              }
+            ]
+          }
+        ],
+        "title": "Selected-cycle history \u00b7 qa_ratio",
+        "type": "line",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Saved observation date"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "multiple",
+          "unit": "multiple"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2cf708b46205e42e7e73f2",
+        "label": "Effective-state items at export",
+        "method": null,
+        "pointer": "/current",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ff149e7c7bc3d2760fb128",
+        "label": "Selected-cycle observations",
+        "method": null,
+        "pointer": "/run/rows",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8e6871680f048ec7e2adef",
+        "label": "Selected-cycle surfaced items",
+        "method": null,
+        "pointer": "/run/surfaced",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-672bb3ef30e781746e802e",
+        "label": "Saved value \u00b7 qa_ratio",
+        "method": null,
+        "pointer": "/run/rows/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5cd5e95260c2d12e7dc8af",
+        "label": "Saved policy threshold \u00b7 qa_ratio",
+        "method": null,
+        "pointer": "/run/rows/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4057906bab67c00f9665da",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/run/rows/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4a2e4f869b8db0dd88c369",
+        "label": "Saved value \u00b7 qa_ratio",
+        "method": null,
+        "pointer": "/current/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9909c99d951c169604d0c1",
+        "label": "Saved policy threshold \u00b7 qa_ratio",
+        "method": null,
+        "pointer": "/current/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-55007b19bab060188ac039",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9a892f6a0877feb4db08c7",
+        "label": "Saved value \u00b7 qa_ratio_v2",
+        "method": null,
+        "pointer": "/current/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5a5cf0cca1fd78990c08b7",
+        "label": "Saved policy threshold \u00b7 qa_ratio_v2",
+        "method": null,
+        "pointer": "/current/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d9e733f8dd1bdffad8953a",
+        "label": "Saved monitoring observation",
+        "method": null,
+        "pointer": "/current/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b3aa95487aa0ef5992c710",
+        "label": "2026-01-01",
+        "method": null,
+        "pointer": "/run/triage_history/qa_ratio/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b933ed1dfa5f4159505e8e",
+        "label": "2026-01-02",
+        "method": null,
+        "pointer": "/run/triage_history/qa_ratio/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c11dcb9f275fcdd4ab3199",
+        "label": "2026-01-03",
+        "method": null,
+        "pointer": "/run/triage_history/qa_ratio/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6459ae4829fdaa7ed1656b",
+        "label": "Pending correction reviews",
+        "method": null,
+        "pointer": "/reviews",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6cab52fbccb4d76c47673c",
+        "label": "Saved correction decisions",
+        "method": null,
+        "pointer": "/decisions",
+        "source_id": "saved-source",
+        "transform": "count"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-189f645937ab75ac7a7a22",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/run",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-29e6fbeb149e931dd0df70",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/current",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5578e69091da594cbe3186",
+        "label": "Recorded breaches in the selected cycle",
+        "method": "Count records whose saved breached flag is true; missing/non-Boolean flags withhold the count. No new threshold assessment.",
+        "pointer": "/run/rows",
+        "source_id": "saved-source",
+        "transform": "approved_python_derivation"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7c96bc8d38c33f5487ab18",
+        "label": "Recorded breaches in non-retired export items",
+        "method": "Count records whose saved breached flag is true excluding rows with a saved retired_to replacement; missing/non-Boolean flags withhold the count. No new threshold assessment.",
+        "pointer": "/current",
+        "source_id": "saved-source",
+        "transform": "approved_python_derivation"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cd0493ddb7c6196289a87a",
+        "label": "Saved selected-cycle surfaced items",
+        "method": null,
+        "pointer": "/run/surfaced",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-274243b3d2b71b283c03bb",
+        "label": "Selected cycle",
+        "method": null,
+        "pointer": "/run/cycle",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-823ff9c74204e3b231039b",
+        "label": "Cycle observation date",
+        "method": null,
+        "pointer": "/run/data_ts",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ed790aa8a337f2be96cde9",
+        "label": "Saved cycle status",
+        "method": null,
+        "pointer": "/run/status",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c6460195a636ab3a28401c",
+        "label": "Baseline / alert suppression",
+        "method": null,
+        "pointer": "/run/baseline",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-85470f5049cd0334217327",
+        "label": "Missed scheduler cycles",
+        "method": null,
+        "pointer": "/run/gap",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2e6c9299c9d5cd2f17a91b",
+        "label": "Saved replay flag",
+        "method": null,
+        "pointer": "/run/replayed",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-71837cc3bf2808ee945fb4",
+        "label": "Snapshot exported at (not an observation date)",
+        "method": null,
+        "pointer": "/exported_at",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3b487768c6e3d22e1c005b",
+        "label": "Unreadable triage audits",
+        "method": null,
+        "pointer": "/unreadable_audits",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5d1ce1b127bd64314b9172",
+        "label": "Saved correction decision; local attribution only",
+        "method": null,
+        "pointer": "/decisions/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d1d0fb35efd379a37932cf",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/before/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e148890a7a0795506e097d",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/before/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8a86dfcc9c2a813283a7c9",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/before/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-088072023fc9e4c6e4c41f",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/before/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cb283fb3cf72cb46e15001",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/before/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-dab18c9892d0063dca8f2a",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/before/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3eccff029f69375d8e3974",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/before/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cc9eb3f5275cdbe5af7a59",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/before/2/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3f566c04a857614ced4246",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/before/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a5296832e9874f8aa69702",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/after/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-301d77a5d04796c0570e4c",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/after/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-72faf4856cf39782b50cba",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/after/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5a8cb21f1f3e0916a8fca8",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/after/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c2acaf6194d11ec419ba24",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/after/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-974826cb219b4e59992f88",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/after/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-33124a7ce42938fe06a8b9",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/0/after/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-edb5e3de710cf7ee8c8e4e",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/0/after/2/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-8a7632192c957edc0e87c1",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/0/after/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-93c8cccd4d52737dec0e0d",
+        "label": "Saved correction decision; local attribution only",
+        "method": null,
+        "pointer": "/decisions/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5ee874d06945883f863c23",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/1/before/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b0bec3fbdfa0a1958be41d",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/1/before/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cab91de737a78750383a12",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/1/before/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-aa21830624c25bce7395b8",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/1/before/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-648e884d25642c252451cd",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/1/before/1/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a2d0b79804469ffb74d557",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/1/before/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-143b8b1ef947c047bd8442",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/1/before/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-dc83edffbeb893849e4b15",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/1/before/2/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ba9f81a67671e73f41cffb",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/1/before/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-26e716176d86569de56a69",
+        "label": "Saved decision observation",
+        "method": null,
+        "pointer": "/decisions/1/after/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4b8a08c2c3e2809aaee7ca",
+        "label": "Saved decision policy",
+        "method": null,
+        "pointer": "/decisions/1/after/0/threshold",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4b2705270c68037d329ac5",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions/1/after/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e990b3a1e8bee4a6e0db80",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/reviews",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-96c8534622975b8befbfc1",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/decisions",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-ff149e7c7bc3d2760fb128"
+          ],
+          "metric_refs": [
+            "cycle-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved selected-cycle observations: 1 (Synthetic selected cycle 3)."
+        },
+        "id": "finding-cycle-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-8e6871680f048ec7e2adef"
+          ],
+          "metric_refs": [
+            "surfaced-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved selected-cycle surfaced items: 1 (Synthetic selected cycle 3)."
+        },
+        "id": "finding-surfaced-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-2cf708b46205e42e7e73f2"
+          ],
+          "metric_refs": [
+            "effective-items"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved effective-state items at export: 2 (Snapshot export: 2026-11-01T00:58:43.669358+00:00)."
+        },
+        "id": "finding-effective-items",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "The saved breached Boolean flag, including widening, improving or stable breaches. The browser does not perform a fresh threshold assessment.",
+        "term": "Recorded breach"
+      },
+      {
+        "definition": "An item selected by saved detection for attention. It may be a breach or an early-warning diagnostic.",
+        "term": "Surfaced item"
+      },
+      {
+        "definition": "At or above means value \u2265 threshold is allowed; at or below means value \u2264 threshold is allowed. These are analyst policies.",
+        "term": "Policy direction"
+      },
+      {
+        "definition": "Observation dates identify saved measurements. Export time identifies when this snapshot was assembled. Scheduler cycles are not reporting periods.",
+        "term": "Observation date and export time"
+      },
+      {
+        "definition": "Only original-cycle histories actually saved in the snapshot are plotted. Cycle IDs, effective-state rows and decision histories are not joined into a new time series.",
+        "term": "Retained history"
+      },
+      {
+        "definition": "Pending candidates remain unapplied. Approved restatements preserve original-cycle records. Definition changes use a new series; rejection retains history. Names record local attribution only.",
+        "term": "Correction evidence"
+      }
+    ],
+    "identity": {
+      "entity": "Example company watchlist",
+      "period_end": null,
+      "period_label": "Synthetic selected cycle 3",
+      "prepared_at": "2026-11-01T00:58:43.674145+00:00",
+      "source_run_id": "3",
+      "ticker": null,
+      "title": "Synthetic QA \u00b7 monitor-replaced"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-2cf708b46205e42e7e73f2"
+        ],
+        "id": "effective-items",
+        "label": "Effective-state items at export",
+        "period_label": "Snapshot export: 2026-11-01T00:58:43.669358+00:00",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-ff149e7c7bc3d2760fb128"
+        ],
+        "id": "cycle-items",
+        "label": "Selected-cycle observations",
+        "period_label": "Synthetic selected cycle 3",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "1",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-8e6871680f048ec7e2adef"
+        ],
+        "id": "surfaced-items",
+        "label": "Selected-cycle surfaced items",
+        "period_label": "Synthetic selected cycle 3",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "1",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-672bb3ef30e781746e802e"
+        ],
+        "id": "cycle-value-0",
+        "label": "Saved value \u00b7 qa_ratio",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5cd5e95260c2d12e7dc8af"
+        ],
+        "id": "cycle-threshold-0",
+        "label": "Saved policy threshold \u00b7 qa_ratio",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-4a2e4f869b8db0dd88c369"
+        ],
+        "id": "effective-value-0",
+        "label": "Saved value \u00b7 qa_ratio",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "5.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-9909c99d951c169604d0c1"
+        ],
+        "id": "effective-threshold-0",
+        "label": "Saved policy threshold \u00b7 qa_ratio",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-9a892f6a0877feb4db08c7"
+        ],
+        "id": "effective-value-1",
+        "label": "Saved value \u00b7 qa_ratio_v2",
+        "period_label": "Observation: 2026-01-05",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5a5cf0cca1fd78990c08b7"
+        ],
+        "id": "effective-threshold-1",
+        "label": "Saved policy threshold \u00b7 qa_ratio_v2",
+        "period_label": "Observation: 2026-01-05",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "7.0",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-6459ae4829fdaa7ed1656b"
+        ],
+        "id": "reviews-count",
+        "label": "Pending correction reviews",
+        "period_label": "Snapshot export: 2026-11-01T00:58:43.669358+00:00",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "0",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-6cab52fbccb4d76c47673c"
+        ],
+        "id": "decisions-count",
+        "label": "Saved correction decisions",
+        "period_label": "Snapshot export: 2026-11-01T00:58:43.669358+00:00",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5578e69091da594cbe3186"
+        ],
+        "id": "cycle-breaches",
+        "label": "Recorded breaches in the selected cycle",
+        "period_label": "Synthetic selected cycle 3",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "1",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-7c96bc8d38c33f5487ab18"
+        ],
+        "id": "effective-breaches",
+        "label": "Recorded breaches in non-retired export items",
+        "period_label": "Snapshot export: 2026-11-01T00:58:43.669358+00:00",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "0",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-d1d0fb35efd379a37932cf"
+        ],
+        "id": "decision-0-before-value-0",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-e148890a7a0795506e097d"
+        ],
+        "id": "decision-0-before-threshold-0",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-088072023fc9e4c6e4c41f"
+        ],
+        "id": "decision-0-before-value-1",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "4",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-cb283fb3cf72cb46e15001"
+        ],
+        "id": "decision-0-before-threshold-1",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-3eccff029f69375d8e3974"
+        ],
+        "id": "decision-0-before-value-2",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-cc9eb3f5275cdbe5af7a59"
+        ],
+        "id": "decision-0-before-threshold-2",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a5296832e9874f8aa69702"
+        ],
+        "id": "decision-0-after-value-0",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-301d77a5d04796c0570e4c"
+        ],
+        "id": "decision-0-after-threshold-0",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5a8cb21f1f3e0916a8fca8"
+        ],
+        "id": "decision-0-after-value-1",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c2acaf6194d11ec419ba24"
+        ],
+        "id": "decision-0-after-threshold-1",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-33124a7ce42938fe06a8b9"
+        ],
+        "id": "decision-0-after-value-2",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-edb5e3de710cf7ee8c8e4e"
+        ],
+        "id": "decision-0-after-threshold-2",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5ee874d06945883f863c23"
+        ],
+        "id": "decision-1-before-value-0",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-b0bec3fbdfa0a1958be41d"
+        ],
+        "id": "decision-1-before-threshold-0",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-01",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-aa21830624c25bce7395b8"
+        ],
+        "id": "decision-1-before-value-1",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-648e884d25642c252451cd"
+        ],
+        "id": "decision-1-before-threshold-1",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-02",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-143b8b1ef947c047bd8442"
+        ],
+        "id": "decision-1-before-value-2",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-dc83edffbeb893849e4b15"
+        ],
+        "id": "decision-1-before-threshold-2",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-03",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "3",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-26e716176d86569de56a69"
+        ],
+        "id": "decision-1-after-value-0",
+        "label": "Saved decision observation",
+        "period_label": "Observation: 2026-01-05",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "2",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-4b8a08c2c3e2809aaee7ca"
+        ],
+        "id": "decision-1-after-threshold-0",
+        "label": "Saved decision policy",
+        "period_label": "Observation: 2026-01-05",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "7",
+        "visibility": "supporting"
+      }
+    ],
+    "report_id": "report-b160b78eb14c9af3ae47bdeb",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "original-cycle",
+          "effective-state",
+          "history",
+          "reviews",
+          "decisions",
+          "monitor-context",
+          "monitor-coverage",
+          "monitor-corrections",
+          "monitor-triage"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect observation dates, skipped inputs and any correction evidence separately.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-189f645937ab75ac7a7a22",
+          "e-29e6fbeb149e931dd0df70"
+        ],
+        "explanation": "Thresholds are saved synthetic analyst policies. Current effective state and original-cycle state answer different questions.",
+        "id": "review-6d8963519479f3c85122",
+        "impact": "section_restriction",
+        "section_refs": [
+          "original-cycle",
+          "effective-state",
+          "history"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/run",
+          "artifact:file-1#/current"
+        ],
+        "title": "Observation and policy scope"
+      },
+      {
+        "action": "Inspect dates, skipped inputs, original histories and correction records. Local reviewer names are not authenticated signatures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-e990b3a1e8bee4a6e0db80",
+          "e-96c8534622975b8befbfc1"
+        ],
+        "explanation": "A skipped or quiet cycle does not clear earlier breaches. Effective state can contain older observations. Pending proposals are not applied; saved decisions identify any restatement or replacement series.",
+        "id": "review-5e1d1fd2a88d9d84690b",
+        "impact": "section_restriction",
+        "section_refs": [
+          "original-cycle",
+          "effective-state",
+          "history",
+          "monitor-context",
+          "monitor-coverage",
+          "monitor-corrections"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/reviews",
+          "artifact:file-1#/decisions"
+        ],
+        "title": "Observation coverage and correction boundaries"
+      },
+      {
+        "action": "Review the original diagnostic definitions, observation intervals, sample size and assumptions before acting.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-189f645937ab75ac7a7a22"
+        ],
+        "explanation": "Anomaly, drift and threshold-path flags are saved diagnostics. They do not establish calibrated breach probabilities, legal compliance or a recommended financial action.",
+        "id": "review-2eb3b9b5fdb7eee7150c",
+        "impact": "section_restriction",
+        "section_refs": [
+          "original-cycle",
+          "history",
+          "monitor-triage"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/run"
+        ],
+        "title": "Early-warning diagnostics require interpretation"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [
+          "finding-effective-items",
+          "finding-cycle-items",
+          "finding-surfaced-items"
+        ],
+        "id": "original-cycle",
+        "metric_refs": [
+          "effective-items",
+          "cycle-items",
+          "surfaced-items",
+          "cycle-breaches"
+        ],
+        "purpose": "Saved cycle observations and surfaced items; no fresh compliance assessment.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122",
+          "review-5e1d1fd2a88d9d84690b",
+          "review-2eb3b9b5fdb7eee7150c"
+        ],
+        "table_refs": [
+          "cycle-observations"
+        ],
+        "title": "Original selected cycle"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "effective-state",
+        "metric_refs": [
+          "effective-items",
+          "effective-breaches"
+        ],
+        "purpose": "This snapshot may differ from the original cycle after later observations or corrections.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122",
+          "review-5e1d1fd2a88d9d84690b"
+        ],
+        "table_refs": [
+          "effective-observations"
+        ],
+        "title": "Effective state at export"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "history-0"
+        ],
+        "finding_refs": [],
+        "id": "history",
+        "metric_refs": [],
+        "purpose": "Only actually saved histories are available.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-6d8963519479f3c85122",
+          "review-5e1d1fd2a88d9d84690b",
+          "review-2eb3b9b5fdb7eee7150c"
+        ],
+        "table_refs": [],
+        "title": "Retained observation history"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "reviews",
+        "metric_refs": [
+          "reviews-count"
+        ],
+        "purpose": "Read-only evidence; original cycles remain unchanged and local attribution is not authenticated approval.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [],
+        "title": "Pending correction reviews"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "decisions",
+        "metric_refs": [
+          "decisions-count"
+        ],
+        "purpose": "Read-only evidence; original cycles remain unchanged and local attribution is not authenticated approval.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [],
+        "title": "Saved correction decisions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "monitor-context",
+        "metric_refs": [],
+        "purpose": "Selected-cycle metadata and export time have different meanings.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-5e1d1fd2a88d9d84690b"
+        ],
+        "table_refs": [
+          "monitor-basis"
+        ],
+        "title": "Cycle and export basis"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "monitor-coverage",
+        "metric_refs": [],
+        "purpose": "Skipped inputs do not reassess compliance or remove retained breaches.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-5e1d1fd2a88d9d84690b"
+        ],
+        "table_refs": [
+          "skipped-inputs"
+        ],
+        "title": "Skipped inputs"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "monitor-corrections",
+        "metric_refs": [],
+        "purpose": "Read-only proposals, decisions and separately saved before/after observations.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-5e1d1fd2a88d9d84690b"
+        ],
+        "table_refs": [
+          "pending-corrections",
+          "correction-decisions",
+          "decision-observations"
+        ],
+        "title": "Correction evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "monitor-triage",
+        "metric_refs": [],
+        "purpose": "Saved process metadata; model commentary does not establish an approved action.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-2eb3b9b5fdb7eee7150c"
+        ],
+        "table_refs": [
+          "triage-attempts"
+        ],
+        "title": "Saved triage attempts"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "completed",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-6d8963519479f3c85122",
+        "review-5e1d1fd2a88d9d84690b",
+        "review-2eb3b9b5fdb7eee7150c"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-189f645937ab75ac7a7a22",
+        "e-29e6fbeb149e931dd0df70"
+      ],
+      "metric_refs": [
+        "cycle-items",
+        "surfaced-items",
+        "cycle-breaches",
+        "effective-items",
+        "effective-breaches"
+      ],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-6d8963519479f3c85122",
+        "review-5e1d1fd2a88d9d84690b",
+        "review-2eb3b9b5fdb7eee7150c"
+      ],
+      "template_id": "monitoring-summary-v1",
+      "text": "Read the selected cycle separately from effective state at export. A surfaced item can be an early warning without a recorded breach. Thresholds are saved analyst policies, not verified contractual covenants. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "item",
+            "label": "Item ID"
+          },
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "metric",
+            "label": "Saved metric"
+          },
+          {
+            "id": "observed",
+            "label": "Observation date"
+          },
+          {
+            "id": "value",
+            "label": "Value"
+          },
+          {
+            "id": "direction",
+            "label": "Policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Threshold"
+          },
+          {
+            "id": "breach",
+            "label": "Saved breach flag"
+          },
+          {
+            "id": "signals",
+            "label": "Saved early-warning signals"
+          },
+          {
+            "id": "attention",
+            "label": "Selected-cycle attention"
+          },
+          {
+            "id": "state",
+            "label": "Saved classification"
+          }
+        ],
+        "id": "cycle-observations",
+        "review_refs": [
+          "review-2eb3b9b5fdb7eee7150c",
+          "review-5e1d1fd2a88d9d84690b",
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Synthetic QA entity"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-03"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cycle-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "cycle-threshold-0"
+              },
+              {
+                "column_id": "breach",
+                "kind": "text",
+                "text": "Recorded breach"
+              },
+              {
+                "column_id": "signals",
+                "kind": "text",
+                "text": "No flags recorded"
+              },
+              {
+                "column_id": "attention",
+                "kind": "text",
+                "text": "Surfaced for attention"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "WIDENING"
+              }
+            ],
+            "evidence_refs": [
+              "e-4057906bab67c00f9665da",
+              "e-cd0493ddb7c6196289a87a"
+            ],
+            "id": "cycle-row-0"
+          }
+        ],
+        "title": "Original selected-cycle observations"
+      },
+      {
+        "columns": [
+          {
+            "id": "item",
+            "label": "Item ID"
+          },
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "metric",
+            "label": "Saved metric"
+          },
+          {
+            "id": "observed",
+            "label": "Observation date"
+          },
+          {
+            "id": "value",
+            "label": "Value"
+          },
+          {
+            "id": "direction",
+            "label": "Policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Threshold"
+          },
+          {
+            "id": "breach",
+            "label": "Saved breach flag"
+          },
+          {
+            "id": "signals",
+            "label": "Saved early-warning signals"
+          },
+          {
+            "id": "state",
+            "label": "Saved classification"
+          }
+        ],
+        "id": "effective-observations",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-6d8963519479f3c85122",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Synthetic QA entity"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-03"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-0"
+              },
+              {
+                "column_id": "breach",
+                "kind": "text",
+                "text": "Recorded breach"
+              },
+              {
+                "column_id": "signals",
+                "kind": "text",
+                "text": "No flags recorded"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH \u00b7 saved correction attribution; not an authenticated signature \u00b7 retired series; replacement item: qa_ratio_v2"
+              }
+            ],
+            "evidence_refs": [
+              "e-55007b19bab060188ac039"
+            ],
+            "id": "effective-row-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio_v2"
+              },
+              {
+                "column_id": "entity",
+                "kind": "text",
+                "text": "Synthetic QA entity"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "observed",
+                "kind": "text",
+                "text": "2026-01-05"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "effective-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "effective-threshold-1"
+              },
+              {
+                "column_id": "breach",
+                "kind": "text",
+                "text": "No recorded breach"
+              },
+              {
+                "column_id": "signals",
+                "kind": "text",
+                "text": "No flags recorded"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "BASELINE \u00b7 saved correction attribution; not an authenticated signature"
+              }
+            ],
+            "evidence_refs": [
+              "e-d9e733f8dd1bdffad8953a"
+            ],
+            "id": "effective-row-1"
+          }
+        ],
+        "title": "Effective state at export"
+      },
+      {
+        "columns": [
+          {
+            "id": "field",
+            "label": "Field"
+          },
+          {
+            "id": "value",
+            "label": "Saved value"
+          }
+        ],
+        "id": "monitor-basis",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Selected cycle"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "3"
+              }
+            ],
+            "evidence_refs": [
+              "e-274243b3d2b71b283c03bb"
+            ],
+            "id": "basis-cycle"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Cycle observation date"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "2026-01-03"
+              }
+            ],
+            "evidence_refs": [
+              "e-823ff9c74204e3b231039b"
+            ],
+            "id": "basis-date"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved cycle status"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "processed"
+              }
+            ],
+            "evidence_refs": [
+              "e-ed790aa8a337f2be96cde9"
+            ],
+            "id": "basis-status"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Baseline / alert suppression"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "False"
+              }
+            ],
+            "evidence_refs": [
+              "e-c6460195a636ab3a28401c"
+            ],
+            "id": "basis-baseline"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Missed scheduler cycles"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "0"
+              }
+            ],
+            "evidence_refs": [
+              "e-85470f5049cd0334217327"
+            ],
+            "id": "basis-gap"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved replay flag"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "False"
+              }
+            ],
+            "evidence_refs": [
+              "e-2e6c9299c9d5cd2f17a91b"
+            ],
+            "id": "basis-replay"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Snapshot exported at (not an observation date)"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "2026-11-01T00:58:43.669358+00:00"
+              }
+            ],
+            "evidence_refs": [
+              "e-71837cc3bf2808ee945fb4"
+            ],
+            "id": "basis-export"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Unreadable triage audits"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "0"
+              }
+            ],
+            "evidence_refs": [
+              "e-3b487768c6e3d22e1c005b"
+            ],
+            "id": "basis-audit"
+          }
+        ],
+        "title": "Cycle and export basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "item",
+            "label": "Item ID"
+          },
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "reason",
+            "label": "Saved reason"
+          },
+          {
+            "id": "metric",
+            "label": "Proposed metric"
+          },
+          {
+            "id": "date",
+            "label": "Candidate observation date"
+          },
+          {
+            "id": "previous",
+            "label": "Previously retained value"
+          },
+          {
+            "id": "candidate",
+            "label": "Candidate value"
+          },
+          {
+            "id": "direction",
+            "label": "Candidate policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Candidate policy threshold"
+          }
+        ],
+        "id": "skipped-inputs",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Skipped inputs in the selected cycle"
+      },
+      {
+        "columns": [
+          {
+            "id": "item",
+            "label": "Item ID"
+          },
+          {
+            "id": "entity",
+            "label": "Entity"
+          },
+          {
+            "id": "reason",
+            "label": "Saved reason"
+          },
+          {
+            "id": "metric",
+            "label": "Proposed metric"
+          },
+          {
+            "id": "date",
+            "label": "Candidate observation date"
+          },
+          {
+            "id": "previous",
+            "label": "Previously retained value"
+          },
+          {
+            "id": "candidate",
+            "label": "Candidate value"
+          },
+          {
+            "id": "direction",
+            "label": "Candidate policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Candidate policy threshold"
+          }
+        ],
+        "id": "pending-corrections",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Pending correction proposals \u2014 not applied"
+      },
+      {
+        "columns": [
+          {
+            "id": "review_id",
+            "label": "Review ID"
+          },
+          {
+            "id": "item_id",
+            "label": "Item ID"
+          },
+          {
+            "id": "action",
+            "label": "Decision"
+          },
+          {
+            "id": "decided_at",
+            "label": "Decision time"
+          },
+          {
+            "id": "reviewer",
+            "label": "Local reviewer name"
+          },
+          {
+            "id": "reason",
+            "label": "Saved reason"
+          },
+          {
+            "id": "effect",
+            "label": "Saved effect"
+          },
+          {
+            "id": "replacement_id",
+            "label": "Replacement series"
+          }
+        ],
+        "id": "correction-decisions",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "review_id",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "item_id",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "action",
+                "kind": "text",
+                "text": "approve"
+              },
+              {
+                "column_id": "decided_at",
+                "kind": "text",
+                "text": "2026-11-01T00:58:43.558610+00:00"
+              },
+              {
+                "column_id": "reviewer",
+                "kind": "text",
+                "text": "QA local analyst"
+              },
+              {
+                "column_id": "reason",
+                "kind": "text",
+                "text": "Synthetic corrected source"
+              },
+              {
+                "column_id": "effect",
+                "kind": "text",
+                "text": "effective history restated; original cycle reports unchanged"
+              },
+              {
+                "column_id": "replacement_id",
+                "kind": "text",
+                "text": "Unavailable"
+              }
+            ],
+            "evidence_refs": [
+              "e-5d1ce1b127bd64314b9172"
+            ],
+            "id": "decision-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review_id",
+                "kind": "text",
+                "text": "c90fa1f1a8a5cca99c4acf1fc355982f7007be312866492588512fa7da82aff1"
+              },
+              {
+                "column_id": "item_id",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "action",
+                "kind": "text",
+                "text": "approve"
+              },
+              {
+                "column_id": "decided_at",
+                "kind": "text",
+                "text": "2026-11-01T00:58:43.630754+00:00"
+              },
+              {
+                "column_id": "reviewer",
+                "kind": "text",
+                "text": "QA local analyst"
+              },
+              {
+                "column_id": "reason",
+                "kind": "text",
+                "text": "Synthetic new definition"
+              },
+              {
+                "column_id": "effect",
+                "kind": "text",
+                "text": "new baseline series; original series retired and preserved; update watchlist item ID"
+              },
+              {
+                "column_id": "replacement_id",
+                "kind": "text",
+                "text": "qa_ratio_v2"
+              }
+            ],
+            "evidence_refs": [
+              "e-93c8cccd4d52737dec0e0d"
+            ],
+            "id": "decision-1"
+          }
+        ],
+        "title": "Saved correction decisions \u2014 local attribution only"
+      },
+      {
+        "columns": [
+          {
+            "id": "review",
+            "label": "Review ID"
+          },
+          {
+            "id": "side",
+            "label": "Decision scope"
+          },
+          {
+            "id": "item",
+            "label": "Item ID"
+          },
+          {
+            "id": "date",
+            "label": "Observation date"
+          },
+          {
+            "id": "metric",
+            "label": "Metric"
+          },
+          {
+            "id": "value",
+            "label": "Value"
+          },
+          {
+            "id": "direction",
+            "label": "Policy direction"
+          },
+          {
+            "id": "threshold",
+            "label": "Policy threshold"
+          },
+          {
+            "id": "state",
+            "label": "Saved classification"
+          }
+        ],
+        "id": "decision-observations",
+        "review_refs": [
+          "review-5e1d1fd2a88d9d84690b",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-01"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "BASELINE"
+              }
+            ],
+            "evidence_refs": [
+              "e-8a86dfcc9c2a813283a7c9"
+            ],
+            "id": "decision-0-before-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-02"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-threshold-1"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-dab18c9892d0063dca8f2a"
+            ],
+            "id": "decision-0-before-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-03"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-value-2"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-before-threshold-2"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "WIDENING"
+              }
+            ],
+            "evidence_refs": [
+              "e-3f566c04a857614ced4246"
+            ],
+            "id": "decision-0-before-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "after"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-01"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "BASELINE"
+              }
+            ],
+            "evidence_refs": [
+              "e-72faf4856cf39782b50cba"
+            ],
+            "id": "decision-0-after-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "after"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-02"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-threshold-1"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-974826cb219b4e59992f88"
+            ],
+            "id": "decision-0-after-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "70900950fa65cab67a3f0b358bb91c1b79d8c4870024bfb3ca26946def0c50c3"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "after"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-03"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-value-2"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-0-after-threshold-2"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-8a7632192c957edc0e87c1"
+            ],
+            "id": "decision-0-after-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "c90fa1f1a8a5cca99c4acf1fc355982f7007be312866492588512fa7da82aff1"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-01"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "BASELINE"
+              }
+            ],
+            "evidence_refs": [
+              "e-cab91de737a78750383a12"
+            ],
+            "id": "decision-1-before-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "c90fa1f1a8a5cca99c4acf1fc355982f7007be312866492588512fa7da82aff1"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-02"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-value-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-threshold-1"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "OK"
+              }
+            ],
+            "evidence_refs": [
+              "e-a2d0b79804469ffb74d557"
+            ],
+            "id": "decision-1-before-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "c90fa1f1a8a5cca99c4acf1fc355982f7007be312866492588512fa7da82aff1"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "before"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-03"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-value-2"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-before-threshold-2"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "NEW_BREACH"
+              }
+            ],
+            "evidence_refs": [
+              "e-ba9f81a67671e73f41cffb"
+            ],
+            "id": "decision-1-before-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "c90fa1f1a8a5cca99c4acf1fc355982f7007be312866492588512fa7da82aff1"
+              },
+              {
+                "column_id": "side",
+                "kind": "text",
+                "text": "after"
+              },
+              {
+                "column_id": "item",
+                "kind": "text",
+                "text": "qa_ratio_v2"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-05"
+              },
+              {
+                "column_id": "metric",
+                "kind": "text",
+                "text": "current_ratio"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-after-value-0"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "At or below"
+              },
+              {
+                "column_id": "threshold",
+                "kind": "metric_ref",
+                "metric_id": "decision-1-after-threshold-0"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "BASELINE"
+              }
+            ],
+            "evidence_refs": [
+              "e-4b2705270c68037d329ac5"
+            ],
+            "id": "decision-1-after-0"
+          }
+        ],
+        "title": "Separately retained decision histories \u2014 before and after"
+      },
+      {
+        "columns": [
+          {
+            "id": "attempt",
+            "label": "Attempt"
+          },
+          {
+            "id": "status",
+            "label": "Saved status"
+          },
+          {
+            "id": "publication",
+            "label": "Saved publication state"
+          },
+          {
+            "id": "mode",
+            "label": "Saved model mode"
+          }
+        ],
+        "id": "triage-attempts",
+        "review_refs": [
+          "review-2eb3b9b5fdb7eee7150c",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Saved triage attempts \u2014 process evidence"
+      }
+    ],
+    "workflow": "monitoring"
+  }
+}

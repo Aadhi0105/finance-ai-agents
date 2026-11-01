@@ -16,7 +16,7 @@ export type ReviewItem = {
   section_refs: string[]; source_check_refs: string[]; evidence_refs: string[];
 };
 export type NativeReport = {
-  schema_version: 1; kind: 'keystone.report-view'; report_id: string; agent: 'agent1' | 'agent3'; workflow: 'research' | 'events' | 'news';
+  schema_version: 1; kind: 'keystone.report-view'; report_id: string; agent: 'agent1' | 'agent2' | 'agent3'; workflow: 'research' | 'monitoring' | 'events' | 'news';
   identity: { title: string; entity: string; ticker: string | null; source_run_id: string; period_label: string; period_end: string | null; prepared_at: string };
   state: { execution: string; evidence_gate: string; financial_approval: false; data_classification: 'synthetic'; integrity: 'matched'; review_refs: string[] };
   artifacts: { id: string; name: string; sha256: string; source_schema: string }[];
@@ -60,8 +60,9 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   const raw = object(value), reg = run.native_view;
   const events = run.agent === 'agent3' && run.workflow === 'events';
   const news = run.agent === 'agent3' && run.workflow === 'news';
+  const monitoring = run.agent === 'agent2' && run.workflow === 'monitoring';
   const family = run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
-    : events ? 'agent3-event-report' : news ? 'agent3-news-report' : null;
+    : events ? 'agent3-event-report' : news ? 'agent3-news-report' : monitoring ? 'agent2-native-report' : null;
   if (raw.schema_version !== 1 || raw.kind !== 'keystone.report-view'
       || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !(news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
     throw new ReportFailure('unsupported_report_schema');
@@ -79,7 +80,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   if (artifacts.length !== 2 || reg.source_artifact_ids.length !== 2
       || artifacts.some((a, i) => a.id !== reg.source_artifact_ids[i])
-      || artifacts[0].source_schema !== (events || news ? 'agent3.run_bundle/1' : 'agent1.model/2') || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
+      || artifacts[0].source_schema !== (events || news ? 'agent3.run_bundle/1' : monitoring ? 'agent2.snapshot/unversioned' : 'agent1.model/2') || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
   const native = run.artifacts.find(a => a.id === reg.artifact_id);
   if (!native || native.kind !== 'report_view') fail();
   const sources = array(raw.sources, 40).map(value => {
@@ -111,7 +112,8 @@ export function parseReport(value: unknown, run: Run): NativeReport {
     const b = object(value);
     const templates = ['saved-summary-v1', 'metric-observation-v1', ...(events && reg.adapter_version === '1.1.0' ? ['event-study-summary-v1'] : []),
       ...(news && ['1.1.0','1.2.0'].includes(reg.adapter_version) ? ['news-study-summary-v1'] : []),
-      ...(news && reg.adapter_version === '1.2.0' ? ['news-retrieval-summary-v1'] : [])];
+      ...(news && reg.adapter_version === '1.2.0' ? ['news-retrieval-summary-v1'] : []),
+      ...(monitoring && reg.adapter_version === '1.1.0' ? ['monitoring-summary-v1'] : [])];
     if (!templates.includes(String(b.template_id))) throw new ReportFailure('unsupported_report_schema');
     return { text: text(b.text, 4000), template_id: text(b.template_id, 80), metric_refs: strings(b.metric_refs), evidence_refs: strings(b.evidence_refs), review_refs: strings(b.review_refs) };
   };
@@ -225,9 +227,25 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   if (analyst_content.market_consensus.availability === 'available'
       && !analyst_content.market_consensus.metric_refs.some(id => metrics.some(m => m.id === id && m.availability === 'available'))) fail();
   if (metrics.some(m => m.id === 'weighted-valuation' && m.visibility !== 'diagnostic')) fail();
-  if (events || news) {
+  if (events || news || monitoring) {
     if (analyst_content.keystone_scope !== 'not_applicable'
         || [analyst_content.market_consensus, analyst_content.external_research].some(a => a.availability !== 'not_applicable' || a.metric_refs.length)) fail();
+  }
+  if (monitoring) {
+    for (const m of metrics) {
+      if (['cycle-items','effective-items','surfaced-items','cycle-breaches','effective-breaches','reviews-count','decisions-count'].includes(m.id)) {
+        if (m.unit !== 'count' || m.visibility !== 'main') fail();
+      } else if (/^(?:cycle|effective)-(?:value|threshold)-\d+$/.test(m.id)
+        || /^(?:skipped|pending)-(?:value|threshold|previous)-\d+$/.test(m.id)
+        || /^decision-\d+-(?:before|after)-(?:value|threshold)-\d+$/.test(m.id)) {
+        if (!['multiple','unknown'].includes(m.unit) || m.visibility !== 'supporting' || m.unit === 'unknown' && m.availability === 'available') fail();
+      } else fail();
+    }
+    for (const c of charts) {
+      if (!/^history-(?:\d+|unavailable)$/.test(c.id) || c.type !== 'line' || !['date','category'].includes(c.x_axis.kind)
+          || !['multiple','unknown'].includes(c.y_axis.unit) || c.visibility !== 'main'
+          || c.availability === 'available' && (c.x_axis.kind !== 'date' || c.y_axis.unit !== 'multiple')) fail();
+    }
   }
   if (events) {
     if (metrics.some(m => !['event-count', 'issuer-count'].includes(m.id) && m.visibility !== 'diagnostic')) fail();
@@ -263,7 +281,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   }
   evidence.forEach(e => { if (!artifacts.some(a => a.id === e.artifact_id) || !sources.some(s => s.id === e.source_id)) fail(); });
   const review_refs = strings(state.review_refs); references(review_refs, ids.reviews);
-  return { schema_version: 1, kind: 'keystone.report-view', report_id: text(raw.report_id, 80), agent: events || news ? 'agent3' : 'agent1', workflow: events ? 'events' : news ? 'news' : 'research',
+  return { schema_version: 1, kind: 'keystone.report-view', report_id: text(raw.report_id, 80), agent: events || news ? 'agent3' : monitoring ? 'agent2' : 'agent1', workflow: events ? 'events' : news ? 'news' : monitoring ? 'monitoring' : 'research',
     identity: { title: run.title, entity: run.entity, ticker: nullable(identity.ticker, 80), source_run_id: run.source_run_id,
       period_label: run.period, period_end: nullable(identity.period_end, 10), prepared_at: run.prepared_at },
     state: { execution: run.execution_status, evidence_gate: member(state.evidence_gate, ['passed_evidence_checks', 'held_for_review', 'unavailable']),
