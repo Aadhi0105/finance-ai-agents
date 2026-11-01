@@ -52,3 +52,4 @@
   .nr-chart-legend button { min-height: 42px; }
 }
 @media (prefers-reduced-motion: reduce) { .nr-chart * { transition: none !important; animation: none !important; } }
+.nr-waterfall-scroll { max-width:100%; overflow-x:auto; }

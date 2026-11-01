@@ -1,0 +1,3896 @@
+{
+  "run": {
+    "id": "close-cost",
+    "agent": "agent4",
+    "workflow": "close",
+    "title": "Synthetic QA \u00b7 close-cost",
+    "entity": "Synthetic cost",
+    "period": "Synthetic close 2026-06-30",
+    "prepared_at": "2026-11-01T08:39:54.743334+00:00",
+    "execution_status": "completed",
+    "review_status": "review_required",
+    "summary": "Controlled synthetic financial-close acceptance case.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Accounting checks do not establish business causes or finance approval.",
+      "Authorised real-company acceptance remains pending."
+    ],
+    "checks": [
+      "Synthetic QA only"
+    ],
+    "metrics": [],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "report.html",
+        "label": "QA fixture description",
+        "kind": "report",
+        "sha256": "7bc98cdcf73a0007b16c6dc31e76c4e2cfb406c1d37bbed1113f0631926114ea",
+        "bytes": 209,
+        "url": "/api/runs/close-cost/files/report.html"
+      },
+      {
+        "id": "file-1",
+        "name": "qa-cost.json",
+        "label": "Controlled synthetic saved close",
+        "kind": "evidence",
+        "sha256": "3c9522372eac7a47fcf9865a12d4eb3a33cef3c4bfd8302675ddb20a4934a04f",
+        "bytes": 20540,
+        "url": "/api/runs/close-cost/files/qa-cost.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "60dd4e7900b863e3137eec850aa9fb117561e1c5f8ea8d8bbae6183158337c21",
+        "bytes": 698,
+        "url": "/api/runs/close-cost/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "a1136466f2bdf8e5982f793f49e77e7419dc095edee12a6469adc2decb31bb49",
+        "bytes": 62304,
+        "url": "/api/runs/close-cost/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "qa-cost",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent4-native-report",
+      "adapter_version": "1.1.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent4",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "qa-cost.json",
+        "sha256": "3c9522372eac7a47fcf9865a12d4eb3a33cef3c4bfd8302675ddb20a4934a04f",
+        "source_schema": "agent4.close/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "60dd4e7900b863e3137eec850aa9fb117561e1c5f8ea8d8bbae6183158337c21",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "close-bridge",
+        "purpose": "Exact saved-account bridge; favourability follows the saved profit-impact convention.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "series": [
+          {
+            "id": "bridge-series",
+            "label": "Saved close bridge",
+            "points": [
+              {
+                "assessment": "anchor",
+                "end": "40",
+                "evidence_refs": [
+                  "e-4534f2efe2b1d5647fef52"
+                ],
+                "id": "step-0",
+                "label": "Budget",
+                "reason_codes": [],
+                "start": "0",
+                "x": "0",
+                "y": "40"
+              },
+              {
+                "assessment": "adverse",
+                "end": "45",
+                "evidence_refs": [
+                  "e-25145b42d365008caec13d"
+                ],
+                "id": "step-1",
+                "label": "spending",
+                "reason_codes": [],
+                "start": "40",
+                "x": "1",
+                "y": "5"
+              },
+              {
+                "assessment": "anchor",
+                "end": "45",
+                "evidence_refs": [
+                  "e-3d0917f3d0fe6077433838"
+                ],
+                "id": "step-2",
+                "label": "Actual",
+                "reason_codes": [],
+                "start": "0",
+                "x": "2",
+                "y": "45"
+              }
+            ]
+          }
+        ],
+        "title": "Budget to actual",
+        "type": "waterfall",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "category",
+          "label": "Anchor / account"
+        },
+        "y_axis": {
+          "currency": "EUR",
+          "label": "currency",
+          "unit": "currency"
+        }
+      },
+      {
+        "availability": "available",
+        "id": "close-variance-history",
+        "purpose": "Saved account amounts (actual less budget), including the selected close. This is not a forecast path or a close-run inventory.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "root-variance",
+            "label": "Saved root variance",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-0665b88b5022ce7c0bf3bd"
+                ],
+                "id": "prior-0",
+                "label": "2026-01-31",
+                "reason_codes": [],
+                "x": "2026-01-31",
+                "y": "5"
+              },
+              {
+                "evidence_refs": [
+                  "e-f03e08529080f7a486b744"
+                ],
+                "id": "prior-1",
+                "label": "2026-02-28",
+                "reason_codes": [],
+                "x": "2026-02-28",
+                "y": "5"
+              },
+              {
+                "evidence_refs": [
+                  "e-6581115321dedd997a9ede"
+                ],
+                "id": "prior-2",
+                "label": "2026-03-31",
+                "reason_codes": [],
+                "x": "2026-03-31",
+                "y": "5"
+              },
+              {
+                "evidence_refs": [
+                  "e-9730817d1320f5bd4e1d7e"
+                ],
+                "id": "prior-3",
+                "label": "2026-04-30",
+                "reason_codes": [],
+                "x": "2026-04-30",
+                "y": "5"
+              },
+              {
+                "evidence_refs": [
+                  "e-cc4c8dab5bd0f95a0330ae"
+                ],
+                "id": "prior-4",
+                "label": "2026-05-31",
+                "reason_codes": [],
+                "x": "2026-05-31",
+                "y": "5"
+              },
+              {
+                "evidence_refs": [
+                  "e-994cfc1f2da2968b16733b"
+                ],
+                "id": "selected-close",
+                "label": "2026-06-30",
+                "reason_codes": [],
+                "x": "2026-06-30",
+                "y": "5"
+              }
+            ]
+          }
+        ],
+        "title": "Root account variance history",
+        "type": "line",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Saved reporting period"
+        },
+        "y_axis": {
+          "currency": "EUR",
+          "label": "currency",
+          "unit": "currency"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d307a4dddaa174c676d08f",
+        "label": "Close budget",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/budget_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-34beed296d9c1b3f4be8cd",
+        "label": "Close actual",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/actual_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-994cfc1f2da2968b16733b",
+        "label": "Actual less budget",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/total_variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-4534f2efe2b1d5647fef52",
+        "label": "Budget",
+        "method": null,
+        "pointer": "/derivations/bridge/data/0/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-25145b42d365008caec13d",
+        "label": "spending",
+        "method": null,
+        "pointer": "/derivations/bridge/data/1/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-3d0917f3d0fe6077433838",
+        "label": "Actual",
+        "method": null,
+        "pointer": "/derivations/bridge/data/2/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-141eaaaf543f50eb4e2df2",
+        "label": "Saved account evidence",
+        "method": null,
+        "pointer": "/report/full_hierarchy",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f35e5ef398e360200cfe85",
+        "label": "Provisional year-end landing",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/reforecasts/cost/projected_landing_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5a9c8345b80878b16e35b9",
+        "label": "Year-end target",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/reforecasts/cost/target_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a3d117b6870aeb3bbee197",
+        "label": "Uncalibrated model probability",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/prob_hit_target",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6d8834eb868eb01e7c1d98",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-becfeaf219bcb2a5782944",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/lineage",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-30015c1ca281e5b9d0c9dc",
+        "label": "Selected saved run",
+        "method": null,
+        "pointer": "/run_id",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7edf09a9f3e512cd981f6e",
+        "label": "Close period",
+        "method": null,
+        "pointer": "/request/close_period",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e2536ab3fb68c187b0f42c",
+        "label": "Reporting frequency",
+        "method": null,
+        "pointer": "/request/frequency",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a0df0e8d0a44902091b16d",
+        "label": "Root measure",
+        "method": null,
+        "pointer": "/report/full_hierarchy/root_measure",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-abd176b9d93b7f2a3c38fb",
+        "label": "Root account",
+        "method": null,
+        "pointer": "/report/full_hierarchy/name",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c4e36119354a4986d4d807",
+        "label": "Currency",
+        "method": null,
+        "pointer": "/report/full_hierarchy/context/currency",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-fdffb046855055392e2ec8",
+        "label": "Budget version",
+        "method": null,
+        "pointer": "/lineage/budget/version",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7940f0f09b3f7b70da89c9",
+        "label": "Submitted actuals version",
+        "method": null,
+        "pointer": "/lineage/actuals/version",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e374a8796c579452729ff4",
+        "label": "Budget source label",
+        "method": null,
+        "pointer": "/lineage/budget/metadata/source",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2bd8e6bc879471126cbcbc",
+        "label": "Actuals source label",
+        "method": null,
+        "pointer": "/lineage/actuals/metadata/source",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b88916d886494bb11d13c4",
+        "label": "Budget approval supplied by caller",
+        "method": null,
+        "pointer": "/request/budget/approved",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-38130b37d9af8364414d30",
+        "label": "Internal result reconciliation",
+        "method": null,
+        "pointer": "/report/reconciles",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-56075238cf0ebdebb57e3a",
+        "label": "Frozen panel reconciliation",
+        "method": null,
+        "pointer": "/report/source_reconciliation",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-086a8bdf0f7912ea9a30f5",
+        "label": "Canonical claim check",
+        "method": null,
+        "pointer": "/report/reconciliation/passed",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0e43b60b8b10f4e8e1e4b7",
+        "label": "Source completeness statement",
+        "method": null,
+        "pointer": "/lineage/completeness",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d3c061d78093824e91592d",
+        "label": "Historical budget basis",
+        "method": null,
+        "pointer": "/lineage/history_budget_basis",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-792514877fcb8fc250eaec",
+        "label": "Effective actuals semantics",
+        "method": null,
+        "pointer": "/lineage/actuals_semantics",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c5a67f16a0b50f9237af97",
+        "label": "Saved profit impact \u00b7 Standalone cost",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/profit_impact_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0665b88b5022ce7c0bf3bd",
+        "label": "Dated prior variance",
+        "method": null,
+        "pointer": "/report/full_hierarchy/history_snapshot/prior_observations/0/variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f03e08529080f7a486b744",
+        "label": "Dated prior variance",
+        "method": null,
+        "pointer": "/report/full_hierarchy/history_snapshot/prior_observations/1/variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6581115321dedd997a9ede",
+        "label": "Dated prior variance",
+        "method": null,
+        "pointer": "/report/full_hierarchy/history_snapshot/prior_observations/2/variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9730817d1320f5bd4e1d7e",
+        "label": "Dated prior variance",
+        "method": null,
+        "pointer": "/report/full_hierarchy/history_snapshot/prior_observations/3/variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-cc4c8dab5bd0f95a0330ae",
+        "label": "Dated prior variance",
+        "method": null,
+        "pointer": "/report/full_hierarchy/history_snapshot/prior_observations/4/variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-59f4b911e72fe612bf8e4a",
+        "label": "Saved forecast and its assumptions",
+        "method": null,
+        "pointer": "/report/reforecasts/cost",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ed867e5a95b3070aaf561a",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/method",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b0ea52e891094afeaccb93",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/input_basis",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f438fd25005f96c8ce879a",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/reason",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a156f21d75c65ae7100078",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/confidence",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c530b5407d5deb16065f28",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/probability_kind",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-38de971d9d722bf1eb1253",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/remaining_periods",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c6e7a3df56e90f3fba61e8",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/direction",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4fd8315e3a2796acfc1053",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/persistence",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-2fd85dc570cf23c0f471b1",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/assumptions/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-131fb74a9474d9c6195d9e",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/assumptions/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d8c730d0d18467de204d05",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/assumptions/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-5ab2f2fbe90442376619ad",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/assumptions/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c6e8e5b173b30fb9dc8892",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts/cost/ytd_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-335d2478ae20eec9ae46cd",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9e8912a27307c3789c2461",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/0/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b279065e8272ec91e160ad",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-20d79932df0394f0d85726",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/1/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-63769215bd1615ab5bcb26",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ab752500e99602d3bda198",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/2/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d7ee7515a843677e8a3101",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-0c31c6fcf91beb3dfb26de",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/3/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ffdb4644bc50ef5206ff91",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1218de2acf528627b5bb5e",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/4/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ed06aa13f7b21e1d276732",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/request/actuals/rows/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-54a527525776e252210552",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/request/actuals/rows/5/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-16d9e79299989fa3e30f00",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-54d6b1c0e966cf651809a8",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/0/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7111585a9f39ab9029f815",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-80f94556305e93d87e3559",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/1/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1dd90d704a63704d824127",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-34c079a3ef2d15d75781c6",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/2/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1ec602715ae6864196d584",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7a8a83dbc13abd5c550d34",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/3/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-78bb733077ad637dd1ed4a",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6d962323bfa2a900cf8f4a",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/4/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f79cbd17b974c80525c37e",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/effective_actuals/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a6d62ce3ae8d8af1b3e326",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/effective_actuals/5/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-dac1838860fc8275811da2",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-40ba8459b9fcd2d1e8ce52",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/0/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-93a5a82a8b2ff517f1c512",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b5b7de5215150ec8c39f5a",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/1/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-7c9dcb8ba1973bc44e0156",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-11434cd5a795f1d80437a9",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/2/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-e3aac2d6c0dd5c49234ed7",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-df0aef31238f74adce88db",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/3/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-651bbb9784bd1c37ed95b2",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/4",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d26dd155edd5f4f3f7a26a",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/4/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-ed2692f875027e0f1c333e",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/5",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-37a7cd4e2da8900aa4928d",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/5/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c924946beebb15be66b076",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/6",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a78b2192806165b28d1331",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/6/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-edc49417547662379579cf",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/7",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-f934c6ddea307a13fcf091",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/7/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-270f482f2583182cb1b401",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/8",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-08009bc21bc4341bdea829",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/8/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1aced80f85b0534d4e59a5",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/9",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-c689b8c78319dffdd2a7ef",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/9/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3f27095aecebc29eeb3a5f",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/10",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-47d8b5ac6e5cd801bc69e2",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/10/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-9e7ad08a7cb1bafa108a3c",
+        "label": "Saved source panel row",
+        "method": null,
+        "pointer": "/sources/budget/11",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-91e3aa92881ce2cea5f479",
+        "label": "Exact amount in cents / 100",
+        "method": null,
+        "pointer": "/sources/budget/11/amount_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-d307a4dddaa174c676d08f"
+          ],
+          "metric_refs": [
+            "close-budget-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved close budget: EUR 40.00 (Synthetic close 2026-06-30)."
+        },
+        "id": "finding-close-budget-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-34beed296d9c1b3f4be8cd"
+          ],
+          "metric_refs": [
+            "close-actual-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved close actual: EUR 45.00 (Synthetic close 2026-06-30)."
+        },
+        "id": "finding-close-actual-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-994cfc1f2da2968b16733b"
+          ],
+          "metric_refs": [
+            "close-total-variance-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved actual less budget: EUR 5.00 (Synthetic close 2026-06-30)."
+        },
+        "id": "finding-close-total-variance-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "Actual less budget is measured in the account\u2019s own units. An increased cost can have a positive account variance and an adverse negative effect on profit. The bridge uses saved steps in the displayed root\u2019s units.",
+        "term": "Account variance and profit effect"
+      },
+      {
+        "definition": "Exact agreement within the supplied source panels and saved calculations. It is not ledger authentication or financial approval.",
+        "term": "Internal reconciliation"
+      },
+      {
+        "definition": "Materiality is a size rule. Significance and persistence are separate saved diagnostics; unavailable results do not become insignificant or one-off.",
+        "term": "Materiality and significance"
+      },
+      {
+        "definition": "A conditional projection from saved YTD inputs, assumptions and remaining periods. A point-only result has no publishable uncertainty interval or probability. Model estimates are uncalibrated.",
+        "term": "Year-end scenario"
+      },
+      {
+        "definition": "This bundle retains dated prior variance observations and an optional supersedes identifier. It does not establish a complete inventory of later or related closes.",
+        "term": "Close history"
+      }
+    ],
+    "identity": {
+      "entity": "Synthetic cost",
+      "period_end": "2026-06-30",
+      "period_label": "Synthetic close 2026-06-30",
+      "prepared_at": "2026-11-01T08:39:54.743334+00:00",
+      "source_run_id": "qa-cost",
+      "ticker": null,
+      "title": "Synthetic QA \u00b7 close-cost"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-d307a4dddaa174c676d08f"
+        ],
+        "id": "close-budget-cents",
+        "label": "Close budget",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "40",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-34beed296d9c1b3f4be8cd"
+        ],
+        "id": "close-actual-cents",
+        "label": "Close actual",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "45",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-994cfc1f2da2968b16733b"
+        ],
+        "id": "close-total-variance-cents",
+        "label": "Actual less budget",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "5",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-d307a4dddaa174c676d08f"
+        ],
+        "id": "account-0-budget-cents",
+        "label": "Budget \u00b7 Standalone cost",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "40",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-34beed296d9c1b3f4be8cd"
+        ],
+        "id": "account-0-actual-cents",
+        "label": "Actual \u00b7 Standalone cost",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "45",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-994cfc1f2da2968b16733b"
+        ],
+        "id": "account-0-total-variance-cents",
+        "label": "Variance \u00b7 Standalone cost",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-f35e5ef398e360200cfe85"
+        ],
+        "id": "forecast-projected-landing-cents",
+        "label": "Provisional year-end landing",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "540",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-5a9c8345b80878b16e35b9"
+        ],
+        "id": "forecast-target-cents",
+        "label": "Year-end target",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "480",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-a3d117b6870aeb3bbee197"
+        ],
+        "id": "forecast-prob-hit-target",
+        "label": "Uncalibrated model probability",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "fraction",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "forecast-band-0",
+        "label": "Model interval lower bound",
+        "period_label": "Year-end model interval",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "forecast-band-1",
+        "label": "Model interval upper bound",
+        "period_label": "Year-end model interval",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-c5a67f16a0b50f9237af97"
+        ],
+        "id": "account-0-profit-impact",
+        "label": "Saved profit impact \u00b7 Standalone cost",
+        "period_label": "Synthetic close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "-5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-f35e5ef398e360200cfe85"
+        ],
+        "id": "account-forecast-0-projected-landing-cents",
+        "label": "Provisional year-end landing \u00b7 Standalone cost",
+        "period_label": "Year-end scenario from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "540",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-5a9c8345b80878b16e35b9"
+        ],
+        "id": "account-forecast-0-target-cents",
+        "label": "Year-end target \u00b7 Standalone cost",
+        "period_label": "Year-end scenario from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "480",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": null,
+        "evidence_refs": [
+          "e-a3d117b6870aeb3bbee197"
+        ],
+        "id": "account-forecast-0-prob-hit-target",
+        "label": "Uncalibrated model probability \u00b7 Standalone cost",
+        "period_label": "Year-end scenario from close 2026-06-30",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "fraction",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "account-forecast-0-band-0",
+        "label": "Conditional interval bound \u00b7 Standalone cost",
+        "period_label": "Year-end conditional model interval",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "withheld",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "account-forecast-0-band-1",
+        "label": "Conditional interval bound \u00b7 Standalone cost",
+        "period_label": "Year-end conditional model interval",
+        "reason_codes": [
+          "forecast_uncertainty_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-c4202060ac8ca3052f3946cf",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "close-results",
+          "accounts",
+          "forecast",
+          "close-basis",
+          "close-diagnostics",
+          "close-history",
+          "close-forecast-context",
+          "close-sources"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect the original forecast interval, persistence evidence, assumptions and source versions.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-6d8834eb868eb01e7c1d98",
+          "e-becfeaf219bcb2a5782944"
+        ],
+        "explanation": "A provisional landing or uncalibrated probability is not a guarantee. Source authenticity and business causes are not established by accounting checks.",
+        "id": "review-cee9eb99bc033d92f905",
+        "impact": "section_restriction",
+        "section_refs": [
+          "close-results",
+          "accounts",
+          "forecast"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/report/reforecasts",
+          "artifact:file-1#/lineage"
+        ],
+        "title": "Forecast and source limitations"
+      },
+      {
+        "action": "Inspect the submitted delta, effective versions, source completeness and any superseded close.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-becfeaf219bcb2a5782944"
+        ],
+        "explanation": "The budget approval flag is a saved caller assertion. Frozen panel reconciliation checks internal agreement; it does not authenticate the ledger or approve the financial conclusions.",
+        "id": "review-7ecf562df4d5b9ac4f8e",
+        "impact": "section_restriction",
+        "section_refs": [
+          "close-basis",
+          "close-results",
+          "accounts",
+          "close-sources"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/lineage"
+        ],
+        "title": "Source versions and approval assertions"
+      },
+      {
+        "action": "Review material accounts and unavailable diagnostics, then confirm causes with the business.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-141eaaaf543f50eb4e2df2"
+        ],
+        "explanation": "Material amounts can require review even when significance or persistence cannot be computed. A saved classification does not establish a business explanation or calibrated forecast.",
+        "id": "review-105fbcdc21141d913e28",
+        "impact": "section_restriction",
+        "section_refs": [
+          "close-diagnostics",
+          "close-history",
+          "accounts",
+          "forecast",
+          "close-forecast-context"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/report/full_hierarchy"
+        ],
+        "title": "Materiality and diagnostic availability"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "close-bridge"
+        ],
+        "finding_refs": [
+          "finding-close-budget-cents",
+          "finding-close-actual-cents",
+          "finding-close-total-variance-cents"
+        ],
+        "id": "close-results",
+        "metric_refs": [
+          "close-budget-cents",
+          "close-actual-cents",
+          "close-total-variance-cents"
+        ],
+        "purpose": "Accounting reconciliation establishes agreement within supplied panels.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905",
+          "review-7ecf562df4d5b9ac4f8e"
+        ],
+        "table_refs": [],
+        "title": "Monthly financial close"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "accounts",
+        "metric_refs": [],
+        "purpose": "Retain source amounts and diagnostic restrictions without inventing business causes.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905",
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-105fbcdc21141d913e28"
+        ],
+        "table_refs": [
+          "accounts"
+        ],
+        "title": "Account evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "forecast",
+        "metric_refs": [
+          "forecast-projected-landing-cents",
+          "forecast-target-cents",
+          "forecast-prob-hit-target",
+          "forecast-band-0",
+          "forecast-band-1"
+        ],
+        "purpose": "Forecast period, assumptions and calibration limits are separate from the close.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905",
+          "review-105fbcdc21141d913e28"
+        ],
+        "table_refs": [],
+        "title": "Forecast evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "close-basis",
+        "metric_refs": [],
+        "purpose": "Source identity and internal checks are distinct from financial approval.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-7ecf562df4d5b9ac4f8e"
+        ],
+        "table_refs": [
+          "close-basis"
+        ],
+        "title": "Selected close and source versions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "close-diagnostics",
+        "metric_refs": [],
+        "purpose": "Saved materiality, significance and persistence; no invented business cause.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-105fbcdc21141d913e28"
+        ],
+        "table_refs": [
+          "account-diagnostics"
+        ],
+        "title": "Account review evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "close-variance-history"
+        ],
+        "finding_refs": [],
+        "id": "close-history",
+        "metric_refs": [],
+        "purpose": "Dated observations from the selected close, not an inventory of later closes.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-105fbcdc21141d913e28"
+        ],
+        "table_refs": [
+          "account-prior-observations"
+        ],
+        "title": "Retained variance observations"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "close-forecast-context",
+        "metric_refs": [],
+        "purpose": "Year-end scenarios and model intervals are separate from monthly accounting.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-105fbcdc21141d913e28"
+        ],
+        "table_refs": [
+          "account-forecasts",
+          "forecast-basis"
+        ],
+        "title": "Forecast basis and restrictions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "close-sources",
+        "metric_refs": [],
+        "purpose": "Original submitted actuals and effective actuals retain their own version basis.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-7ecf562df4d5b9ac4f8e"
+        ],
+        "table_refs": [
+          "submitted-actuals",
+          "effective-actuals",
+          "budget-panel",
+          "history-exclusions"
+        ],
+        "title": "Submitted and effective source panels"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "completed",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cee9eb99bc033d92f905",
+        "review-7ecf562df4d5b9ac4f8e",
+        "review-105fbcdc21141d913e28"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-141eaaaf543f50eb4e2df2"
+      ],
+      "metric_refs": [
+        "close-budget-cents",
+        "close-actual-cents",
+        "close-total-variance-cents"
+      ],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cee9eb99bc033d92f905",
+        "review-7ecf562df4d5b9ac4f8e",
+        "review-105fbcdc21141d913e28"
+      ],
+      "template_id": "close-summary-v1",
+      "text": "This saved close compares budget and actual amounts for one reporting period. The bridge explains the accounting movement; account review evidence and year-end evidence appear separately. Internal reconciliation does not authenticate a ledger or establish business causes."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "node",
+            "label": "Account ID"
+          },
+          {
+            "id": "account",
+            "label": "Account"
+          },
+          {
+            "id": "budget_cents",
+            "label": "Budget"
+          },
+          {
+            "id": "actual_cents",
+            "label": "Actual"
+          },
+          {
+            "id": "total_variance_cents",
+            "label": "Variance"
+          },
+          {
+            "id": "favourability",
+            "label": "Assessment"
+          },
+          {
+            "id": "review",
+            "label": "Saved review class"
+          },
+          {
+            "id": "parent",
+            "label": "Parent account ID"
+          },
+          {
+            "id": "material",
+            "label": "Saved materiality"
+          },
+          {
+            "id": "significant",
+            "label": "Saved significance"
+          },
+          {
+            "id": "impact",
+            "label": "Saved profit impact"
+          }
+        ],
+        "id": "accounts",
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "account",
+                "kind": "text",
+                "text": "Standalone cost"
+              },
+              {
+                "column_id": "budget_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-budget-cents"
+              },
+              {
+                "column_id": "actual_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-actual-cents"
+              },
+              {
+                "column_id": "total_variance_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-total-variance-cents"
+              },
+              {
+                "column_id": "favourability",
+                "kind": "text",
+                "text": "Adverse"
+              },
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "MATERIAL_SIG_NC"
+              },
+              {
+                "column_id": "parent",
+                "kind": "text",
+                "text": "Root"
+              },
+              {
+                "column_id": "material",
+                "kind": "text",
+                "text": "Material"
+              },
+              {
+                "column_id": "significant",
+                "kind": "text",
+                "text": "Not computable"
+              },
+              {
+                "column_id": "impact",
+                "kind": "metric_ref",
+                "metric_id": "account-0-profit-impact"
+              }
+            ],
+            "evidence_refs": [
+              "e-141eaaaf543f50eb4e2df2"
+            ],
+            "id": "account-row-0"
+          }
+        ],
+        "title": "Saved account evidence"
+      },
+      {
+        "columns": [
+          {
+            "id": "field",
+            "label": "Field"
+          },
+          {
+            "id": "value",
+            "label": "Saved value"
+          }
+        ],
+        "id": "close-basis",
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Selected saved run"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "qa-cost"
+              }
+            ],
+            "evidence_refs": [
+              "e-30015c1ca281e5b9d0c9dc"
+            ],
+            "id": "run"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Close period"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "2026-06-30"
+              }
+            ],
+            "evidence_refs": [
+              "e-7edf09a9f3e512cd981f6e"
+            ],
+            "id": "date"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Reporting frequency"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "monthly"
+              }
+            ],
+            "evidence_refs": [
+              "e-e2536ab3fb68c187b0f42c"
+            ],
+            "id": "frequency"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Root measure"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "cost"
+              }
+            ],
+            "evidence_refs": [
+              "e-a0df0e8d0a44902091b16d"
+            ],
+            "id": "measure"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Root account"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Standalone cost"
+              }
+            ],
+            "evidence_refs": [
+              "e-abd176b9d93b7f2a3c38fb"
+            ],
+            "id": "name"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Currency"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "EUR"
+              }
+            ],
+            "evidence_refs": [
+              "e-c4e36119354a4986d4d807"
+            ],
+            "id": "currency"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Budget version"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-fdffb046855055392e2ec8"
+            ],
+            "id": "budget-version"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Submitted actuals version"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-7940f0f09b3f7b70da89c9"
+            ],
+            "id": "actual-version"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Budget source label"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "approved-budget.csv"
+              }
+            ],
+            "evidence_refs": [
+              "e-e374a8796c579452729ff4"
+            ],
+            "id": "budget-source"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Actuals source label"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "closed-ledger.csv"
+              }
+            ],
+            "evidence_refs": [
+              "e-2bd8e6bc879471126cbcbc"
+            ],
+            "id": "actual-source"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Budget approval supplied by caller"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Yes (saved assertion)"
+              }
+            ],
+            "evidence_refs": [
+              "e-b88916d886494bb11d13c4"
+            ],
+            "id": "budget-assertion"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Supersedes saved run (if retained)"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-1525c34937377ece6c46a6"
+            ],
+            "id": "supersedes"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Internal result reconciliation"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Yes (saved assertion)"
+              }
+            ],
+            "evidence_refs": [
+              "e-38130b37d9af8364414d30"
+            ],
+            "id": "accounting"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Frozen panel reconciliation"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "matched"
+              }
+            ],
+            "evidence_refs": [
+              "e-56075238cf0ebdebb57e3a"
+            ],
+            "id": "source-check"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Canonical claim check"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Yes (saved assertion)"
+              }
+            ],
+            "evidence_refs": [
+              "e-086a8bdf0f7912ea9a30f5"
+            ],
+            "id": "claim-check"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Source completeness statement"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "all leaf lines, full-year budget and closed YTD actuals verified"
+              }
+            ],
+            "evidence_refs": [
+              "e-0e43b60b8b10f4e8e1e4b7"
+            ],
+            "id": "coverage"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Historical budget basis"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "selected approved budget, including any supplied prior-period budgets"
+              }
+            ],
+            "evidence_refs": [
+              "e-d3c061d78093824e91592d"
+            ],
+            "id": "history-basis"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Effective actuals semantics"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "effective ordered deltas; later versions supersede matching line/period only"
+              }
+            ],
+            "evidence_refs": [
+              "e-792514877fcb8fc250eaec"
+            ],
+            "id": "actual-semantics"
+          }
+        ],
+        "title": "Selected close and source basis"
+      },
+      {
+        "columns": [
+          {
+            "id": "node",
+            "label": "Account ID"
+          },
+          {
+            "id": "name",
+            "label": "Account"
+          },
+          {
+            "id": "triage",
+            "label": "Saved triage"
+          },
+          {
+            "id": "significance",
+            "label": "Significance limitation"
+          },
+          {
+            "id": "persistence",
+            "label": "Persistence classification"
+          },
+          {
+            "id": "reason",
+            "label": "Persistence limitation"
+          },
+          {
+            "id": "granularity",
+            "label": "Attribution granularity"
+          }
+        ],
+        "id": "account-diagnostics",
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "name",
+                "kind": "text",
+                "text": "Standalone cost"
+              },
+              {
+                "column_id": "triage",
+                "kind": "text",
+                "text": "material by size; significance not computable (insufficient history (<6 prior points) \u2014 significance not computable)"
+              },
+              {
+                "column_id": "significance",
+                "kind": "text",
+                "text": "insufficient history (<6 prior points) \u2014 significance not computable"
+              },
+              {
+                "column_id": "persistence",
+                "kind": "text",
+                "text": "INSUFFICIENT_HISTORY"
+              },
+              {
+                "column_id": "reason",
+                "kind": "text",
+                "text": "need >6 periods, have 6"
+              },
+              {
+                "column_id": "granularity",
+                "kind": "text",
+                "text": "no unit (price/volume) data \u2014 reporting total spending variance only; volume/rate split not computable"
+              }
+            ],
+            "evidence_refs": [
+              "e-141eaaaf543f50eb4e2df2"
+            ],
+            "id": "detail-0"
+          }
+        ],
+        "title": "Saved account diagnostic limitations"
+      },
+      {
+        "columns": [
+          {
+            "id": "node",
+            "label": "Account ID"
+          },
+          {
+            "id": "date",
+            "label": "Observation period"
+          },
+          {
+            "id": "amount",
+            "label": "Actual less budget (EUR)"
+          }
+        ],
+        "id": "account-prior-observations",
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 5"
+              }
+            ],
+            "evidence_refs": [
+              "e-0665b88b5022ce7c0bf3bd"
+            ],
+            "id": "history-0-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-02-28"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 5"
+              }
+            ],
+            "evidence_refs": [
+              "e-f03e08529080f7a486b744"
+            ],
+            "id": "history-0-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-03-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 5"
+              }
+            ],
+            "evidence_refs": [
+              "e-6581115321dedd997a9ede"
+            ],
+            "id": "history-0-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-04-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 5"
+              }
+            ],
+            "evidence_refs": [
+              "e-9730817d1320f5bd4e1d7e"
+            ],
+            "id": "history-0-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-05-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 5"
+              }
+            ],
+            "evidence_refs": [
+              "e-cc4c8dab5bd0f95a0330ae"
+            ],
+            "id": "history-0-4"
+          }
+        ],
+        "title": "Retained prior variances \u2014 account amounts"
+      },
+      {
+        "columns": [
+          {
+            "id": "node",
+            "label": "Account ID"
+          },
+          {
+            "id": "name",
+            "label": "Account"
+          },
+          {
+            "id": "state",
+            "label": "Publication state"
+          },
+          {
+            "id": "landing",
+            "label": "Year-end amount"
+          },
+          {
+            "id": "target",
+            "label": "Target"
+          },
+          {
+            "id": "probability",
+            "label": "Saved probability / outcome"
+          },
+          {
+            "id": "low",
+            "label": "Interval lower bound"
+          },
+          {
+            "id": "high",
+            "label": "Interval upper bound"
+          },
+          {
+            "id": "direction",
+            "label": "Target direction"
+          }
+        ],
+        "id": "account-forecasts",
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "name",
+                "kind": "text",
+                "text": "Standalone cost"
+              },
+              {
+                "column_id": "state",
+                "kind": "text",
+                "text": "point_only"
+              },
+              {
+                "column_id": "landing",
+                "kind": "metric_ref",
+                "metric_id": "account-forecast-0-projected-landing-cents"
+              },
+              {
+                "column_id": "target",
+                "kind": "metric_ref",
+                "metric_id": "account-forecast-0-target-cents"
+              },
+              {
+                "column_id": "probability",
+                "kind": "metric_ref",
+                "metric_id": "account-forecast-0-prob-hit-target"
+              },
+              {
+                "column_id": "low",
+                "kind": "metric_ref",
+                "metric_id": "account-forecast-0-band-0"
+              },
+              {
+                "column_id": "high",
+                "kind": "metric_ref",
+                "metric_id": "account-forecast-0-band-1"
+              },
+              {
+                "column_id": "direction",
+                "kind": "text",
+                "text": "lower_is_better"
+              }
+            ],
+            "evidence_refs": [
+              "e-59f4b911e72fe612bf8e4a"
+            ],
+            "id": "forecast-0"
+          }
+        ],
+        "title": "Saved account year-end evidence \u2014 diagnostic"
+      },
+      {
+        "columns": [
+          {
+            "id": "node",
+            "label": "Account ID"
+          },
+          {
+            "id": "field",
+            "label": "Field"
+          },
+          {
+            "id": "value",
+            "label": "Saved value"
+          }
+        ],
+        "id": "forecast-basis",
+        "review_refs": [
+          "review-105fbcdc21141d913e28",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Method"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "phasing-aware (YTD performance vs. phased budget)"
+              }
+            ],
+            "evidence_refs": [
+              "e-ed867e5a95b3070aaf561a"
+            ],
+            "id": "forecast-0-method"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Input basis"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "caller-supplied YTD scenario; not inferred from single-close actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-b0ea52e891094afeaccb93"
+            ],
+            "id": "forecast-0-input_basis"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Publication reason"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "persistence evidence unavailable; point is an unconfirmed scenario"
+              }
+            ],
+            "evidence_refs": [
+              "e-f438fd25005f96c8ce879a"
+            ],
+            "id": "forecast-0-reason"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Uncertainty basis"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "not computable"
+              }
+            ],
+            "evidence_refs": [
+              "e-a156f21d75c65ae7100078"
+            ],
+            "id": "forecast-0-confidence"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Model interval level"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Not retained"
+              }
+            ],
+            "evidence_refs": [
+              "e-1525c34937377ece6c46a6"
+            ],
+            "id": "forecast-0-band_confidence"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Probability interpretation"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "uncalibrated model estimate"
+              }
+            ],
+            "evidence_refs": [
+              "e-c530b5407d5deb16065f28"
+            ],
+            "id": "forecast-0-probability_kind"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Remaining periods"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "6"
+              }
+            ],
+            "evidence_refs": [
+              "e-38de971d9d722bf1eb1253"
+            ],
+            "id": "forecast-0-remaining_periods"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Target direction"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "lower_is_better"
+              }
+            ],
+            "evidence_refs": [
+              "e-c6e7a3df56e90f3fba61e8"
+            ],
+            "id": "forecast-0-direction"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved persistence"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "INSUFFICIENT_HISTORY"
+              }
+            ],
+            "evidence_refs": [
+              "e-4fd8315e3a2796acfc1053"
+            ],
+            "id": "forecast-0-persistence"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Single-line projection; no cross-line correlation model."
+              }
+            ],
+            "evidence_refs": [
+              "e-2fd85dc570cf23c0f471b1"
+            ],
+            "id": "assumption-0-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Historical variance dispersion assumes independent, comparable reporting periods."
+              }
+            ],
+            "evidence_refs": [
+              "e-131fb74a9474d9c6195d9e"
+            ],
+            "id": "assumption-0-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Normal-distribution range/probability is conditional on the projection method; coverage is not backtested."
+              }
+            ],
+            "evidence_refs": [
+              "e-d8c730d0d18467de204d05"
+            ],
+            "id": "assumption-0-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "Persistence is a provisional rule or explicit caller scenario, not established business causation."
+              }
+            ],
+            "evidence_refs": [
+              "e-5ab2f2fbe90442376619ad"
+            ],
+            "id": "assumption-0-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved YTD actuals"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "EUR 270"
+              }
+            ],
+            "evidence_refs": [
+              "e-c6e8e5b173b30fb9dc8892"
+            ],
+            "id": "forecast-0-ytd_cents"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "node",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "field",
+                "kind": "text",
+                "text": "Saved year-end target"
+              },
+              {
+                "column_id": "value",
+                "kind": "text",
+                "text": "EUR 480"
+              }
+            ],
+            "evidence_refs": [
+              "e-5a9c8345b80878b16e35b9"
+            ],
+            "id": "forecast-0-target_cents"
+          }
+        ],
+        "title": "Forecast basis and assumptions"
+      },
+      {
+        "columns": [
+          {
+            "id": "line",
+            "label": "Line ID"
+          },
+          {
+            "id": "date",
+            "label": "Period"
+          },
+          {
+            "id": "amount",
+            "label": "Amount (EUR)"
+          },
+          {
+            "id": "minor",
+            "label": "Canonical cents"
+          },
+          {
+            "id": "version",
+            "label": "Source version"
+          }
+        ],
+        "id": "submitted-actuals",
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-335d2478ae20eec9ae46cd",
+              "e-9e8912a27307c3789c2461"
+            ],
+            "id": "submitted-actuals-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-02-28"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-b279065e8272ec91e160ad",
+              "e-20d79932df0394f0d85726"
+            ],
+            "id": "submitted-actuals-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-03-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-63769215bd1615ab5bcb26",
+              "e-ab752500e99602d3bda198"
+            ],
+            "id": "submitted-actuals-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-04-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-d7ee7515a843677e8a3101",
+              "e-0c31c6fcf91beb3dfb26de"
+            ],
+            "id": "submitted-actuals-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-05-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-ffdb4644bc50ef5206ff91",
+              "e-1218de2acf528627b5bb5e"
+            ],
+            "id": "submitted-actuals-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-06-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-ed06aa13f7b21e1d276732",
+              "e-54a527525776e252210552"
+            ],
+            "id": "submitted-actuals-5"
+          }
+        ],
+        "title": "Original submitted actuals delta"
+      },
+      {
+        "columns": [
+          {
+            "id": "line",
+            "label": "Line ID"
+          },
+          {
+            "id": "date",
+            "label": "Period"
+          },
+          {
+            "id": "amount",
+            "label": "Amount (EUR)"
+          },
+          {
+            "id": "minor",
+            "label": "Canonical cents"
+          },
+          {
+            "id": "version",
+            "label": "Source version"
+          }
+        ],
+        "id": "effective-actuals",
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-16d9e79299989fa3e30f00",
+              "e-54d6b1c0e966cf651809a8"
+            ],
+            "id": "effective-actuals-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-02-28"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-7111585a9f39ab9029f815",
+              "e-80f94556305e93d87e3559"
+            ],
+            "id": "effective-actuals-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-03-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-1dd90d704a63704d824127",
+              "e-34c079a3ef2d15d75781c6"
+            ],
+            "id": "effective-actuals-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-04-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-1ec602715ae6864196d584",
+              "e-7a8a83dbc13abd5c550d34"
+            ],
+            "id": "effective-actuals-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-05-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-78bb733077ad637dd1ed4a",
+              "e-6d962323bfa2a900cf8f4a"
+            ],
+            "id": "effective-actuals-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-06-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 45"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4500"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-actuals"
+              }
+            ],
+            "evidence_refs": [
+              "e-f79cbd17b974c80525c37e",
+              "e-a6d62ce3ae8d8af1b3e326"
+            ],
+            "id": "effective-actuals-5"
+          }
+        ],
+        "title": "Effective actuals used by the saved close"
+      },
+      {
+        "columns": [
+          {
+            "id": "line",
+            "label": "Line ID"
+          },
+          {
+            "id": "date",
+            "label": "Period"
+          },
+          {
+            "id": "amount",
+            "label": "Amount (EUR)"
+          },
+          {
+            "id": "minor",
+            "label": "Canonical cents"
+          },
+          {
+            "id": "version",
+            "label": "Source version"
+          }
+        ],
+        "id": "budget-panel",
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-01-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-dac1838860fc8275811da2",
+              "e-40ba8459b9fcd2d1e8ce52"
+            ],
+            "id": "budget-panel-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-02-28"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-93a5a82a8b2ff517f1c512",
+              "e-b5b7de5215150ec8c39f5a"
+            ],
+            "id": "budget-panel-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-03-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-7c9dcb8ba1973bc44e0156",
+              "e-11434cd5a795f1d80437a9"
+            ],
+            "id": "budget-panel-2"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-04-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-e3aac2d6c0dd5c49234ed7",
+              "e-df0aef31238f74adce88db"
+            ],
+            "id": "budget-panel-3"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-05-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-651bbb9784bd1c37ed95b2",
+              "e-d26dd155edd5f4f3f7a26a"
+            ],
+            "id": "budget-panel-4"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-06-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-ed2692f875027e0f1c333e",
+              "e-37a7cd4e2da8900aa4928d"
+            ],
+            "id": "budget-panel-5"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-07-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-c924946beebb15be66b076",
+              "e-a78b2192806165b28d1331"
+            ],
+            "id": "budget-panel-6"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-08-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-edc49417547662379579cf",
+              "e-f934c6ddea307a13fcf091"
+            ],
+            "id": "budget-panel-7"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-09-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-270f482f2583182cb1b401",
+              "e-08009bc21bc4341bdea829"
+            ],
+            "id": "budget-panel-8"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-10-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-1aced80f85b0534d4e59a5",
+              "e-c689b8c78319dffdd2a7ef"
+            ],
+            "id": "budget-panel-9"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-11-30"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-3f27095aecebc29eeb3a5f",
+              "e-47d8b5ac6e5cd801bc69e2"
+            ],
+            "id": "budget-panel-10"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "line",
+                "kind": "text",
+                "text": "cost"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-12-31"
+              },
+              {
+                "column_id": "amount",
+                "kind": "text",
+                "text": "EUR 40"
+              },
+              {
+                "column_id": "minor",
+                "kind": "text",
+                "text": "4000"
+              },
+              {
+                "column_id": "version",
+                "kind": "text",
+                "text": "qa-cost-budget"
+              }
+            ],
+            "evidence_refs": [
+              "e-9e7ad08a7cb1bafa108a3c",
+              "e-91e3aa92881ce2cea5f479"
+            ],
+            "id": "budget-panel-11"
+          }
+        ],
+        "title": "Selected budget panel"
+      },
+      {
+        "columns": [
+          {
+            "id": "period",
+            "label": "Saved excluded period / reason"
+          }
+        ],
+        "id": "history-exclusions",
+        "review_refs": [
+          "review-7ecf562df4d5b9ac4f8e",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [],
+        "title": "Excluded incomplete historical periods"
+      }
+    ],
+    "workflow": "close"
+  }
+}

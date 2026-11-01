@@ -185,6 +185,13 @@ verified inputs into a new database if migration is needed.
 
 ## Reports and delivery recovery
 
+The local Keystone workspace also offers a [native close reader](../../webapp/native-reports/part4b-close.md)
+for registered **saved synthetic** outputs: an interactive variance bridge,
+account review, separate year-end scenarios and source-version panels. Its
+complete reading copy retains all evidence rows; verified original downloads
+remain available. This does not enable arbitrary live-data imports, browser close
+execution or authenticated approvals.
+
 Export HTML from an already committed close without recalculating its statistics:
 
 ```bash

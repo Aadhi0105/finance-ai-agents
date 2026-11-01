@@ -7,6 +7,7 @@ import { calendarDate, formatMetric, savedInstant } from './format';
 import { AnalysisSections } from './AnalysisSections';
 import { EventSections, EventGateDetails } from './EventSections';
 import { NewsSections, NewsReviewDetails } from './NewsSections';
+import { CloseSections } from './CloseSections';
 import { MonitoringSections } from './MonitoringSections';
 import { ReadingCopy } from './ReadingCopy';
 import { MetricCard, ReportHeader, ReportSection, ReportStates, ReviewNotice, SectionNavigation } from './ReportFrame';
@@ -21,7 +22,8 @@ const eventLinks = [['summary', 'Study summary'], ['sample', 'What was examined'
 const newsLinks = [['summary', 'News summary'], ['stories', 'Retained stories'], ['coverage', 'Coverage and exclusions'],
   ['tone', 'Tone evidence'], ['review', 'Why review is required'], ['evidence', 'Saved evidence']] as const;
 const monitoringLinks = [['summary','Monitoring summary'],['observations','Observations & policies'],['history','Retained history'],['effective','Effective state'],['corrections','Corrections & recovery'],['review','Review requirements'],['evidence','Saved evidence']] as const;
-type SectionId = typeof researchLinks[number][0] | typeof eventLinks[number][0] | typeof newsLinks[number][0] | typeof monitoringLinks[number][0];
+const closeLinks = [['summary','Close summary'],['bridge','Variance bridge'],['accounts','Account review'],['forecast','Forecast & limitations'],['versions','Source versions'],['review','Review requirements'],['evidence','Saved evidence']] as const;
+type SectionId = typeof researchLinks[number][0] | typeof eventLinks[number][0] | typeof newsLinks[number][0] | typeof monitoringLinks[number][0] | typeof closeLinks[number][0];
 const categoryLabel: Record<string, string> = { data_basis: 'Data basis', observation_dates: 'Dates & recency', valuation_assumptions: 'Valuation assumptions',
   peer_comparability: 'Peer comparison', narrative_support: 'Supported narrative', statistical_eligibility: 'Statistical eligibility', delivery: 'Saved files' };
 
@@ -32,6 +34,7 @@ function jumpTo(section: SectionId) {
 }
 
 export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onReloadWorkspace: () => void }) {
+  const isClose = run.workflow === 'close';
   const isMonitoring = run.workflow === 'monitoring';
   const isEvents = run.workflow === 'events';
   const isNews = run.workflow === 'news', isMarket = isEvents || isNews;
@@ -101,9 +104,9 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
   function closeCopy(){setCopyOpen(false);requestAnimationFrame(()=>{copyReturn.current?.scrollIntoView({block:'center'});copyReturn.current?.focus({preventScroll:true});});}
   const retry = () => { activeRequest.current?.abort(); downloadRequest.current?.abort();copyRequest.current?.abort();setCopyOpen(false);setCopyBusy(false); setState({ kind: 'loading' }); setAttempt(n => n + 1); };
   return <div className="native-reader">
-    <a href={isMonitoring ? '#/agent/agent2' : isMarket ? '#/agent/agent3' : '#/agent/agent1'} className="back-link"><Icon name="back" size={16} />{isMonitoring ? 'Monitoring reports' : isMarket ? 'Market & news reports' : 'Research reports'}</a>
-    {state.kind === 'loading' ? <section className="nr-load" aria-busy="true" role="status"><span className="spinner" /><h1>{isMonitoring ? 'Opening saved monitoring' : isNews ? 'Opening saved company news' : isEvents ? 'Opening saved event study' : 'Opening saved research'}</h1><p>Checking the report and its registered evidence…</p><div className="nr-skeleton" aria-hidden="true"><span /><span /><span /></div></section>
-      : state.kind === 'error' ? <section className="nr-error" role="alert"><span className="nr-error-icon"><Icon name="info" size={26} /></span><p className="eyebrow">{isMonitoring ? 'SAVED MONITORING' : isNews ? 'SAVED COMPANY NEWS' : isEvents ? 'SAVED EVENT STUDY' : 'SAVED RESEARCH'} / {run.entity}</p><h1 tabIndex={-1} ref={errorHeading}>{state.error.title}</h1><p>{state.error.message}</p>
+    <a href={isClose ? '#/agent/agent4' : isMonitoring ? '#/agent/agent2' : isMarket ? '#/agent/agent3' : '#/agent/agent1'} className="back-link"><Icon name="back" size={16} />{isClose ? 'Financial-close reports' : isMonitoring ? 'Monitoring reports' : isMarket ? 'Market & news reports' : 'Research reports'}</a>
+    {state.kind === 'loading' ? <section className="nr-load" aria-busy="true" role="status"><span className="spinner" /><h1>{isClose ? 'Opening saved financial close' : isMonitoring ? 'Opening saved monitoring' : isNews ? 'Opening saved company news' : isEvents ? 'Opening saved event study' : 'Opening saved research'}</h1><p>Checking the report and its registered evidence…</p><div className="nr-skeleton" aria-hidden="true"><span /><span /><span /></div></section>
+      : state.kind === 'error' ? <section className="nr-error" role="alert"><span className="nr-error-icon"><Icon name="info" size={26} /></span><p className="eyebrow">{isClose ? 'SAVED FINANCIAL CLOSE' : isMonitoring ? 'SAVED MONITORING' : isNews ? 'SAVED COMPANY NEWS' : isEvents ? 'SAVED EVENT STUDY' : 'SAVED RESEARCH'} / {run.entity}</p><h1 tabIndex={-1} ref={errorHeading}>{state.error.title}</h1><p>{state.error.message}</p>
         <div className="nr-error-actions"><button className="primary-button" onClick={retry}>Try reading again</button><button className="nr-secondary-button" onClick={onReloadWorkspace}>Reload workspace</button></div>
         {state.originalVerified && original && <div className="nr-original-available"><h2>Original saved report</h2><p>The registered original passed the workspace checks. It retains its original restrictions.</p><button className="text-button" onClick={() => download(original)} disabled={!!downloading}><Icon name="download" size={16} />{downloading ? 'Checking download…' : 'Download original HTML'}</button></div>}
       </section>
@@ -116,10 +119,11 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
 function ReportContent({ report, run, downloading, onDownload, onRecheck, onReadingCopy, copyBusy }: {
   report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;onReadingCopy:(control:HTMLElement)=>void;copyBusy:boolean;
 }) {
+  const isClose = report.workflow === 'close';
   const isMonitoring = report.workflow === 'monitoring';
   const isEvents = report.workflow === 'events';
   const isNews = report.workflow === 'news', isMarket = isEvents || isNews;
-  const sectionLinks = isMonitoring ? monitoringLinks : isNews ? newsLinks : isEvents ? eventLinks : researchLinks;
+  const sectionLinks = isClose ? closeLinks : isMonitoring ? monitoringLinks : isNews ? newsLinks : isEvents ? eventLinks : researchLinks;
   const [active, setActive] = useState<SectionId>('summary');
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence[]>([]);
   const returnControl = useRef<HTMLElement | null>(null);
@@ -152,13 +156,13 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
     returnControl.current?.scrollIntoView({ block: 'center' }); returnControl.current?.focus({ preventScroll: true });
   }
   return <>
-    <ReportHeader title={isMonitoring ? 'Financial monitoring' : isNews ? 'Company news' : isEvents ? 'Past event reactions' : report.identity.title} entity={report.identity.entity}
-      eyebrow={isMonitoring ? <>AGENT 02 <span>/</span> SAVED MONITORING</> : isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
-      period={<>{(isMarket || isMonitoring) && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>Saved synthetic inputs</>}
-      action={<div className="nr-header-actions">{(isMarket||isMonitoring)&&<button className="nr-secondary-button" onClick={event=>onReadingCopy(event.currentTarget)} disabled={copyBusy||!!downloading}>{copyBusy?'Checking saved evidence…':'Reading & print copy'}</button>}<button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading||copyBusy}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button></div>} />
+    <ReportHeader title={isClose ? 'Financial close' : isMonitoring ? 'Financial monitoring' : isNews ? 'Company news' : isEvents ? 'Past event reactions' : report.identity.title} entity={report.identity.entity}
+      eyebrow={isClose ? <>AGENT 04 <span>/</span> SAVED FINANCIAL CLOSE</> : isMonitoring ? <>AGENT 02 <span>/</span> SAVED MONITORING</> : isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
+      period={<>{(isMarket || isMonitoring || isClose) && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>Saved synthetic inputs</>}
+      action={<div className="nr-header-actions"><button className="nr-secondary-button" onClick={event=>onReadingCopy(event.currentTarget)} disabled={copyBusy||!!downloading}>{copyBusy?'Checking saved evidence…':'Reading & print copy'}</button><button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading||copyBusy}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button></div>} />
     <ReportStates execution={report.state.execution} evidenceGate={report.state.evidence_gate} />
-    <ReviewNotice title={isMonitoring ? 'Saved analyst policies — review required' : isNews ? 'Synthetic news — published tone withheld' : isEvents ? 'Historical diagnostics — review required' : 'Read as illustrative research'} action={<button onClick={() => jumpTo('review')}>{isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
-      {isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These synthetic observations do not establish contractual compliance or calibrated financial risk.' : isNews ? 'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.' : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
+    <ReviewNotice title={isClose ? 'Saved close — financial review required' : isMonitoring ? 'Saved analyst policies — review required' : isNews ? 'Synthetic news — published tone withheld' : isEvents ? 'Historical diagnostics — review required' : 'Read as illustrative research'} action={<button onClick={() => jumpTo('review')}>{isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
+      {isClose ? 'Internal accounting checks establish agreement within supplied panels. They do not authenticate a ledger, verify budget approval or establish calibrated forecasts.' : isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These synthetic observations do not establish contractual compliance or calibrated financial risk.' : isNews ? 'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.' : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
     </ReviewNotice>
 
     <div className="nr-report-grid">
@@ -166,8 +170,8 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
         <div className="nr-reading-note"><Icon name="evidence" size={21} /><h2>A saved snapshot</h2><p>Opening this report does not refresh observations, prices or sources.</p><button className="text-button" onClick={onRecheck}>Recheck saved report</button></div>
       </SectionNavigation>
 
-      <div className="nr-report-body">
-        {isMonitoring ? <MonitoringSections report={report} onInspect={inspect} onReviews={showReviews} /> : isNews ? <NewsSections report={report} onInspect={inspect} onReviews={showReviews} /> : isEvents ? <EventSections report={report} onInspect={inspect} onReviews={showReviews} /> : <>
+      <div className="nr-report-body" data-workspace-run={run.id}>
+        {isClose ? <CloseSections report={report} onInspect={inspect} onReviews={showReviews}/> : isMonitoring ? <MonitoringSections report={report} onInspect={inspect} onReviews={showReviews} /> : isNews ? <NewsSections report={report} onInspect={inspect} onReviews={showReviews} /> : isEvents ? <EventSections report={report} onInspect={inspect} onReviews={showReviews} /> : <>
         <ReportSection id="summary" eyebrow="01 / THE SAVED OBSERVATIONS" title="Research summary">
           <p className="nr-summary-text">{report.summary.text}</p>
           {findings.length ? <ol className="nr-findings">{findings.map((finding, i) => <li key={finding.id}><span className="nr-finding-number">{String(i + 1).padStart(2, '0')}</span><div><p>{finding.content.text}</p><button className="nr-source-button" onClick={() => inspect(finding.content.evidence_refs)}><Icon name="evidence" size={13} />View saved source</button></div></li>)}</ol>
@@ -184,7 +188,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
         <AnalysisSections report={report} onInspect={inspect} onReviews={showReviews} />
         </>}
 
-        <ReportSection id="review" eyebrow={isMonitoring ? '06 / BEFORE ACTING ON THE RESULT' : isMarket ? '05 / UNDERSTAND THE RESTRICTIONS' : '09 / BEFORE RELYING ON THE RESULT'} title={isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}>
+        <ReportSection id="review" eyebrow={isClose || isMonitoring ? '06 / BEFORE ACTING ON THE RESULT' : isMarket ? '05 / UNDERSTAND THE RESTRICTIONS' : '09 / BEFORE RELYING ON THE RESULT'} title={isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}>
           <p className="nr-section-intro">Saved review notes and their source findings remain attached to this report. Completing a process does not approve its financial conclusions.</p>
           {report.review_items.length ? <div className="nr-review-list">{report.review_items.map(item => <details key={item.id} ref={node => { if (node) reviewPanels.current.set(item.id, node); else reviewPanels.current.delete(item.id); }} className="nr-review-item"><summary><Icon name="info" size={17} /><span>{item.title}</span><small>{item.impact === 'publication_block' ? 'Publication restricted' : 'Section requires review'}</small><span className="nr-expand-mark" aria-hidden="true">+</span></summary><div className="nr-review-detail"><p className="eyebrow">{categoryLabel[item.category] || 'Saved review requirement'}</p><p>{item.explanation}</p><p><strong>Next review:</strong> {item.action}</p>{item.section_refs.length > 0 && <p className="nr-affected">Applies to: {item.section_refs.map(id => report.sections.find(s => s.id === id)?.title || id).join(' · ')}</p>}<button className="nr-source-button" onClick={() => inspect(item.evidence_refs)}>Inspect original findings<Icon name="arrow" size={14} /></button><details className="nr-reference-details"><summary>Saved check references ({item.source_check_refs.length})</summary><ul>{item.source_check_refs.map(ref => <li key={ref}><code>{ref}</code></li>)}</ul></details></div></details>)}</div>
             : <div className="nr-empty"><p>No additional review notes were saved. Financial approval remains unavailable in this workspace.</p></div>}
@@ -192,7 +196,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
           {isNews && <NewsReviewDetails report={report} onInspect={inspect} />}
         </ReportSection>
 
-        <ReportSection id="evidence" eyebrow={isMonitoring ? '07 / TRACE THE SAVED RECORD' : isMarket ? '06 / TRACE THE SAVED RECORD' : '10 / TRACE THE SAVED RECORD'} title="Saved evidence">
+        <ReportSection id="evidence" eyebrow={isClose || isMonitoring ? '07 / TRACE THE SAVED RECORD' : isMarket ? '06 / TRACE THE SAVED RECORD' : '10 / TRACE THE SAVED RECORD'} title="Saved evidence">
           <p className="nr-section-intro">File checks establish consistency with the saved inventory. They do not authenticate an issuer or establish source truth.</p>
           {selectedEvidence.length > 0 && <div className="nr-selected-source"><div className="nr-source-heading"><h3>Selected source references</h3><button className="text-button" onClick={returnToFigure}><Icon name="back" size={14} />Return to reading</button></div>{selectedEvidence.map(e => {
             const artifact = run.artifacts.find(a => a.id === e.artifact_id)!;

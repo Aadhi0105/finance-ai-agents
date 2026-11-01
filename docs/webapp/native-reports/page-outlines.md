@@ -236,6 +236,10 @@ then distinguish a newly surfaced issue from an ongoing breach or later correcti
 
 ## Agent 4 — financial close
 
+[Part 4B](part4b-close.md) implements this native reader for registered saved
+synthetic closes, including the exact waterfall and complete reading copy. Wider
+interpretation, physical accessibility and PDF/print acceptance remain open.
+
 **Question:** How did actual results differ from budget, and what does the saved
 close establish?
 

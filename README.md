@@ -197,7 +197,13 @@ adds complete Agent 3 reading/print copies, early-failure handling and controlle
 browser acceptance cases. [Part 4A](docs/webapp/native-reports/part4a-monitoring.md)
 adds native Agent 2 monitoring with separate cycle/export summaries, policy cards,
 interactive retained histories, read-only correction evidence and complete reading
-copies. Agent 4 retains its saved-HTML reader. Verified event-relative paths and authorised
+copies. [Part 4B](docs/webapp/native-reports/part4b-close.md) adds native Agent 4 close
+reports with an exact interactive waterfall, account review, conditional year-end
+scenarios, source-version panels and complete reading copies.
+[Part 4C](docs/webapp/native-reports/part4c-acceptance.md) adds Agent 1 complete
+reading copies, consistent static graphs and cross-agent browser acceptance across
+32 controlled reports. Human interpretation, physical accessibility and actual
+PDF/print acceptance remain open. Verified event-relative paths and authorised
 live-source integration remain later work.
 
 ## Read the result before acting on it

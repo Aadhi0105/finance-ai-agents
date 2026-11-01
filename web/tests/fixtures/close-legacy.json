@@ -1,0 +1,1050 @@
+{
+  "run": {
+    "id": "close-example",
+    "agent": "agent4",
+    "workflow": "close",
+    "title": "Monthly financial close",
+    "entity": "Example Ltd \u00b7 fictional company",
+    "period": "2026-06-30",
+    "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+    "execution_status": "completed",
+    "review_status": "review_required",
+    "summary": "Saved budget-versus-actual close with reconciled amounts, input versions and retained lineage.",
+    "limitations": [
+      "Synthetic demonstration. Figures are not verified company facts.",
+      "Accounting checks do not establish business causes or finance approval.",
+      "Authorised real-company acceptance remains pending."
+    ],
+    "checks": [
+      "Saved bundle validated",
+      "Budget and actuals reconciled"
+    ],
+    "metrics": [
+      {
+        "label": "Budget profit",
+        "value": "EUR 60.00",
+        "basis": "Saved close \u00b7 amount-based"
+      },
+      {
+        "label": "Actual profit",
+        "value": "EUR 65.00",
+        "basis": "Saved close \u00b7 amount-based"
+      },
+      {
+        "label": "Variance",
+        "value": "EUR +5.00",
+        "basis": "Actual less budget \u00b7 synthetic"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": "file-0",
+        "name": "close-june.html",
+        "label": "Financial close report",
+        "kind": "report",
+        "sha256": "3d995642bb2b2e1d9140777344dcda5ff4467670ce324b88a8adf76549723352",
+        "bytes": 37185,
+        "url": "/api/runs/close-example/files/close-june.html"
+      },
+      {
+        "id": "file-1",
+        "name": "close-june.json",
+        "label": "Saved close and lineage",
+        "kind": "evidence",
+        "sha256": "2866394f403bc1a1b92c0e623901caab5af46d2ce87977fd4f2439d43dd11010",
+        "bytes": 75351,
+        "url": "/api/runs/close-example/files/close-june.json"
+      },
+      {
+        "id": "file-2",
+        "name": "input.json",
+        "label": "Synthetic budget and actuals",
+        "kind": "input",
+        "sha256": "d426300b7334612fd20c013a711d6c9255bfab63ab0c34910f2b17d780c6fb64",
+        "bytes": 4502,
+        "url": "/api/runs/close-example/files/input.json"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "3ba27b5f66b78b0b5ffb13e3d71fc4b7434f6f7304b351eec812a162f89e2356",
+        "bytes": 776,
+        "url": "/api/runs/close-example/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "a816a3cb4f4869982a49cd450391ce10f39efd65d06a6a048cb38069dc6dd32d",
+        "bytes": 18008,
+        "url": "/api/runs/close-example/files/native-report.json"
+      }
+    ],
+    "report_id": "file-0",
+    "source_run_id": "close-june",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent4-native-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "file-1",
+        "native-series"
+      ]
+    }
+  },
+  "report": {
+    "agent": "agent4",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "file-1",
+        "name": "close-june.json",
+        "sha256": "2866394f403bc1a1b92c0e623901caab5af46d2ce87977fd4f2439d43dd11010",
+        "source_schema": "agent4.close/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "3ba27b5f66b78b0b5ffb13e3d71fc4b7434f6f7304b351eec812a162f89e2356",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "close-bridge",
+        "purpose": "Exact saved-account bridge; favourability follows the saved profit-impact convention.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "series": [
+          {
+            "id": "bridge-series",
+            "label": "Saved close bridge",
+            "points": [
+              {
+                "assessment": "anchor",
+                "end": "60",
+                "evidence_refs": [
+                  "e-4534f2efe2b1d5647fef52"
+                ],
+                "id": "step-0",
+                "label": "Budget",
+                "reason_codes": [],
+                "start": "0",
+                "x": "0",
+                "y": "60"
+              },
+              {
+                "assessment": "favourable",
+                "end": "70",
+                "evidence_refs": [
+                  "e-25145b42d365008caec13d"
+                ],
+                "id": "step-1",
+                "label": "Sales",
+                "reason_codes": [],
+                "start": "60",
+                "x": "1",
+                "y": "10"
+              },
+              {
+                "assessment": "adverse",
+                "end": "65",
+                "evidence_refs": [
+                  "e-3d0917f3d0fe6077433838"
+                ],
+                "id": "step-2",
+                "label": "Cost",
+                "reason_codes": [],
+                "start": "70",
+                "x": "2",
+                "y": "-5"
+              },
+              {
+                "assessment": "anchor",
+                "end": "65",
+                "evidence_refs": [
+                  "e-a0dc1b2d85a7881e942275"
+                ],
+                "id": "step-3",
+                "label": "Actual",
+                "reason_codes": [],
+                "start": "0",
+                "x": "3",
+                "y": "65"
+              }
+            ]
+          }
+        ],
+        "title": "Budget to actual",
+        "type": "waterfall",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "category",
+          "label": "Anchor / account"
+        },
+        "y_axis": {
+          "currency": "EUR",
+          "label": "currency",
+          "unit": "currency"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "file-1",
+        "id": "e-1525c34937377ece6c46a6",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d307a4dddaa174c676d08f",
+        "label": "Close budget",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/budget_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-34beed296d9c1b3f4be8cd",
+        "label": "Close actual",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/actual_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-994cfc1f2da2968b16733b",
+        "label": "Actual less budget",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/total_variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-4534f2efe2b1d5647fef52",
+        "label": "Budget",
+        "method": null,
+        "pointer": "/derivations/bridge/data/0/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-25145b42d365008caec13d",
+        "label": "Sales",
+        "method": null,
+        "pointer": "/derivations/bridge/data/1/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-3d0917f3d0fe6077433838",
+        "label": "Cost",
+        "method": null,
+        "pointer": "/derivations/bridge/data/2/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "native-series",
+        "id": "e-a0dc1b2d85a7881e942275",
+        "label": "Actual",
+        "method": null,
+        "pointer": "/derivations/bridge/data/3/value",
+        "source_id": "derived-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-141eaaaf543f50eb4e2df2",
+        "label": "Saved account evidence",
+        "method": null,
+        "pointer": "/report/full_hierarchy",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3cdce99fbe0e8b1f273e8c",
+        "label": "Budget \u00b7 Sales",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/0/budget_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-80a37d43d7999565dc3945",
+        "label": "Actual \u00b7 Sales",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/0/actual_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-87c19fb08a2e094331b2e7",
+        "label": "Variance \u00b7 Sales",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/0/total_variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-653525b4900ec2cae8d70c",
+        "label": "Saved account evidence",
+        "method": null,
+        "pointer": "/report/full_hierarchy/children/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-d934e8e2d80d4ccb86a832",
+        "label": "Budget \u00b7 Cost",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/1/budget_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a19a9a3d83f732950dcea9",
+        "label": "Actual \u00b7 Cost",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/1/actual_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-b0c076626a7f9f07181eb7",
+        "label": "Variance \u00b7 Cost",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/full_hierarchy/children/1/total_variance_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-1f980f3f6862da1f0b9f7e",
+        "label": "Saved account evidence",
+        "method": null,
+        "pointer": "/report/full_hierarchy/children/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-4ca42aafd137b247a6cd51",
+        "label": "Provisional year-end landing",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/reforecasts/profit/projected_landing_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-3614c5a23a01de9adcaca1",
+        "label": "Year-end target",
+        "method": "Exact integer minor units / 100.",
+        "pointer": "/report/reforecasts/profit/target_cents",
+        "source_id": "saved-source",
+        "transform": "minor_to_major"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-a7c21ab9b5efc2cb0837df",
+        "label": "Uncalibrated model probability",
+        "method": null,
+        "pointer": "/report/reforecasts/profit/prob_hit_target",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-6d8834eb868eb01e7c1d98",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/report/reforecasts",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "file-1",
+        "id": "e-becfeaf219bcb2a5782944",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/lineage",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-d307a4dddaa174c676d08f"
+          ],
+          "metric_refs": [
+            "close-budget-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved close budget: EUR 60.00 (2026-06-30)."
+        },
+        "id": "finding-close-budget-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-34beed296d9c1b3f4be8cd"
+          ],
+          "metric_refs": [
+            "close-actual-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved close actual: EUR 65.00 (2026-06-30)."
+        },
+        "id": "finding-close-actual-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-994cfc1f2da2968b16733b"
+          ],
+          "metric_refs": [
+            "close-total-variance-cents"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved actual less budget: EUR 5.00 (2026-06-30)."
+        },
+        "id": "finding-close-total-variance-cents",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [],
+    "identity": {
+      "entity": "Example Ltd \u00b7 fictional company",
+      "period_end": "2026-06-30",
+      "period_label": "2026-06-30",
+      "prepared_at": "2026-10-30T18:26:33.417585+00:00",
+      "source_run_id": "close-june",
+      "ticker": null,
+      "title": "Monthly financial close"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-d307a4dddaa174c676d08f"
+        ],
+        "id": "close-budget-cents",
+        "label": "Close budget",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "60",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-34beed296d9c1b3f4be8cd"
+        ],
+        "id": "close-actual-cents",
+        "label": "Close actual",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "65",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-994cfc1f2da2968b16733b"
+        ],
+        "id": "close-total-variance-cents",
+        "label": "Actual less budget",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "5",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-d307a4dddaa174c676d08f"
+        ],
+        "id": "account-0-budget-cents",
+        "label": "Budget \u00b7 Profit",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "60",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-34beed296d9c1b3f4be8cd"
+        ],
+        "id": "account-0-actual-cents",
+        "label": "Actual \u00b7 Profit",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "65",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-994cfc1f2da2968b16733b"
+        ],
+        "id": "account-0-total-variance-cents",
+        "label": "Variance \u00b7 Profit",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-3cdce99fbe0e8b1f273e8c"
+        ],
+        "id": "account-1-budget-cents",
+        "label": "Budget \u00b7 Sales",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "100",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-80a37d43d7999565dc3945"
+        ],
+        "id": "account-1-actual-cents",
+        "label": "Actual \u00b7 Sales",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "110",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-87c19fb08a2e094331b2e7"
+        ],
+        "id": "account-1-total-variance-cents",
+        "label": "Variance \u00b7 Sales",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "10",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-d934e8e2d80d4ccb86a832"
+        ],
+        "id": "account-2-budget-cents",
+        "label": "Budget \u00b7 Cost",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "40",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-a19a9a3d83f732950dcea9"
+        ],
+        "id": "account-2-actual-cents",
+        "label": "Actual \u00b7 Cost",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "45",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-b0c076626a7f9f07181eb7"
+        ],
+        "id": "account-2-total-variance-cents",
+        "label": "Variance \u00b7 Cost",
+        "period_label": "2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-4ca42aafd137b247a6cd51"
+        ],
+        "id": "forecast-projected-landing-cents",
+        "label": "Provisional year-end landing",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "780",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-3614c5a23a01de9adcaca1"
+        ],
+        "id": "forecast-target-cents",
+        "label": "Year-end target",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "720",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": null,
+        "evidence_refs": [
+          "e-a7c21ab9b5efc2cb0837df"
+        ],
+        "id": "forecast-prob-hit-target",
+        "label": "Uncalibrated model probability",
+        "period_label": "Year-end forecast from close 2026-06-30",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "fraction",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "forecast-band-0",
+        "label": "Model interval lower bound",
+        "period_label": "Year-end model interval",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "id": "forecast-band-1",
+        "label": "Model interval upper bound",
+        "period_label": "Year-end model interval",
+        "reason_codes": [
+          "saved_value_unavailable"
+        ],
+        "unit": "currency",
+        "value": null,
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-d0088c636458d40fe11fe668",
+    "review_items": [
+      {
+        "action": "Inspect authorised source evidence before relying on the figures.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-1525c34937377ece6c46a6"
+        ],
+        "explanation": "These illustrative inputs do not establish verified company facts or financial approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "close-results",
+          "accounts",
+          "forecast"
+        ],
+        "source_check_refs": [
+          "policy:synthetic-local-review/v1"
+        ],
+        "title": "Synthetic demonstration"
+      },
+      {
+        "action": "Inspect the original forecast interval, persistence evidence, assumptions and source versions.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-6d8834eb868eb01e7c1d98",
+          "e-becfeaf219bcb2a5782944"
+        ],
+        "explanation": "A provisional landing or uncalibrated probability is not a guarantee. Source authenticity and business causes are not established by accounting checks.",
+        "id": "review-cee9eb99bc033d92f905",
+        "impact": "section_restriction",
+        "section_refs": [
+          "close-results",
+          "accounts",
+          "forecast"
+        ],
+        "source_check_refs": [
+          "artifact:file-1#/report/reforecasts",
+          "artifact:file-1#/lineage"
+        ],
+        "title": "Forecast and source limitations"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [
+          "close-bridge"
+        ],
+        "finding_refs": [
+          "finding-close-budget-cents",
+          "finding-close-actual-cents",
+          "finding-close-total-variance-cents"
+        ],
+        "id": "close-results",
+        "metric_refs": [
+          "close-budget-cents",
+          "close-actual-cents",
+          "close-total-variance-cents"
+        ],
+        "purpose": "Accounting reconciliation establishes agreement within supplied panels.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "table_refs": [],
+        "title": "Monthly financial close"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "accounts",
+        "metric_refs": [],
+        "purpose": "Retain source amounts and diagnostic restrictions without inventing business causes.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "table_refs": [
+          "accounts"
+        ],
+        "title": "Account evidence"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "forecast",
+        "metric_refs": [
+          "forecast-projected-landing-cents",
+          "forecast-target-cents",
+          "forecast-prob-hit-target",
+          "forecast-band-0",
+          "forecast-band-1"
+        ],
+        "purpose": "Forecast period, assumptions and calibration limits are separate from the close.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "table_refs": [],
+        "title": "Forecast evidence"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Saved demonstration inputs; preparation is not an observation/publication date.",
+        "id": "saved-source",
+        "label": "Saved synthetic evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "completed",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cee9eb99bc033d92f905"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-1525c34937377ece6c46a6"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-cee9eb99bc033d92f905"
+      ],
+      "template_id": "saved-summary-v1",
+      "text": "Saved synthetic financial close evidence for Example Ltd \u00b7 fictional company. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "account",
+            "label": "Account"
+          },
+          {
+            "id": "budget_cents",
+            "label": "Budget"
+          },
+          {
+            "id": "actual_cents",
+            "label": "Actual"
+          },
+          {
+            "id": "total_variance_cents",
+            "label": "Variance"
+          },
+          {
+            "id": "favourability",
+            "label": "Assessment"
+          },
+          {
+            "id": "review",
+            "label": "Saved review class"
+          }
+        ],
+        "id": "accounts",
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-cee9eb99bc033d92f905"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "account",
+                "kind": "text",
+                "text": "Profit"
+              },
+              {
+                "column_id": "budget_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-budget-cents"
+              },
+              {
+                "column_id": "actual_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-actual-cents"
+              },
+              {
+                "column_id": "total_variance_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-0-total-variance-cents"
+              },
+              {
+                "column_id": "favourability",
+                "kind": "text",
+                "text": "Favourable"
+              },
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "MATERIAL_SIG_NC"
+              }
+            ],
+            "evidence_refs": [
+              "e-141eaaaf543f50eb4e2df2"
+            ],
+            "id": "account-row-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "account",
+                "kind": "text",
+                "text": "Sales"
+              },
+              {
+                "column_id": "budget_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-1-budget-cents"
+              },
+              {
+                "column_id": "actual_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-1-actual-cents"
+              },
+              {
+                "column_id": "total_variance_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-1-total-variance-cents"
+              },
+              {
+                "column_id": "favourability",
+                "kind": "text",
+                "text": "Favourable"
+              },
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "MATERIAL_SIG_NC"
+              }
+            ],
+            "evidence_refs": [
+              "e-653525b4900ec2cae8d70c"
+            ],
+            "id": "account-row-1"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "account",
+                "kind": "text",
+                "text": "Cost"
+              },
+              {
+                "column_id": "budget_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-2-budget-cents"
+              },
+              {
+                "column_id": "actual_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-2-actual-cents"
+              },
+              {
+                "column_id": "total_variance_cents",
+                "kind": "metric_ref",
+                "metric_id": "account-2-total-variance-cents"
+              },
+              {
+                "column_id": "favourability",
+                "kind": "text",
+                "text": "Adverse"
+              },
+              {
+                "column_id": "review",
+                "kind": "text",
+                "text": "MATERIAL_SIG_NC"
+              }
+            ],
+            "evidence_refs": [
+              "e-1f980f3f6862da1f0b9f7e"
+            ],
+            "id": "account-row-2"
+          }
+        ],
+        "title": "Saved account evidence"
+      }
+    ],
+    "workflow": "close"
+  }
+}

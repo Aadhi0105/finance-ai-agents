@@ -14,6 +14,10 @@ and separate diagnostic text-tone graphs.
 failure handling and repeatable controlled browser acceptance cases.
 [Part 4A](part4a-monitoring.md) adds native Agent 2 monitoring, separate cycle and
 export state, correction evidence and interactive retained-history charts.
+[Part 4B](part4b-close.md) adds native Agent 4 financial close, an exact interactive
+waterfall, account review, conditional year-end scenarios and source-version panels.
+[Part 4C](part4c-acceptance.md) adds Agent 1 complete copies, shared static plot
+semantics and a 32-run cross-agent browser rehearsal.
 See [Part 2A implementation and commands](part2a-data-layer.md).
 
 ## The intended experience
@@ -28,8 +32,9 @@ analysis, review notes and evidence controls. Consensus and broker research have
 separate availability. Agent 3 events also open natively, with source-linked sample
 and review details. Company news opens natively with explicit text scope and
 withheld published tone. Agent 2 opens natively with monitoring cards, policy
-thresholds, retained histories and read-only correction evidence. Agent 4 retains
-the saved-HTML reader.
+thresholds, retained histories and read-only correction evidence. Agent 4 opens
+natively with its variance bridge, account review, separate year-end basis and
+source-version evidence. Original saved HTML remains available as verified downloads.
 
 ## Read this pack
 
@@ -38,7 +43,9 @@ the saved-HTML reader.
 | [Report specification](report-specification.md) | Reading order, content boundaries, chart behaviour, visual principles and scope |
 | [Page outlines](page-outlines.md) | Five annotated report layouts, including detailed Agent 1 and Agent 3 examples |
 | [Data contract](report-data-contract.md) | What Python supplies, how the browser reads it, source mapping and error behaviour |
-| [Acceptance matrix](acceptance-matrix.md) | How later implementation will demonstrate correctness and usability |
+| [Acceptance matrix](acceptance-matrix.md) | Implemented checks and remaining acceptance |
+| [Part 4C acceptance](part4c-acceptance.md) | Repeatable cross-agent QA, observed results and limitations |
+| [Reader trial](reader-trial.md) | Plain-language tasks and the still-pending human/accessibility/PDF review |
 | [JSON Schema](report-view.schema.json) | Machine-readable structural definition of the proposed format |
 | [Agent 1 example](examples/agent1-research.json) | Financial history, valuation restrictions and unavailable consensus |
 | [Agent 2 example](examples/agent2-monitoring.json) | A saved monitoring exception with its original threshold and observation date |
@@ -86,8 +93,10 @@ These are explicit design recommendations, not user approval or financial sign-o
    Part 3C: validation and polish — implemented for the controlled cases in its
    guide; human, physical-accessibility and full print/PDF acceptance remain open.
 6. Part 4A: native Agent 2 monitoring — implemented for saved synthetic evidence.
-   Part 4B: native Agent 4 financial close. Part 4C: complete cross-agent browser,
-   accessibility, interpretation and export acceptance. The latter two remain open.
+   Part 4B: native Agent 4 financial close — implemented for saved synthetic evidence.
+   Part 4C: bounded cross-agent browser/export rehearsal and polish — implemented.
+   Human interpretation, physical accessibility and actual PDF/print acceptance
+   remain open; use the prepared reader trial.
 7. Webapp Batch 2: controlled execution, using the same report contract for newly
    completed runs.
 

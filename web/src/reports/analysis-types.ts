@@ -1,6 +1,7 @@
 import type { Availability, Unit } from './report-data';
 
-export type ChartPoint = { id: string; x: string; label: string; y: string | null; evidence_refs: string[]; reason_codes: string[] };
+export type ChartPoint = { id: string; x: string; label: string; y: string | null; evidence_refs: string[]; reason_codes: string[];
+  start?:string; end?:string; assessment?:'anchor'|'favourable'|'adverse' };
 export type ChartData = {
   id: string; title: string; purpose: string; type: string; availability: Availability;
   visibility: 'main' | 'supporting' | 'diagnostic'; reason_codes: string[]; review_refs: string[];

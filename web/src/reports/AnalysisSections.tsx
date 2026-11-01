@@ -61,11 +61,12 @@ export function SavedTable({ table, report, onInspect }: Pick<Context, 'report' 
 
 export function DatasetTable({ chart, onInspect, review }: { chart: ChartData; onInspect: Inspect; review?: React.ReactNode }) {
   const [page, setPage] = useState(0);
-  const id = useId(), rows = datasetRows(chart);
+  const id = useId(), rows = datasetRows(chart), waterfall=chart.type==='waterfall';
   const unit = chart.y_axis.currency || ({ fraction: 'percent', multiple: 'multiple', index: 'index points' } as Record<string, string>)[chart.y_axis.unit] || chart.y_axis.unit;
-  const table = rows.length ? <><div id={id} className="nr-table-scroll" role="region" aria-label={chart.title + ' numerical data'} tabIndex={0}><table className="nr-data-table"><caption>{chart.title} · {unit}</caption><thead><tr><th scope="col">{chart.x_axis.label}</th>{chart.series.map(s => <th scope="col" key={s.id}>{s.label}</th>)}<th scope="col">Evidence</th></tr></thead><tbody>{rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map(row => <tr key={row.x}>
+  const table = rows.length ? <><div id={id} className="nr-table-scroll" role="region" aria-label={chart.title + ' numerical data'} tabIndex={0}><table className="nr-data-table"><caption>{chart.title} · {unit}</caption><thead><tr><th scope="col">{chart.x_axis.label}</th>{chart.series.map(s => <th scope="col" key={s.id}>{s.label}</th>)}{waterfall&&<><th scope="col">Start</th><th scope="col">End</th><th scope="col">Saved assessment</th></>}<th scope="col">Evidence</th></tr></thead><tbody>{rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map(row => <tr key={row.x}>
     <th scope="row">{chart.x_axis.kind === 'date' ? calendarDate(row.x) : row.label === row.x ? row.label : row.x + ' · ' + row.label}</th>
     {row.points.map((point, i) => <td key={chart.series[i].id} className={point?.y !== null && point ? 'nr-number' : 'nr-unavailable-cell'} title={point?.y === null ? 'No usable saved value for this observation' : point?.y ?? 'No point retained for this observation'}>{point ? formatMetric(pointMetric(chart, point)) : 'Not retained'}</td>)}
+    {waterfall&&<><td>{formatMetric({...pointMetric(chart,row.points[0]!),value:row.points[0]!.start!})}</td><td>{formatMetric({...pointMetric(chart,row.points[0]!),value:row.points[0]!.end!})}</td><td>{row.points[0]!.assessment}</td></>}
     <td><SourceButton refs={[...new Set(row.points.flatMap(p => p?.evidence_refs || []))]} onInspect={onInspect} /></td></tr>)}</tbody></table></div>
     <Pager page={page} count={rows.length} onPage={next => { setPage(next); document.getElementById(id)?.focus({ preventScroll: true }); }} label={chart.title} />
     {chart.series.some(s => s.points.some(p => p.y === null)) && <p className="nr-table-note">Unavailable points retain their saved missing state and source evidence; no zero or interpolated value is supplied.</p>}</>
