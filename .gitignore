@@ -35,6 +35,7 @@ waterfall_demo.svg
 state/.keystone-maintenance.lock
 state/.keystone-maintenance.lock.mutator*
 state/operations/
+state/workspace-jobs/
 
 # Frozen local pilot environment
 .venv-pilot/

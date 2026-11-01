@@ -24,7 +24,11 @@ ENTRYPOINTS = {
     'agent3-bundles': ['-m', 'agent3.bundles'],
     'agent4-close': ['-m', 'agent4.close'],
     'agent4-report': ['-m', 'agent4.report'],
+    'workspace-saved': ['-m', 'keystone.workspace.saved_job'],
 }
+MAX_TIMEOUT_SECONDS = 600
+MAX_REQUESTS = 12
+MAX_OUTPUT_TOKENS = 48000
 
 
 def now():
@@ -55,7 +59,7 @@ def write_record(path, data):
 def outcome(agent, code):
     if code == 0:
         return 'completed', 'Review agent evidence; process success is not financial approval.'
-    if agent == 'agent1' and code == 3 or agent.startswith('agent3') and code == 3:
+    if agent in {'agent1', 'workspace-saved'} and code == 3 or agent.startswith('agent3') and code == 3:
         return 'review_required', 'Inspect held agent evidence; do not publish as approved.'
     if agent == 'agent1' and code == 4:
         return 'incomplete', 'Inspect saved evidence before an explicit new operation.'
@@ -68,12 +72,20 @@ def outcome(agent, code):
     return 'failed_inspect_state', 'Inspect authoritative state before retrying; failure does not prove no commit.'
 
 
+def request_fingerprint(agent, arguments, allow_paid, allow_live_data, timeout, max_requests, max_output_tokens):
+    return hashlib.sha256(json.dumps([agent, arguments, allow_paid, allow_live_data, timeout, max_requests,
+                                     max_output_tokens], separators=(',', ':')).encode()).hexdigest()
+
+
 def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False, allow_live_data=False,
-            timeout=600, max_requests=12, max_output_tokens=48000):
+            timeout=MAX_TIMEOUT_SECONDS, max_requests=MAX_REQUESTS, max_output_tokens=MAX_OUTPUT_TOKENS,
+            environment=None, lease_fds=()):
     if agent not in ENTRYPOINTS or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,79}', operation_id):
         raise ValueError('Invalid operation identity or agent.')
-    if not 1 <= timeout <= 600 or not 1 <= max_requests <= 12 or not 1 <= max_output_tokens <= 48000:
+    if not 1 <= timeout <= MAX_TIMEOUT_SECONDS or not 1 <= max_requests <= MAX_REQUESTS or not 1 <= max_output_tokens <= MAX_OUTPUT_TOKENS:
         raise ValueError('Limits must be positive and within the selected pilot ceiling.')
+    for fd in lease_fds:
+        os.fstat(fd)
     # Scheduler mode is outside supervised one-operation acceptance.
     if agent == 'agent2' and any(a in {'--loop', '--cron', '--reset'} for a in arguments):
         raise ValueError('Unattended scheduling and reset are outside controlled operation.')
@@ -94,8 +106,7 @@ def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False,
     if live_data and not allow_live_data:
         raise ValueError('Live data requires explicit admission and separately reviewed source rights.')
     base = Path(directory) if directory else ROOT / 'state' / 'operations'
-    fingerprint = hashlib.sha256(json.dumps([agent, arguments, allow_paid, allow_live_data, timeout, max_requests,
-                                           max_output_tokens], separators=(',', ':')).encode()).hexdigest()
+    fingerprint = request_fingerprint(agent, arguments, allow_paid, allow_live_data, timeout, max_requests, max_output_tokens)
     with gate():
         base.mkdir(parents=True, exist_ok=True, mode=0o700)
         if base.is_symlink() or base.stat().st_mode & 0o077:
@@ -112,6 +123,10 @@ def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False,
                       paid_calls_enabled=allow_paid, live_data_enabled=allow_live_data, timeout_seconds=timeout,
                       max_requests=max_requests, max_output_tokens=max_output_tokens,
                       financial_approval=False, supervisor_pid=os.getpid())
+        if agent == 'workspace-saved':
+            if len(arguments) != 1:
+                raise ValueError('Saved jobs require one server-owned working directory.')
+            record['saved_job_input'] = str(Path(arguments[0]).absolute())
         defaults = {
             'agent1': {'--output':'output'},
             'agent2': {'--db':'state/monitor.duckdb'},
@@ -130,8 +145,9 @@ def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False,
                                  max_output_tokens=max_output_tokens, requests_reserved=0,
                                  output_tokens_reserved=0, input_bytes_limit=100000,
                                  deadline_epoch=time.time()+timeout, calls=[]))
-        env = dict(os.environ, KEYSTONE_SUPERVISED='1', KEYSTONE_USAGE_PATH=str(budget.resolve()),
+        env = dict(os.environ if environment is None else environment, KEYSTONE_SUPERVISED='1', KEYSTONE_USAGE_PATH=str(budget.resolve()),
                    AGENT_MCP_PARENT_GUARD='1', MPLBACKEND='Agg', AGENT_DATA_SOURCE='fixture', AGENT_SENTIMENT_SCORER='lm')
+        env['KEYSTONE_MUTATOR_FD'] = os.environ['KEYSTONE_MUTATOR_FD']
         process = None
         started = time.monotonic()
         prior_term = signal.getsignal(signal.SIGTERM)
@@ -140,7 +156,7 @@ def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False,
         signal.signal(signal.SIGTERM, interrupted)
         try:
             process = subprocess.Popen([sys.executable, *ENTRYPOINTS[agent], *arguments],
-                                       cwd=ROOT, env=env, pass_fds=inherited_fds(),
+                                       cwd=ROOT, env=env, pass_fds=tuple(set(inherited_fds() + tuple(lease_fds))),
                                        start_new_session=True, stdout=subprocess.DEVNULL,
                                        stderr=subprocess.DEVNULL)
             record.update(status='running', worker_pid=process.pid)
@@ -182,9 +198,9 @@ def main(argv=None):
     parser.add_argument('--operation-id', required=True, help='unique ID; reused IDs are refused, never rerun')
     parser.add_argument('--allow-paid-model', action='store_true')
     parser.add_argument('--allow-live-data', action='store_true')
-    parser.add_argument('--timeout', type=int, default=600)
-    parser.add_argument('--max-requests', type=int, default=12)
-    parser.add_argument('--max-output-tokens', type=int, default=48000)
+    parser.add_argument('--timeout', type=int, default=MAX_TIMEOUT_SECONDS)
+    parser.add_argument('--max-requests', type=int, default=MAX_REQUESTS)
+    parser.add_argument('--max-output-tokens', type=int, default=MAX_OUTPUT_TOKENS)
     # Separate control options from the agent's own options explicitly.
     raw = list(sys.argv[1:] if argv is None else argv)
     split = raw.index('--') if '--' in raw else len(raw)

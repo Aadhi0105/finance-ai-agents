@@ -31,6 +31,33 @@ def _open_lock(path):
 
 
 @contextmanager
+def control_write_gate(*, queue_only=False):
+    """HTTP control writes join CLI admission without process-wide env/umask changes.
+
+    This lease is never lent to a child. The later worker uses the normal operation
+    supervisor and its inherited lease. Threaded HTTP callers must not use gate(),
+    which intentionally changes process-wide settings for CLI child creation.
+    queue_only covers transactional admission records while an enabled worker
+    owns the financial mutator lease; it still excludes exclusive maintenance.
+    """
+    target = ROOT / 'state' / '.keystone-maintenance.lock'
+    target.parent.mkdir(parents=True, exist_ok=True)
+    descriptors = []
+    try:
+        locks = [(target, fcntl.LOCK_SH)]
+        if not queue_only:
+            locks.append((target.with_name(target.name + '.mutator.lock'), fcntl.LOCK_EX))
+        for path, mode in locks:
+            fd = _open_lock(path)
+            descriptors.append(fd)
+            fcntl.flock(fd, mode | fcntl.LOCK_NB)
+        yield
+    finally:
+        for fd in reversed(descriptors):
+            os.close(fd)
+
+
+@contextmanager
 def gate(exclusive=False, path=None):
     target = Path(path) if path else ROOT / 'state' / '.keystone-maintenance.lock'
     target.parent.mkdir(parents=True, exist_ok=True)

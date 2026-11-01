@@ -1,0 +1,127 @@
+"""Closed offline admission contract. No browser-provided commands or paths."""
+from datetime import datetime, timezone
+import hashlib
+import json
+from typing import Literal
+
+from pydantic import Field, field_validator, model_validator
+
+from keystone.operation import MAX_TIMEOUT_SECONDS, MAX_REQUESTS, MAX_OUTPUT_TOKENS
+from .catalog import ArtifactV2, ID, NativeViewRegistration, Record
+
+WORKFLOWS = Literal['research', 'monitoring', 'events', 'news', 'close']
+PROFILES = {
+    'research': 'rebuild-saved-research',
+    'monitoring': 'render-saved-monitoring',
+    'events': 'replay-saved-events',
+    'news': 'replay-saved-news',
+    'close': 'render-saved-close',
+}
+JOB_ID = r'^job-[a-f0-9]{32}$'
+MAX_REQUEST_BYTES = 4096
+MAX_PENDING_JOBS = 20
+MAX_RETAINED_JOBS = 1000
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False)
+
+
+def fingerprint(value):
+    return hashlib.sha256(canonical(value).encode()).hexdigest()
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+class JobError(ValueError):
+    def __init__(self, code, status=503):
+        self.code, self.status = code, status
+        super().__init__(code)
+
+    def envelope(self):
+        messages = {
+            'job_access_required': 'A valid local job-access token is required.',
+            'job_origin_refused': 'Job requests require the configured local origin.',
+            'job_request_invalid': 'Use the supported offline job request and request key.',
+            'job_request_too_large': 'The job request exceeds the supported size.',
+            'job_media_type_refused': 'Job requests require application/json without compression.',
+            'job_source_unavailable': 'The registered synthetic source is unavailable or unsupported.',
+            'job_request_conflict': 'This request key already identifies a different request.',
+            'job_capacity_reached': 'Job admission is full. Preserve existing jobs and inspect their status.',
+            'job_control_busy': 'Local control is busy. Retry the same request key later.',
+            'job_not_found': 'The saved job was not found.',
+            'job_store_unavailable': 'Job control state is unavailable. Preserve it and inspect locally.',
+            'job_worker_unavailable': 'The local worker could not start. Preserve the job ledger and inspect locally.',
+            'job_recovery_unavailable': 'Verified saved delivery is not available for this job. Do not rerun it blindly.',
+        }
+        return {'error': {'code': self.code, 'message': messages[self.code]}}
+
+
+class JobRequest(Record):
+    schema_version: int = Field(default=1, ge=1, le=1)
+    workflow: WORKFLOWS
+    source_run_id: str = Field(pattern=ID)
+    timeout_seconds: int = Field(default=MAX_TIMEOUT_SECONDS, ge=1, le=MAX_TIMEOUT_SECONDS)
+
+
+class SourceBinding(Record):
+    run_id: str = Field(pattern=ID)
+    workflow: WORKFLOWS
+    run_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    primary_artifact_id: str = Field(pattern=ID)
+    native_view: NativeViewRegistration
+    artifacts: list[ArtifactV2] = Field(min_length=2, max_length=40)
+
+
+class JobRecord(Record):
+    schema_version: int = Field(default=1, ge=1, le=1)
+    job_id: str = Field(pattern=JOB_ID)
+    operation_id: str = Field(pattern=r'^web-[a-f0-9]{32}$')
+    request: JobRequest
+    request_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    created_at: str = Field(min_length=20, max_length=80)
+    profile: str = Field(min_length=1, max_length=60)
+    profile_version: int = Field(default=1, ge=1, le=1)
+    status: Literal['queued'] = 'queued'
+    source: SourceBinding
+    input_validation: Literal['matched_at_admission'] = 'matched_at_admission'
+    worker_enabled: Literal[False] = False
+    live_data_enabled: Literal[False] = False
+    paid_models_enabled: Literal[False] = False
+    financial_approval: Literal[False] = False
+    max_requests: int = Field(default=MAX_REQUESTS, ge=MAX_REQUESTS, le=MAX_REQUESTS)
+    max_output_tokens: int = Field(default=MAX_OUTPUT_TOKENS, ge=MAX_OUTPUT_TOKENS, le=MAX_OUTPUT_TOKENS)
+
+    @field_validator('worker_enabled', 'live_data_enabled', 'paid_models_enabled', 'financial_approval', mode='before')
+    @classmethod
+    def only_false(cls, value):
+        if value is not False:
+            raise ValueError('This capability is disabled.')
+        return value
+
+    @model_validator(mode='after')
+    def bound_identity(self):
+        if (self.operation_id != 'web-' + self.job_id[4:]
+                or self.request_sha256 != fingerprint(self.request.model_dump())
+                or self.profile != PROFILES[self.request.workflow]
+                or self.source.workflow != self.request.workflow
+                or self.source.run_id != self.request.source_run_id
+                or self.source.primary_artifact_id != self.source.native_view.source_artifact_ids[0]
+                or self.source.primary_artifact_id not in {a.id for a in self.source.artifacts}
+                or datetime.fromisoformat(self.created_at).utcoffset() is None):
+            raise ValueError('Job identities disagree.')
+        return self
+
+
+def capabilities(enabled, worker=False, worker_requested=False):
+    return dict(schema_version=1, admission_enabled=enabled, worker_enabled=worker,
+                worker_status='running' if worker else 'stopped' if worker_requested else 'not_enabled',
+                local_token_required=enabled, classification='synthetic',
+                live_data_enabled=False, paid_models_enabled=False, financial_approval=False,
+                workflows=list(PROFILES) if enabled else [],
+                profiles=PROFILES if enabled else {}, timeout_seconds_max=MAX_TIMEOUT_SECONDS,
+                max_requests=MAX_REQUESTS, max_output_tokens=MAX_OUTPUT_TOKENS,
+                max_pending_jobs=MAX_PENDING_JOBS, max_retained_jobs=MAX_RETAINED_JOBS,
+                scope='Supervised offline saved-evidence execution.' if worker else 'Admission only; the local worker is disabled.')

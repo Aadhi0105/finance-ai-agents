@@ -1,1 +1,1 @@
-"""Local synthetic saved-report workspace. No execution endpoints."""
+"""Local synthetic report workspace with optional offline job admission."""
