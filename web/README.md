@@ -1,13 +1,19 @@
 # Keystone report workspace frontend
 
-React/TypeScript browser interface for the local, read-only FastAPI workspace.
-It displays saved synthetic results from the four existing agents. It has no
-execution, upload, correction or approval controls.
+React/TypeScript browser interface for the local FastAPI workspace. It displays
+saved synthetic results from the four existing agents. The default server is
+read-only. [Batch 2C](../docs/webapp/batch2c-run-interface.md) adds **Run & jobs**
+over explicitly enabled protected admission and the supervised offline worker:
+temporary token access, bounded saved-source requests, recorded stages, history
+and result navigation. Uploads, corrections and financial approvals are absent.
+[Batch 2D](../docs/webapp/batch2d-execution-acceptance.md) validates failure/recovery
+flows and larger histories, with guards against late navigation and stale page rows.
 
 Agent 1 uses native summary, financial analysis, valuation, peer and dated market
 sections through the registered report-view API. Consensus and broker research
-have separate availability. Agent 3 historical events and company news also use
-the native reader; Agents 2/4 retain the original saved-report reader.
+have separate availability. Agent 3 historical events/company news, Agent 2
+monitoring and Agent 4 financial close also use native readers; originals remain
+available as verified downloads.
 See [Part 2B.1](../docs/webapp/native-reports/part2b1-reader.md) for the shared reader
 and [Part 2B.2](../docs/webapp/native-reports/part2b2-research.md) for supporting
 sections, research adapter compatibility and verification.

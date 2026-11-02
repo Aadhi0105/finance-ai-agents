@@ -101,8 +101,10 @@ These are explicit design recommendations, not user approval or financial sign-o
    completed runs. [Part 2A job admission](../batch2a-job-admission.md) is implemented:
    protected offline requests, durable identities and pinned registered evidence.
    [Part 2B](../batch2b-background-execution.md) adds the opt-in supervised worker,
-   native report registration and delivery-only recovery. Part 2C adds the Run
-   interface and 2D the complete execution/recovery validation. Admission alone
+   native report registration and delivery-only recovery. [Part 2C](../batch2c-run-interface.md)
+   implements Run/access forms, job history, recorded stages and result navigation.
+   [Part 2D](../batch2d-execution-acceptance.md) validates the complete path and
+   failure/recovery cases within the local synthetic scope. Admission alone
    continues to queue work without starting an agent.
 
 External broker research, free-form investment theses, real-data permissions,

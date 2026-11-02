@@ -117,9 +117,10 @@ def create_app(workspace, frontend=None, *, admission=None):
             except ValueError:
                 raise JobError('job_request_invalid', 422) from None
             job, replayed = await run_in_threadpool(admission.submit, value, request.headers['idempotency-key'])
-            return JSONResponse(dict(job=job, replayed=replayed, worker_enabled=admission.worker_enabled,
-                next_action='Inspect saved job status and its registered report; financial review remains required.'
-                if admission.worker_enabled else 'Queued; the local worker is disabled.'),
+            return JSONResponse(dict(job=job, replayed=replayed, worker_enabled=job['worker_enabled'],
+                next_action='Queued; the local worker is disabled.'
+                if job['status'] == 'queued' and not job['worker_enabled']
+                else 'Inspect saved job status and evidence; financial review remains required.'),
                 status_code=200 if replayed else 202, headers={'Location': '/api/jobs/' + job['job_id']})
 
         @app.api_route('/api/jobs', methods=['GET', 'HEAD'])

@@ -89,6 +89,13 @@ def recover_delivery(store, job_id):
     """Explicit delivery-only recovery; never calls execute or the render/replay spine."""
     with gate():
         public = store.get(job_id)['job']
+        if public['status'] == 'running':
+            # The recovery caller already owns the exclusive worker lease, and
+            # this gate excludes a surviving supervised child. Record the orphaned
+            # attempt before inspecting its saved output; never dispatch it again.
+            store.update_execution(job_id, event='interrupted', status='outcome_unknown',
+                finished_at=now(), reason='interrupted')
+            public = store.get(job_id)['job']
         if public['status'] not in {'delivery_failed','outcome_unknown','completed','review_required'}:
             raise JobError('job_recovery_unavailable', 409)
         record = store.immutable(job_id)

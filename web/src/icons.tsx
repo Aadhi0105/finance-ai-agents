@@ -1,5 +1,6 @@
-export type IconName = 'overview' | 'research' | 'monitoring' | 'events' | 'close' | 'history' | 'evidence' | 'arrow' | 'search' | 'check' | 'download' | 'info' | 'back' | 'external';
+export type IconName = 'overview' | 'research' | 'monitoring' | 'events' | 'close' | 'history' | 'evidence' | 'arrow' | 'search' | 'check' | 'download' | 'info' | 'back' | 'external' | 'execution';
 const paths: Record<IconName, string> = {
+  execution: 'M8 5v14l11-7z M3 5v14',
   overview: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
   research: 'M5 3h11l3 3v15H5z M9 8h5 M9 12h6 M9 16h6',
   monitoring: 'M3 12h4l3-7 4 14 3-7h4',

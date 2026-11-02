@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -6,6 +6,11 @@ import type { Artifact, Run, Workspace } from './workspace-types';
 import { Icon, type IconName } from './icons';
 import { NativeReportReader } from './reports/NativeReportReader';
 import { responseFailure } from './reports/report-data';
+import { ExecutionWorkspace } from './execution/ExecutionWorkspace';
+import { JobClient } from './execution/job-client';
+import { PageActions } from './execution/page-actions';
+import type { Job, JobRequest } from './execution/job-data';
+import { eligibleRuns } from './execution/job-data';
 const agents = [
   { id: 'agent1', name: 'Research', icon: 'research' as IconName, number: '01' },
   { id: 'agent2', name: 'Financial monitoring', icon: 'monitoring' as IconName, number: '02' },
@@ -22,6 +27,8 @@ function Execution({ status }: { status: string }) {
 function Review({ status }: { status: Run['review_status'] }) { return <span className="review-tag">{status === 'review_required' ? 'Review required' : 'Not financial approval'}</span>; }
 
 function App() {
+  const [jobClient] = useState(() => new JobClient());
+  const [pageActions] = useState(() => new PageActions());
   const [route, setRoute] = useState(location.hash.slice(1) || '/');
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [error, setError] = useState('');
@@ -30,6 +37,30 @@ function App() {
   const [status, setStatus] = useState('all');
   const [attempt, setAttempt] = useState(0);
   const [about, setAbout] = useState(false);
+  useEffect(() => {
+    const clear = () => { pageActions.moved(); jobClient.disconnect(); };
+    addEventListener('pagehide',clear);
+    return () => { removeEventListener('pagehide',clear); pageActions.moved(); jobClient.disconnect(); };
+  },[jobClient,pageActions]);
+  const refreshReports = useCallback(async () => {
+    const controller = new AbortController(), timer = setTimeout(() => controller.abort(),12000);
+    try {
+      const response = await fetch('/api/workspace',{cache:'no-store',credentials:'omit',redirect:'error',signal:controller.signal});
+      if (!response.ok) throw new Error('Workspace could not be checked.');
+      const data = await response.json();
+      if (data.kind !== 'keystone.synthetic-workspace' || data.classification !== 'synthetic' || data.production_release_approved !== false || !Array.isArray(data.runs)) throw new Error('Unsupported workspace.');
+      setWorkspace(data);setError('');return data as Workspace;
+    } finally { clearTimeout(timer); }
+  },[]);
+  const submitJob = useCallback((request?: JobRequest) => pageActions.run(() => jobClient.submit(request), job => {
+    if (job) location.hash = '#/jobs/' + job.id;
+  }),[jobClient,pageActions]);
+  const openJobReport = useCallback((job: Job) => pageActions.run(async () => {
+    const data = await refreshReports();
+    const expected = 'result-' + job.id.slice(4);
+    if (!job.resultUrl || !data.runs.some(r => r.id === expected)) throw new Error('Registered report unavailable.');
+    return job.resultUrl;
+  },url => { location.hash = url; }),[refreshReports,pageActions]);
   useEffect(() => {
     if (!about) return;
     const previous = document.activeElement as HTMLElement | null;
@@ -48,10 +79,10 @@ function App() {
     return () => { document.removeEventListener('keydown', onKey); previous?.focus(); };
   }, [about]);
   useEffect(() => {
-    const change = () => { setRoute(location.hash.slice(1) || '/'); setSearch(''); setStatus('all'); window.scrollTo(0, 0); };
+    const change = () => { pageActions.moved(); setRoute(location.hash.slice(1) || '/'); setSearch(''); setStatus('all'); window.scrollTo(0, 0); };
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
-  }, []);
+  }, [pageActions]);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError('');
@@ -79,7 +110,8 @@ function App() {
   const agent = agents.find(item => item.id === agentFilter);
   const isEvidence = route === '/evidence';
   const isHistory = route === '/history';
-  const title = selected ? selected.title : isEvidence ? 'Evidence library' : isHistory ? 'Saved run history' : agent ? agent.name : 'Workspace overview';
+  const isJobs = route === '/jobs' || route.startsWith('/jobs/');
+  const title = isJobs ? 'Run & jobs' : selected ? selected.title : isEvidence ? 'Evidence library' : isHistory ? 'Saved run history' : agent ? agent.name : 'Workspace overview';
   const filtered = runs.filter(run => (!agentFilter || run.agent === agentFilter)
     && (status === 'all' || run.execution_status === status)
     && `${run.title} ${run.entity} ${workflowName[run.workflow]} ${run.period}`.toLowerCase().includes(search.toLowerCase()));
@@ -93,6 +125,7 @@ function App() {
       <nav>
         <Nav href="#/" icon="overview" active={route === '/'}>Overview</Nav>
         <Nav href="#/history" icon="history" active={isHistory}>Run history<span className="nav-count">{runs.length}</span></Nav>
+        <Nav href="#/jobs" icon="execution" active={isJobs}>Run & jobs</Nav>
         <Nav href="#/evidence" icon="evidence" active={isEvidence}>Evidence library</Nav>
         <p className="nav-label workflows-label">WORKFLOWS</p>
         {agents.map(item => <Nav key={item.id} href={`#/agent/${item.id}`} icon={item.icon} active={activeAgent === item.id}>{item.name}<span className="nav-number">{item.number}</span></Nav>)}
@@ -104,12 +137,13 @@ function App() {
       <header className="topbar"><div className="breadcrumb">Workspace<span>/</span><strong>{title}</strong></div><div className="topbar-right"><span className="mode-indicator"><span className="status-dot" />Offline workspace</span><span className="profile-mark" aria-label="Keystone workspace">K</span></div></header>
       <main id="main" tabIndex={-1}>
         <div className="scope-banner"><span className="synthetic-label">SYNTHETIC DATA</span><span>This workspace uses saved demonstration inputs. Results require review and are not verified company facts.</span></div>
-        {loading ? <div className="loading-state" role="status"><span className="spinner" />Loading saved workspace…</div>
+        {isJobs ? <><ExecutionWorkspace client={jobClient} runs={loading || error ? [] : runs} route={route} inventoryStatus={loading ? 'loading' : error ? 'unavailable' : 'ready'} onRefreshReports={refreshReports} onOpenReport={openJobReport} onSubmit={submitJob}/>{error && <p className="execution-alert" role="alert">Report inventory is unavailable. Inspect saved job history and recheck the workspace before requesting new work.</p>}</>
+          : loading ? <div className="loading-state" role="status"><span className="spinner" />Loading saved workspace…</div>
           : error ? <div className="error-state" role="alert"><Icon name="info" size={28} /><h1>Workspace unavailable</h1><p>{error}</p><button className="primary-button" onClick={() => setAttempt(attempt + 1)}>Try loading again</button></div>
-          : selectedId ? selected ? (selected.agent === 'agent1' && selected.workflow === 'research') || (selected.agent === 'agent2' && selected.workflow === 'monitoring') || (selected.agent === 'agent4' && selected.workflow === 'close') || (selected.agent === 'agent3' && ['events','news'].includes(selected.workflow)) ? <NativeReportReader key={selected.id} run={selected} onReloadWorkspace={() => setAttempt(value => value + 1)} /> : <RunDetail key={selected.id} run={selected} /> : <div className="empty-state"><h1>Saved run not found</h1><p>This run is not registered in the workspace.</p><a className="primary-button" href="#/">Back to overview</a></div>
+          : selectedId ? selected ? <>{eligibleRuns([selected]).length > 0 && <div className="execution-entry"><a href={'#/jobs/new/'+selected.id}><Icon name="execution" size={16}/>Run from this saved evidence</a></div>}{(selected.agent === 'agent1' && selected.workflow === 'research') || (selected.agent === 'agent2' && selected.workflow === 'monitoring') || (selected.agent === 'agent4' && selected.workflow === 'close') || (selected.agent === 'agent3' && ['events','news'].includes(selected.workflow)) ? <NativeReportReader key={selected.id} run={selected} onReloadWorkspace={() => setAttempt(value => value + 1)} /> : <RunDetail key={selected.id} run={selected} />}</> : <div className="empty-state"><h1>Saved run not found</h1><p>This run is not registered in the workspace.</p><a className="primary-button" href="#/">Back to overview</a></div>
           : isEvidence ? <EvidenceLibrary runs={runs} />
           : <>
-            <div className="page-heading"><div><p className="eyebrow">{agent ? `AGENT ${agent.number} / SAVED WORK` : isHistory ? 'YOUR ANALYTICAL RECORD' : 'THE ANALYST DESK'}</p><h1>{agent ? agent.name : isHistory ? 'Every run, in one place.' : 'A clearer view of your work.'}</h1><p>{agent ? 'Inspect saved results, review restrictions and the evidence behind them.' : 'Research, monitoring, intelligence and close — connected by evidence.'}</p></div><div className="heading-stamp"><span className="stamp-icon"><Icon name="evidence" size={22} /></span><strong>Read-only workspace</strong><small>Browsing never starts an analysis</small></div></div>
+            <div className="page-heading"><div><p className="eyebrow">{agent ? `AGENT ${agent.number} / SAVED WORK` : isHistory ? 'YOUR ANALYTICAL RECORD' : 'THE ANALYST DESK'}</p><h1>{agent ? agent.name : isHistory ? 'Every run, in one place.' : 'A clearer view of your work.'}</h1><p>{agent ? 'Inspect saved results, review restrictions and the evidence behind them.' : 'Research, monitoring, intelligence and close — connected by evidence.'}</p></div><div className="heading-stamp"><span className="stamp-icon"><Icon name="evidence" size={22} /></span><strong>Saved report catalogue</strong><small>Browsing never starts an analysis</small></div></div>
             {!agent && !isHistory && <div className="stats-grid"><Stat label="SAVED REPORTS" value={String(runs.length).padStart(2, '0')} note="Generated by the existing engines" icon="research" /><Stat label="AGENT WORKFLOWS" value={String(new Set(runs.map(r => r.agent)).size).padStart(2, '0')} note="One evidence-led workspace" icon="overview" /><Stat label="REQUIRE REVIEW" value={String(runs.filter(r => r.review_status === 'review_required').length).padStart(2, '0')} note="Execution success is not approval" icon="evidence" amber /></div>}
             <div className={`workspace-grid ${isHistory || agent ? 'wide-grid' : ''}`}>
               <section className="panel reports-panel" aria-labelledby="reports-title"><div className="panel-heading"><div><h2 id="reports-title">{isHistory ? 'Saved run history' : agent ? 'Saved reports' : 'Your saved reports'}<span className="count-badge">{filtered.length}</span></h2><p>Frozen inputs. Retained outcomes. Nothing silently refreshed.</p></div></div>
@@ -123,7 +157,7 @@ function App() {
         <footer className="workspace-footer"><span>KEYSTONE <span className="footer-divider">/</span> Traceable analysis, thoughtful review.</span><span>{workspace ? `Prepared ${date(workspace.prepared_at)}` : 'Local report workspace'}</span></footer>
       </main>
     </div>
-    {about && <div className="modal-backdrop" onClick={() => setAbout(false)}><section className="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title" onClick={event => event.stopPropagation()}><p className="eyebrow">KEYSTONE / BATCH 1</p><h2 id="about-title">About this workspace</h2><p>A local report browser backed by the existing four agent engines. Every registered run in this workspace was generated offline from synthetic inputs.</p><ul><li>Report browsing makes no provider or model calls.</li><li>Review-required outcomes remain held.</li><li>No financial decisions or corrections can be submitted here.</li><li>File hashes check inventory consistency; they do not establish source truth.</li><li>Independent backup and production acceptance remain pending.</li></ul><button className="primary-button" onClick={() => setAbout(false)}>Return to workspace</button></section></div>}
+    {about && <div className="modal-backdrop" onClick={() => setAbout(false)}><section className="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-title" onClick={event => event.stopPropagation()}><p className="eyebrow">KEYSTONE / LOCAL WORKSPACE</p><h2 id="about-title">About this workspace</h2><p>A local report workspace backed by the existing four agent engines. Registered demonstrations use synthetic inputs.</p><ul><li>Report browsing makes no provider or model calls.</li><li>Run & jobs can request supported offline work when the operator enables execution.</li><li>Review-required outcomes remain held; financial decisions and corrections cannot be submitted here.</li><li>File hashes check inventory consistency; they do not establish source truth.</li><li>Independent backup and production acceptance remain pending.</li></ul><button className="primary-button" onClick={() => setAbout(false)}>Return to workspace</button></section></div>}
   </div>;
 }
 
