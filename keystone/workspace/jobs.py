@@ -78,10 +78,11 @@ class Admission:
     def worker_enabled(self):
         return self.worker is not None and self.worker.running
 
-    def public_job(self, job):
-        return {**job, 'schema_version':2, 'admission_schema_version':1, 'worker_enabled': self.worker_enabled,
+    def public_job(self, job, *, worker_enabled=None):
+        enabled = self.worker_enabled if worker_enabled is None else worker_enabled
+        return {**job, 'schema_version':2, 'admission_schema_version':1, 'worker_enabled': enabled,
                 'recovery_required': job['status'] in {'outcome_unknown','delivery_failed'}
-                    or job['status']=='running' and self.worker_requested and not self.worker_enabled,
+                    or job['status']=='running' and self.worker_requested and not enabled,
                 'result_url': '#/runs/' + job['execution']['result']['run_id']
                 if job['status'] in {'completed','review_required'} else None}
 
@@ -161,4 +162,5 @@ class Admission:
         except (ValueError, TypeError):
             raise JobError('job_request_invalid', 422) from None
         value = self._safe(lambda: self.store.list(int(raw), before))
-        return {**value, 'jobs': [self.public_job(j) for j in value['jobs']], 'worker_enabled': self.worker_enabled}
+        enabled = self.worker_enabled
+        return {**value, 'jobs': [self.public_job(j, worker_enabled=enabled) for j in value['jobs']], 'worker_enabled': enabled}

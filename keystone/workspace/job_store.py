@@ -170,9 +170,14 @@ class JobStore:
         con = sqlite3.connect(self.path.as_uri() + ('?mode=rw' if write else '?mode=ro'), uri=True,
                               isolation_level=None, timeout=1)
         try:
+            con.execute('PRAGMA foreign_keys=ON')
+            if not write:
+                # Execution state and its audit event are committed together.
+                # Keep all validation/record/event SELECTs on the same snapshot
+                # so a concurrent worker commit cannot look like corruption.
+                con.execute('BEGIN')
             if not initial:
                 self._validate_database(con)
-            con.execute('PRAGMA foreign_keys=ON')
             if write:
                 # DELETE journals avoid an unaccounted WAL dependency. EXTRA also
                 # flushes the parent directory when the rollback journal is removed.

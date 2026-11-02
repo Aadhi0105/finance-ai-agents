@@ -168,6 +168,12 @@ directory, with the actual job ID:
   --job-id job-REPLACE_WITH_SAVED_ID
 ```
 
+Batch 2D corrects recovery after a hard worker exit: once the operator command
+owns the worker and mutator leases, an orphaned `running` attempt is recorded as
+`outcome_unknown` before proof is inspected. Complete verified output can then
+be delivered; an unfinished/missing result remains refused. This changes no HTTP
+read and never reruns processing.
+
 Recovery acquires the worker/mutator leases and verifies the saved input copy,
 successful supervisor receipt, staged native workspace and prepared-result hashes.
 It never invokes the renderer/replayer or a financial mutation. A folder already
@@ -221,7 +227,8 @@ The enabled worker and admission server were stopped after the checks. A read-on
 preview was left on port 8794 for inspecting the generated reports. Broader device,
 human and full-workflow acceptance remain separately scoped.
 
-Batch 2C is the Run/progress/token-entry interface. Batch 2D is the broader complete
-workflow/recovery acceptance. Human report interpretation, physical accessibility,
+[Batch 2C](batch2c-run-interface.md) implements the Run/progress/token-entry interface.
+[Batch 2D](batch2d-execution-acceptance.md) records the broader complete
+workflow/recovery acceptance for the local synthetic profiles. Human report interpretation, physical accessibility,
 actual PDF/print review, real-source permissions and production deployment remain
 separate work.

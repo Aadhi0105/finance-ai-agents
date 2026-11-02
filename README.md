@@ -148,10 +148,11 @@ history links and evidence downloads. A valid close can contain a held forecast.
 
 ## Browse the local report workspace
 
-The React/TypeScript workspace provides one read-only browser interface for all
-four agents. It displays five saved synthetic examples, separate execution and
-financial-review statuses, original HTML reports, charts, and registered JSON
-evidence. FastAPI serves an explicit file inventory; browsing starts no agent work.
+The React/TypeScript workspace provides native reports for all four agents, with
+interactive charts, separate execution/financial-review states and registered
+evidence. FastAPI serves the selected saved inventory; browsing starts no agent
+work. The default server is read-only. Operators can separately enable the
+protected **Run & jobs** interface for supported offline saved-evidence work.
 
 Requires Python 3.11/3.12, Node.js 24 and pnpm 11.25.0. From the repository root:
 
@@ -161,8 +162,8 @@ cd web
 pnpm install --frozen-lockfile
 pnpm run build
 cd ..
-.venv/bin/python -m keystone.workspace prepare --destination output/workspace-demo
-.venv/bin/python -m keystone.workspace serve --workspace output/workspace-demo --port 8765
+.venv/bin/python -m keystone.workspace prepare --native --destination output/workspace-native-demo
+.venv/bin/python -m keystone.workspace serve --workspace output/workspace-native-demo --port 8765
 ```
 
 Open **http://127.0.0.1:8765/** while the server is running; stop it with Ctrl+C.
@@ -170,9 +171,9 @@ Preparation needs a new destination name and generates examples offline using th
 existing agent engines. Existing destinations are preserved. Provider credentials
 are unnecessary. Dependencies must be installed before offline use.
 
-This first batch is a local synthetic workspace. Live data, browser execution,
-uploads, authenticated approvals, shared access and production hosting remain
-outside its scope. It does not change the pilot's source-permission or independent
+This is a local synthetic workspace. Fresh live-data execution, uploads,
+authenticated approvals, shared access and production hosting remain separately
+scoped. It does not change the pilot's source-permission or independent
 backup dependencies. See the [workspace guide](docs/webapp/batch1-report-workspace.md)
 for architecture, setup, boundaries, and acceptance evidence; the earlier
 [showcase](keystone-showcase/README.md) remains a separate illustrative prototype.
@@ -213,7 +214,16 @@ access. The default report server remains read-only. Accepted jobs wait for the
 background worker unless it is explicitly enabled.
 [Batch 2B](docs/webapp/batch2b-background-execution.md) implements supervised
 background rebuild/replay, pre-execution source checks, append-only native report
-registration and delivery-only recovery. Interface Run controls follow in 2C.
+registration and delivery-only recovery.
+[Batch 2C](docs/webapp/batch2c-run-interface.md) adds Run forms, temporary local
+access, durable job history, recorded progress and navigation to registered native
+results. It retains request identities after uncertain responses and explains
+operator recovery without automatic processing retries. See its guide for the
+explicit server flags; live/paid execution and financial approval remain disabled.
+[Batch 2D](docs/webapp/batch2d-execution-acceptance.md) adds complete-path and
+failure/recovery acceptance for this local synthetic scope. It fixes orphaned-job
+delivery recovery, consistent ledger reads, late-response navigation and history-page loading, with
+repeatable HTTP/worker scenarios and a larger browser history rehearsal.
 
 ## Read the result before acting on it
 
