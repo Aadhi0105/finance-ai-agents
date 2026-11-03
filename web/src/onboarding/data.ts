@@ -1,0 +1,93 @@
+import type { Run, Classification } from '../workspace-types.ts';
+
+export const formats = {research:['agent1.model/2'],monitoring:['agent2.snapshot/legacy-1'],events:['agent3.events-bundle/1'],news:['agent3.news-bundle/1'],close:['agent4.close/1','agent4.close-request/1']} as const;
+export type Workflow=keyof typeof formats;
+export const workflowLabels:Record<Workflow,string>={research:'Company research',monitoring:'Financial monitoring',events:'Past event reactions',news:'Company news',close:'Financial close'};
+export const actions:Record<string,string>={'agent1.model/2':'Rebuild saved research','agent2.snapshot/legacy-1':'Render saved monitoring','agent3.events-bundle/1':'Replay saved event study','agent3.news-bundle/1':'Replay saved news','agent4.close/1':'Render saved close','agent4.close-request/1':'Calculate financial close'};
+export const classificationLabels:Record<Classification,string>={synthetic:'Synthetic example',provider:'Provider data',issuer:'Issuer evidence',internal:'Internal data',mixed:'Mixed sources',unknown:'Unclassified'};
+export const idPattern=/^[a-z0-9][a-z0-9_-]{0,79}$/;
+export const shaPattern=/^[a-f0-9]{64}$/;
+const classifications=Object.keys(classificationLabels);
+export class InputFailure extends Error {
+  readonly code:string;readonly refused:boolean;
+  constructor(code='connection_unavailable',refused=false){super(({
+    connection_unavailable:'The local workspace could not confirm the response. Check the saved status before trying again.',
+    access_required:'Access has expired or the token is invalid. Reconnect to the current local server.',
+    unsupported_response:'The workspace returned an unsupported or inconsistent record. Refresh before continuing.',
+    input_policy_refused:'Current source permission does not allow this action. Ask the local operator to review the content-scoped permission record.',
+    input_invalid:'The package does not match the selected dataset or supported financial format. Check its company, format, dates, currency and exact-cent rows.',
+    input_conflict:'The saved identity or accounting predecessor has changed. Inspect the saved receipt and selected version.',
+    input_busy:'Another local operation needs attention. Inspect import and job history, then retry this same request.',
+    input_capacity:'Local input capacity is full. Preserve the existing evidence and ask the operator to inspect storage.',
+    input_unavailable:'Saved input or permission evidence is missing, changed or inaccessible. Processing is held.',
+    input_too_large:'Choose one uncompressed JSON package no larger than 20 MB.',
+    input_disabled:'The operator has not enabled input admission for this workspace.',
+    job_source_unavailable:'This input version is no longer eligible. Recheck permissions, validation and the accounting predecessor.',
+    job_capacity_reached:'The job queue is full. Inspect existing jobs before starting another request.',
+    job_request_conflict:'This request key belongs to a different saved request. Preserve its receipt.',
+  } as Record<string,string>)[code]||'The local action is held. Inspect its receipt and ask the operator to review the evidence.');this.code=code;this.refused=refused;}
+}
+export const obj=(v:unknown):Record<string,unknown>=>{if(!v||typeof v!=='object'||Array.isArray(v))throw new InputFailure('unsupported_response');return v as Record<string,unknown>;};
+export const str=(v:unknown,max=1600):string=>{if(typeof v!=='string'||v.length>max)throw new InputFailure('unsupported_response');return v;};
+export const id=(v:unknown):string=>{const s=str(v,80);if(!idPattern.test(s))throw new InputFailure('unsupported_response');return s;};
+export const sha=(v:unknown):string=>{const s=str(v,64);if(!shaPattern.test(s))throw new InputFailure('unsupported_response');return s;};
+export const list=(v:unknown,max=100):unknown[]=>{if(!Array.isArray(v)||v.length>max)throw new InputFailure('unsupported_response');return v;};
+const yesNo=(v:unknown):boolean=>{if(typeof v!=='boolean')throw new InputFailure('unsupported_response');return v;};
+export function classification(v:unknown):Classification{if(!classifications.includes(str(v,20)))throw new InputFailure('unsupported_response');return v as Classification;}
+export function workflow(v:unknown):Workflow{if(!Object.hasOwn(formats,str(v,20)))throw new InputFailure('unsupported_response');return v as Workflow;}
+export function format(flow:Workflow,v:unknown):string{const s=str(v,60);if(!(formats[flow] as readonly string[]).includes(s))throw new InputFailure('unsupported_response');return s;}
+export function safeError(e:unknown):InputFailure{return e instanceof InputFailure?e:new InputFailure();}
+export async function responseError(r:Response):Promise<InputFailure>{
+  let code='';try{code=str(obj(obj(await r.json()).error).code,80);}catch{/* Never expose raw errors or paths. */}
+  if(code==='job_access_required'||code==='job_origin_refused')return new InputFailure('access_required',true);
+  return new InputFailure(code||'connection_unavailable',[403,404,405,409,413,415,422].includes(r.status));
+}
+export type Capabilities={imports:boolean;jobs:boolean;worker:boolean;timeout:number;maxPackage:number};
+export function parseCapabilities(v:unknown):Capabilities{
+  const r=obj(v);
+  if(r.schema_version!==2||r.classification!=='private'||r.local_token_required!==true||r.live_data_enabled!==false||r.paid_models_enabled!==false||r.financial_approval!==false||r.max_package_bytes!==20_000_000||r.timeout_seconds_max!==600)throw new InputFailure('unsupported_response');
+  const enabled=obj(r.supported_input_formats);
+  if(r.imports_enabled===true)for(const flow of Object.keys(formats) as Workflow[])if(JSON.stringify(enabled[flow])!==JSON.stringify(formats[flow]))throw new InputFailure('unsupported_response');
+  return {imports:yesNo(r.imports_enabled),jobs:yesNo(r.admission_enabled),worker:yesNo(r.worker_enabled),timeout:600,maxPackage:20_000_000};
+}
+export type Entity={id:string;name:string;kind:'company'|'group';ticker:string|null;members:string[]};
+export function parseEntity(v:unknown):Entity{const r=obj(v);if(!['company','group'].includes(String(r.kind)))throw new InputFailure('unsupported_response');return {id:id(r.id),name:str(r.name,160),kind:r.kind as Entity['kind'],ticker:r.ticker===null?null:str(r.ticker,32),members:list(r.members,1000).map(x=>str(x,160))};}
+export type Dataset={id:string;entity_id:string;title:string;workflow:Workflow;payload_format:string};
+export function parseDataset(v:unknown):Dataset{const r=obj(v),f=workflow(r.workflow);return {id:id(r.id),entity_id:id(r.entity_id),title:str(r.title,160),workflow:f,payload_format:format(f,r.payload_format)};}
+export type Page<T>={items:T[];next:string|null};
+export function parsePage<T>(v:unknown,parse:(v:unknown)=>T):Page<T>{const r=obj(v);return {items:list(r.items).map(parse),next:r.next_cursor===null?null:id(r.next_cursor)};}
+export type Receipt={id:string;dataset_id:string;state:string;version_id:string|null;created_at:string;reason:string|null};
+export function parseReceipt(v:unknown):Receipt{const r=obj(v);if(r.financial_approval!==false||!['reserved','receiving','validating','accepted','rejected','interrupted','delivery_failed'].includes(String(r.state)))throw new InputFailure('unsupported_response');return {id:id(r.id),dataset_id:id(r.dataset_id),state:str(r.state,30),version_id:r.version_id===null?null:id(r.version_id),created_at:str(r.created_at,80),reason:r.reason===null?null:str(r.reason,80)};}
+export type Source={source_id:string;role:string;category:string;provider_or_owner:string;reference:string|null;permission_record_id:string;currency:string|null;units:string|null;period_start:string|null;period_end:string|null;published_at:string|null;retrieved_at:string|null};
+export type Metadata={workflow:Workflow;payload_format:string;dataset:{entity_id:string;title:string;upstream_id:string|null;supersedes_version_id:string|null};sources:Source[]};
+export function parseMetadata(v:unknown):Metadata{const r=obj(v),d=obj(r.dataset),f=workflow(r.workflow);if(r.schema_version!==1||r.kind!=='keystone.input-package')throw new InputFailure('unsupported_response');return {workflow:f,payload_format:format(f,r.payload_format),dataset:{entity_id:id(d.entity_id),title:str(d.title,160),upstream_id:d.upstream_id===null?null:str(d.upstream_id,200),supersedes_version_id:d.supersedes_version_id===null?null:id(d.supersedes_version_id)},sources:list(r.sources,20).map(x=>{const s=obj(x);return {source_id:id(s.source_id),role:str(s.role,80),category:str(s.category,40),provider_or_owner:str(s.provider_or_owner,240),reference:s.reference===null?null:str(s.reference,2048),permission_record_id:id(s.permission_record_id),currency:s.currency===null?null:str(s.currency,3),units:s.units===null?null:str(s.units,200),period_start:s.period_start===null?null:str(s.period_start,10),period_end:s.period_end===null?null:str(s.period_end,10),published_at:s.published_at===null?null:str(s.published_at,80),retrieved_at:s.retrieved_at===null?null:str(s.retrieved_at,80)};})};}
+export type Version={id:string;dataset_id:string;created_at:string;contract_sha256:string;payload_sha256:string;classification:Classification;backup_holds:string[];metadata:Metadata;eligible:boolean;period:string;upstream_id:string;reasons:string[];validationVersion:number;predecessor:string|null;lineage:string[];files:Record<string,{bytes:number;sha256:string}>};
+export function parseVersion(v:unknown):Version{const r=obj(v),c=obj(r.contract),policy=obj(c.policy),receipt=obj(c.validation),m=parseMetadata(c.metadata),fresh=m.payload_format==='agent4.close-request/1';
+  if(c.schema_version!==1||c.dataset_id!==r.dataset_id||receipt.payload_sha256!==c.payload_sha256||receipt.schema_version!==(fresh?2:1)||receipt.validator_version!=='1.0.0')throw new InputFailure('unsupported_response');
+  const files=obj(r.files);if(Object.keys(files).sort().join(',')!==['package.json','payload.json','validation.json','context.json','preflight.json','contract.json'].sort().join(','))throw new InputFailure('unsupported_response');
+  const pin=fresh?obj(receipt.accounting_source):null;
+  return {id:id(r.id),dataset_id:id(r.dataset_id),created_at:str(r.created_at,80),contract_sha256:sha(r.contract_sha256),payload_sha256:sha(c.payload_sha256),classification:classification(policy.classification),backup_holds:list(policy.backup_holds,20).map(id),metadata:m,eligible:yesNo(receipt.eligible),period:str(receipt.period,120),upstream_id:str(receipt.upstream_id,200),reasons:list(receipt.reasons,30).map(x=>str(x,160)),validationVersion:receipt.schema_version as number,predecessor:pin?sha(pin.generation_sha256):null,lineage:pin?list(pin.lineage_versions,200).map(id):[],files:Object.fromEntries(Object.entries(files).map(([name,value])=>{const f=obj(value);if(typeof f.bytes!=='number'||f.bytes<1||f.bytes>20_000_000)throw new InputFailure('unsupported_response');return [name,{bytes:f.bytes,sha256:sha(f.sha256)}];}))};
+}
+export type Preview={descriptor:Record<string,unknown>;metadata:Metadata;classification:Classification;backup_holds:string[];package_sha256:string;bytes:number;dataset_id:string};
+export function parsePreview(v:unknown,dataset:Dataset):Preview{const r=obj(v),d=obj(r.descriptor),p=obj(r.policy),m=parseMetadata(d.metadata);if(r.schema_version!==1||r.financial_approval!==false||r.validation!=='pending_import'||r.processing!=='not_started'||d.schema_version!==1||d.dataset_id!==dataset.id||m.dataset.entity_id!==dataset.entity_id||m.workflow!==dataset.workflow||m.payload_format!==dataset.payload_format||typeof d.package_bytes!=='number'||d.package_bytes<1||d.package_bytes>20_000_000)throw new InputFailure('unsupported_response');sha(d.payload_sha256);return {descriptor:d,metadata:m,classification:classification(p.classification),backup_holds:list(p.backup_holds,20).map(id),package_sha256:sha(d.package_sha256),bytes:d.package_bytes,dataset_id:dataset.id};}
+export type JobRequest={schema_version:2;workflow:Workflow;source:{kind:'dataset_version';dataset_id:string;version_id:string;contract_sha256:string};timeout_seconds:number};
+export function jobRequest(v:Version,timeout:number):JobRequest{if(!v.eligible||!Number.isInteger(timeout)||timeout<1||timeout>600)throw new InputFailure('input_invalid',true);return {schema_version:2,workflow:v.metadata.workflow,source:{kind:'dataset_version',dataset_id:v.dataset_id,version_id:v.id,contract_sha256:v.contract_sha256},timeout_seconds:timeout};}
+export type PrivateJob={id:string;operation_id:string;status:string;profile:string;request:JobRequest;worker:boolean;recovery:boolean;resultUrl:string|null;attempt:number;operation_status:string;reason:string;created_at:string;commit_sha256:string|null};
+export const jobLabels:Record<string,string>={queued:'Queued',running:'Running',review_required:'Report ready · review required',completed:'Completed',failed:'Failed · inspect outcome',source_changed:'Source changed · held',outcome_unknown:'Outcome unknown · inspect',delivery_failed:'Delivery needs recovery'};
+export function parseJob(v:unknown,workspaceId:string):PrivateJob{const r=obj(v),q=obj(r.request),s=obj(q.source),binding=obj(r.source),e=obj(r.execution),f=workflow(q.workflow),fresh=r.profile==='calculate-imported-close';
+  if(r.schema_version!==3||r.admission_schema_version!==2||q.schema_version!==2||s.kind!=='dataset_version'||binding.workspace_id!==workspaceId||binding.dataset_id!==s.dataset_id||binding.version_id!==s.version_id||binding.contract_sha256!==s.contract_sha256||e.schema_version!==(fresh?2:1)||r.financial_approval!==false||r.live_data_enabled!==false||r.paid_models_enabled!==false||e.status!==r.status||!Object.hasOwn(jobLabels,String(r.status))||!Number.isInteger(q.timeout_seconds)||Number(q.timeout_seconds)<1||Number(q.timeout_seconds)>600||![0,1].includes(Number(e.attempt)))throw new InputFailure('unsupported_response');
+  const profiles={research:'rebuild-imported-research',monitoring:'render-imported-monitoring',events:'replay-imported-events',news:'replay-imported-news',close:'render-imported-close'};
+  if(r.profile!==(fresh&&f==='close'?'calculate-imported-close':profiles[f]))throw new InputFailure('unsupported_response');
+  const ident=id(r.job_id);if(!/^job-[a-f0-9]{32}$/.test(ident)||r.operation_id!=='web-'+ident.slice(4))throw new InputFailure('unsupported_response');
+  const resultUrl=r.result_url===null?null:str(r.result_url,160);if(resultUrl!==null&&(resultUrl!=='#/runs/result-'+ident.slice(4)||!['completed','review_required'].includes(String(r.status))))throw new InputFailure('unsupported_response');
+  return {id:ident,operation_id:str(r.operation_id,40),status:str(r.status,30),profile:str(r.profile,60),request:{schema_version:2,workflow:f,source:{kind:'dataset_version',dataset_id:id(s.dataset_id),version_id:id(s.version_id),contract_sha256:sha(s.contract_sha256)},timeout_seconds:Number(q.timeout_seconds)},worker:yesNo(r.worker_enabled),recovery:yesNo(r.recovery_required),resultUrl,attempt:Number(e.attempt),operation_status:str(e.operation_status,40),reason:str(e.reason,80),created_at:str(r.created_at,80),commit_sha256:fresh&&e.accounting_commit_sha256!==null?sha(e.accounting_commit_sha256):null};
+}
+export function parseRun(v:unknown):Run{const r=obj(v),origin=obj(r.input_origin),accounting=r.accounting_origin===null||r.accounting_origin===undefined?null:obj(r.accounting_origin),f=workflow(r.workflow);
+  if(r.review_status!=='review_required'||r.id!=='result-'+id(origin.job_id).slice(4)||!['completed','held','failed','refused','unavailable'].includes(String(r.execution_status)))throw new InputFailure('unsupported_response');
+  const artifacts=list(r.artifacts,40).map(x=>{const a=obj(x),name=str(a.name,240);if(name.split('/').some(p=>! /^[A-Za-z0-9_-][A-Za-z0-9_.-]*$/.test(p))||a.url!==`/api/runs/${id(r.id)}/files/${name}`||typeof a.bytes!=='number'||a.bytes<1||a.bytes>20_000_000)throw new InputFailure('unsupported_response');return {id:id(a.id),name,label:str(a.label,120),kind:str(a.kind,30),sha256:sha(a.sha256),bytes:a.bytes,url:str(a.url,500)};});
+  if(new Set(artifacts.map(a=>a.id)).size!==artifacts.length||!artifacts.some(a=>a.id===r.report_id&&a.kind==='report'))throw new InputFailure('unsupported_response');
+  const reg=obj(r.native_view);if(reg.adapter_version!=='2.0.0'||!artifacts.some(a=>a.id===reg.artifact_id&&a.kind==='report_view'))throw new InputFailure('unsupported_response');
+  if((origin.profile==='calculate-imported-close')!==(accounting!==null))throw new InputFailure('unsupported_response');
+  return {id:id(r.id),agent:str(r.agent,10),workflow:f,title:str(r.title,160),entity:str(r.entity,160),period:str(r.period,120),prepared_at:str(r.prepared_at,80),source_run_id:str(r.source_run_id,200),execution_status:str(r.execution_status,30),review_status:'review_required',summary:str(r.summary),limitations:list(r.limitations,100).map(x=>str(x)),checks:list(r.checks,100).map(x=>str(x)),metrics:[],artifacts,report_id:id(r.report_id),native_view:{artifact_id:id(reg.artifact_id),view_schema_version:Number(reg.view_schema_version),adapter_id:str(reg.adapter_id,80),adapter_version:'2.0.0',source_artifact_ids:list(reg.source_artifact_ids,2).map(id)},input_origin:{dataset_id:id(origin.dataset_id),version_id:id(origin.version_id),classification:classification(origin.classification),contract_sha256:sha(origin.contract_sha256),job_id:id(origin.job_id)},accounting_origin:accounting?{classification:classification(accounting.classification),commit_sha256:sha(accounting.commit_sha256)}:null};
+}
+export function parseWorkspace(v:unknown){const r=obj(v);if(r.schema_version!==3||r.kind!=='keystone.private-workspace-reports'||r.classification!=='private'||r.production_release_approved!==false||r.live_data_enabled!==false||r.paid_models_enabled!==false)throw new InputFailure('unsupported_response');return {id:id(r.workspace_id),name:typeof r.workspace_name==='string'?str(r.workspace_name,160):'Private analyst workspace',runs:list(r.runs,100).map(parseRun)};}

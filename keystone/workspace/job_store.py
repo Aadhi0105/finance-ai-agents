@@ -14,8 +14,9 @@ from keystone.operation import sync_directory
 from .catalog import read_json
 from .job_contract import (JobError, JobRecord, MAX_PENDING_JOBS,
                            MAX_RETAINED_JOBS, canonical, fingerprint)
-from .job_execution import JobExecution, PreparedResult, claimed, changed, TERMINAL
+from .job_execution import JobExecution, PreparedResult, claimed, changed, TERMINAL, initial_execution, parse_execution
 from .job_contract import now
+from .job_contract import parse_job_record
 
 APPLICATION_ID = 0x4B534A31
 MAX_STORE_BYTES = 64_000_000
@@ -210,7 +211,7 @@ class JobStore:
             if row is None or len(row[5]) > 65_536:
                 raise ValueError('Missing or oversized job record.')
             raw = read_json(row[5].encode())
-            record = JobRecord.model_validate(raw)
+            record = parse_job_record(raw)
             if (fingerprint(raw) != row[6] or record.job_id != row[1]
                     or record.request_sha256 != row[3] or record.created_at != row[4]):
                 raise ValueError('Inconsistent job record.')
@@ -244,7 +245,7 @@ class JobStore:
             con.execute('INSERT INTO jobs(job_id,key_hash,request_sha256,created_at,record_json,record_sha256) VALUES (?,?,?,?,?,?)',
                         (record.job_id, key_hash, record.request_sha256, record.created_at, canonical(raw), fingerprint(raw)))
             con.execute('INSERT INTO events(job_id,event,created_at) VALUES (?,?,?)', (record.job_id, 'admitted', record.created_at))
-            execution = JobExecution().model_dump()
+            execution = initial_execution(record).model_dump()
             con.execute('INSERT INTO executions VALUES (?,?,?,?)', (record.job_id, 'queued', canonical(execution), fingerprint(execution)))
             public = self._public(con, con.execute('SELECT * FROM jobs WHERE job_id=?', (record.job_id,)).fetchone())
         return public, False
@@ -281,8 +282,10 @@ class JobStore:
         if row is None:
             raise JobError('job_store_unavailable')
         raw = read_json(row[1].encode())
-        execution = JobExecution.model_validate(raw)
-        if (row[0] != execution.status or fingerprint(raw) != row[2]
+        execution = parse_execution(raw)
+        bound = parse_job_record(self._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
+        if (execution.schema_version != (2 if bound.schema_version == 3 else 1)
+                or row[0] != execution.status or fingerprint(raw) != row[2]
                 or execution.result is not None and execution.result.run_id != 'result-' + job_id[4:]):
             raise JobError('job_store_unavailable')
         latest = con.execute('SELECT event FROM events WHERE job_id=? ORDER BY event_id DESC LIMIT 1', (job_id,)).fetchone()
@@ -301,7 +304,7 @@ class JobStore:
 
     def immutable(self, job_id):
         with self._connect(write=False) as con:
-            return JobRecord.model_validate(self._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
+            return parse_job_record(self._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
 
     def _save_execution(self, con, job_id, execution, event):
         if not self.worker:
@@ -309,7 +312,9 @@ class JobStore:
         old = self._execution(con, job_id)
         allowed = (old.status == 'queued' and execution.status == 'running'
                    or old.status == 'running' and execution.status != 'queued'
-                   or old.status in {'delivery_failed','outcome_unknown'} and execution.status in {'completed','review_required'})
+                   or old.status in {'delivery_failed','outcome_unknown'} and execution.status in {'completed','review_required'}
+                   or old.schema_version == 2 and old.status == 'failed' and execution.status == 'review_required'
+                      and execution.reason == 'recovered' and execution.accounting_commit_sha256 is not None)
         if not allowed or con.execute('SELECT count(*) FROM events WHERE job_id=?', (job_id,)).fetchone()[0] >= 50:
             raise JobError('job_recovery_unavailable', 409)
         raw = execution.model_dump()
@@ -322,8 +327,8 @@ class JobStore:
             row = con.execute("SELECT j.* FROM jobs j JOIN executions x ON x.job_id=j.job_id WHERE x.status='queued' ORDER BY j.sequence LIMIT 1").fetchone()
             if row is None:
                 return None
-            record = JobRecord.model_validate(self._record(row))
-            self._save_execution(con, record.job_id, claimed(), 'claimed')
+            record = parse_job_record(self._record(row))
+            self._save_execution(con, record.job_id, claimed(record), 'claimed')
             return record
 
     def update_execution(self, job_id, *, event, **values):

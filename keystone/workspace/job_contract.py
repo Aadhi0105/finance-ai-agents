@@ -115,6 +115,81 @@ class JobRecord(Record):
         return self
 
 
+class DatasetReference(Record):
+    kind: Literal['dataset_version']
+    dataset_id: str = Field(pattern=ID)
+    version_id: str = Field(pattern=ID)
+    contract_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+
+
+class DatasetJobRequest(Record):
+    schema_version: int = Field(default=2, ge=2, le=2)
+    workflow: WORKFLOWS
+    source: DatasetReference
+    timeout_seconds: int = Field(default=MAX_TIMEOUT_SECONDS, ge=1, le=MAX_TIMEOUT_SECONDS)
+
+
+DATASET_PROFILES = {key:value.replace('saved','imported') for key,value in PROFILES.items()}
+
+
+class DatasetBinding(Record):
+    workspace_id: str = Field(pattern=ID)
+    dataset_id: str = Field(pattern=ID)
+    version_id: str = Field(pattern=ID)
+    contract_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    payload_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    receipt_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    entity_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    policy_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    classification: Literal['synthetic','provider','issuer','internal','mixed','unknown']
+
+
+class DatasetJobRecord(JobRecord):
+    schema_version: int = Field(default=2, ge=2, le=2)
+    request: DatasetJobRequest
+    source: DatasetBinding
+
+    @model_validator(mode='after')
+    def bound_identity(self):
+        if (self.operation_id != 'web-'+self.job_id[4:]
+                or self.request_sha256 != fingerprint(self.request.model_dump())
+                or self.profile != DATASET_PROFILES[self.request.workflow]
+                or (self.source.dataset_id,self.source.version_id,self.source.contract_sha256) !=
+                   (self.request.source.dataset_id,self.request.source.version_id,self.request.source.contract_sha256)
+                or datetime.fromisoformat(self.created_at).utcoffset() is None):
+            raise ValueError('Dataset job identities disagree.')
+        return self
+
+
+class FreshCloseJobRecord(DatasetJobRecord):
+    schema_version: int = Field(default=3, ge=3, le=3)
+    # Import here would create a contracts/catalogue cycle; the pin has a small
+    # standalone strict model in the onboarding contract and is checked below.
+    accounting_source: dict
+
+    @model_validator(mode='after')
+    def bound_identity(self):
+        from .onboarding.contracts import AccountingSource
+        pin = AccountingSource.model_validate(self.accounting_source)
+        if (self.request.workflow != 'close' or self.profile != 'calculate-imported-close'
+                or self.operation_id != 'web-'+self.job_id[4:]
+                or self.request_sha256 != fingerprint(self.request.model_dump())
+                or pin.workspace_id != self.source.workspace_id
+                or (self.source.dataset_id,self.source.version_id,self.source.contract_sha256) !=
+                   (self.request.source.dataset_id,self.request.source.version_id,self.request.source.contract_sha256)
+                or datetime.fromisoformat(self.created_at).utcoffset() is None):
+            raise ValueError('Fresh close identities disagree.')
+        return self
+
+
+def parse_job_record(raw):
+    if not isinstance(raw,dict) or type(raw.get('schema_version')) is not int:
+        raise ValueError('Unsupported job record.')
+    model = {1:JobRecord,2:DatasetJobRecord,3:FreshCloseJobRecord}.get(raw['schema_version'])
+    if model is None: raise ValueError('Unsupported job record.')
+    return model.model_validate(raw)
+
+
 def capabilities(enabled, worker=False, worker_requested=False):
     return dict(schema_version=1, admission_enabled=enabled, worker_enabled=worker,
                 worker_status='running' if worker else 'stopped' if worker_requested else 'not_enabled',

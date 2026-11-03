@@ -1,5 +1,5 @@
 /** Read boundary for the first native reader; financial validation stays in Python. */
-import type { Artifact, Run } from '../workspace-types';
+import type { Artifact, Run, Classification } from '../workspace-types';
 import type { AnalystArea, ChartData, ChartPoint, SavedSection, TableCell, TableData } from './analysis-types';
 
 export type Availability = 'available' | 'unavailable' | 'withheld' | 'not_applicable';
@@ -18,7 +18,7 @@ export type ReviewItem = {
 export type NativeReport = {
   schema_version: 1; kind: 'keystone.report-view'; report_id: string; agent: 'agent1' | 'agent2' | 'agent3' | 'agent4'; workflow: 'research' | 'monitoring' | 'events' | 'news' | 'close';
   identity: { title: string; entity: string; ticker: string | null; source_run_id: string; period_label: string; period_end: string | null; prepared_at: string };
-  state: { execution: string; evidence_gate: string; financial_approval: false; data_classification: 'synthetic'; integrity: 'matched'; review_refs: string[] };
+  state: { execution: string; evidence_gate: string; financial_approval: false; data_classification: Classification; integrity: 'matched'; review_refs: string[] };
   artifacts: { id: string; name: string; sha256: string; source_schema: string }[];
   sources: { id: string; label: string; source_type: string; observed_at: string | null; published_at: string | null; retrieved_at: string | null; date_reason: string | null }[];
   summary: TextBlock; metrics: Metric[];
@@ -58,6 +58,9 @@ const unique = (rows: { id: string }[]) => { if (new Set(rows.map(r => r.id)).si
  */
 export function parseReport(value: unknown, run: Run): NativeReport {
   const raw = object(value), reg = run.native_view;
+  const imported=!!run.input_origin;
+  const expectedClass=run.accounting_origin?.classification||run.input_origin?.classification||'synthetic';
+  const modern=imported||reg?.adapter_version==='1.1.0';
   const events = run.agent === 'agent3' && run.workflow === 'events';
   const news = run.agent === 'agent3' && run.workflow === 'news';
   const monitoring = run.agent === 'agent2' && run.workflow === 'monitoring';
@@ -65,7 +68,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   const family = run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
     : events ? 'agent3-event-report' : news ? 'agent3-news-report' : monitoring ? 'agent2-native-report' : close ? 'agent4-native-report' : null;
   if (raw.schema_version !== 1 || raw.kind !== 'keystone.report-view'
-      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !(news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
+      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !(imported?['2.0.0']:news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
     throw new ReportFailure('unsupported_report_schema');
   }
   if (raw.agent !== run.agent || raw.workflow !== run.workflow) fail();
@@ -73,7 +76,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   for (const [field, expected] of Object.entries({ title: run.title, entity: run.entity, source_run_id: run.source_run_id,
     period_label: run.period, prepared_at: run.prepared_at })) if (identity[field] !== expected) fail();
   if (state.execution !== run.execution_status || state.financial_approval !== false
-      || state.data_classification !== 'synthetic' || state.integrity !== 'matched') fail();
+      || state.data_classification !== expectedClass || state.integrity !== 'matched') fail();
   const artifacts = array(raw.artifacts, 40).map(value => {
     const a = object(value), registered = run.artifacts.find(r => r.id === a.id);
     if (!registered || registered.name !== a.name || registered.sha256 !== a.sha256 || registered.kind !== 'evidence') fail();
@@ -111,11 +114,11 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   const block = (value: unknown): TextBlock => {
     const b = object(value);
-    const templates = ['saved-summary-v1', 'metric-observation-v1', ...(events && reg.adapter_version === '1.1.0' ? ['event-study-summary-v1'] : []),
-      ...(news && ['1.1.0','1.2.0'].includes(reg.adapter_version) ? ['news-study-summary-v1'] : []),
-      ...(news && reg.adapter_version === '1.2.0' ? ['news-retrieval-summary-v1'] : []),
-      ...(monitoring && reg.adapter_version === '1.1.0' ? ['monitoring-summary-v1'] : []),
-      ...(close && reg.adapter_version === '1.1.0' ? ['close-summary-v1'] : [])];
+    const templates = ['saved-summary-v1', 'metric-observation-v1', ...(events && modern ? ['event-study-summary-v1'] : []),
+      ...(news && (imported||['1.1.0','1.2.0'].includes(reg.adapter_version)) ? ['news-study-summary-v1'] : []),
+      ...(news && (imported||reg.adapter_version === '1.2.0') ? ['news-retrieval-summary-v1'] : []),
+      ...(monitoring && modern ? ['monitoring-summary-v1'] : []),
+      ...(close && modern ? ['close-summary-v1'] : [])];
     if (!templates.includes(String(b.template_id))) throw new ReportFailure('unsupported_report_schema');
     return { text: text(b.text, 4000), template_id: text(b.template_id, 80), metric_refs: strings(b.metric_refs), evidence_refs: strings(b.evidence_refs), review_refs: strings(b.review_refs) };
   };
@@ -253,7 +256,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
       else if(c.id==='close-variance-history') {if(c.type!=='line'||c.x_axis.kind!=='date')fail();}
       else fail();
     }
-    if(reg.adapter_version==='1.1.0') {
+    if(modern) {
       const forecastRows=tables.find(t=>t.id==='account-forecasts')?.rows ?? fail();if(!forecastRows.length)fail();
       const checkForecast=(status:string|undefined,values:Metric[])=>{
         const held=!['point_only','model_estimate','deterministic'].includes(status||'');
@@ -320,7 +323,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
     identity: { title: run.title, entity: run.entity, ticker: nullable(identity.ticker, 80), source_run_id: run.source_run_id,
       period_label: run.period, period_end: nullable(identity.period_end, 10), prepared_at: run.prepared_at },
     state: { execution: run.execution_status, evidence_gate: member(state.evidence_gate, ['passed_evidence_checks', 'held_for_review', 'unavailable']),
-      financial_approval: false, data_classification: 'synthetic', integrity: 'matched', review_refs },
+      financial_approval: false, data_classification: expectedClass, integrity: 'matched', review_refs },
     artifacts, sources, summary, metrics, findings, evidence, review_items, sections, charts, tables, analyst_content, glossary };
 }
 
@@ -332,10 +335,10 @@ export async function responseFailure(response: Response): Promise<ReportFailure
   return new ReportFailure(response.status === 404 ? 'saved_run_not_found' : response.status === 403 ? 'local_access_required' : 'saved_evidence_invalid');
 }
 
-export async function fetchReport(run: Run, signal: AbortSignal): Promise<NativeReport> {
+export async function fetchReport(run: Run, signal: AbortSignal,fetcher:typeof fetch=fetch): Promise<NativeReport> {
   let response: Response;
   try {
-    response = await fetch(`/api/runs/${encodeURIComponent(run.id)}/report-view`, { signal, cache: 'no-store', redirect: 'error' });
+    response = await fetcher(`/api/runs/${encodeURIComponent(run.id)}/report-view`, { signal, cache: 'no-store', redirect: 'error' });
   } catch (error) {
     if (signal.aborted) throw error;
     throw new ReportFailure('connection_unavailable');
@@ -364,11 +367,11 @@ export function artifactUrl(run: Run, artifact: Artifact): string {
   return expected;
 }
 
-export async function fetchArtifact(run: Run, artifact: Artifact, signal: AbortSignal): Promise<ArrayBuffer> {
+export async function fetchArtifact(run: Run, artifact: Artifact, signal: AbortSignal,fetcher:typeof fetch=fetch): Promise<ArrayBuffer> {
   const url = artifactUrl(run, artifact);
   if (artifact.bytes < 1 || artifact.bytes > 20_000_000) fail();
   let response: Response;
-  try { response = await fetch(url, { signal, cache: 'no-store', redirect: 'error' }); }
+  try { response = await fetcher(url, { signal, cache: 'no-store', redirect: 'error' }); }
   catch (error) { if (signal.aborted) throw error; throw new ReportFailure('connection_unavailable'); }
   if (!response.ok) throw await responseFailure(response);
   try {
@@ -382,10 +385,10 @@ export async function fetchArtifact(run: Run, artifact: Artifact, signal: AbortS
   } catch (error) { if (signal.aborted || error instanceof ReportFailure) throw error; return fail(); }
 }
 
-export async function verifyOriginal(run: Run, signal: AbortSignal): Promise<boolean> {
+export async function verifyOriginal(run: Run, signal: AbortSignal,fetcher:typeof fetch=fetch): Promise<boolean> {
   const artifact = run.artifacts.find(a => a.id === run.report_id && a.kind === 'report');
   if (!artifact) return false;
-  try { return (await fetch(artifactUrl(run, artifact), { method: 'HEAD', signal, cache: 'no-store', redirect: 'error' })).ok; }
+  try { return (await fetcher(artifactUrl(run, artifact), { method: 'HEAD', signal, cache: 'no-store', redirect: 'error' })).ok; }
   catch { return false; }
 }
 

@@ -4,14 +4,14 @@ from pathlib import Path
 import uuid
 
 from keystone.operation import request_fingerprint, sync_directory
-from .catalog import Catalog, ManifestV2, read_confined, read_json, run_identity
+from .catalog import Catalog, ManifestV2, parse_manifest, read_confined, read_json, run_identity
 from .job_contract import JobError, fingerprint
 from .job_execution import PreparedResult
 from .job_files import digest_bytes, flush_tree, matching_source, write_new
 from .job_store import private_member
 
 
-def operation_proof(store, record):
+def operation_proof(store, record, *, committed_close=False):
     relative = f'operations/{record.operation_id}/operation.json'
     data = read_confined(store.root, relative, 65_536)
     private_member(store.root / relative)
@@ -25,16 +25,32 @@ def operation_proof(store, record):
         raise JobError('job_recovery_unavailable', 409)
     expected = request_fingerprint('workspace-saved', [original_folder], False, False,
         record.request.timeout_seconds, record.max_requests, record.max_output_tokens)
+    orphaned = committed_close and record.schema_version == 3 and saved.get('status') in {'admitted','running'}
+    usage_ok = not any(saved.get('model_control', {}).get(k) != 0
+                       for k in ('requests_reserved','output_tokens_reserved','unknown_usage_calls'))
+    if orphaned:
+        # An abruptly lost supervisor may never write its final receipt. Preserve
+        # those bytes and verify the separate disabled usage ledger instead.
+        usage = read_json(read_confined(store.root,f'operations/{record.operation_id}/usage.json',65536))
+        usage_ok = (usage.get('enabled') is False and usage.get('calls') == []
+                    and usage.get('requests_reserved') == usage.get('output_tokens_reserved') == 0
+                    and usage.get('max_requests') == record.max_requests
+                    and usage.get('max_output_tokens') == record.max_output_tokens)
     if (saved.get('operation_id') != record.operation_id or saved.get('agent') != 'workspace-saved'
-            or saved.get('request_sha256') != expected or saved.get('status') not in {'completed','review_required'}
-            or type(saved.get('exit_code')) is not int or saved['exit_code'] not in {0,3}
+            or saved.get('request_sha256') != expected
+            or (saved.get('status') not in {'completed','review_required'} or type(saved.get('exit_code')) is not int
+                or saved['exit_code'] not in {0,3}) and not (committed_close and record.schema_version == 3
+                    and (saved.get('status') in {'failed_inspect_state','outcome_unknown'} or orphaned))
             or any(saved.get(k) is not False for k in ('paid_calls_enabled','live_data_enabled','financial_approval'))
-            or any(saved.get('model_control', {}).get(k) != 0 for k in ('requests_reserved','output_tokens_reserved','unknown_usage_calls'))):
+            or not usage_ok):
         raise JobError('job_recovery_unavailable', 409)
-    return saved, digest_bytes(data)
+    return ({**saved,'status':'outcome_unknown'} if orphaned else saved), digest_bytes(data)
 
 
 def verified_result(store, record, expected=None):
+    if record.schema_version in {2, 3}:
+        from .onboarding.execution import verified_result as verified_dataset
+        return verified_dataset(store,record,expected)
     folder = store.root / 'jobs' / record.job_id
     stage = folder / 'result'
     catalog = Catalog(stage)
@@ -88,7 +104,7 @@ def publish_result(store, record, expected):
         return run.id
     raw = read_json(old_bytes)
     raw['runs'].append(run_identity(run))
-    complete = ManifestV2.model_validate(raw)
+    complete = parse_manifest(raw)
     from .job_contract import canonical
     inventory_bytes = (canonical(raw) + '\n').encode()
     if (len({r.id for r in complete.runs}) != len(complete.runs)

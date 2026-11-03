@@ -47,6 +47,9 @@ def matching_source(catalog, record):
 
 
 def prepare_inputs(store, record):
+    if record.schema_version in {2, 3}:
+        from .onboarding.execution import prepare_inputs as prepare_dataset
+        return prepare_dataset(store,record)
     catalog = Catalog(store.workspace)
     manifest, run = matching_source(catalog, record)
     if any(r.id == 'result-' + record.job_id[4:] for r in manifest.runs):
@@ -79,10 +82,15 @@ def read_job(folder):
     if any(p.is_symlink() for p in [folder, *folder.parents]):
         raise ValueError('Unsafe job directory.')
     private_member(folder, directory=True)
-    record = JobRecord.model_validate(read_json(read_confined(folder, 'job.json', 65_536)))
+    from .job_contract import parse_job_record
+    record = parse_job_record(read_json(read_confined(folder, 'job.json', 65_536)))
     if folder.name != record.job_id:
         raise ValueError('Wrong job directory identity.')
-    matching_source(Catalog(folder / 'inputs'), record)
+    if record.schema_version in {2, 3}:
+        from .onboarding.execution import read_inputs
+        read_inputs(folder,record)
+    else:
+        matching_source(Catalog(folder / 'inputs'), record)
     return record
 
 

@@ -51,7 +51,7 @@ def control_write_gate(*, queue_only=False):
             fd = _open_lock(path)
             descriptors.append(fd)
             fcntl.flock(fd, mode | fcntl.LOCK_NB)
-        yield
+        yield tuple(descriptors)
     finally:
         for fd in reversed(descriptors):
             os.close(fd)

@@ -16,8 +16,16 @@ APP_CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'sel
 REPORT_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; sandbox allow-same-origin allow-downloads"
 
 
-def create_app(workspace, frontend=None, *, admission=None):
+def create_app(workspace, frontend=None, *, admission=None, private=None):
     catalog = Catalog(workspace)
+    if private is not None and admission is not private:
+        raise ValueError('Private reads and job admission must share their session.')
+    try:
+        raw = read_json(read_confined(catalog.root,'catalog.json',2_000_000))
+    except CatalogError:
+        raw = {}
+    if isinstance(raw,dict) and raw.get('schema_version') == 3 and private is None:
+        raise ValueError('A private catalogue requires its authenticated workspace session.')
     frontend = Path(frontend) if frontend is not None else ROOT / 'web/dist'
     @asynccontextmanager
     async def lifespan(app):
@@ -34,6 +42,13 @@ def create_app(workspace, frontend=None, *, admission=None):
     if admission is not None and admission.catalog.root.resolve() != catalog.root.resolve():
         raise ValueError('Job admission and report workspace must agree.')
 
+    def load_catalog():
+        manifest=catalog.load()
+        if private is not None and (manifest.schema_version!=3 or manifest.workspace_id!=private.inputs.descriptor['id']):
+            from .onboarding.contracts import InputError
+            raise InputError('input_unavailable',503)
+        return manifest
+
     @app.middleware('http')
     async def local_read_boundary(request: Request, call_next):
         native_request = request.url.path.endswith('/report-view')
@@ -48,8 +63,12 @@ def create_app(workspace, frontend=None, *, admission=None):
             response = JSONResponse({'detail': 'Local same-origin access required.'}, status_code=403)
             if native_request:
                 response = JSONResponse(NativeViewError('local_access_required').envelope(), status_code=403)
-        elif (request.method not in {'GET', 'HEAD'} and
-              not (admission is not None and request.method == 'POST' and request.url.path == '/api/jobs')):
+        elif (request.method not in {'GET', 'HEAD'} and not (
+              admission is not None and request.method == 'POST' and request.url.path == '/api/jobs'
+              or private is not None and private.imports_enabled and (
+                  request.method == 'POST' and request.url.path in {'/api/entities','/api/datasets','/api/imports'}
+                  or request.method == 'POST' and re.fullmatch(r'/api/datasets/[a-z0-9_-]+/inspect',request.url.path)
+                  or request.method == 'PUT' and re.fullmatch(r'/api/imports/[a-z0-9_-]+/package',request.url.path)))):
             response = JSONResponse({'detail': 'This workspace is read-only.'}, status_code=405,
                                     headers={'Allow': 'GET, HEAD'})
             if native_request:
@@ -57,7 +76,9 @@ def create_app(workspace, frontend=None, *, admission=None):
                                         headers={'Allow': 'GET, HEAD'})
         else:
             try:
-                if job_request and admission is not None:
+                if private is not None and request.url.path.startswith('/api/') and request.url.path != '/api/execution':
+                    private.authorize(request)
+                elif job_request and admission is not None:
                     admission.authorize(request)
             except JobError as error:
                 response = JSONResponse(error.envelope(), status_code=error.status)
@@ -74,6 +95,9 @@ def create_app(workspace, frontend=None, *, admission=None):
 
     @app.exception_handler(CatalogError)
     async def inventory_error(request, error):
+        if private is not None:
+            from .onboarding.contracts import InputError
+            return JSONResponse(InputError('input_unavailable',503).envelope(),status_code=503)
         if request.url.path.endswith('/report-view'):
             return JSONResponse(NativeViewError().envelope(), status_code=503)
         return JSONResponse({'detail': 'Saved evidence is missing, changed or invalid. Prepare a fresh synthetic workspace.'}, status_code=503)
@@ -89,8 +113,14 @@ def create_app(workspace, frontend=None, *, admission=None):
 
     @app.api_route('/api/execution', methods=['GET', 'HEAD'])
     def execution_capabilities():
+        if private is not None:
+            return private.capabilities()
         return capabilities(admission is not None, admission.worker_enabled if admission is not None else False,
                             admission.worker_requested if admission is not None else False)
+
+    if private is not None:
+        from .onboarding.api import add_routes
+        add_routes(app,private)
 
     if admission is not None:
         @app.post('/api/jobs')
@@ -135,10 +165,13 @@ def create_app(workspace, frontend=None, *, admission=None):
 
     @app.api_route('/api/workspace', methods=['GET', 'HEAD'])
     def workspace_info():
-        manifest = catalog.load()
-        return {**manifest.model_dump(exclude={'runs'}), 'read_only': True,
+        manifest = load_catalog()
+        if private is not None:
+            for run in manifest.runs: private.source_version(run)
+        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled) if private else True,
                 'live_data_enabled': False, 'paid_models_enabled': False,
-                'job_admission_enabled': admission is not None,
+                'input_admission_enabled': private.imports_enabled if private else False,
+                'job_admission_enabled': private.jobs_enabled if private else admission is not None,
                 'job_worker_enabled': admission.worker_enabled if admission is not None else False,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
@@ -146,12 +179,16 @@ def create_app(workspace, frontend=None, *, admission=None):
     def list_runs(agent: str | None = None):
         if agent is not None and agent not in {'agent1', 'agent2', 'agent3', 'agent4'}:
             raise HTTPException(422, 'Unknown agent filter.')
-        return {'runs': [catalog.public_run(r) for r in catalog.load().runs if agent is None or r.agent == agent]}
+        runs = [r for r in load_catalog().runs if agent is None or r.agent == agent]
+        if private is not None:
+            for run in runs: private.source_version(run)
+        return {'runs': [catalog.public_run(r) for r in runs]}
 
     def registered_run(run_id):
-        run = next((r for r in catalog.load().runs if r.id == run_id), None)
+        run = next((r for r in load_catalog().runs if r.id == run_id), None)
         if run is None:
             raise HTTPException(404, 'Saved run not found.')
+        if private is not None: private.source_version(run)
         return run
 
     @app.api_route('/api/runs/{run_id}', methods=['GET', 'HEAD'])
@@ -161,9 +198,10 @@ def create_app(workspace, frontend=None, *, admission=None):
     @app.api_route('/api/runs/{run_id}/report-view', methods=['GET', 'HEAD'])
     def report_view(run_id: str):
         from .report_views.delivery import load_view
-        run = next((r for r in catalog.load().runs if r.id == run_id), None)
+        run = next((r for r in load_catalog().runs if r.id == run_id), None)
         if run is None:
             raise NativeViewError('saved_run_not_found')
+        if private is not None: private.source_version(run)
         return load_view(catalog, run)
 
     @app.api_route('/api/runs/{run_id}/files/{name:path}', methods=['GET', 'HEAD'])
@@ -175,6 +213,8 @@ def create_app(workspace, frontend=None, *, admission=None):
         media = {'.html': 'text/html', '.json': 'application/json', '.png': 'image/png'}[Path(name).suffix]
         headers = {'Content-Security-Policy': REPORT_CSP if media == 'text/html' else "default-src 'none'; frame-ancestors 'self'"}
         if media == 'application/json':
+            headers['Content-Disposition'] = f'attachment; filename="{Path(name).name}"'
+        if private is not None:
             headers['Content-Disposition'] = f'attachment; filename="{Path(name).name}"'
         return Response(catalog.read(run.id, artifact), media_type=media, headers=headers)
 

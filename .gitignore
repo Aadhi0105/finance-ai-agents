@@ -36,6 +36,7 @@ state/.keystone-maintenance.lock
 state/.keystone-maintenance.lock.mutator*
 state/operations/
 state/workspace-jobs/
+state/workspaces/
 
 # Frozen local pilot environment
 .venv-pilot/

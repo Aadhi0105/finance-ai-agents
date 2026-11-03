@@ -46,15 +46,36 @@ class JobExecution(Record):
                 or self.status in TERMINAL and self.finished_at is None
                 or self.status in {'queued', 'running'} and self.finished_at is not None
                 or self.status in {'completed', 'review_required', 'delivery_failed'} and
-                    (self.result is None or self.operation_status not in {'completed', 'review_required'})
+                    (self.result is None or self.operation_status not in {'completed', 'review_required'} and
+                     not (self.schema_version == 2 and getattr(self,'accounting_commit_sha256',None)
+                          and self.reason == 'recovered' and self.operation_status in {'failed_inspect_state','outcome_unknown'}))
                 or self.result is not None and self.inputs_verified_at is None):
             raise ValueError('Execution phase disagrees.')
         return self
 
 
-def claimed():
-    return JobExecution(status='running', attempt=1, started_at=now(), reason='processing')
+class CloseExecution(JobExecution):
+    schema_version: int = Field(default=2, ge=2, le=2)
+    accounting_commit_sha256: str | None = Field(default=None, pattern=r'^[a-f0-9]{64}$')
+
+    @model_validator(mode='after')
+    def committed_result(self):
+        if self.status in {'completed','review_required','delivery_failed'} and self.accounting_commit_sha256 is None:
+            raise ValueError('A close delivery requires accounting commit evidence.')
+        return self
+
+
+def parse_execution(raw):
+    return (CloseExecution if raw.get('schema_version') == 2 else JobExecution).model_validate(raw)
+
+
+def initial_execution(record):
+    return CloseExecution() if record.schema_version == 3 else JobExecution()
+
+
+def claimed(record):
+    return type(initial_execution(record))(status='running', attempt=1, started_at=now(), reason='processing')
 
 
 def changed(execution, **values):
-    return JobExecution.model_validate({**execution.model_dump(), **values})
+    return type(execution).model_validate({**execution.model_dump(), **values})

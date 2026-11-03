@@ -1,5 +1,7 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
+import {EvidenceClass} from './data-basis';
+import {classificationLabels} from '../onboarding/data';
 import { Icon } from '../icons';
 import type { ChartData } from './analysis-types';
 import type { ChartRow } from './chart-layout';
@@ -20,6 +22,7 @@ function shortDate(x: string) {
 export function InteractiveChart({ chart, rows, onInspect }: {
   chart: ChartData; rows: ChartRow[]; onInspect: (refs: string[]) => void;
 }) {
+  const classification=useContext(EvidenceClass);
   const container = useRef<HTMLDivElement>(null), id = useId();
   const bridgeScroll=useRef<HTMLDivElement>(null),scrollSelection=useRef(false);
   const [width, setWidth] = useState(700), [selected, setSelected] = useState(0);
@@ -68,7 +71,7 @@ export function InteractiveChart({ chart, rows, onInspect }: {
   }
   const x = geometry.xs[selected];
   return <div className="nr-chart" ref={container} role="group" aria-label={chart.title + ' interactive chart'}>
-    <div className="nr-chart-basis" id={id+'-basis'}><span>Saved synthetic evidence</span><span>{rows.length} observations · {unit}</span></div>
+    <div className="nr-chart-basis" id={id+'-basis'}><span>{classification==='synthetic'?'Saved synthetic evidence':classificationLabels[classification]+' · retained evidence'}</span><span>{rows.length} observations · {unit}</span></div>
     <div className="nr-chart-legend" aria-label="Chart series">
       {chart.series.map((series, i) => <button key={series.id} type="button" aria-pressed={!hidden.includes(series.id)}
         aria-label={(hidden.includes(series.id) ? 'Show ' : 'Hide ') + series.label}

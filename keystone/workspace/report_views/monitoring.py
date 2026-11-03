@@ -71,7 +71,8 @@ def build(b):
         ident = b.metric(field + '-count', title, '/' + field, 'count', transform='count')
         b.section(field, title, 'Read-only evidence; original cycles remain unchanged and local attribution is not authenticated approval.', metrics=[ident])
     b.review('data_basis', 'Observation and policy scope',
-        'Thresholds are saved synthetic analyst policies. Current effective state and original-cycle state answer different questions.',
+        ('Thresholds are imported saved analyst policies. ' if b.imported else 'Thresholds are saved synthetic analyst policies. ') +
+        'Current effective state and original-cycle state answer different questions.',
         'Inspect observation dates, skipped inputs and any correction evidence separately.',
         [f'artifact:{b.primary_id}#/run', f'artifact:{b.primary_id}#/current'],
         [b.evidence('/run'), b.evidence('/current')], section_refs=['original-cycle', 'effective-state', 'history'])

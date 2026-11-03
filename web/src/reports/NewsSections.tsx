@@ -21,7 +21,7 @@ export function NewsSections({report,onInspect,onReviews}:Props) {
     <ReportSection id="summary" eyebrow="01 / COVERAGE BEFORE CONCLUSIONS" title="News summary">
       <p className="nr-summary-text">{report.summary.text}</p>
       <div className="nr-news-cutoff"><div><span>Saved cutoff</span><strong>{newsBasis(report,'cutoff')==='Not retained' ? 'Not retained in this presentation' : savedInstant(newsBasis(report,'cutoff'))}</strong></div><div><span>Maximum publication age</span><strong>{newsBasis(report,'max-age')==='Not retained' ? 'Not retained' : newsBasis(report,'max-age')+' days'}</strong></div></div>
-      <p className="nr-analysis-note">This is a saved synthetic snapshot. Opening the report does not fetch current headlines. Publication time, retrieval time and report preparation time have separate meanings.</p>
+      <p className="nr-analysis-note">This is a saved {report.state.data_classification==='synthetic'?'synthetic':'imported'} snapshot. Opening the report does not fetch current headlines. Publication time, retrieval time and report preparation time have separate meanings.</p>
       <div className="nr-news-metrics">{['coverage-raw','coverage-after-relevance','coverage-after-dedup'].flatMap(id=>{const m=report.metrics.find(m=>m.id===id);return m?[<MetricCard key={id} metric={m} onInspect={()=>onInspect(m.evidence_refs)}/>]:[];})}</div>
       <div className="nr-news-held"><p className="eyebrow">PUBLISHED DOCUMENT TONE</p><h3>Tone withheld</h3><p>These illustrative inputs do not support a published tone conclusion. A saved diagnostic value of zero does not make the published result neutral. No investment recommendation or future-return estimate is supplied.</p><button className="nr-source-button" onClick={()=>onReviews(report.sections.find(s=>s.id==='tone')?.review_refs || [])}>Understand the tone restrictions →</button></div>
     </ReportSection>
@@ -33,7 +33,7 @@ export function NewsSections({report,onInspect,onReviews}:Props) {
         <div className="nr-news-search"><label htmlFor="news-story-search">Search saved headlines or publishers</label><input id="news-story-search" type="search" value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}} placeholder="Filter retained records…"/><p role="status">{filtered.length} matches from {stories.length} saved representatives. {filtered.length>0?`Showing ${page*PAGE_SIZE+1}–${Math.min((page+1)*PAGE_SIZE,filtered.length)}.`:'No matching headlines shown.'} Filtering changes only this list.</p></div>
         <div ref={pageStart} role="region" aria-label="Retained headline page" tabIndex={-1}>
         {filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE).map(story=><article className="nr-news-story" key={story.id}>
-          <div className="nr-news-story-meta"><span>Story {story.index+1} · synthetic evidence</span><span>{story.publisher}</span></div><h3>{story.headline}</h3>
+          <div className="nr-news-story-meta"><span>Story {story.index+1} · {report.state.data_classification==='synthetic'?'synthetic':'retained'} evidence</span><span>{story.publisher}</span></div><h3>{story.headline}</h3>
           <dl className="nr-news-story-basis"><div><dt>Published</dt><dd>{savedInstant(story.published)}</dd></div><div><dt>Retained scope</dt><dd>{story.scope}</dd></div></dl>
           <button className="nr-source-button" onClick={()=>onInspect(story.refs)}>Inspect story evidence →</button>
           <details className="nr-news-story-detail"><summary>Text, relevance and grouping details</summary>

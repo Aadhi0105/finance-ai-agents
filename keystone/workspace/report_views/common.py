@@ -13,6 +13,7 @@ MISSING = object()
 class Builder:
     def __init__(self, run, source, series, artifacts, source_schema):
         self.run, self.source, self.series = run, source, series
+        self.imported = getattr(run, 'input_origin', None) is not None
         self._evidence_ids = set()
         self._point_count = 0
         self.primary_id, self.series_id = artifacts[0].id, artifacts[1].id
@@ -56,6 +57,24 @@ class Builder:
         self.view['summary'] = dict(
             text=f"Saved synthetic {names[run.workflow]} evidence for {run.entity}. Financial review is required.",
             template_id='saved-summary-v1', metric_refs=[], evidence_refs=[self.root_evidence], review_refs=[])
+        origin = getattr(run, 'input_origin', None)
+        if origin is not None:
+            accounting = getattr(run, 'accounting_origin', None)
+            classification = accounting.classification if accounting is not None else origin.classification
+            self.view['state']['data_classification'] = classification
+            self.view['sources'][0].update(label='Imported saved evidence',
+                source_type=classification if classification in {'provider','issuer','internal'} else
+                    'fixture' if classification == 'synthetic' else 'unknown',
+                date_reason='Imported retained evidence; upload/preparation does not establish observation or publication dates.')
+            review = self.view['review_items'][0]
+            review.update(title='Imported evidence requires review',
+                explanation='Source-use permission and matching files do not establish financial accuracy, authenticity or approval.',
+                action='Inspect the retained input contract, source evidence and all financial review requirements.',
+                source_check_refs=['policy:input-contract/'+origin.contract_sha256])
+            self.view['summary']['text'] = f"Imported saved {names[run.workflow]} evidence for {run.entity}. Financial review is required."
+            if accounting is not None:
+                self.view['sources'][0]['label'] = 'Committed close from imported budget and actuals'
+                self.view['summary']['text'] = f"Financial close calculated from imported budget and actuals for {run.entity}. Financial review is required."
 
     @staticmethod
     def analyst_area(availability='not_applicable', reasons=None, metrics=None, evidence=None):

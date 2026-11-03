@@ -119,12 +119,66 @@ def run_identity(run):
     value = run.model_dump()
     if value.get('job_origin') is None:
         value.pop('job_origin', None)
+    if value.get('accounting_origin') is None:
+        value.pop('accounting_origin', None)
     return value
 
 
 class ManifestV2(Manifest):
     schema_version: Literal[2]
     runs: list[RunV2] = Field(max_length=100)
+
+
+class DatasetOrigin(Record):
+    dataset_id: str = Field(pattern=ID)
+    version_id: str = Field(pattern=ID)
+    contract_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    payload_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    receipt_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    entity_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    classification: Literal['synthetic', 'provider', 'issuer', 'internal', 'mixed', 'unknown']
+    job_id: str = Field(pattern=r'^job-[a-f0-9]{32}$')
+    request_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    profile: str = Field(min_length=1, max_length=60)
+
+
+class AccountingOrigin(Record):
+    commit_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    bundle_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    classification: Literal['synthetic', 'provider', 'issuer', 'internal', 'mixed', 'unknown']
+    lineage_versions: list[str] = Field(max_length=200)
+
+
+class RunV3(RunV2):
+    job_origin: None = None
+    input_origin: DatasetOrigin
+    accounting_origin: AccountingOrigin | None = None
+
+    @model_validator(mode='after')
+    def dataset_identity(self):
+        fresh = self.input_origin.profile == 'calculate-imported-close'
+        if (self.id != 'result-' + self.input_origin.job_id[4:]
+                or fresh != (self.accounting_origin is not None)
+                or fresh and self.workflow != 'close'):
+            raise ValueError('Dataset result identity disagrees.')
+        return self
+
+
+class ManifestV3(ManifestV2):
+    schema_version: Literal[3]
+    kind: Literal['keystone.private-workspace-reports']
+    classification: Literal['private']
+    workspace_id: str = Field(pattern=ID)
+    runs: list[RunV3] = Field(max_length=100)
+
+
+def parse_manifest(raw):
+    if not isinstance(raw, dict) or type(raw.get('schema_version')) is not int:
+        raise CatalogError('Unsupported workspace inventory version.')
+    model = {1: Manifest, 2: ManifestV2, 3: ManifestV3}.get(raw['schema_version'])
+    if model is None:
+        raise CatalogError('Unsupported workspace inventory version.')
+    return model.model_validate(raw)
 
 
 def safe_relative(value):
@@ -195,10 +249,7 @@ class Catalog:
     def load(self):
         try:
             raw = read_json(read_confined(self.root, 'catalog.json', 2_000_000))
-            if not isinstance(raw, dict) or type(raw.get('schema_version')) is not int or raw['schema_version'] not in {1, 2}:
-                raise CatalogError('Unsupported workspace inventory version.')
-            model = ManifestV2 if isinstance(raw, dict) and type(raw.get('schema_version')) is int and raw['schema_version'] == 2 else Manifest
-            manifest = model.model_validate(raw)
+            manifest = parse_manifest(raw)
             if len({r.id for r in manifest.runs}) != len(manifest.runs):
                 raise CatalogError('Duplicate run identity.')
             expected = {'agent1': {'research'}, 'agent2': {'monitoring'},
