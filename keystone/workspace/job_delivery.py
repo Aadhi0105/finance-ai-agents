@@ -11,7 +11,7 @@ from .job_files import digest_bytes, flush_tree, matching_source, write_new
 from .job_store import private_member
 
 
-def operation_proof(store, record, *, committed_close=False):
+def operation_proof(store, record, *, committed_close=False,committed_local=False):
     relative = f'operations/{record.operation_id}/operation.json'
     data = read_confined(store.root, relative, 65_536)
     private_member(store.root / relative)
@@ -25,7 +25,8 @@ def operation_proof(store, record, *, committed_close=False):
         raise JobError('job_recovery_unavailable', 409)
     expected = request_fingerprint('workspace-saved', [original_folder], False, False,
         record.request.timeout_seconds, record.max_requests, record.max_output_tokens)
-    orphaned = committed_close and record.schema_version == 3 and saved.get('status') in {'admitted','running'}
+    committed=(committed_close and record.schema_version==3) or (committed_local and record.schema_version==4)
+    orphaned = committed and saved.get('status') in {'admitted','running'}
     usage_ok = not any(saved.get('model_control', {}).get(k) != 0
                        for k in ('requests_reserved','output_tokens_reserved','unknown_usage_calls'))
     if orphaned:
@@ -39,7 +40,7 @@ def operation_proof(store, record, *, committed_close=False):
     if (saved.get('operation_id') != record.operation_id or saved.get('agent') != 'workspace-saved'
             or saved.get('request_sha256') != expected
             or (saved.get('status') not in {'completed','review_required'} or type(saved.get('exit_code')) is not int
-                or saved['exit_code'] not in {0,3}) and not (committed_close and record.schema_version == 3
+                or saved['exit_code'] not in {0,3}) and not (committed
                     and (saved.get('status') in {'failed_inspect_state','outcome_unknown'} or orphaned))
             or any(saved.get(k) is not False for k in ('paid_calls_enabled','live_data_enabled','financial_approval'))
             or not usage_ok):
@@ -48,7 +49,7 @@ def operation_proof(store, record, *, committed_close=False):
 
 
 def verified_result(store, record, expected=None):
-    if record.schema_version in {2, 3}:
+    if record.schema_version in {2, 3, 4}:
         from .onboarding.execution import verified_result as verified_dataset
         return verified_dataset(store,record,expected)
     folder = store.root / 'jobs' / record.job_id

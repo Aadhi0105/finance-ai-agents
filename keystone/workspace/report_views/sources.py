@@ -13,6 +13,10 @@ ADAPTERS = {
 
 def adapter_for(run):
     try:
+        if getattr(getattr(run,'input_origin',None),'profile',None)=='calculate-local-research':
+            reg=getattr(run,'native_view',None)
+            if reg and (reg.adapter_id!='agent1-local-report' or reg.adapter_version!='1.0.0'):raise NativeViewError('unsupported_report_schema')
+            return 'agent1-local-report','1.0.0','agent1.local-analysis/1'
         ident, latest, schema = ADAPTERS[run.workflow]
         private = getattr(run, 'input_origin', None) is not None
         if private:
@@ -35,6 +39,16 @@ def check_source(run, source):
     workflow = run.workflow
     origin = getattr(run, 'input_origin', None)
     private = origin is not None
+    if getattr(origin,'profile',None)=='calculate-local-research':
+        from ..onboarding.research.contracts import validate_shape
+        try:
+            validate_shape('result',source)
+            lineage=source['lineage']
+            if (workflow!='research' or source['result_id']!=run.id or run.source_run_id!=run.id
+                    or source['execution']['status']!=run.execution_status or source['provenance']['classification']!=origin.classification
+                    or any(lineage[k]!=getattr(origin,k) for k in ('dataset_id','version_id','contract_sha256','payload_sha256','receipt_sha256','entity_sha256','job_id','request_sha256'))):raise ValueError()
+        except Exception as error:raise NativeViewError() from error
+        return
     if workflow == 'research':
         if type(source.get('schema_version')) is not int or source['schema_version'] != 2:
             raise NativeViewError('unsupported_report_schema')

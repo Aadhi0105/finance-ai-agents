@@ -26,6 +26,9 @@ def validate_series(run, source, series, primary):
     if series != expected or not isinstance(series['derivations'], dict):
         raise NativeViewError()
     derivations = series['derivations']
+    if adapter=='agent1-local-report':
+        if derivations!={}:raise NativeViewError()
+        return
     keys = {'ma50', 'ma200', 'volatility30', 'drawdown', 'rebased_stock', 'rebased_index'} if run.workflow == 'research' else {'bridge'} if run.workflow == 'close' else set()
     if set(derivations) != keys:
         raise NativeViewError()

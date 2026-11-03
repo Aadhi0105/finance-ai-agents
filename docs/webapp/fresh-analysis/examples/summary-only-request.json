@@ -1,0 +1,19 @@
+{
+  "schema_version": 3,
+  "workflow": "research",
+  "source": {
+    "kind": "dataset_version",
+    "dataset_id": "dataset-northstar",
+    "version_id": "version-complete-example",
+    "contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "analysis_plan": {
+    "schema_version": 1,
+    "financial_summary": true,
+    "annual_trends": true,
+    "quote_metrics": "if_eligible",
+    "valuation": null
+  },
+  "assumption_review": null,
+  "timeout_seconds": 120
+}

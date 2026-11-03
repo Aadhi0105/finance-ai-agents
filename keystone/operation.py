@@ -82,7 +82,8 @@ def execute(agent, arguments, operation_id, *, directory=None, allow_paid=False,
             environment=None, lease_fds=()):
     if agent not in ENTRYPOINTS or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,79}', operation_id):
         raise ValueError('Invalid operation identity or agent.')
-    if not 1 <= timeout <= MAX_TIMEOUT_SECONDS or not 1 <= max_requests <= MAX_REQUESTS or not 1 <= max_output_tokens <= MAX_OUTPUT_TOKENS:
+    minimum = 0 if agent=='workspace-saved' and not allow_paid and not allow_live_data else 1
+    if not 1 <= timeout <= MAX_TIMEOUT_SECONDS or not minimum <= max_requests <= MAX_REQUESTS or not minimum <= max_output_tokens <= MAX_OUTPUT_TOKENS:
         raise ValueError('Limits must be positive and within the selected pilot ceiling.')
     for fd in lease_fds:
         os.fstat(fd)

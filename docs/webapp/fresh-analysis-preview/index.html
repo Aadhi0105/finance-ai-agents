@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <title>Keystone · New analysis design preview</title>
+  <link rel="stylesheet" href="preview.css"><script src="preview.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to design preview</a>
+<div class="app">
+  <aside class="sidebar">
+    <a class="brand" href="#start"><span class="mark">K</span>keystone<span class="period">.</span></a>
+    <p class="nav-label">ANALYST WORKSPACE</p>
+    <nav aria-label="Preview navigation"><a class="active" href="#start">↗ <span>New analysis</span></a><a href="#scope">▦ <span>Workflow scope</span></a><a href="#boundary">◷ <span>What comes next</span></a></nav>
+    <div class="sidebar-note"><span class="dot"></span> Local design preview<p>Traceable analysis, thoughtful review.</p></div>
+  </aside>
+  <div class="body">
+    <header class="topbar"><span>Workspace <span class="slash">/</span> New analysis</span><span class="chip design-chip">4A.1 · DESIGN PREVIEW</span></header>
+    <main id="main" tabindex="-1">
+      <div class="preview-notice" role="note"><strong>A walkthrough of the proposed experience.</strong><span>All examples are fictional. This page creates no input version, job or report.</span></div>
+      <section id="start" aria-labelledby="page-title">
+        <p class="eyebrow">FROM NEW EVIDENCE TO NEW INSIGHT</p>
+        <h1 id="page-title">Start with the question.<br><em>Keep the evidence close.</em></h1>
+        <p class="intro">A proposed path from local financial inputs to a new company analysis. Explore the steps before we build the processing behind them.</p>
+        <div class="mode-switch" role="group" aria-label="Analysis path"><button id="new-path" aria-pressed="true">New company analysis <span>Planned</span></button><button id="saved-path" aria-pressed="false">Rebuild saved research <span>Available today</span></button></div>
+        <div id="saved-note" class="card" hidden><p class="eyebrow">THE EXISTING PATH</p><h2>A saved report, rebuilt from its evidence.</h2><p>The current workspace accepts a supported research model and rebuilds its saved results. The new path below would accept financial inputs and perform new calculations.</p><button class="secondary" id="return-new">Return to the proposed new analysis</button></div>
+        <div id="journey">
+          <nav class="steps" aria-label="Proposed analysis steps">
+            <button data-step="0" aria-current="step"><span>01</span> Choose inputs</button><button data-step="1"><span>02</span> Check readiness</button><button data-step="2"><span>03</span> Review assumptions</button><button data-step="3"><span>04</span> Preview result</button>
+          </nav>
+          <div class="desk">
+            <section class="card stage-card" aria-labelledby="stage-title"><div id="stage"></div></section>
+            <aside class="outline card" aria-labelledby="outline-title"><p class="eyebrow">YOUR PROPOSED ANALYSIS</p><h2 id="outline-title">The run outline.</h2><dl><div><dt>Company</dt><dd><span id="outline-company" class="company-name">Northstar Components</span><span id="outline-company-kind">Fictional operating company</span></dd></div><div><dt>Financial periods</dt><dd>FY2025 and FY2024<span>Annual · EUR base units</span></dd></div><div><dt>Input route</dt><dd>Local research input kit<span>Future supported structured format</span></dd></div><div><dt>Processing</dt><dd>Local financial calculations<span>Provider access and paid models off</span></dd></div></dl><div class="outline-state"><span class="dot"></span><strong id="outline-status">Example inputs selected</strong><p id="outline-copy">Choose a scenario to see how missing evidence would affect the journey.</p></div><p class="fine">An accepted input, a completed calculation and a financial review remain separate records.</p></aside>
+          </div>
+          <p class="step-status" id="step-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+      <section id="scope" class="scope" aria-labelledby="scope-title"><p class="eyebrow">ONE WORKSPACE, DISTINCT WORKFLOWS</p><h2 id="scope-title">Prove one complete path first.</h2><p class="section-copy">Agent 1 comes first. Each later workflow needs its own inputs, state rules and evidence checks.</p><div class="scope-grid"><article class="card"><span class="number">01</span><h3>Company research</h3><span class="tag">First implementation</span><p>New ratios, trends and eligible conditional valuation from a validated local financial kit.</p></article><article class="card"><span class="number">02</span><h3>Monitoring</h3><span class="tag muted">Later slice</span><p>New observations evaluated against policies, with original cycles and corrections kept separate.</p></article><article class="card"><span class="number">03</span><h3>Events &amp; news</h3><span class="tag muted">Later slices</span><p>New event assembly and news processing, each with its own source, date and model requirements.</p></article><article class="card"><span class="number">04</span><h3>Financial close</h3><span class="tag muted">Existing calculation path</span><p>Supported new budget/actuals closes and corrections already have their own protected workflow.</p></article></div></section>
+      <section id="boundary" class="next card" aria-labelledby="next-title"><div><p class="eyebrow">THE TWO PARTS OF 4A</p><h2 id="next-title">Experience first. Contracts next.</h2></div><dl><div><dt>4A.1 · This preview</dt><dd>Purpose, first supported scope, user journey, missing-data behaviour and report expectations.</dd></div><div><dt>4A.2 · Next</dt><dd>Exact input schemas, provenance and permission rules, financial dependencies, execution/recovery design and test matrix.</dd></div><div><dt>4B · Implementation</dt><dd>Build and verify the new Agent 1 path after those contracts are defined.</dd></div></dl></section>
+      <footer><span>KEYSTONE <span class="slash">/</span> A considered place to work.</span><span>Fictional interaction mockup · local memory only</span></footer>
+    </main>
+  </div>
+</div>
+</body>
+</html>

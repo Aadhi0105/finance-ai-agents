@@ -238,6 +238,22 @@ connection, company/dataset forms, package inspection/import, version-pinned
 processing requests and classification-aware native readers. Local snapshots cover
 the new input/control files. [Batch 3D](docs/webapp/batch3d-onboarding-acceptance.md) adds explicit private restoration at a new folder, preserved history, held restored queues, operator rechecks and cross-workflow failure/volume acceptance.
 
+[Webapp Batch 4A.1](docs/webapp/batch4a1-fresh-analysis-scope.md) defines the first
+fresh-analysis use case, supported scope, user journey and missing-data behaviour,
+with a separate fictional interaction preview.
+[4A.2](docs/webapp/batch4a2-fresh-analysis-contracts.md) specifies strict local
+financial-kit, request and result contracts, annual/quote/optional DCF semantics,
+permission and review binding, durable execution/recovery and a 39-row pending
+acceptance matrix. Design schemas and fictional arithmetic examples are checked;
+these planning parts add no runtime capability themselves.
+[4B](docs/webapp/batch4b-local-research.md) now implements the separate local
+Agent 1 workflow: import an authorised annual EUR financial kit, confirm a
+version-pinned financial summary or explicitly reviewed DCF plan, and receive a
+new native report with interactive numerical charts. Missing evidence retains
+section holds. The fixed profile uses zero provider/model requests, preserves
+one-attempt jobs and supports delivery-only recovery and held-queue restoration.
+Real-source permission and financial approval remain separate requirements.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

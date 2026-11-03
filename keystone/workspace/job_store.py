@@ -246,6 +246,15 @@ class JobStore:
             pending = con.execute("SELECT count(*) FROM executions WHERE status IN ('queued','running')").fetchone()[0]
             if count >= MAX_RETAINED_JOBS or pending >= MAX_PENDING_JOBS:
                 raise JobError('job_capacity_reached', 409)
+            if record.schema_version==4:
+                reserved=con.execute("SELECT count(*) FROM jobs j JOIN executions e USING(job_id) WHERE json_extract(j.record_json,'$.schema_version')=4 AND e.status IN ('queued','running')").fetchone()[0]*16_000_000
+                total=0;files=0
+                for root in (self.root/'jobs',self.root/'operations',self.workspace):
+                    if root.exists():
+                        for path in root.rglob('*'):
+                            private_member(path,directory=path.is_dir())
+                            if path.is_file():total+=path.stat().st_size;files+=1
+                            if total+reserved+16_000_000>100_000_000 or files>60000:raise JobError('job_capacity_reached',409)
             raw = record.model_dump()
             con.execute('INSERT INTO jobs(job_id,key_hash,request_sha256,created_at,record_json,record_sha256) VALUES (?,?,?,?,?,?)',
                         (record.job_id, key_hash, record.request_sha256, record.created_at, canonical(raw), fingerprint(raw)))
@@ -290,7 +299,7 @@ class JobStore:
         raw = read_json(row[1].encode())
         execution = parse_execution(raw)
         bound = parse_job_record(JobStore._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
-        if (execution.schema_version != (2 if bound.schema_version == 3 else 1)
+        if (execution.schema_version != (3 if bound.schema_version==4 else 2 if bound.schema_version == 3 else 1)
                 or row[0] != execution.status or fingerprint(raw) != row[2]
                 or execution.result is not None and execution.result.run_id != 'result-' + job_id[4:]):
             raise JobError('job_store_unavailable')
@@ -345,8 +354,8 @@ class JobStore:
         allowed = (old.status == 'queued' and execution.status == 'running'
                    or old.status == 'running' and execution.status != 'queued'
                    or old.status in {'delivery_failed','outcome_unknown'} and execution.status in {'completed','review_required'}
-                   or old.schema_version == 2 and old.status == 'failed' and execution.status == 'review_required'
-                      and execution.reason == 'recovered' and execution.accounting_commit_sha256 is not None)
+                   or old.schema_version in {2,3} and old.status == 'failed' and execution.status == 'review_required'
+                      and execution.reason == 'recovered' and (getattr(execution,'accounting_commit_sha256',None) or getattr(execution,'analysis_commit_sha256',None)))
         if not allowed or con.execute('SELECT count(*) FROM events WHERE job_id=?', (job_id,)).fetchone()[0] >= 50:
             raise JobError('job_recovery_unavailable', 409)
         raw = execution.model_dump()

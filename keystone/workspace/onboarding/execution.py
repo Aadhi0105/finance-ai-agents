@@ -12,17 +12,22 @@ from .store import InputStore
 from .service import binding
 
 
-def current_version(store,record):
+def current_version(store,record,*,executing=False):
     try:
         inputs=InputStore(store.workspace.parent)
         version=inputs.version(record.source.version_id,processing=True)
         if binding(inputs,version)!=record.source:raise ValueError()
+        if record.schema_version==4 and executing:
+            from .research.contracts import readiness,producer
+            payload=read_json(inputs.read('inputs/'+version['id']+'/payload.json'))
+            if c.fingerprint(readiness(payload))!=record.admission_readiness_sha256 or c.fingerprint(producer())!=record.producer_sha256:
+                raise ValueError('Local readiness or producer changed')
         return inputs,version
     except Exception:raise JobError('job_source_unavailable',409) from None
 
 
 def prepare_inputs(store,record):
-    inputs,version=current_version(store,record)
+    inputs,version=current_version(store,record,executing=True)
     manifest=Catalog(store.workspace).load()
     if manifest.schema_version!=3 or manifest.workspace_id!=record.source.workspace_id:raise JobError('job_source_unavailable')
     if any(r.id=='result-'+record.job_id[4:] for r in manifest.runs):raise JobError('job_recovery_unavailable',409)
@@ -40,7 +45,7 @@ def prepare_inputs(store,record):
     entity=inputs.object('entity',version['contract']['metadata']['dataset']['entity_id'])
     write_new(working/'entity.json',c.canonical(entity))
     read_inputs(folder,record)
-    current_version(store,record)
+    current_version(store,record,executing=True)
     flush_tree(folder)
     return folder
 
@@ -62,10 +67,14 @@ def read_inputs(folder,record):
     if record.schema_version == 3 and (contract['metadata']['payload_format'] != c.FRESH_CLOSE
             or validation.get('accounting_source') != record.accounting_source):
         raise JobError('job_source_unavailable')
+    if record.schema_version==4 and contract['metadata']['payload_format']!=c.FRESH_RESEARCH:raise JobError('job_source_unavailable')
     return read_json(raw['payload.json']),contract,entity
 
 
 def render(folder,record, *, saved_close=None):
+    if record.schema_version==4:
+        from .research.delivery import render as render_local
+        return render_local(folder,record)
     source,contract,entity=read_inputs(folder,record)
     description=contract['validation'];workflow=record.request.workflow
     fresh = record.schema_version == 3
@@ -138,6 +147,9 @@ def render(folder,record, *, saved_close=None):
 
 
 def verified_result(store,record,expected=None):
+    if record.schema_version==4:
+        from .research.delivery import verified_result as verify_local
+        return verify_local(store,record,expected)
     inputs,_ = current_version(store,record)
     folder=store.root/'jobs'/record.job_id
     before,contract,entity=read_inputs(folder,record)

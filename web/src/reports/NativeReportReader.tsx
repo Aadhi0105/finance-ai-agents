@@ -137,7 +137,8 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
   const reviewPanels = useRef(new Map<string, HTMLDetailsElement>());
   const original = run.artifacts.find(a => a.id === run.report_id)!;
   const findings = summaryFindings(report);
-  const metrics = coreMetricIds.flatMap(id => report.metrics.filter(m => m.id === id && m.visibility === 'main'));
+  const coreIds=run.native_view?.adapter_id==='agent1-local-report'?(report.sections.find(s=>s.id==='summary')?.metric_refs||[]):coreMetricIds;
+  const metrics = coreIds.flatMap(id => report.metrics.filter(m => m.id === id && m.visibility === 'main'));
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {

@@ -1,0 +1,2154 @@
+{
+  "run": {
+    "id": "result-34119f8815124c51a8dd891639af5df0",
+    "agent": "agent1",
+    "workflow": "research",
+    "title": "Company analysis \u00b7 Northstar Components \u00b7 fictional",
+    "entity": "Northstar Components \u00b7 fictional",
+    "period": "2025-12-31",
+    "prepared_at": "2026-11-03T21:16:19.120422+00:00",
+    "execution_status": "completed",
+    "review_status": "review_required",
+    "summary": "Calculated from supplied local financial observations. Financial review remains required.",
+    "limitations": [
+      "Source permissions and matching files do not establish authenticity.",
+      "No provider retrieval, model inference or investment recommendation."
+    ],
+    "checks": [
+      "Exact source, plan and review binding verified."
+    ],
+    "metrics": [],
+    "artifacts": [
+      {
+        "id": "local-result",
+        "name": "payload.json",
+        "label": "Calculated local research",
+        "kind": "evidence",
+        "sha256": "c3513a7f0e4b3bc396013374d5d7ccd7960001ff21e1418f9434035232aaf539",
+        "bytes": 27641,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/payload.json"
+      },
+      {
+        "id": "financial-kit",
+        "name": "financial-kit.json",
+        "label": "Supplied financial observations",
+        "kind": "evidence",
+        "sha256": "e66249a700d0534873e5bacccf750589acbe9279fe184888cf625ed88bca0e69",
+        "bytes": 6946,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/financial-kit.json"
+      },
+      {
+        "id": "analysis-request",
+        "name": "analysis-request.json",
+        "label": "Exact plan and acknowledgement",
+        "kind": "evidence",
+        "sha256": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7",
+        "bytes": 1033,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/analysis-request.json"
+      },
+      {
+        "id": "input-contract",
+        "name": "input-contract.json",
+        "label": "Source contract and validation",
+        "kind": "evidence",
+        "sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+        "bytes": 3338,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/input-contract.json"
+      },
+      {
+        "id": "research-report",
+        "name": "report_REVIEW.html",
+        "label": "Local research review export",
+        "kind": "report",
+        "sha256": "710be8253006f1a3656ec923958299a6efe858cbcdbc310894929b13401daa61",
+        "bytes": 9565,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/report_REVIEW.html"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "c97ed958a0895a45cded58ebb04c5e0e418669e2ad42597bcc69a046da8e369e",
+        "bytes": 250,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "7b5933774c010a19afad2d7fe2a022c43be715405693257e40fdc800b2aa516b",
+        "bytes": 35364,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/native-report.json"
+      },
+      {
+        "id": "analysis-commit",
+        "name": "analysis-commit.json",
+        "label": "Atomic analytical result proof",
+        "kind": "evidence",
+        "sha256": "ce2425e836ff5e34bdce32cae9b0899530875e3639e0a6d157371bedb48c28b3",
+        "bytes": 1795,
+        "url": "/api/runs/result-34119f8815124c51a8dd891639af5df0/files/analysis-commit.json"
+      }
+    ],
+    "report_id": "research-report",
+    "source_run_id": "result-34119f8815124c51a8dd891639af5df0",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "agent1-local-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "local-result",
+        "native-series"
+      ]
+    },
+    "input_origin": {
+      "dataset_id": "dataset-3c937f111e01489485263166adf77148",
+      "version_id": "version-2dac8d9e8827430ea72b55b9ddac6497",
+      "contract_sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+      "payload_sha256": "e66249a700d0534873e5bacccf750589acbe9279fe184888cf625ed88bca0e69",
+      "receipt_sha256": "125927557c86208546b18f833317920981219c8faf2ce6f67a682040edd90eea",
+      "entity_sha256": "7a2349f41cab999fc3c6fd95b1c72df9837c07930ede45dae6eb9d0da2d34305",
+      "classification": "synthetic",
+      "job_id": "job-34119f8815124c51a8dd891639af5df0",
+      "request_sha256": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7",
+      "profile": "calculate-local-research"
+    }
+  },
+  "report": {
+    "agent": "agent1",
+    "analyst_content": {
+      "external_research": {
+        "availability": "unavailable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "unsupported_input_group"
+        ]
+      },
+      "keystone_scope": "supported_facts_only",
+      "market_consensus": {
+        "availability": "unavailable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "unsupported_input_group"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "local-result",
+        "name": "payload.json",
+        "sha256": "c3513a7f0e4b3bc396013374d5d7ccd7960001ff21e1418f9434035232aaf539",
+        "source_schema": "agent1.local-analysis/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "c97ed958a0895a45cded58ebb04c5e0e418669e2ad42597bcc69a046da8e369e",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "revenue-history",
+        "purpose": "Supplied annual observations. Missing values remain gaps.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-00387a1212b6a1a254b6",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "revenue-history-series",
+            "label": "Annual revenue",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-d26eb8e1a3e3d43af8d9a0"
+                ],
+                "id": "revenue-history-0",
+                "label": "2023-12-31",
+                "reason_codes": [],
+                "x": "2023-12-31",
+                "y": "800000000"
+              },
+              {
+                "evidence_refs": [
+                  "e-7c2e60acc97c21a04c0527"
+                ],
+                "id": "revenue-history-1",
+                "label": "2024-12-31",
+                "reason_codes": [],
+                "x": "2024-12-31",
+                "y": "900000000"
+              },
+              {
+                "evidence_refs": [
+                  "e-ed821d4b4f8474c91e68e6"
+                ],
+                "id": "revenue-history-2",
+                "label": "2025-12-31",
+                "reason_codes": [],
+                "x": "2025-12-31",
+                "y": "1000000000"
+              }
+            ]
+          }
+        ],
+        "title": "Annual revenue",
+        "type": "bar",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Financial period end"
+        },
+        "y_axis": {
+          "currency": "EUR",
+          "label": "currency",
+          "unit": "currency"
+        }
+      },
+      {
+        "availability": "available",
+        "id": "net-margin-history",
+        "purpose": "Supplied annual observations. Missing values remain gaps.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-00387a1212b6a1a254b6",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "net-margin-history-series",
+            "label": "Annual net margin",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-d968a4b76c601e21dcf859"
+                ],
+                "id": "net-margin-history-0",
+                "label": "2023-12-31",
+                "reason_codes": [],
+                "x": "2023-12-31",
+                "y": "0.075"
+              },
+              {
+                "evidence_refs": [
+                  "e-b1d894485602c9b372e0c1"
+                ],
+                "id": "net-margin-history-1",
+                "label": "2024-12-31",
+                "reason_codes": [],
+                "x": "2024-12-31",
+                "y": "0.075"
+              },
+              {
+                "evidence_refs": [
+                  "e-c30edc3e4c581cf18107d0"
+                ],
+                "id": "net-margin-history-2",
+                "label": "2025-12-31",
+                "reason_codes": [],
+                "x": "2025-12-31",
+                "y": "0.075"
+              }
+            ]
+          }
+        ],
+        "title": "Annual net margin",
+        "type": "line",
+        "visibility": "main",
+        "x_axis": {
+          "kind": "date",
+          "label": "Financial period end"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "fraction",
+          "unit": "fraction"
+        }
+      },
+      {
+        "availability": "available",
+        "id": "conditional-scenarios",
+        "purpose": "Assigned scenarios, not broker targets or forecast probabilities.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-00387a1212b6a1a254b6",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "series": [
+          {
+            "id": "scenario-values",
+            "label": "Conditional equity value per share",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-cf777f4f08dd1d955b771e"
+                ],
+                "id": "scenario-bear",
+                "label": "Bear",
+                "reason_codes": [],
+                "x": "bear",
+                "y": "96.0"
+              },
+              {
+                "evidence_refs": [
+                  "e-ffa937f019046f7f79bc04"
+                ],
+                "id": "scenario-base",
+                "label": "Base",
+                "reason_codes": [],
+                "x": "base",
+                "y": "100.0"
+              },
+              {
+                "evidence_refs": [
+                  "e-60571f546e2364cad50d50"
+                ],
+                "id": "scenario-bull",
+                "label": "Bull",
+                "reason_codes": [],
+                "x": "bull",
+                "y": "104.0"
+              }
+            ]
+          }
+        ],
+        "title": "Conditional equity values per share",
+        "type": "scenario_range",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "category",
+          "label": "Observation"
+        },
+        "y_axis": {
+          "currency": "EUR",
+          "label": "currency_per_share",
+          "unit": "currency_per_share"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "local-result",
+        "id": "e-ea1d0f795f4fabbb024302",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-5788cd03709121e4da19ab",
+        "label": "Annual revenue 2023",
+        "method": null,
+        "pointer": "/metrics/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a82fa2f5468aad6be1c192",
+        "label": "Annual net margin 2023",
+        "method": null,
+        "pointer": "/metrics/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-3a23197371941660bda550",
+        "label": "Annual revenue 2024",
+        "method": null,
+        "pointer": "/metrics/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-64a965971f88a28dced484",
+        "label": "Annual net margin 2024",
+        "method": null,
+        "pointer": "/metrics/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-bf60129d4fe6467b66b729",
+        "label": "Annual revenue 2025",
+        "method": null,
+        "pointer": "/metrics/4/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c5a7506603bf43072cb4a6",
+        "label": "Annual net margin 2025",
+        "method": null,
+        "pointer": "/metrics/5/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-4fee68529fdbfd09e81d99",
+        "label": "Operating income",
+        "method": null,
+        "pointer": "/metrics/6/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-591cacd50a9392b8d642d4",
+        "label": "Attributable ordinary net income",
+        "method": null,
+        "pointer": "/metrics/7/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-db1c3bd3e1c9dff526a505",
+        "label": "Period-end debt including leases",
+        "method": null,
+        "pointer": "/metrics/8/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a171f7e9db118801f119c7",
+        "label": "Period-end unrestricted cash",
+        "method": null,
+        "pointer": "/metrics/9/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-622d8525e866ac28de0961",
+        "label": "Gross margin",
+        "method": null,
+        "pointer": "/metrics/10/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ce8bf2d2ffaf68d1d0376a",
+        "label": "Operating margin",
+        "method": null,
+        "pointer": "/metrics/11/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-d9cf229a282cb818f36336",
+        "label": "Revenue growth",
+        "method": null,
+        "pointer": "/metrics/12/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c49db5147efcea1bf0eeb6",
+        "label": "Revenue CAGR 2023-12-31 / 2025-12-31",
+        "method": null,
+        "pointer": "/metrics/13/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-e0cf12ca21dac1b724d0e9",
+        "label": "Dated quote / annual earnings",
+        "method": null,
+        "pointer": "/metrics/14/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c587a17caac955a9235f9a",
+        "label": "Dated EV / annual operating income",
+        "method": null,
+        "pointer": "/metrics/15/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a6b90307d1835764659a2b",
+        "label": "Base FCFF",
+        "method": null,
+        "pointer": "/metrics/16/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a92393181b67c999c479ef",
+        "label": "Enterprise value \u00b7 bear",
+        "method": null,
+        "pointer": "/metrics/17/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-1e150f680effe1acd79590",
+        "label": "Equity value \u00b7 bear",
+        "method": null,
+        "pointer": "/metrics/18/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-cf777f4f08dd1d955b771e",
+        "label": "Equity value per share \u00b7 bear",
+        "method": null,
+        "pointer": "/metrics/19/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-45d6aa9cdb4caad7f7bc89",
+        "label": "Terminal-value concentration \u00b7 bear",
+        "method": null,
+        "pointer": "/metrics/20/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-5c5925f88317af4d1d3b4c",
+        "label": "Enterprise value \u00b7 base",
+        "method": null,
+        "pointer": "/metrics/21/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-7c79f6de48701ab6ab80f7",
+        "label": "Equity value \u00b7 base",
+        "method": null,
+        "pointer": "/metrics/22/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ffa937f019046f7f79bc04",
+        "label": "Equity value per share \u00b7 base",
+        "method": null,
+        "pointer": "/metrics/23/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ba3680ed3b984c35fc46c6",
+        "label": "Terminal-value concentration \u00b7 base",
+        "method": null,
+        "pointer": "/metrics/24/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-9e78d15441c51470952dd1",
+        "label": "Enterprise value \u00b7 bull",
+        "method": null,
+        "pointer": "/metrics/25/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-bdc4967dff8e2a9cf09e1c",
+        "label": "Equity value \u00b7 bull",
+        "method": null,
+        "pointer": "/metrics/26/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-60571f546e2364cad50d50",
+        "label": "Equity value per share \u00b7 bull",
+        "method": null,
+        "pointer": "/metrics/27/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-59f0e1e96a04e13547c7f0",
+        "label": "Terminal-value concentration \u00b7 bull",
+        "method": null,
+        "pointer": "/metrics/28/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ed48f7836c9875aa71e6f8",
+        "label": "Scenario-weighted equity value per share",
+        "method": null,
+        "pointer": "/metrics/29/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-65d5a6f7e798a91ee337fe",
+        "label": "Conditional model-value gap",
+        "method": null,
+        "pointer": "/metrics/30/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-d26eb8e1a3e3d43af8d9a0",
+        "label": "2023-12-31",
+        "method": null,
+        "pointer": "/series/0/points/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-7c2e60acc97c21a04c0527",
+        "label": "2024-12-31",
+        "method": null,
+        "pointer": "/series/0/points/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ed821d4b4f8474c91e68e6",
+        "label": "2025-12-31",
+        "method": null,
+        "pointer": "/series/0/points/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-d968a4b76c601e21dcf859",
+        "label": "2023-12-31",
+        "method": null,
+        "pointer": "/series/1/points/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-b1d894485602c9b372e0c1",
+        "label": "2024-12-31",
+        "method": null,
+        "pointer": "/series/1/points/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c30edc3e4c581cf18107d0",
+        "label": "2025-12-31",
+        "method": null,
+        "pointer": "/series/1/points/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a152d0cc1395755ac1ab57",
+        "label": "Discount rate assumption",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/discount_rate",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a09379443951ea48cb49b7",
+        "label": "Initial growth assumption",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/high_growth",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-fad6bbe651f92ae95a9b6d",
+        "label": "Terminal growth assumption",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/terminal_growth",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-98cd0cb2d68a14cc6a0e26",
+        "label": "Projection horizon",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/horizon_years",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-09a968cfb0fa139de3c9c9",
+        "label": "Explicit tax-rate override",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/tax_rate",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-2267063ae1374d485417a0",
+        "label": "Bear scenario weight",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/weights/bear",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-70c8deb61f3187bb39ca0a",
+        "label": "Base scenario weight",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/weights/base",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-23fbeb5423a49528391ef3",
+        "label": "Bull scenario weight",
+        "method": null,
+        "pointer": "/analysis_plan/valuation/weights/bull",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-38a453e76d3e072b604718",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/checks/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-41e0c46b20aee5bcce207c",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/checks/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [
+      {
+        "content": {
+          "evidence_refs": [
+            "e-bf60129d4fe6467b66b729"
+          ],
+          "metric_refs": [
+            "revenue-2025"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved annual revenue 2025: EUR 1,000,000,000.00 (2025-12-31)."
+        },
+        "id": "finding-revenue-2025",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-ce8bf2d2ffaf68d1d0376a"
+          ],
+          "metric_refs": [
+            "operating-margin"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved operating margin: 12.00% (2025-12-31)."
+        },
+        "id": "finding-operating-margin",
+        "kind": "observed_fact",
+        "visibility": "main"
+      },
+      {
+        "content": {
+          "evidence_refs": [
+            "e-d9cf229a282cb818f36336"
+          ],
+          "metric_refs": [
+            "revenue-yoy"
+          ],
+          "review_refs": [],
+          "template_id": "metric-observation-v1",
+          "text": "Saved revenue growth: 11.11% (2025-12-31)."
+        },
+        "id": "finding-revenue-yoy",
+        "kind": "observed_fact",
+        "visibility": "main"
+      }
+    ],
+    "glossary": [
+      {
+        "definition": "Model value divided by the dated supplied quote, minus one. It is not an expected return.",
+        "term": "Conditional model-value gap"
+      },
+      {
+        "definition": "Explicit analyst assumptions; they are not measured probabilities.",
+        "term": "Scenario weights"
+      },
+      {
+        "definition": "Supplied structured observations. No provider retrieval or language-model inference was performed.",
+        "term": "Local inputs"
+      }
+    ],
+    "identity": {
+      "entity": "Northstar Components \u00b7 fictional",
+      "period_end": "2025-12-31",
+      "period_label": "2025-12-31",
+      "prepared_at": "2026-11-03T21:16:19.120422+00:00",
+      "source_run_id": "result-34119f8815124c51a8dd891639af5df0",
+      "ticker": "NSTAR",
+      "title": "Company analysis \u00b7 Northstar Components \u00b7 fictional"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-5788cd03709121e4da19ab"
+        ],
+        "id": "revenue-2023",
+        "label": "Annual revenue 2023",
+        "period_label": "2023-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "800000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a82fa2f5468aad6be1c192"
+        ],
+        "id": "net-margin-2023",
+        "label": "Annual net margin 2023",
+        "period_label": "2023-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.075",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-3a23197371941660bda550"
+        ],
+        "id": "revenue-2024",
+        "label": "Annual revenue 2024",
+        "period_label": "2024-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "900000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-64a965971f88a28dced484"
+        ],
+        "id": "net-margin-2024",
+        "label": "Annual net margin 2024",
+        "period_label": "2024-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.075",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-bf60129d4fe6467b66b729"
+        ],
+        "id": "revenue-2025",
+        "label": "Annual revenue 2025",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1000000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c5a7506603bf43072cb4a6"
+        ],
+        "id": "net-margin-2025",
+        "label": "Annual net margin 2025",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.075",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-4fee68529fdbfd09e81d99"
+        ],
+        "id": "operating-income",
+        "label": "Operating income",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "120000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-591cacd50a9392b8d642d4"
+        ],
+        "id": "net-income",
+        "label": "Attributable ordinary net income",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "75000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-db1c3bd3e1c9dff526a505"
+        ],
+        "id": "total-debt",
+        "label": "Period-end debt including leases",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "200000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-a171f7e9db118801f119c7"
+        ],
+        "id": "cash-and-equivalents",
+        "label": "Period-end unrestricted cash",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "100000000",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-622d8525e866ac28de0961"
+        ],
+        "id": "gross-margin",
+        "label": "Gross margin",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.3",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-ce8bf2d2ffaf68d1d0376a"
+        ],
+        "id": "operating-margin",
+        "label": "Operating margin",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.12",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-d9cf229a282cb818f36336"
+        ],
+        "id": "revenue-yoy",
+        "label": "Revenue growth",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.1111",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c49db5147efcea1bf0eeb6"
+        ],
+        "id": "revenue-cagr",
+        "label": "Revenue CAGR 2023-12-31 / 2025-12-31",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.1180339887498948",
+        "visibility": "main"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-e0cf12ca21dac1b724d0e9"
+        ],
+        "id": "annual-pe",
+        "label": "Dated quote / annual earnings",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "10.6667",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c587a17caac955a9235f9a"
+        ],
+        "id": "ev-operating-income",
+        "label": "Dated EV / annual operating income",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "multiple",
+        "value": "7.5",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-a6b90307d1835764659a2b"
+        ],
+        "id": "base-fcff",
+        "label": "Base FCFF",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "80000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-a92393181b67c999c479ef"
+        ],
+        "id": "bear-ev",
+        "label": "Enterprise value \u00b7 bear",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1060000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-1e150f680effe1acd79590"
+        ],
+        "id": "bear-equity",
+        "label": "Equity value \u00b7 bear",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "960000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-cf777f4f08dd1d955b771e"
+        ],
+        "id": "bear-per-share",
+        "label": "Equity value per share \u00b7 bear",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency_per_share",
+        "value": "96.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-45d6aa9cdb4caad7f7bc89"
+        ],
+        "id": "bear-terminal-concentration",
+        "label": "Terminal-value concentration \u00b7 bear",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.9273",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-5c5925f88317af4d1d3b4c"
+        ],
+        "id": "base-ev",
+        "label": "Enterprise value \u00b7 base",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1100000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-7c79f6de48701ab6ab80f7"
+        ],
+        "id": "base-equity",
+        "label": "Equity value \u00b7 base",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1000000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-ffa937f019046f7f79bc04"
+        ],
+        "id": "base-per-share",
+        "label": "Equity value per share \u00b7 base",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency_per_share",
+        "value": "100.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-ba3680ed3b984c35fc46c6"
+        ],
+        "id": "base-terminal-concentration",
+        "label": "Terminal-value concentration \u00b7 base",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.9273",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-9e78d15441c51470952dd1"
+        ],
+        "id": "bull-ev",
+        "label": "Enterprise value \u00b7 bull",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1140000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-bdc4967dff8e2a9cf09e1c"
+        ],
+        "id": "bull-equity",
+        "label": "Equity value \u00b7 bull",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency",
+        "value": "1040000000.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-60571f546e2364cad50d50"
+        ],
+        "id": "bull-per-share",
+        "label": "Equity value per share \u00b7 bull",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency_per_share",
+        "value": "104.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-59f0e1e96a04e13547c7f0"
+        ],
+        "id": "bull-terminal-concentration",
+        "label": "Terminal-value concentration \u00b7 bull",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.9273",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": "EUR",
+        "evidence_refs": [
+          "e-ed48f7836c9875aa71e6f8"
+        ],
+        "id": "weighted-per-share",
+        "label": "Scenario-weighted equity value per share",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "currency_per_share",
+        "value": "100.0",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": "2026-11-02",
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-65d5a6f7e798a91ee337fe"
+        ],
+        "id": "model-value-gap",
+        "label": "Conditional model-value gap",
+        "period_label": "2025-12-31",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.25",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a152d0cc1395755ac1ab57"
+        ],
+        "id": "assumption-discount-rate",
+        "label": "Discount rate assumption",
+        "period_label": "Selected model assumption",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a09379443951ea48cb49b7"
+        ],
+        "id": "assumption-high-growth",
+        "label": "Initial growth assumption",
+        "period_label": "Selected model assumption",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-fad6bbe651f92ae95a9b6d"
+        ],
+        "id": "assumption-terminal-growth",
+        "label": "Terminal growth assumption",
+        "period_label": "Selected model assumption",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.02",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-98cd0cb2d68a14cc6a0e26"
+        ],
+        "id": "assumption-horizon-years",
+        "label": "Projection horizon",
+        "period_label": "Selected model assumption",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "1",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-09a968cfb0fa139de3c9c9"
+        ],
+        "id": "assumption-tax-rate",
+        "label": "Explicit tax-rate override",
+        "period_label": "Selected model assumption",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.25",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-2267063ae1374d485417a0"
+        ],
+        "id": "weight-bear",
+        "label": "Bear scenario weight",
+        "period_label": "Assigned weight; not probability",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.25",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-70c8deb61f3187bb39ca0a"
+        ],
+        "id": "weight-base",
+        "label": "Base scenario weight",
+        "period_label": "Assigned weight; not probability",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.50",
+        "visibility": "supporting"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-23fbeb5423a49528391ef3"
+        ],
+        "id": "weight-bull",
+        "label": "Bull scenario weight",
+        "period_label": "Assigned weight; not probability",
+        "reason_codes": [],
+        "unit": "fraction",
+        "value": "0.25",
+        "visibility": "supporting"
+      }
+    ],
+    "report_id": "report-102e17cdf65edb7b5ce96163",
+    "review_items": [
+      {
+        "action": "Inspect the retained input contract, source evidence and all financial review requirements.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-ea1d0f795f4fabbb024302"
+        ],
+        "explanation": "Source-use permission and matching files do not establish financial accuracy, authenticity or approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "summary",
+          "performance",
+          "valuation",
+          "peers",
+          "market",
+          "consensus",
+          "external-research",
+          "evidence"
+        ],
+        "source_check_refs": [
+          "policy:input-contract/af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793"
+        ],
+        "title": "Imported evidence requires review"
+      },
+      {
+        "action": "Inspect the linked calculation and original input before relying on this section.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-38a453e76d3e072b604718"
+        ],
+        "explanation": "Supplied local observations require financial review. Matching files do not establish source authenticity.",
+        "id": "review-00387a1212b6a1a254b6",
+        "impact": "section_restriction",
+        "section_refs": [
+          "summary",
+          "performance",
+          "valuation",
+          "peers",
+          "market",
+          "consensus",
+          "external-research",
+          "evidence"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/checks/0"
+        ],
+        "title": "Synthetic evidence"
+      },
+      {
+        "action": "Inspect the linked calculation and original input before relying on this section.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-41e0c46b20aee5bcce207c"
+        ],
+        "explanation": "Source publication/retrieval instants are unknown. Processing time is not an observation date.",
+        "id": "review-5d2aae8a0aabdf6a1eae",
+        "impact": "section_restriction",
+        "section_refs": [
+          "evidence"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/checks/1"
+        ],
+        "title": "Source dates unknown"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [
+          "finding-revenue-2025",
+          "finding-operating-margin",
+          "finding-revenue-yoy"
+        ],
+        "id": "summary",
+        "metric_refs": [
+          "revenue-2025",
+          "operating-margin",
+          "revenue-yoy"
+        ],
+        "purpose": "Calculated from the exact selected local input. Review source dates, scope and assumptions.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "At a glance"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "revenue-history",
+          "net-margin-history"
+        ],
+        "finding_refs": [],
+        "id": "performance",
+        "metric_refs": [
+          "revenue-2023",
+          "net-margin-2023",
+          "revenue-2024",
+          "net-margin-2024",
+          "revenue-2025",
+          "net-margin-2025",
+          "operating-income",
+          "net-income",
+          "total-debt",
+          "cash-and-equivalents",
+          "gross-margin",
+          "operating-margin",
+          "revenue-yoy",
+          "revenue-cagr",
+          "annual-pe",
+          "ev-operating-income"
+        ],
+        "purpose": "Calculated from the exact selected local input. Review source dates, scope and assumptions.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "Financial performance"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "conditional-scenarios"
+        ],
+        "finding_refs": [],
+        "id": "valuation",
+        "metric_refs": [
+          "base-fcff",
+          "bear-ev",
+          "bear-equity",
+          "bear-per-share",
+          "bear-terminal-concentration",
+          "base-ev",
+          "base-equity",
+          "base-per-share",
+          "base-terminal-concentration",
+          "bull-ev",
+          "bull-equity",
+          "bull-per-share",
+          "bull-terminal-concentration",
+          "weighted-per-share",
+          "model-value-gap"
+        ],
+        "purpose": "Calculated from the exact selected local input. Review source dates, scope and assumptions.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [
+          "assumptions",
+          "equity-bridge"
+        ],
+        "title": "Conditional valuation"
+      },
+      {
+        "availability": "unavailable",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "peers",
+        "metric_refs": [],
+        "purpose": "unsupported input group",
+        "reason_codes": [
+          "unsupported_input_group"
+        ],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "Peer comparison"
+      },
+      {
+        "availability": "unavailable",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "market",
+        "metric_refs": [],
+        "purpose": "unsupported input group",
+        "reason_codes": [
+          "unsupported_input_group"
+        ],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "Market price history"
+      },
+      {
+        "availability": "unavailable",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "consensus",
+        "metric_refs": [],
+        "purpose": "unsupported input group",
+        "reason_codes": [
+          "unsupported_input_group"
+        ],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "External analyst estimates"
+      },
+      {
+        "availability": "unavailable",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "external-research",
+        "metric_refs": [],
+        "purpose": "unsupported input group",
+        "reason_codes": [
+          "unsupported_input_group"
+        ],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6"
+        ],
+        "table_refs": [],
+        "title": "Broker research"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "evidence",
+        "metric_refs": [],
+        "purpose": "Calculated from the exact selected local input. Review source dates, scope and assumptions.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-00387a1212b6a1a254b6",
+          "review-5d2aae8a0aabdf6a1eae"
+        ],
+        "table_refs": [],
+        "title": "Evidence and method"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Each metric retains its own statement/quote date. Source authenticity has not been independently established.",
+        "id": "saved-source",
+        "label": "Calculated from supplied local evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "completed",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-00387a1212b6a1a254b6",
+        "review-5d2aae8a0aabdf6a1eae"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-ea1d0f795f4fabbb024302"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-00387a1212b6a1a254b6",
+        "review-5d2aae8a0aabdf6a1eae"
+      ],
+      "template_id": "local-research-summary-v1",
+      "text": "Company analysis calculated from supplied local evidence for Northstar Components \u00b7 fictional. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "parameter",
+            "label": "Parameter"
+          },
+          {
+            "id": "value",
+            "label": "Selected value"
+          }
+        ],
+        "id": "assumptions",
+        "review_refs": [
+          "review-00387a1212b6a1a254b6",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Discount rate assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "assumption-discount-rate"
+              }
+            ],
+            "evidence_refs": [
+              "e-a152d0cc1395755ac1ab57"
+            ],
+            "id": "assumption-discount-rate"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Initial growth assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "assumption-high-growth"
+              }
+            ],
+            "evidence_refs": [
+              "e-a09379443951ea48cb49b7"
+            ],
+            "id": "assumption-high-growth"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Terminal growth assumption"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "assumption-terminal-growth"
+              }
+            ],
+            "evidence_refs": [
+              "e-fad6bbe651f92ae95a9b6d"
+            ],
+            "id": "assumption-terminal-growth"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Projection horizon"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "assumption-horizon-years"
+              }
+            ],
+            "evidence_refs": [
+              "e-98cd0cb2d68a14cc6a0e26"
+            ],
+            "id": "assumption-horizon-years"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Explicit tax-rate override"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "assumption-tax-rate"
+              }
+            ],
+            "evidence_refs": [
+              "e-09a968cfb0fa139de3c9c9"
+            ],
+            "id": "assumption-tax-rate"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Bear scenario weight"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "weight-bear"
+              }
+            ],
+            "evidence_refs": [
+              "e-2267063ae1374d485417a0"
+            ],
+            "id": "weight-bear"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Base scenario weight"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "weight-base"
+              }
+            ],
+            "evidence_refs": [
+              "e-70c8deb61f3187bb39ca0a"
+            ],
+            "id": "weight-base"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "parameter",
+                "kind": "text",
+                "text": "Bull scenario weight"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "weight-bull"
+              }
+            ],
+            "evidence_refs": [
+              "e-23fbeb5423a49528391ef3"
+            ],
+            "id": "weight-bull"
+          }
+        ],
+        "title": "Selected valuation assumptions"
+      },
+      {
+        "columns": [
+          {
+            "id": "measure",
+            "label": "Measure"
+          },
+          {
+            "id": "value",
+            "label": "Retained amount"
+          }
+        ],
+        "id": "equity-bridge",
+        "review_refs": [
+          "review-00387a1212b6a1a254b6",
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Enterprise value \u00b7 bear"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "bear-ev"
+              }
+            ],
+            "evidence_refs": [
+              "e-a92393181b67c999c479ef"
+            ],
+            "id": "bridge-bear-ev"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Enterprise value \u00b7 base"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "base-ev"
+              }
+            ],
+            "evidence_refs": [
+              "e-5c5925f88317af4d1d3b4c"
+            ],
+            "id": "bridge-base-ev"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Enterprise value \u00b7 bull"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "bull-ev"
+              }
+            ],
+            "evidence_refs": [
+              "e-9e78d15441c51470952dd1"
+            ],
+            "id": "bridge-bull-ev"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Period-end debt including leases"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "total-debt"
+              }
+            ],
+            "evidence_refs": [
+              "e-db1c3bd3e1c9dff526a505"
+            ],
+            "id": "bridge-total-debt"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Period-end unrestricted cash"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "cash-and-equivalents"
+              }
+            ],
+            "evidence_refs": [
+              "e-a171f7e9db118801f119c7"
+            ],
+            "id": "bridge-cash-and-equivalents"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Equity value \u00b7 bear"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "bear-equity"
+              }
+            ],
+            "evidence_refs": [
+              "e-1e150f680effe1acd79590"
+            ],
+            "id": "bridge-bear-equity"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Equity value \u00b7 base"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "base-equity"
+              }
+            ],
+            "evidence_refs": [
+              "e-7c79f6de48701ab6ab80f7"
+            ],
+            "id": "bridge-base-equity"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "measure",
+                "kind": "text",
+                "text": "Equity value \u00b7 bull"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "bull-equity"
+              }
+            ],
+            "evidence_refs": [
+              "e-bdc4967dff8e2a9cf09e1c"
+            ],
+            "id": "bridge-bull-equity"
+          }
+        ],
+        "title": "Enterprise to equity bridge"
+      }
+    ],
+    "workflow": "research"
+  },
+  "job": {
+    "schema_version": 3,
+    "job_id": "job-34119f8815124c51a8dd891639af5df0",
+    "operation_id": "web-34119f8815124c51a8dd891639af5df0",
+    "request": {
+      "schema_version": 3,
+      "workflow": "research",
+      "source": {
+        "kind": "dataset_version",
+        "dataset_id": "dataset-3c937f111e01489485263166adf77148",
+        "version_id": "version-2dac8d9e8827430ea72b55b9ddac6497",
+        "contract_sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793"
+      },
+      "timeout_seconds": 120,
+      "analysis_plan": {
+        "annual_trends": true,
+        "financial_summary": true,
+        "quote_metrics": "if_eligible",
+        "schema_version": 1,
+        "valuation": {
+          "discount_rate": "0.1",
+          "high_growth": "0.1",
+          "horizon_years": 1,
+          "method": "fcff-linear-fade/1",
+          "rationale": "Fictional independent one-year arithmetic benchmark. These are not investment recommendations.",
+          "scenario_deltas": {
+            "base": "0",
+            "bear": "-0.04",
+            "bull": "0.04"
+          },
+          "tax_basis": "explicit_rate",
+          "tax_rate": "0.25",
+          "terminal_growth": "0.02",
+          "weights": {
+            "base": "0.50",
+            "bear": "0.25",
+            "bull": "0.25"
+          }
+        }
+      },
+      "assumption_review": {
+        "acknowledged": true,
+        "analysis_plan_sha256": "ce55b2da0f247388cade2316e5a97bf6a1cfc22f1c45c80a6cc6c3116f166fee",
+        "source_reference_sha256": "5d401412daa82af18583603f63a0579da323311f9af2cacee597f5b29e222e32"
+      }
+    },
+    "request_sha256": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7",
+    "created_at": "2026-11-03T21:16:18.204402+00:00",
+    "profile": "calculate-local-research",
+    "profile_version": 1,
+    "status": "review_required",
+    "source": {
+      "workspace_id": "workspace-53d224fb05df41af98fb4ee2356745de",
+      "dataset_id": "dataset-3c937f111e01489485263166adf77148",
+      "version_id": "version-2dac8d9e8827430ea72b55b9ddac6497",
+      "contract_sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+      "payload_sha256": "e66249a700d0534873e5bacccf750589acbe9279fe184888cf625ed88bca0e69",
+      "receipt_sha256": "125927557c86208546b18f833317920981219c8faf2ce6f67a682040edd90eea",
+      "entity_sha256": "7a2349f41cab999fc3c6fd95b1c72df9837c07930ede45dae6eb9d0da2d34305",
+      "policy_sha256": "4e79dad3f1994645b9df5c5808d41f3ff20a8541034e5ed934a661daa08d8922",
+      "classification": "synthetic"
+    },
+    "input_validation": "matched_at_admission",
+    "worker_enabled": true,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "financial_approval": false,
+    "max_requests": 0,
+    "max_output_tokens": 0,
+    "evaluated_on": "2026-11-03",
+    "admission_readiness_sha256": "ff4d7492f7616294346dc8d1d7805de8b9c28cb27ecbc914d14980fdfbb26e72",
+    "producer_sha256": "2b030182437400e3742fe14c5720bee38271a248f137e213e6347c49fc2b7c51",
+    "execution": {
+      "schema_version": 3,
+      "status": "review_required",
+      "attempt": 1,
+      "started_at": "2026-11-03T21:16:18.464382+00:00",
+      "inputs_verified_at": "2026-11-03T21:16:18.596372+00:00",
+      "finished_at": "2026-11-03T21:16:19.565633+00:00",
+      "operation_status": "review_required",
+      "reason": "registered",
+      "result": {
+        "run_id": "result-34119f8815124c51a8dd891639af5df0",
+        "manifest_sha256": "96c8c5261e0f22b304ca910204ba24271e2fcf3fd891bd392f6d942a48d447a6",
+        "run_sha256": "d8025bb3522c2dc17c95eff579973e62b8856b99537d4ae40c1c79506c6e2db3",
+        "operation_receipt_sha256": "d443a8e555d248499132dea2c4ef44a4045770549342f379afd94a24fd375c6b"
+      },
+      "analysis_commit_sha256": "ce2425e836ff5e34bdce32cae9b0899530875e3639e0a6d157371bedb48c28b3"
+    },
+    "restoration_hold": false,
+    "admission_schema_version": 3,
+    "recovery_required": false,
+    "result_url": "#/runs/result-34119f8815124c51a8dd891639af5df0"
+  }
+}

@@ -47,7 +47,7 @@ class JobExecution(Record):
                 or self.status in {'queued', 'running'} and self.finished_at is not None
                 or self.status in {'completed', 'review_required', 'delivery_failed'} and
                     (self.result is None or self.operation_status not in {'completed', 'review_required'} and
-                     not (self.schema_version == 2 and getattr(self,'accounting_commit_sha256',None)
+                     not (self.schema_version in {2,3} and (getattr(self,'accounting_commit_sha256',None) or getattr(self,'analysis_commit_sha256',None))
                           and self.reason == 'recovered' and self.operation_status in {'failed_inspect_state','outcome_unknown'}))
                 or self.result is not None and self.inputs_verified_at is None):
             raise ValueError('Execution phase disagrees.')
@@ -65,12 +65,26 @@ class CloseExecution(JobExecution):
         return self
 
 
+class LocalResearchExecution(JobExecution):
+    schema_version: Literal[3] = 3
+    analysis_commit_sha256: str | None = Field(default=None,pattern=r'^[a-f0-9]{64}$')
+
+    @model_validator(mode='after')
+    def committed_result(self):
+        if self.status in {'completed','review_required','delivery_failed'} and self.analysis_commit_sha256 is None:
+            raise ValueError('Local research delivery requires analytical commit evidence')
+        return self
+
+
 def parse_execution(raw):
-    return (CloseExecution if raw.get('schema_version') == 2 else JobExecution).model_validate(raw)
+    if not isinstance(raw,dict) or type(raw.get('schema_version')) is not int:raise ValueError('Execution version required')
+    model={1:JobExecution,2:CloseExecution,3:LocalResearchExecution}.get(raw['schema_version'])
+    if model is None:raise ValueError('Unsupported execution version')
+    return model.model_validate(raw)
 
 
 def initial_execution(record):
-    return CloseExecution() if record.schema_version == 3 else JobExecution()
+    return LocalResearchExecution() if record.schema_version==4 else CloseExecution() if record.schema_version == 3 else JobExecution()
 
 
 def claimed(record):

@@ -1,0 +1,42 @@
+{
+  "schema_version": 3,
+  "workflow": "research",
+  "source": {
+    "kind": "dataset_version",
+    "dataset_id": "dataset-northstar",
+    "version_id": "version-missing-cash-example",
+    "contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "analysis_plan": {
+    "schema_version": 1,
+    "financial_summary": true,
+    "annual_trends": true,
+    "quote_metrics": "if_eligible",
+    "valuation": {
+      "method": "fcff-linear-fade/1",
+      "horizon_years": 1,
+      "discount_rate": "0.1",
+      "terminal_growth": "0.02",
+      "high_growth": "0.1",
+      "scenario_deltas": {
+        "bear": "-0.04",
+        "base": "0",
+        "bull": "0.04"
+      },
+      "weights": {
+        "bear": "0.25",
+        "base": "0.5",
+        "bull": "0.25"
+      },
+      "tax_basis": "explicit_rate",
+      "tax_rate": "0.25",
+      "rationale": "Fictional one-year arithmetic benchmark; not company investment assumptions."
+    }
+  },
+  "assumption_review": {
+    "acknowledged": true,
+    "source_reference_sha256": "a93d4f270a6a50ff6ef8fcd9032cd90f213d1c5cae01f6003f3c8bab6a71f0d4",
+    "analysis_plan_sha256": "51fd84a8f16736b24e09de3fffad74c565ad34788d0bc39ede77f5d7f25959c4"
+  },
+  "timeout_seconds": 120
+}

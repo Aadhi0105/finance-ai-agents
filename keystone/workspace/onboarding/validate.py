@@ -165,6 +165,10 @@ def validate(folder):
     payload=c.canonical(value['payload'])
     if c.sha(payload)!=descriptor['payload_sha256']: raise c.InputError()
     write_new(folder/'payload.json',payload)
+    if value['payload_format'] == c.FRESH_RESEARCH:
+        from .research.receipt import validate_import
+        validate_import(value,context,folder)
+        return
     fresh = value['payload_format'] == c.FRESH_CLOSE
     if fresh:
         description = validate_close_request(value, context, folder)

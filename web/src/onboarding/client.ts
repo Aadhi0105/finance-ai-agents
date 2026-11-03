@@ -1,6 +1,8 @@
 import { InputFailure, safeError, responseError, obj, id, list, parseCapabilities, parseWorkspace, parseEntity, parseDataset, parsePage, parseVersion, parsePreview, parseReceipt, parseJob, jobRequest } from './data.ts';
 import type { Capabilities, Entity, Dataset, Version, Preview, Receipt, PrivateJob, JobRequest, Page } from './data.ts';
 
+export function canonicalLocal(v:unknown):string {if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonicalLocal).join(',')+']';return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonicalLocal((v as Record<string,unknown>)[k])).join(',')+'}';}
+
 type Workspace=ReturnType<typeof parseWorkspace>;
 type PendingImport={preview:Preview;file:Blob;key:string;id:string|null;workspaceId:string};
 type PendingJob={request:JobRequest;key:string;workspaceId:string};
@@ -84,7 +86,7 @@ export class PrivateClient {
   async receipt(ident:string){const r=parseReceipt(await this.read('/api/imports/'+id(ident)));if(r.id!==ident)throw new InputFailure('unsupported_response');return r;}
   async inspect(dataset:Dataset,file:File):Promise<Preview>{
     if(!this.state.caps?.imports)throw new InputFailure('input_disabled');
-    if(this.importing||!file.name.toLowerCase().endsWith('.json')||file.size<1||file.size>20_000_000)throw new InputFailure(this.importing?'input_busy':'input_too_large');
+    if(this.importing||!file.name.toLowerCase().endsWith('.json')||file.size<1||file.size>(dataset.payload_format==='agent1.financial-kit/1'?1_000_000:20_000_000))throw new InputFailure(this.importing?'input_busy':'input_too_large');
     const epoch=this.epoch;
     // The server computes Python's exact canonical payload hash. Browsers never
     // reinterpret integers/floats or rewrite the submitted JSON package.
@@ -122,14 +124,14 @@ export class PrivateClient {
   }
   async jobs(before:string|null=null):Promise<Page<PrivateJob>>{const r=obj(await this.read('/api/jobs?limit=25'+(before?'&before='+id(before):'')));return {items:list(r.jobs,25).map(v=>parseJob(v,this.state.workspace!.id)),next:r.next_cursor===null?null:id(r.next_cursor)};}
   async job(ident:string){const r=obj(await this.read('/api/jobs/'+id(ident))),job=parseJob(r.job,this.state.workspace!.id);if(job.id!==ident)throw new InputFailure('unsupported_response');return {job,events:list(r.events,50).map(x=>{const e=obj(x);return {event:String(e.event).slice(0,80),created_at:String(e.created_at).slice(0,80)};})};}
-  async submit(version?:Version,timeout=600):Promise<PrivateJob|null>{
+  async submit(version?:Version,timeout=600,selection?:{analysis_plan:Record<string,unknown>;reviewed:boolean}):Promise<PrivateJob|null>{
     if(!this.state.connected||!this.state.caps?.jobs||this.state.jobState==='sending'||this.preparing)return null;
-    if(!this.submitting){if(!version)return null;const epoch=this.epoch;this.preparing=true;this.update({jobState:'sending',jobError:''});try{const checked=await this.version(version.dataset_id,version.id);if(epoch!==this.epoch)return null;if(checked.contract_sha256!==version.contract_sha256)throw new InputFailure('input_conflict');this.submitting={request:jobRequest(checked,timeout),key:this.key(),workspaceId:this.state.workspace!.id};}catch(e){if(epoch===this.epoch)this.update({jobState:'idle',jobError:safeError(e).message});throw safeError(e);}finally{this.preparing=false;}}
+    if(!this.submitting){if(!version)return null;const epoch=this.epoch;this.preparing=true;this.update({jobState:'sending',jobError:''});try{const checked=await this.version(version.dataset_id,version.id);if(epoch!==this.epoch)return null;if(checked.contract_sha256!==version.contract_sha256)throw new InputFailure('input_conflict');let request:JobRequest;if(checked.metadata.payload_format==='agent1.financial-kit/1'){if(!selection||!Number.isInteger(timeout)||timeout<1||timeout>120||selection.analysis_plan.valuation&&!selection.reviewed)throw new InputFailure('input_invalid',true);const source={kind:'dataset_version' as const,dataset_id:checked.dataset_id,version_id:checked.id,contract_sha256:checked.contract_sha256};const hash=async(v:unknown)=>this.hash(new TextEncoder().encode(canonicalLocal(v)).buffer as ArrayBuffer);request={schema_version:3,workflow:'research',source,analysis_plan:selection.analysis_plan,assumption_review:selection.analysis_plan.valuation?{acknowledged:true,source_reference_sha256:await hash(source),analysis_plan_sha256:await hash(selection.analysis_plan)}:null,timeout_seconds:timeout};}else request=jobRequest(checked,timeout);this.submitting={request,key:this.key(),workspaceId:this.state.workspace!.id};}catch(e){if(epoch===this.epoch)this.update({jobState:'idle',jobError:safeError(e).message});throw safeError(e);}finally{this.preparing=false;}}
     else if(version)throw new InputFailure('input_conflict');
     const pending=this.submitting,epoch=this.epoch,wasUnconfirmed=this.state.jobState==='unconfirmed';if(pending.workspaceId!==this.state.workspace?.id)throw new InputFailure('input_conflict');
     this.update({jobState:'sending',jobError:''});
     try{const r=obj(await this.post('/api/jobs',pending.request,pending.key));if(typeof r.replayed!=='boolean')throw new InputFailure('unsupported_response');const job=parseJob(r.job,pending.workspaceId);
-      if(JSON.stringify(job.request)!==JSON.stringify(pending.request))throw new InputFailure('unsupported_response');
+      if(canonicalLocal(job.request)!==canonicalLocal(pending.request))throw new InputFailure('unsupported_response');
       if(epoch!==this.epoch)throw new InputFailure();this.submitting=null;this.update({jobState:'idle',jobError:''});return job;
     }catch(e){const error=safeError(e);this.update({jobState:error.refused&&!wasUnconfirmed?'refused':'unconfirmed',jobError:error.message});return null;}
   }
