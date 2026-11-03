@@ -21,6 +21,9 @@ def deny_network(*args, **kwargs):
 
 def render(folder):
     record = read_job(folder)
+    if record.schema_version in {2, 3}:
+        from .onboarding.execution import render as render_dataset
+        return render_dataset(folder,record)
     catalog = Catalog(folder / 'inputs')
     source_manifest, source_run = matching_source(catalog, record)
     commit = subprocess.run(['git','rev-parse','HEAD'], cwd=ROOT, capture_output=True, text=True, timeout=5, check=True)

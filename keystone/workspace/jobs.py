@@ -94,7 +94,7 @@ class Admission:
                 or headers.get('origin') not in (None, self.origin)
                 or len(headers.getlist('sec-fetch-site')) > 1
                 or headers.get('sec-fetch-site') not in (None, 'same-origin', 'none')
-                or request.method == 'POST' and (headers.get('origin') != self.origin
+                or request.method in {'POST','PUT','PATCH','DELETE'} and (headers.get('origin') != self.origin
                     or headers.get('sec-fetch-site') not in (None, 'same-origin'))):
             raise JobError('job_origin_refused', 403)
         if (self.token is None or len(headers.getlist('authorization')) != 1

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
+import { PrivateWorkspace } from './onboarding/PrivateWorkspace';
 
 import type { Artifact, Run, Workspace } from './workspace-types';
 import { Icon, type IconName } from './icons';
@@ -202,4 +203,10 @@ function EvidenceLibrary({ runs }: { runs: Run[] }) {
   return <><div className="page-heading"><div><p className="eyebrow">THE SOURCE BEHIND THE RESULT</p><h1>Evidence, within reach.</h1><p>{count} registered artifacts across {runs.length} saved reports. Original evidence remains separate from interpretation.</p></div></div><div className="evidence-grid">{runs.map(run => <a className="panel evidence-card" key={run.id} href={runHref(run)}><WorkflowIcon run={run} /><span className="eyebrow">{workflowName[run.workflow]}</span><h2>{run.title}</h2><p>{run.entity}</p><div><span>{run.artifacts.length} registered files</span><Icon name="arrow" size={18} /></div></a>)}</div><div className="evidence-note"><Icon name="info" /><p>Files are checked against the saved inventory before delivery. Matching hashes do not authenticate an issuer, approve financial conclusions or replace an independent backup.</p></div></>;
 }
 
-createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
+function WorkspaceRoot() {
+  const [mode,setMode]=useState<'checking'|'private'|'synthetic'|'error'>('checking');
+  const [connectionAttempt,retryConnection]=useState(0);
+  useEffect(()=>{const c=new AbortController();fetch('/api/execution',{signal:c.signal,cache:'no-store',credentials:'omit',redirect:'error'}).then(async r=>{if(!r.ok)throw new Error();const v=await r.json();if(v.schema_version===2&&v.classification==='private')setMode('private');else if(v.schema_version===1&&v.classification==='synthetic')setMode('synthetic');else throw new Error();}).catch(()=>{if(!c.signal.aborted)setMode('error');});return()=>c.abort();},[connectionAttempt]);
+  return mode==='private'?<PrivateWorkspace/>:mode==='synthetic'?<App/>:<main className="private-loading" role={mode==='error'?'alert':'status'}><h1>Keystone</h1><p>{mode==='error'?'Cannot reach the local workspace. Check the server and reload.':'Connecting to the local workspace…'}</p>{mode==='error'&&<button className="primary-button" onClick={()=>{setMode('checking');retryConnection(n=>n+1);}}>Check connection again</button>}</main>;
+}
+createRoot(document.getElementById('root')!).render(<React.StrictMode><WorkspaceRoot /></React.StrictMode>);

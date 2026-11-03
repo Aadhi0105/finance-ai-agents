@@ -217,7 +217,7 @@ def _diagnostics(b, cases):
     _table(b, 'historical-findings', 'event-spread', 'Saved descriptive sample spread', [('measure', 'Sample description'), ('value', 'Diagnostic value')], rows)
     counts = [metrics[k] for k in ('event-count', 'issuer-count')]
     if all(m['availability'] == 'available' for m in counts):
-        text = f"The saved synthetic study records {counts[0]['value']} historical cases from {counts[1]['value']} issuers. "
+        text = ('The imported saved study' if b.imported else 'The saved synthetic study') + f" records {counts[0]['value']} historical cases from {counts[1]['value']} issuers. "
         if metrics['mean-car']['availability'] == 'available':
             text += f"Its mean accumulated abnormal return is {Decimal(metrics['mean-car']['value']) * 100:,.2f}%, a description of the retained sample. "
         else: text += 'The aggregate mean is withheld. '

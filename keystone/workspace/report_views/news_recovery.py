@@ -16,7 +16,7 @@ def extend(b):
     fields = [('coverage-state', 'Coverage state', 'retrieval_failed'),
               ('cutoff', 'Requested cutoff (not an observation)', get(b.source, pointer + '/request/as_of') or 'Not retained'),
               ('max-age', 'Requested maximum publication age', get(b.source, pointer + '/request/max_age_days', 'Not retained')),
-              ('input-basis', 'Input basis', 'Saved synthetic attempt; coverage not established'),
+              ('input-basis', 'Input basis', 'Imported saved attempt; coverage not established' if b.imported else 'Saved synthetic attempt; coverage not established'),
               ('terminal-reason', 'Saved terminal reason', get(b.source, pointer + '/reason') or 'Not retained')]
     b.table('news-basis', 'Saved incomplete news attempt', [('field', 'Basis'), ('value', 'Saved description')],
         [dict(id=ident, cells=[text_cell('field', label), text_cell('value', value)], evidence_refs=[evidence]) for ident, label, value in fields])
@@ -28,5 +28,5 @@ def extend(b):
         'The saved attempt stopped before retaining an analytical news result. Coverage and document tone cannot be established; this is not a valid empty feed.',
         'Inspect the original terminal status and reason. A new controlled attempt would be separate work.',
         [f'artifact:{b.primary_id}#/record'], [evidence], section_refs=['coverage', 'retained-news', 'tone', 'news-context'], impact='publication_block')
-    b.view['summary'].update(text='The saved synthetic news attempt stopped without an analytical result. Coverage is unavailable and published tone is withheld. No conclusion about the presence or absence of company news is supported.',
+    b.view['summary'].update(text=('The imported saved news attempt' if b.imported else 'The saved synthetic news attempt') + ' stopped without an analytical result. Coverage is unavailable and published tone is withheld. No conclusion about the presence or absence of company news is supported.',
         template_id='news-retrieval-summary-v1', evidence_refs=[evidence])

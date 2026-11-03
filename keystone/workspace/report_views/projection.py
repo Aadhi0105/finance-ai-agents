@@ -11,16 +11,16 @@ def build_view(run, source, series, artifacts):
     check_source(run, source)
     builder = Builder(run, source, series, artifacts, adapter_for(run)[2])
     BUILDERS[run.workflow](builder)
-    if run.workflow == 'close' and adapter_for(run)[1] == '1.1.0':
+    if run.workflow == 'close' and adapter_for(run)[1] in {'1.1.0','2.0.0'}:
         close_context.extend(builder)
-    if run.workflow == 'monitoring' and adapter_for(run)[1] == '1.1.0':
+    if run.workflow == 'monitoring' and adapter_for(run)[1] in {'1.1.0','2.0.0'}:
         monitoring_context.extend(builder)
-    if run.workflow == 'research' and adapter_for(run)[1] == '1.1.0':
+    if run.workflow == 'research' and adapter_for(run)[1] in {'1.1.0','2.0.0'}:
         research_context.extend(builder)
-    if run.workflow == 'events' and adapter_for(run)[1] == '1.1.0':
+    if run.workflow == 'events' and adapter_for(run)[1] in {'1.1.0','2.0.0'}:
         event_context.extend(builder)
     if run.workflow == 'news' and adapter_for(run)[1] == '1.1.0':
         news_context.extend(builder)
-    if run.workflow == 'news' and adapter_for(run)[1] == '1.2.0':
+    if run.workflow == 'news' and adapter_for(run)[1] in {'1.2.0','2.0.0'}:
         news_recovery.extend(builder)
     return builder.finish()

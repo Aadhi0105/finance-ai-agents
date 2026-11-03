@@ -13,7 +13,7 @@ def build(b):
     for i, row in enumerate(signals):
         published = b.metric('published-tone-' + str(i), 'Published tone · ' + str(row.get('entity')),
             f'/record/result/signals/{i}/level', 'score', period=str(row.get('day', b.run.period)),
-            restriction='synthetic_published_tone_withheld')
+            restriction='imported_published_tone_withheld' if b.imported else 'synthetic_published_tone_withheld')
         diagnostic = b.metric('diagnostic-tone-' + str(i), 'Saved diagnostic tone · ' + str(row.get('entity')),
             f'/record/result/signals/{i}/diagnostic_level', 'score', period=str(row.get('day', b.run.period)), visibility='diagnostic')
         tone.extend([published, diagnostic])
@@ -34,7 +34,8 @@ def build(b):
     b.section('tone', 'Text-tone evidence', 'A withheld published level is not neutral, zero or a trading signal.', metrics=tone)
     evidence = b.maybe_evidence('/record/result', 'Original news publication and exclusion evidence')
     b.review('narrative_support', 'Tone and relevance limitations',
-        'Published tone is withheld in this synthetic workspace. Diagnostic tone concerns retained document text, not a verified company-specific investment conclusion.',
+        ('Published tone is withheld for imported saved evidence. ' if b.imported else 'Published tone is withheld in this synthetic workspace. ') +
+        'Diagnostic tone concerns retained document text, not a verified company-specific investment conclusion.',
         'Read scorer restrictions, relevance, duplicates, exclusions and the original publication state.',
         [f'artifact:{b.primary_id}#/record'], [evidence], section_refs=['coverage', 'retained-news', 'tone'])
     b.view['glossary'] = [dict(term='Headline cluster', definition='A heuristic text grouping, not proof of independent stories.'),

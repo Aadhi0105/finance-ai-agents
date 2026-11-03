@@ -14,10 +14,13 @@ ADAPTERS = {
 def adapter_for(run):
     try:
         ident, latest, schema = ADAPTERS[run.workflow]
+        private = getattr(run, 'input_origin', None) is not None
+        if private:
+            latest = '2.0.0'
         registration = getattr(run, 'native_view', None)
         version = registration.adapter_version if registration else latest
-        supported = {'1.0.0', '1.1.0'}
-        if run.workflow == 'news': supported.add('1.2.0')
+        supported = {'2.0.0'} if private else {'1.0.0', '1.1.0'}
+        if run.workflow == 'news' and not private: supported.add('1.2.0')
         if version not in supported:
             raise NativeViewError('unsupported_report_schema')
         return ident, version, schema
@@ -30,23 +33,30 @@ def check_source(run, source):
     if not isinstance(source, dict):
         raise NativeViewError()
     workflow = run.workflow
+    origin = getattr(run, 'input_origin', None)
+    private = origin is not None
     if workflow == 'research':
         if type(source.get('schema_version')) is not int or source['schema_version'] != 2:
             raise NativeViewError('unsupported_report_schema')
         meta = source.get('meta', {})
-        if (not isinstance(meta, dict) or meta.get('mode') != 'offline'
-                or meta.get('data_source') != 'fixture'):
+        pair = (meta.get('mode'), meta.get('data_source')) if isinstance(meta, dict) else None
+        if (pair not in ({('offline','fixture'), ('live','yfinance')} if private else {('offline','fixture')})
+                or pair == ('live','yfinance') and origin.classification == 'synthetic'):
             raise NativeViewError('unsupported_report_schema')
         identities = {meta.get('run_id'), f"{meta.get('ticker')}_{meta.get('run_id')}"}
+        execution = get(source, '/execution/status')
+        if private and execution not in {'completed','held','refused','unavailable','failed'}:
+            execution = 'held'
         if (run.source_run_id not in identities or not isinstance(source.get('analysis'), dict)
-                or get(source, '/execution/status') != run.execution_status):
+                or execution != run.execution_status):
             raise NativeViewError()
     elif workflow == 'monitoring':
         # This older export has no schema_version: recognise this exact family.
         required = {'run': dict, 'current': list, 'reviews': list, 'decisions': list,
                     'cycles': list, 'attempts': list, 'unreadable_audits': int,
                     'exported_at': str}
-        if ('schema_version' in source or source.get('data_mode') != 'bundled_fixtures'
+        if ('schema_version' in source or source.get('data_mode') not in ({'bundled_fixtures','yfinance'} if private else {'bundled_fixtures'})
+                or source.get('data_mode') == 'yfinance' and origin.classification == 'synthetic'
                 or any(type(source.get(k)) is not t for k, t in required.items())):
             raise NativeViewError('unsupported_report_schema')
         if (type(source['run'].get('cycle')) is not int
@@ -76,13 +86,14 @@ def check_source(run, source):
             raise NativeViewError()
         mode = (get(source, '/inputs/assembled_inputs/source', request.get('source'))
                 if workflow == 'events' else request.get('data_mode'))
-        if mode != 'fixture':
+        if mode not in ({'fixture','live'} if private else {'fixture'}) or mode == 'live' and origin.classification == 'synthetic':
             raise NativeViewError('unsupported_report_schema')
     elif workflow == 'close':
         if type(source.get('schema_version')) is not int or source['schema_version'] != 1:
             raise NativeViewError('unsupported_report_schema')
         request = source.get('request') or {}
-        if request.get('data_kind') != 'synthetic':
+        if (request.get('data_kind') not in ({'synthetic','unverified'} if private else {'synthetic'})
+                or request.get('data_kind') == 'unverified' and origin.classification == 'synthetic'):
             raise NativeViewError('unsupported_report_schema')
         if get(source, '/report/full_hierarchy/context/currency') != 'EUR':
             raise NativeViewError('unsupported_report_schema')

@@ -8,7 +8,7 @@ import hashlib
 import os
 from pathlib import Path
 
-from ..catalog import ArtifactV2, Catalog, ManifestV2, RunV2, read_json
+from ..catalog import ArtifactV2, Catalog, ManifestV2, RunV2, RunV3, parse_manifest, read_json
 from .delivery import validate_registration
 from .errors import NativeViewError
 from .projection import build_view
@@ -32,11 +32,12 @@ def register_views(destination, manifest):
     if (destination / 'catalog.json').exists() or (destination / 'catalog.json').is_symlink():
         raise FileExistsError('Native registration requires an unpublished destination.')
     result = manifest.model_dump()
-    result['schema_version'] = 2
+    result['schema_version'] = 3 if manifest.schema_version == 3 else 2
     for raw_run in result['runs']:
         raw_run.pop('native_view', None)
-        run = RunV2.model_validate(raw_run)
-        expected_name = {'research': 'model.json', 'monitoring': 'snapshot.json',
+        model = RunV3 if manifest.schema_version == 3 else RunV2
+        run = model.model_validate(raw_run)
+        expected_name = 'payload.json' if manifest.schema_version == 3 else {'research': 'model.json', 'monitoring': 'snapshot.json',
                          'events': 'bundle.json', 'news': 'bundle.json',
                          'close': run.source_run_id + '.json'}[run.workflow]
         primary = next((a for a in run.artifacts if a.kind == 'evidence' and a.name == expected_name), None)
@@ -54,8 +55,8 @@ def register_views(destination, manifest):
         raw_run['artifacts'] += [series.model_dump(), native.model_dump()]
         raw_run['native_view'] = dict(artifact_id=native.id, view_schema_version=1, adapter_id=adapter,
                                      adapter_version=version, source_artifact_ids=[primary.id, series.id])
-        validate_registration(RunV2.model_validate(raw_run))
-    complete = ManifestV2.model_validate(result)
+        validate_registration(model.model_validate(raw_run))
+    complete = parse_manifest(result)
     catalog = Catalog(destination)
     for run in complete.runs:
         for artifact in run.artifacts:
@@ -86,6 +87,8 @@ def project_workspace(workspace, destination):
         with gate(exclusive=True):
             catalog = Catalog(source_root)
             manifest = catalog.load()
+            if manifest.schema_version == 3:
+                raise ValueError('Private inputs use their authenticated workspace and dataset jobs.')
             raw = manifest.model_dump()
             raw['schema_version'] = 2
             raw['prepared_at'] = datetime.now(timezone.utc).isoformat()

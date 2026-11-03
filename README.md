@@ -225,6 +225,19 @@ failure/recovery acceptance for this local synthetic scope. It fixes orphaned-jo
 delivery recovery, consistent ledger reads, late-response navigation and history-page loading, with
 repeatable HTTP/worker scenarios and a larger browser history rehearsal.
 
+[Webapp Batch 3A](docs/webapp/batch3a-input-contracts.md) specifies controlled data
+onboarding: per-agent input formats, permission and private-read boundaries,
+immutable dataset versions, storage/recovery rules and a pending acceptance
+matrix. [Batch 3B.1](docs/webapp/batch3b1-data-onboarding.md) implements a separate
+private backend: content-scoped operator permission records, protected reads,
+bounded JSON imports, immutable dataset versions and explicit offline v2 jobs for
+the five saved-evidence families. [Batch 3B.2](docs/webapp/batch3b2-fresh-close.md)
+adds fresh EUR budget/actuals close requests, company-specific accounting state,
+predecessor pins and explicit committed-close delivery recovery. [Batch 3C](docs/webapp/batch3c-browser-onboarding.md) adds the protected browser
+connection, company/dataset forms, package inspection/import, version-pinned
+processing requests and classification-aware native readers. Local snapshots cover
+the new input/control files; portable server restart after restore remains 3D work.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

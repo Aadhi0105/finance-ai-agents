@@ -122,7 +122,7 @@ def _coverage(b, items, signals, ingested, excluded):
     fields = [('coverage-state', 'Saved coverage state', ROOT + '/funnel', state),
               ('cutoff', 'Saved cutoff', ROOT + '/as_of', None),
               ('max-age', 'Maximum publication age (days)', ROOT + '/max_age_days', None),
-              ('input-basis', 'Input basis', ROOT + '/data_mode', 'Saved synthetic input; no live retrieval is established'),
+              ('input-basis', 'Input basis', ROOT + '/data_mode', 'Imported saved input; no fresh retrieval' if b.imported else 'Saved synthetic input; no live retrieval is established'),
               ('publication', 'Original publication state', ROOT + '/publication_state', None),
               ('scope', 'Original scope note', ROOT + '/scope_note', None)]
     rows = [dict(id=ident, cells=[text_cell('field', label), text_cell('value', _display(value if value is not None else get(b.source, pointer)))],
@@ -133,7 +133,7 @@ def _coverage(b, items, signals, ingested, excluded):
         [dict(id='exclusion-' + str(i), cells=[text_cell('record', _display(r.get('id') or r.get('evidence_id') or r.get('input_index'))),
             text_cell('stage', _display(r.get('stage'))), text_cell('reason', _display(r.get('reason')))],
             evidence_refs=[b.evidence(ROOT + '/exclusions/' + str(i), 'Original exclusion')]) for i, r in enumerate(excluded)])
-    text = ('The saved synthetic news run retains ' + str(len(items)) + ' headline clusters. ' if consistent and not failed else
+    text = (('The imported saved news run retains ' if b.imported else 'The saved synthetic news run retains ') + str(len(items)) + ' headline clusters. ' if consistent and not failed else
             'Coverage cannot be established from this saved news record. ')
     text += 'Published document tone is withheld. The retained text does not establish company-specific sentiment or a future return.'
     b.view['summary'].update(text=text, template_id='news-study-summary-v1',

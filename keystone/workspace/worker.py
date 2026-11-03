@@ -55,11 +55,21 @@ def run_one(store):
                     status='outcome_unknown' if unknown else 'failed', finished_at=now(),
                     reason='interrupted' if unknown else 'execution_failed', operation_status=op['status'])
                 return True, op.get('termination') == 'cancelled'
+            commit_values = {}
+            if record.schema_version == 3:
+                from .onboarding.close_state import committed, remember
+                from .onboarding.store import InputStore
+                inputs = InputStore(store.workspace.parent)
+                _,proof = committed(inputs,record)
+                commit_values['accounting_commit_sha256'] = remember(inputs,proof)
             result, _, _ = verified_result(store, record)
-            store.update_execution(record.job_id, event='prepared', result=result.model_dump(), operation_status=op['status'])
+            store.update_execution(record.job_id, event='prepared', result=result.model_dump(), operation_status=op['status'],**commit_values)
             publish_result(store, record, result)
             store.update_execution(record.job_id, event='registered', status='review_required',
                 finished_at=now(), reason='registered')
+            if record.schema_version == 3:
+                from .onboarding.close_state import resolve
+                resolve(inputs,record)
             return True, False
         except (KeyboardInterrupt, SystemExit):
             store.update_execution(record.job_id, event='interrupted', status='outcome_unknown',
@@ -96,11 +106,14 @@ def recover_delivery(store, job_id):
             store.update_execution(job_id, event='interrupted', status='outcome_unknown',
                 finished_at=now(), reason='interrupted')
             public = store.get(job_id)['job']
+        record = store.immutable(job_id)
+        if record.schema_version == 3:
+            return recover_close_delivery(store,record,public)
         if public['status'] not in {'delivery_failed','outcome_unknown','completed','review_required'}:
             raise JobError('job_recovery_unavailable', 409)
         record = store.immutable(job_id)
-        from .job_execution import JobExecution
-        old = JobExecution.model_validate(public['execution'])
+        from .job_execution import parse_execution
+        old = parse_execution(public['execution'])
         result, _, saved = verified_result(store, record, old.result)
         publish_result(store, record, result)
         if old.status not in {'completed','review_required'}:
@@ -108,6 +121,61 @@ def recover_delivery(store, job_id):
                 reason='recovered', result=result.model_dump(), operation_status=saved['status'],
                 inputs_verified_at=old.inputs_verified_at or now())
         return store.get(job_id)
+
+
+def recover_close_delivery(store,record,public):
+    """Worker lease and gate are held. Read frozen accounting evidence only."""
+    from .job_execution import parse_execution
+    from .onboarding.store import InputStore
+    from .onboarding import close_state
+    from .onboarding.execution import render
+    from .job_files import read_job
+    import uuid
+    inputs = InputStore(store.workspace.parent)
+    old = parse_execution(public['execution'])
+    if old.status not in {'failed','outcome_unknown','delivery_failed','completed','review_required'}:
+        raise JobError('job_recovery_unavailable',409)
+    folder = store.root/'jobs'/record.job_id
+    if read_job(folder) != record: raise JobError('job_recovery_unavailable',409)
+    # Successful deliveries can be reopened after later closes using their
+    # immutable proof. Interrupted deliveries must first prove an actual commit.
+    if old.status in {'completed','review_required'}:
+        result,_,_ = verified_result(store,record,old.result)
+        publish_result(store,record,result)
+        close_state.resolve(inputs,record)
+        return store.get(record.job_id)
+    saved,proof = close_state.committed(inputs,record,recovery=True)
+    commit_sha = close_state.remember(inputs,proof)
+    from .job_delivery import operation_proof
+    operation_proof(store,record,committed_close=True)
+    try: result,_,op = verified_result(store,record,old.result)
+    except Exception:
+        if old.result is not None: raise
+        # Preserve partial delivery bytes for inspection. Nothing is overwritten.
+        pending = folder/'result'
+        if pending.exists() or pending.is_symlink():
+            private_member(pending,directory=True)
+            os.rename(pending,folder/('held-result-'+uuid.uuid4().hex))
+        render(folder,record,saved_close=(saved,proof))
+        result,_,op = verified_result(store,record)
+    publish_result(store,record,result)
+    store.update_execution(record.job_id,event='recovered',status='review_required',finished_at=now(),
+        reason='recovered',result=result.model_dump(),operation_status=op['status'],
+        inputs_verified_at=old.inputs_verified_at or now(),accounting_commit_sha256=commit_sha)
+    close_state.resolve(inputs,record)
+    return store.get(record.job_id)
+
+
+def release_uncommitted_close(store,job_id):
+    """Explicit operator inspection, never a requeue or financial execution."""
+    from .onboarding.store import InputStore
+    from .onboarding.close_state import resolve
+    with gate():
+        record = store.immutable(job_id); public = store.get(job_id)['job']
+        if record.schema_version != 3 or public['status'] not in {'failed','outcome_unknown','source_changed'}:
+            raise JobError('job_recovery_unavailable',409)
+        resolve(InputStore(store.workspace.parent),record,no_commit=True)
+        return dict(job_id=job_id,status=public['status'],resolution='no_commit_verified',financial_approval=False)
 
 
 def main(argv=None):

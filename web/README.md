@@ -9,6 +9,20 @@ and result navigation. Uploads, corrections and financial approvals are absent.
 [Batch 2D](../docs/webapp/batch2d-execution-acceptance.md) validates failure/recovery
 flows and larger histories, with guards against late navigation and stale page rows.
 
+[Webapp Batch 3A](../docs/webapp/batch3a-input-contracts.md) is the design for data
+onboarding and workspace/input versions. It defines the initial JSON contracts,
+permission preflight, protected private reads, later interface flow and acceptance
+criteria. [3B.1](../docs/webapp/batch3b1-data-onboarding.md) implements its private
+backend and protected saved-input jobs. The frontend serves both the existing synthetic workspaces and the protected
+private interface. [3C](../docs/webapp/batch3c-browser-onboarding.md) adds local
+connection, company/dataset management, package review/import, immutable-version
+execution and classification-aware native readers. Private records require access;
+the public shell contains no company metadata.
+
+[3B.2](../docs/webapp/batch3b2-fresh-close.md) adds the fresh-close backend with
+exact-cent validation, fixed per-company accounting state and delivery-only
+recovery of committed calculations. Its input selection and version pages are implemented in 3C.
+
 Agent 1 uses native summary, financial analysis, valuation, peer and dated market
 sections through the registered report-view API. Consensus and broker research
 have separate availability. Agent 3 historical events/company news, Agent 2

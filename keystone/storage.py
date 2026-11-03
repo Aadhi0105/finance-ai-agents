@@ -123,7 +123,7 @@ def verify(snapshot):
     return m
 
 
-def snapshot(plan, destination, *, quiescent=False):
+def snapshot(plan, destination, *, quiescent=False, verify_source=None):
     validate_plan(plan)
     if not quiescent: raise ValueError('Explicit quiescent acknowledgement required')
     dest = Path(destination).absolute()
@@ -134,6 +134,8 @@ def snapshot(plan, destination, *, quiescent=False):
     dest.mkdir(parents=True, exist_ok=True, mode=0o700); safe_source(dest)
     stage = None
     with gate(exclusive=True), ExitStack() as stack:
+        if verify_source is not None:
+            verify_source()
         # Hold native exclusive writer connections until publication; CHECKPOINT
         # removes WAL dependence. Also honour Agent 2's application file lock.
         for entry in sorted(plan['sources'], key=lambda x:x['path']):
@@ -150,6 +152,8 @@ def snapshot(plan, destination, *, quiescent=False):
             after, excluded_after=inventory(plan)
             if fingerprint(after)!=hashes or excluded_after!=excluded:
                 raise ValueError('Source changed during snapshot; no snapshot published')
+            if verify_source is not None:
+                verify_source()
             git=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True)
             m={'schema_version':1,'snapshot_id':uuid.uuid4().hex,'created_at':datetime.now(timezone.utc).isoformat(),
                'plan':plan,'files':hashes,'excluded_lock_files':excluded,'code_commit':git.stdout.strip() if git.returncode==0 else None,

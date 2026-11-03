@@ -9,6 +9,8 @@ import { EventSections, EventGateDetails } from './EventSections';
 import { NewsSections, NewsReviewDetails } from './NewsSections';
 import { CloseSections } from './CloseSections';
 import { MonitoringSections } from './MonitoringSections';
+import { EvidenceClass } from './data-basis';
+import { classificationLabels } from '../onboarding/data';
 import { ReadingCopy } from './ReadingCopy';
 import { MetricCard, ReportHeader, ReportSection, ReportStates, ReviewNotice, SectionNavigation } from './ReportFrame';
 import './report-reader.css';
@@ -33,7 +35,8 @@ function jumpTo(section: SectionId) {
   target?.focus({ preventScroll: true });
 }
 
-export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onReloadWorkspace: () => void }) {
+const publicFetch:typeof fetch=(...args)=>fetch(...args);
+export function NativeReportReader({ run, onReloadWorkspace, fetcher=publicFetch }: { run: Run; onReloadWorkspace: () => void; fetcher?:typeof fetch }) {
   const isClose = run.workflow === 'close';
   const isMonitoring = run.workflow === 'monitoring';
   const isEvents = run.workflow === 'events';
@@ -46,6 +49,7 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
   const copyRequest=useRef<AbortController|null>(null),copyReturn=useRef<HTMLElement|null>(null);
   const activeRequest = useRef<AbortController | null>(null);
   const downloadRequest = useRef<AbortController | null>(null);
+  const objectUrls=useRef(new Set<string>());
   const errorHeading = useRef<HTMLHeadingElement | null>(null);
   const original = run.artifacts.find(a => a.id === run.report_id && a.kind === 'report');
 
@@ -53,16 +57,16 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
     const controller = new AbortController();
     activeRequest.current = controller;
     setState({ kind: 'loading' }); setDownloadNotice(''); setDownloading(null);
-    fetchReport(run, controller.signal).then(report => {
+    fetchReport(run, controller.signal,fetcher).then(report => {
       if (!controller.signal.aborted) setState({ kind: 'ready', report });
     }).catch(async reason => {
       if (controller.signal.aborted) return;
       const error = reason instanceof ReportFailure ? reason : new ReportFailure('connection_unavailable');
-      const originalVerified = error.code === 'native_view_unavailable' && await verifyOriginal(run, controller.signal);
+      const originalVerified = error.code === 'native_view_unavailable' && await verifyOriginal(run, controller.signal,fetcher);
       if (!controller.signal.aborted) setState({ kind: 'error', error, originalVerified });
     });
-    return () => { controller.abort(); downloadRequest.current?.abort(); copyRequest.current?.abort(); };
-  }, [run, attempt]);
+    return () => { controller.abort(); downloadRequest.current?.abort(); copyRequest.current?.abort();objectUrls.current.forEach(url=>URL.revokeObjectURL(url));objectUrls.current.clear(); };
+  }, [run, attempt,fetcher]);
   useEffect(() => {
     if (state.kind === 'error') errorHeading.current?.focus();
     if (state.kind === 'ready') document.getElementById('native-report-title')?.focus();
@@ -73,11 +77,12 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
     const controller = new AbortController(); downloadRequest.current = controller;
     setDownloading(artifact.id); setDownloadNotice('');
     try {
-      const bytes = await fetchArtifact(run, artifact, controller.signal);
+      const bytes = await fetchArtifact(run, artifact, controller.signal,fetcher);
       const url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+      objectUrls.current.add(url);
       const link = document.createElement('a'); link.href = url; link.download = artifact.name.split('/').pop()!;
       document.body.append(link); link.click(); link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      window.setTimeout(() => {URL.revokeObjectURL(url);objectUrls.current.delete(url);}, 1000);
       setDownloadNotice('Verified download ready: ' + artifact.label);
     } catch (reason) {
       if (controller.signal.aborted) return;
@@ -92,7 +97,7 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
     if(control)copyReturn.current=control;
     setCopyBusy(true);
     try {
-      const report=await fetchReport(run,controller.signal);
+      const report=await fetchReport(run,controller.signal,fetcher);
       if(controller.signal.aborted)return;
       setState({kind:'ready',report});setCopyOpen(true);
       if(print){await new Promise(requestAnimationFrame);if(!controller.signal.aborted)window.print();}
@@ -110,8 +115,8 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
         <div className="nr-error-actions"><button className="primary-button" onClick={retry}>Try reading again</button><button className="nr-secondary-button" onClick={onReloadWorkspace}>Reload workspace</button></div>
         {state.originalVerified && original && <div className="nr-original-available"><h2>Original saved report</h2><p>The registered original passed the workspace checks. It retains its original restrictions.</p><button className="text-button" onClick={() => download(original)} disabled={!!downloading}><Icon name="download" size={16} />{downloading ? 'Checking download…' : 'Download original HTML'}</button></div>}
       </section>
-      : <><div hidden={copyOpen}><ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} onReadingCopy={openCopy} copyBusy={copyBusy}/></div>
-        {copyOpen&&<ReadingCopy report={state.report} run={run} busy={copyBusy} onClose={closeCopy} onPrint={()=>openCopy(undefined,true)}/>}</>}
+      : <EvidenceClass.Provider value={state.report.state.data_classification}><div hidden={copyOpen}><ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} onReadingCopy={openCopy} copyBusy={copyBusy}/></div>
+        {copyOpen&&<ReadingCopy report={state.report} run={run} busy={copyBusy} onClose={closeCopy} onPrint={()=>openCopy(undefined,true)}/>}</EvidenceClass.Provider>}
     <p className="nr-download-notice" role="status">{downloadNotice}</p>
   </div>;
 }
@@ -119,6 +124,8 @@ export function NativeReportReader({ run, onReloadWorkspace }: { run: Run; onRel
 function ReportContent({ report, run, downloading, onDownload, onRecheck, onReadingCopy, copyBusy }: {
   report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;onReadingCopy:(control:HTMLElement)=>void;copyBusy:boolean;
 }) {
+  const synthetic=report.state.data_classification==='synthetic';
+  const dataBasis=classificationLabels[report.state.data_classification];
   const isClose = report.workflow === 'close';
   const isMonitoring = report.workflow === 'monitoring';
   const isEvents = report.workflow === 'events';
@@ -158,11 +165,11 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
   return <>
     <ReportHeader title={isClose ? 'Financial close' : isMonitoring ? 'Financial monitoring' : isNews ? 'Company news' : isEvents ? 'Past event reactions' : report.identity.title} entity={report.identity.entity}
       eyebrow={isClose ? <>AGENT 04 <span>/</span> SAVED FINANCIAL CLOSE</> : isMonitoring ? <>AGENT 02 <span>/</span> SAVED MONITORING</> : isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
-      period={<>{(isMarket || isMonitoring || isClose) && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>Saved synthetic inputs</>}
+      period={<>{(isMarket || isMonitoring || isClose) && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>{dataBasis}</>}
       action={<div className="nr-header-actions"><button className="nr-secondary-button" onClick={event=>onReadingCopy(event.currentTarget)} disabled={copyBusy||!!downloading}>{copyBusy?'Checking saved evidence…':'Reading & print copy'}</button><button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading||copyBusy}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button></div>} />
     <ReportStates execution={report.state.execution} evidenceGate={report.state.evidence_gate} />
-    <ReviewNotice title={isClose ? 'Saved close — financial review required' : isMonitoring ? 'Saved analyst policies — review required' : isNews ? 'Synthetic news — published tone withheld' : isEvents ? 'Historical diagnostics — review required' : 'Read as illustrative research'} action={<button onClick={() => jumpTo('review')}>{isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
-      {isClose ? 'Internal accounting checks establish agreement within supplied panels. They do not authenticate a ledger, verify budget approval or establish calibrated forecasts.' : isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These synthetic observations do not establish contractual compliance or calibrated financial risk.' : isNews ? 'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.' : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
+    <ReviewNotice title={isClose ? 'Saved close — financial review required' : isMonitoring ? 'Saved analyst policies — review required' : isNews ? (synthetic?'Synthetic news — published tone withheld':'Retained news — published tone withheld') : isEvents ? 'Historical diagnostics — review required' : synthetic?'Read as illustrative research':'Saved research — financial review required'} action={<button onClick={() => jumpTo('review')}>{isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
+      {isClose ? 'Internal accounting checks establish agreement within supplied panels. They do not authenticate a ledger, verify budget approval or establish calibrated forecasts.' : isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These retained observations do not establish contractual compliance or calibrated financial risk.' : isNews ? (synthetic?'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.':'Scores describe retained document text. They do not establish company-specific sentiment, market direction or financial approval.') : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
     </ReviewNotice>
 
     <div className="nr-report-grid">
@@ -180,7 +187,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
         </ReportSection>
 
         <ReportSection id="figures" eyebrow="02 / PERIOD AND UNITS RETAINED" title="Key figures">
-          <p className="nr-section-intro">Illustrative saved values for the stated period. Open a figure’s source to inspect its exact value and basis.</p>
+          <p className="nr-section-intro">{synthetic?'Illustrative saved values':'Retained source values'} for the stated period. Open a figure’s source to inspect its exact value and basis.</p>
           {metrics.length ? <div className="nr-metric-grid">{metrics.map(metric => <MetricCard key={metric.id} metric={metric} onInspect={() => inspect(metric.evidence_refs)} />)}</div>
             : <div className="nr-empty"><h3>Key figures unavailable</h3><p>No supported key figures are present in this saved report. Missing values have not been replaced with zero.</p></div>}
         </ReportSection>
@@ -205,7 +212,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
             const referencedPoints = referencedMetrics.length ? [] : report.charts.flatMap(c => c.series.flatMap(series => series.points.filter(p => p.evidence_refs.includes(e.id)).map(p => ({ key: c.id + '-' + series.id + '-' + p.id, metric: pointMetric(c, p), label: series.label }))));
             return <div className="nr-source-record" key={e.id}><h4>{e.label}</h4>{referencedMetrics.map(m => <p className="nr-exact-value" key={m.id}>{m.label}: <strong>{formatMetric(m)}</strong><span>{calendarDate(m.period_label)}</span><small>Canonical saved value: {m.value ?? 'null'} · {m.unit}{m.visibility === 'diagnostic' ? ' · diagnostic; review required' : ''}</small></p>)}{referencedPoints.map(({key,metric,label}) => <p className="nr-exact-value" key={key}>{label}: <strong>{formatMetric(metric)}</strong><span>{calendarDate(metric.period_label)}</span><small>Canonical saved value: {metric.value ?? 'null'} · {metric.unit}{metric.visibility === 'diagnostic' ? ' · diagnostic; review required' : ''}</small></p>)}<dl><dt>Saved artifact</dt><dd>{artifact.name}</dd><dt>Source basis</dt><dd>{source.label}</dd><dt>Saved field</dt><dd><code>{e.pointer || '(complete saved record)'}</code></dd><dt>Transformation</dt><dd>{e.method || (e.transform === 'identity' ? 'Original saved field' : e.transform)}</dd></dl><button className="nr-source-button" onClick={() => onDownload(artifact)} disabled={!!downloading}><Icon name="download" size={14} />Download {artifact.name}</button></div>;
           })}</div>}
-          <dl className="nr-record-meta"><div><dt>Prepared</dt><dd><time dateTime={report.identity.prepared_at}>{savedInstant(report.identity.prepared_at)}</time></dd></div><div><dt>Data basis</dt><dd>Synthetic demonstration</dd></div><div><dt>Observation / estimate dates</dt><dd>Not established by preparation time</dd></div><div><dt>Reader scope</dt><dd>Saved observations; no authenticated financial approval</dd></div></dl>
+          <dl className="nr-record-meta"><div><dt>Prepared</dt><dd><time dateTime={report.identity.prepared_at}>{savedInstant(report.identity.prepared_at)}</time></dd></div><div><dt>Data basis</dt><dd>{dataBasis}</dd></div><div><dt>Observation / estimate dates</dt><dd>Not established by preparation time</dd></div><div><dt>Reader scope</dt><dd>Saved observations; no authenticated financial approval</dd></div></dl>
           <button className="nr-secondary-button nr-mobile-recheck" onClick={onRecheck}><Icon name="history" size={15} />Recheck saved report</button>
           <div className="nr-file-list">{run.artifacts.filter(a => a.kind === 'report' || a.kind === 'evidence' || a.kind === 'report_view').map(artifact => <div className="nr-file" key={artifact.id}><span className="nr-file-icon"><Icon name={artifact.kind === 'report' ? 'research' : 'evidence'} size={19} /></span><div><h3>{artifact.label}</h3><p>{artifact.name}</p></div><button aria-label={`Download ${artifact.label}`} className="nr-file-download" disabled={!!downloading} onClick={() => onDownload(artifact)}><Icon name="download" size={17} />{downloading === artifact.id ? 'Checking…' : 'Download'}</button></div>)}</div>
           {report.glossary.length > 0 && <details className="nr-method-glossary"><summary>Methodology & definitions</summary><dl>{report.glossary.map(g => <div key={g.term}><dt>{g.term}</dt><dd>{g.definition}</dd></div>)}</dl></details>}

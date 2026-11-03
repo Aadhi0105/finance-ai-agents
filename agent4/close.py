@@ -63,6 +63,10 @@ def _topology(template):
         ids.add(ident); names.add(label)
         if not root and node.get('sign') not in ('add','subtract'):
             raise ValueError('non-root nodes require a sign')
+        if root and node.get('sign', 'add') != 'add':
+            raise ValueError('root sign must be add')
+        if ('root_measure' in node and (not root or node['root_measure'] not in ('profit','revenue','cost'))):
+            raise ValueError('root_measure is valid only on the root: profit, revenue or cost')
         if ('children' in node) == ('leaf' in node):
             raise ValueError('node requires leaf or children')
         if 'leaf' in node:
@@ -118,7 +122,7 @@ def _freshness(store, request):
                       [request['run_id'],request['close_period'],request['entity']])
 
 
-def execute_close(store, request):
+def execute_close(store, request, *, commit_hook=None):
     """Record attempts separately so interrupted work can be distinguished from a commit."""
     from uuid import uuid4
     if not isinstance(request, dict):
@@ -128,7 +132,7 @@ def execute_close(store, request):
     attempt_id = uuid4().hex
     store.attempt_event(attempt_id, run_id, request_digest, 'started')
     try:
-        result = _execute_close(store, request)
+        result = _execute_close(store, request, commit_hook=commit_hook)
     except BaseException as exc:
         store.attempt_event(attempt_id, run_id, request_digest, 'failed', str(exc))
         raise
@@ -136,7 +140,7 @@ def execute_close(store, request):
     return result
 
 
-def _execute_close(store, request):
+def _execute_close(store, request, *, commit_hook=None):
     """Commit sources, forecasts and full bundle together, or roll back everything.
 
     The same run_id + identical request replays before any freshness/recalculation.
@@ -151,74 +155,13 @@ def _execute_close(store, request):
         if existing['request_digest'] != request_digest:
             raise ValueError('run_id conflict: changed inputs require a new run_id')
         return {**existing, 'status':'replayed'}
-    if request.get('data_kind', 'unverified') not in ('synthetic', 'unverified'):
-        raise ValueError('data_kind must be synthetic or unverified')
-    entity = identifier(request['entity'], 'entity')
-    close = iso_period(request['close_period'])
-    annual = _periods(date.fromisoformat(close).year, request['frequency'])
-    if close not in annual:
-        raise ValueError('close must be a calendar reporting-period end')
-    leaves = _topology(request['tree'])
-    for kind in ('budget', 'actuals'):
-        fields = {'version','rows','source'} | ({'approved'} if kind=='budget' else set())
-        _fields(request[kind], fields)
-        identifier(request[kind]['source'], kind+' source')
-    if request['budget']['approved'] is not True:
-        raise ValueError('an explicitly approved budget basis is required')
-    budget_version = request['budget']['version']
-    actuals_version = request['actuals']['version']
     with store.transaction():
-        _freshness(store, request)
-        for kind in ('budget','actuals'):
-            data = request[kind]
-            meta = {'entity':entity,'currency':'EUR','frequency':request['frequency'],'source':data['source']}
-            if kind == 'budget':
-                meta['approved'] = True
-                store.set_budget(data['version'], data['rows'], metadata=meta)
-            else:
-                store.append_actuals(data['version'], data['rows'], metadata=meta)
-        entity_versions = [v for v in store.versions('actuals') if v['metadata'].get('entity') == entity]
-        if entity_versions[-1]['version'] != actuals_version:
-            raise ValueError('stale actuals basis: use the latest entity delta for a new close')
-        budget_rows = store.get_budget(budget_version)
-        actuals_rows = store.actuals_snapshot(actuals_version)
-        # Reject changed cadence/currency even for older deltas in the same entity.
-        for version in {r['source_version'] for r in actuals_rows}:
-            meta = store.version_info('actuals', version)['metadata']
-            if meta.get('currency') != 'EUR' or meta.get('frequency') != request['frequency']:
-                raise ValueError('actuals history has incompatible currency or frequency')
-        for rows in (budget_rows, actuals_rows):
-            for row in rows:
-                period = row['period']
-                if row['line'] not in leaves or period not in _periods(date.fromisoformat(period).year, request['frequency']):
-                    raise ValueError('source panel contains an unknown line or misaligned period')
-        if any(row['period'] > close for row in actuals_rows):
-            raise ValueError('actuals contain future observations beyond the close')
-        budget = {(r['line'],r['period']):r['amount_cents'] for r in budget_rows}
-        actuals = {(r['line'],r['period']):r['amount_cents'] for r in actuals_rows}
-        elapsed = annual.index(close)+1
-        if any((line,p) not in budget for line in leaves for p in annual):
-            raise ValueError('budget is incomplete for the full reporting year')
-        if any((line,p) not in actuals for line in leaves for p in annual[:elapsed]):
-            raise ValueError('actuals are incomplete for closed YTD periods')
-        candidate_history = sorted({p for _,p in actuals if p < close})
-        history_periods = [p for p in candidate_history if all((line,p) in actuals and (line,p) in budget for line in leaves)]
-        held_history = sorted(set(candidate_history)-set(history_periods))
-        bt = {p:_totals(request['tree'],budget,p) for p in sorted(set(annual+history_periods))}
-        at = {p:_totals(request['tree'],actuals,p) for p in sorted(set(history_periods+annual[:elapsed]))}
-        tree = deepcopy(request['tree'])
-        def bind(node):
-            ident = node['node_id']
-            node.update(budget_cents=bt[close][ident],actual_cents=at[close][ident],
-                        observation_history=[{'period':p,'variance_cents':cents(at[p][ident]-bt[p][ident])} for p in history_periods],
-                        history_frequency=request['frequency'])
-            if 'leaf' in node:
-                node['leaf'].update(name=node['name'], budget={'amount':_amount(bt[close][ident])}, actual={'amount':_amount(at[close][ident])})
-            for child in node.get('children',[]):
-                bind(child)
-        bind(tree)
-        tree['context'] = {'entity':entity,'currency':'EUR','monetary_unit':'major','close_date':close,
-                           'source_version':f'{budget_version} / {actuals_version}'}
+        prepared = prepare_close_sources(store, request)
+        entity, close, annual = (prepared[k] for k in ('entity','close','annual'))
+        budget_version, actuals_version = (prepared[k] for k in ('budget_version','actuals_version'))
+        budget_rows, actuals_rows = (prepared[k] for k in ('budget_rows','actuals_rows'))
+        elapsed, history_periods, held_history = (prepared[k] for k in ('elapsed','history_periods','held_history'))
+        bt, at, tree = (prepared[k] for k in ('bt','at','tree'))
         result = rollup(tree)
         forecasts = {}
         def forecast(node):
@@ -255,7 +198,91 @@ def _execute_close(store, request):
                                     metadata={'run_id':run_id,'entity':entity,'budget_version':budget_version,
                                               'actuals_version':actuals_version,'request_digest':request_digest})
         store.commit_run(run_id, request_digest, entity, close, bundle)
+        if commit_hook is not None:
+            commit_hook(store, store.get_run(run_id))
     return {**store.get_run(run_id), 'status':'committed'}
+
+
+def prepare_close_sources(store, request):
+    """Validate and bind panels inside a caller transaction; no forecasts or run commit.
+
+    Import validation uses a disposable state copy and rolls this transaction back.
+    """
+    _fields(request, {'run_id','entity','close_period','frequency','budget','actuals','tree','supersedes','data_kind'},
+            {'run_id','entity','close_period','frequency','budget','actuals','tree'})
+    _safe_run_id(request['run_id'])
+    if store.get_run(request['run_id']) is not None:
+        raise ValueError('fresh close requires a new run_id')
+    if request.get('data_kind', 'unverified') not in ('synthetic', 'unverified'):
+        raise ValueError('data_kind must be synthetic or unverified')
+    entity = identifier(request['entity'], 'entity')
+    close = iso_period(request['close_period'])
+    annual = _periods(date.fromisoformat(close).year, request['frequency'])
+    if close not in annual:
+        raise ValueError('close must be a calendar reporting-period end')
+    leaves = _topology(request['tree'])
+    for kind in ('budget', 'actuals'):
+        fields = {'version','rows','source'} | ({'approved'} if kind=='budget' else set())
+        _fields(request[kind], fields)
+        identifier(request[kind]['source'], kind+' source')
+    if request['budget']['approved'] is not True:
+        raise ValueError('an explicitly approved budget basis is required')
+    budget_version = request['budget']['version']
+    actuals_version = request['actuals']['version']
+    _freshness(store, request)
+    for kind in ('budget','actuals'):
+        data = request[kind]
+        meta = {'entity':entity,'currency':'EUR','frequency':request['frequency'],'source':data['source']}
+        if kind == 'budget':
+            meta['approved'] = True
+            store.set_budget(data['version'], data['rows'], metadata=meta)
+        else:
+            store.append_actuals(data['version'], data['rows'], metadata=meta)
+    entity_versions = [v for v in store.versions('actuals') if v['metadata'].get('entity') == entity]
+    if entity_versions[-1]['version'] != actuals_version:
+        raise ValueError('stale actuals basis: use the latest entity delta for a new close')
+    budget_rows = store.get_budget(budget_version)
+    actuals_rows = store.actuals_snapshot(actuals_version)
+    # Reject changed cadence/currency even for older deltas in the same entity.
+    for version in {r['source_version'] for r in actuals_rows}:
+        meta = store.version_info('actuals', version)['metadata']
+        if meta.get('currency') != 'EUR' or meta.get('frequency') != request['frequency']:
+            raise ValueError('actuals history has incompatible currency or frequency')
+    for rows in (budget_rows, actuals_rows):
+        for row in rows:
+            period = row['period']
+            if row['line'] not in leaves or period not in _periods(date.fromisoformat(period).year, request['frequency']):
+                raise ValueError('source panel contains an unknown line or misaligned period')
+    if any(row['period'] > close for row in actuals_rows):
+        raise ValueError('actuals contain future observations beyond the close')
+    budget = {(r['line'],r['period']):r['amount_cents'] for r in budget_rows}
+    actuals = {(r['line'],r['period']):r['amount_cents'] for r in actuals_rows}
+    elapsed = annual.index(close)+1
+    if any((line,p) not in budget for line in leaves for p in annual):
+        raise ValueError('budget is incomplete for the full reporting year')
+    if any((line,p) not in actuals for line in leaves for p in annual[:elapsed]):
+        raise ValueError('actuals are incomplete for closed YTD periods')
+    candidate_history = sorted({p for _,p in actuals if p < close})
+    history_periods = [p for p in candidate_history if all((line,p) in actuals and (line,p) in budget for line in leaves)]
+    held_history = sorted(set(candidate_history)-set(history_periods))
+    bt = {p:_totals(request['tree'],budget,p) for p in sorted(set(annual+history_periods))}
+    at = {p:_totals(request['tree'],actuals,p) for p in sorted(set(history_periods+annual[:elapsed]))}
+    tree = deepcopy(request['tree'])
+    def bind(node):
+        ident = node['node_id']
+        node.update(budget_cents=bt[close][ident],actual_cents=at[close][ident],
+                    observation_history=[{'period':p,'variance_cents':cents(at[p][ident]-bt[p][ident])} for p in history_periods],
+                    history_frequency=request['frequency'])
+        if 'leaf' in node:
+            node['leaf'].update(name=node['name'], budget={'amount':_amount(bt[close][ident])}, actual={'amount':_amount(at[close][ident])})
+        for child in node.get('children',[]):
+            bind(child)
+    bind(tree)
+    tree['context'] = {'entity':entity,'currency':'EUR','monetary_unit':'major','close_date':close,
+                       'source_version':f'{budget_version} / {actuals_version}'}
+    return dict(entity=entity, close=close, annual=annual, budget_version=budget_version,
+                actuals_version=actuals_version, budget_rows=budget_rows, actuals_rows=actuals_rows,
+                elapsed=elapsed, history_periods=history_periods, held_history=held_history, bt=bt, at=at, tree=tree)
 
 
 def deliver_run(store, run_id, output_dir):
