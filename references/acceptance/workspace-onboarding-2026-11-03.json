@@ -1,0 +1,149 @@
+{
+  "artifacts": {
+    "boundary_log": "/tmp/keystone-3d-boundaries-final.log",
+    "browser_root": "output/onboarding-acceptance-3d-verified/",
+    "final_http": "output/onboarding-acceptance-3d-final/receipt.json",
+    "frontend_log": "/tmp/keystone-3d-web-final.log",
+    "full_python_log": "/tmp/keystone-3d-python-final.log"
+  },
+  "browser": {
+    "held_job_after_restart_attempts": 0,
+    "held_job_css_widths_without_horizontal_overflow": [
+      1280,
+      320
+    ],
+    "iframes": 0,
+    "interactive_research_and_close_charts": "passed",
+    "native_readers": [
+      "research",
+      "monitoring",
+      "events",
+      "news",
+      "saved_close",
+      "fresh_close",
+      "close_correction"
+    ],
+    "original_html_download_hash": "matched",
+    "private_records_cleared_on_disconnect": "passed",
+    "restart_rotates_access_and_explains_reconnection": "passed",
+    "viewport_override_reset": true
+  },
+  "candidate": {
+    "base_commit": "a6235064c3d2350b5deaa7dec464d385b09c7c04",
+    "platform": "macOS arm64",
+    "python": "3.11.9",
+    "source_sha256": {
+      "keystone/storage.py": "275399e28810b268f66b7502d89987283d1d78e5d3a01c20da776b4e9fc4f4f3",
+      "keystone/workspace/__main__.py": "d2292b236e86c8ead4b341bf58c7df67a805c6965b973cc9d910d75346be5ae5",
+      "keystone/workspace/job_contract.py": "c8b9093c29374173a8e55c555d10682c00e8226f689b83d5b16b4f507e2ab760",
+      "keystone/workspace/job_store.py": "05274700fcee2f0e3e1393840e5953099d532558965df9079c18cd800cbd7198",
+      "keystone/workspace/jobs.py": "fe0bc859da0b757b56ae46e7b3fd5de0ee0438ef77226066ebbd2f7e0982f730",
+      "keystone/workspace/onboarding/recovery.py": "167b3588a3cdc07bf676556239808c8400a70a744e4d52d657027e04cdca36d2",
+      "keystone/workspace/onboarding/service.py": "fd42e950f0fff919c5dbec0b9a5b60395df4a30f383948ec635fc82730a3b81a",
+      "keystone/workspace/onboarding/store.py": "c9423dd2c30fc28e0ab85a03a32f0ba6f534e735892eba3d5fd3a942de8cc7ca",
+      "keystone/workspace/onboarding/validate.py": "1bdc2c310287ba7505fbcf760da46cf418b751fb8e62c69b9a36ad00747dcb83",
+      "keystone/workspace/worker.py": "ecf062fa70521a7184ab5788b9aa4d0818d695c736a9cac5d53ea97337a89d06",
+      "tests/test_workspace_onboarding_acceptance.py": "4e39ff8ac510484dc545771ad8e5223ca16550d8f3a851f30f58816b1c722b85",
+      "tests/test_workspace_private_recovery.py": "cf446862b54aa5be1c6dc562c3e6ddb3d9854c05ef5a18d7d22f1d3b5d976ce7",
+      "tests/workspace_onboarding_acceptance.py": "cf9f2e1d9171fce18f6456e27f239b16974f1bfb6142e031b72745868a762704",
+      "web/src/onboarding/HistoryPages.tsx": "af93197b1f4128cdeeae21da7baab9e3267140f3553bd4ce61c8214d8241976f",
+      "web/src/onboarding/PrivateWorkspace.tsx": "849d615ff1b3ad7d71b9037a4f2dd0ac99f094c1fbbd27c9810d5e9ffa06fff9",
+      "web/src/onboarding/client.ts": "91185c63aa6b5b4308eaa682081ef6ba04c70a0302be4cda84ec7986e951e34f",
+      "web/src/onboarding/data.ts": "b5b004bd48338d6515ef923daf93f362a7706781a99751e0ed3e46c46f4bed81",
+      "web/tests/onboarding.test.mjs": "95a8f99b20e79f82a4e5734f0678fcfa6ea97a01c4d75b52714ca0cea227bdbf"
+    },
+    "worktree_dirty": true
+  },
+  "date": "2026-11-03",
+  "engineering_matrix_rows": [
+    "IN-01",
+    "IN-02",
+    "IN-03",
+    "IN-04",
+    "IN-05",
+    "IN-06",
+    "IN-07",
+    "IN-08",
+    "IN-09",
+    "IN-10",
+    "IN-11",
+    "IN-12",
+    "IN-13",
+    "IN-14",
+    "IN-15",
+    "IN-16",
+    "IN-17",
+    "IN-18",
+    "IN-19",
+    "IN-20",
+    "IN-21",
+    "IN-22",
+    "IN-23",
+    "IN-24",
+    "IN-25",
+    "IN-26",
+    "IN-27",
+    "IN-28",
+    "IN-29",
+    "IN-30"
+  ],
+  "financial_approval": false,
+  "financial_expected_and_actual": {
+    "accounting_runs": 2,
+    "budget_cents": 6000,
+    "corrected_actual_cents": 7500,
+    "corrected_variance_cents": 1500,
+    "currency": "EUR",
+    "original_actual_cents": 6500,
+    "original_variance_cents": 500
+  },
+  "frontend": {
+    "passed": 273,
+    "production_build": "passed",
+    "typescript": "passed"
+  },
+  "kind": "keystone.webapp-3d-engineering-acceptance",
+  "limitations": [
+    "Local measurements are not production capacity/latency guarantees",
+    "A same-device restore does not protect against device loss",
+    "Fictional source attestations grant no real provider/company rights",
+    "Browser checks do not certify all browsers or physical print accessibility"
+  ],
+  "production_release_approved": false,
+  "python": {
+    "additional_cases_not_in_full_run": 4,
+    "collected_current_cases": 1412,
+    "final_boundary_suite_passed": 16,
+    "full_suite_exit_code": 0,
+    "full_suite_passed": 1408,
+    "unique_current_cases_validated": 1412
+  },
+  "rehearsal": {
+    "accepted_versions": 7,
+    "accounting_runs": 2,
+    "dataset_pages": [
+      25,
+      25,
+      10
+    ],
+    "metadata_max_seconds": 0.002,
+    "model_requests_reserved": 0,
+    "provider_requests": 0,
+    "queued_attempts_after_restore": 0,
+    "registered_reports": 8,
+    "released_attempts": 1,
+    "source_files_preserved": 54,
+    "source_hashes": "c154bb00d3c254127d7ba555ebe35a472621e7ff186f9080da7c6492ce95f8ed"
+  },
+  "remaining": [
+    "Real-source permissions",
+    "Human financial/news/interpretation review",
+    "Authorised real-company FP&A acceptance",
+    "Independent encrypted backup and key recovery (deferred)",
+    "Clean-machine disaster recovery",
+    "Enterprise identity and hosted deployment"
+  ],
+  "schema_version": 1,
+  "scope": "Single-analyst offline local engineering acceptance using fictional inputs and test-only source attestations",
+  "source_use_permission_approved": false
+}

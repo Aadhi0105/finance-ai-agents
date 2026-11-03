@@ -182,7 +182,7 @@ def validate(folder):
     if value['workflow']=='research' and value['dataset']['listing']:
         from ..report_views.values import get
         quote=value['dataset']['listing']['quote_currency'];saved=get(value['payload'],'/analysis/get_prices/currency')
-        if quote is not None and saved is not None and quote!=saved:raise c.InputError()
+        if quote is not None and (saved is None or quote!=saved):raise c.InputError()
     # Validate the consumed native shape without publishing a bootstrap report.
     if description['eligible'] and not fresh:
         from ..report_views.series import prepare_series

@@ -10,7 +10,7 @@ This slice accepts the five saved-evidence families, not arbitrary financial
 spreadsheets or fresh raw Agent 4 close requests. Imports do not run jobs. New
 closes are implemented separately in [3B.2](batch3b2-fresh-close.md); this guide
 records the saved-input slice and its original verification. Wider browser and
-portable-restart acceptance remains 3C/3D work.
+portable-restart acceptance is recorded in [3C](batch3c-browser-onboarding.md) and [3D](batch3d-onboarding-acceptance.md).
 
 ## Implemented flow
 
@@ -197,10 +197,7 @@ omitting affected inputs.
 
 This is **local snapshot evidence**. Generic restore into a fresh destination can
 verify retained input versions, but the job ledger retains its original absolute
-workspace binding. Automatic adoption into a new path is refused. Portable server
-rebinding, empty-directory reconstruction and complete restored-job acceptance are
-explicit **3D work**. Do not replace metadata or create a fresh ledger to bypass
-that refusal. Independent encrypted-device backup and clean-machine recovery
+workspace binding. Automatic adoption into a new path is refused. The explicit `restore-private` command in [3D](batch3d-onboarding-acceptance.md) now verifies and rebinds copied control metadata, reconstructs fixed empty directories and holds queued work for operator review. Generic restore still does not adopt the queue. Do not replace metadata or create a fresh ledger to bypass a refusal. Independent encrypted-device backup and clean-machine recovery
 remain deferred/open as previously recorded.
 
 ## Verification and repeatable engineering rehearsal
@@ -246,6 +243,6 @@ The separate forced-exit regression verifies the final startup recovery correcti
 No provider permissions or financial approval are established by the fictional
 test policy records. Access tokens and generated files remain excluded from Git.
 
-Broader browser interaction and portable server recovery remain 3C/3D work;
+Subsequent browser interaction and explicit portable recovery are recorded in [3C](batch3c-browser-onboarding.md) and [3D](batch3d-onboarding-acceptance.md);
 fresh-close processing remains 3B.2. No real-company or production acceptance gate
 advances from this engineering rehearsal.

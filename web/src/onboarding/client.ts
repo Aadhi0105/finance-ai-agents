@@ -41,7 +41,7 @@ export class PrivateClient {
       c.signal.throwIfAborted();if(!write&&epoch!==this.epoch)throw new InputFailure('access_required');
       const bytes=new Uint8Array(length);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
       const response=new Response(bytes,{status:r.status,headers:r.headers});
-      if(!r.ok){const error=await responseError(response);if(error.code==='access_required'&&epoch===this.epoch)this.disconnect();throw error;}
+      if(!r.ok){const error=await responseError(response);if(error.code==='access_required'&&epoch===this.epoch){this.disconnect();this.update({error:error.message});}throw error;}
       return response;
     }catch(e){throw safeError(e);}finally{clearTimeout(timer);this.reads.delete(c);init.signal?.removeEventListener('abort',abort);}
   }

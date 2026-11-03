@@ -81,7 +81,7 @@ class Admission:
     def public_job(self, job, *, worker_enabled=None):
         enabled = self.worker_enabled if worker_enabled is None else worker_enabled
         return {**job, 'schema_version':2, 'admission_schema_version':1, 'worker_enabled': enabled,
-                'recovery_required': job['status'] in {'outcome_unknown','delivery_failed'}
+                'recovery_required': job.get('restoration_hold',False) or job['status'] in {'outcome_unknown','delivery_failed'}
                     or job['status']=='running' and self.worker_requested and not enabled,
                 'result_url': '#/runs/' + job['execution']['result']['run_id']
                 if job['status'] in {'completed','review_required'} else None}

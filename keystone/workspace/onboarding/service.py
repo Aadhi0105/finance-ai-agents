@@ -63,6 +63,8 @@ class PrivateAdmission(Admission):
 
     def public_job(self,job,*,worker_enabled=None):
         value=super().public_job(job,worker_enabled=worker_enabled)
+        if job.get('restoration_hold'):
+            value['next_action']='Restored request held. A local operator must recheck and release this exact never-started job.'
         if job.get('profile') == 'calculate-imported-close' and job['status'] == 'failed':
             value['recovery_required'] = True
         return {**value,'schema_version':3,'admission_schema_version':2}

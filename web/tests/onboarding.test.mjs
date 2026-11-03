@@ -39,3 +39,32 @@ test('changing financial approval, request limits or workspace binding refuses a
 test('input download requires current authentication and exact registered bytes',async()=>{const x=await connected(p=>p.endsWith('/files/package.json')?new Response('changed'):undefined);await assert.rejects(x.client.downloadInput(parseVersion(fixture.version),'package.json'),e=>e instanceof InputFailure&&e.code==='input_unavailable');});
 test('native report and original evidence use the injected authenticated transport',async()=>{const f=JSON.parse(readFileSync(new URL('./fixtures/private-fresh-close.json',import.meta.url),'utf8')),paths=[];const transport=async p=>{paths.push(p);return json(f.report);};const report=await fetchReport(parseRun(f.run),new AbortController().signal,transport);assert.equal(report.agent,'agent4');assert.deepEqual(paths,['/api/runs/'+f.run.id+'/report-view']);});
 for(const flow of ['research','monitoring','events','news'])test('saved '+flow+' package preview retains nullable source references and dates',()=>{const cases=JSON.parse(readFileSync(new URL('./fixtures/private-previews.json',import.meta.url),'utf8')),v=cases[flow],m=v.descriptor.metadata;const selected={id:v.descriptor.dataset_id,entity_id:m.dataset.entity_id,title:m.dataset.title,workflow:m.workflow,payload_format:m.payload_format};const preview=parsePreview(v,selected);assert.equal(preview.metadata.sources[0].reference,null);assert.equal(preview.metadata.sources[0].currency,null);assert.equal(preview.classification,'synthetic');});
+
+
+test('restored queued work stays visibly held and separate from a claimed attempt',()=>{
+ const j=clone().job;j.status='queued';j.result_url=null;j.restoration_hold=true;j.recovery_required=true;
+ j.execution={...j.execution,status:'queued',attempt:0,operation_status:'not_started',reason:'waiting',result:null};
+ const parsed=parseJob(j,fixture.workspace.workspace_id);
+ assert.equal(parsed.restorationHold,true);assert.equal(parsed.attempt,0);assert.equal(parsed.recovery,true);
+ for(const edit of [v=>v.restoration_hold='true',v=>v.status='running',v=>v.execution.attempt=1,v=>v.recovery_required=false]){
+  const bad=structuredClone(j);edit(bad);assert.throws(()=>parseJob(bad,fixture.workspace.workspace_id));
+ }
+});
+test('older private job receipts remain supported without recovery metadata',()=>{
+ const j=clone().job;delete j.restoration_hold;assert.equal(parseJob(j,fixture.workspace.workspace_id).restorationHold,false);
+});
+
+test('refused connection clears private records and explains that current local access is required',async()=>{
+ const x=setup(p=>p==='/api/workspace'?json({error:{code:'job_access_required'}},403):undefined);
+ await x.client.connect(token);
+ const s=x.client.getSnapshot();assert.equal(s.connected,false);assert.equal(s.connecting,false);
+ assert.equal(s.workspace,null);assert.deepEqual(s.entities,[]);assert.ok(s.error.length>0);
+});
+test('a late refused connection cannot clear or add an error to a newer valid connection',async()=>{
+ const wait=deferred();let first=true;
+ const x=setup(p=>{if(p==='/api/workspace'&&first){first=false;return wait.promise;}});
+ const old=x.client.connect(token);await new Promise(setImmediate);
+ await x.client.connect(token);assert.equal(x.client.getSnapshot().connected,true);
+ wait.resolve(json({error:{code:'job_access_required'}},403));await old;
+ assert.equal(x.client.getSnapshot().connected,true);assert.equal(x.client.getSnapshot().error,'');
+});

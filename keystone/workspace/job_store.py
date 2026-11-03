@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import fcntl
 import hashlib
 import os
+import re
 from pathlib import Path
 from datetime import datetime
 import sqlite3
@@ -113,9 +114,13 @@ class JobStore:
             self._lease = None
 
     def _validate_database(self, con):
+        self.validate_binding(con, self.binding)
+
+    @staticmethod
+    def validate_binding(con, binding):
         if (con.execute('PRAGMA application_id').fetchone()[0] != APPLICATION_ID
                 or con.execute('PRAGMA user_version').fetchone()[0] != 2
-                or con.execute('SELECT value FROM metadata WHERE key=?', ('workspace',)).fetchone() != (self.binding,)
+                or con.execute('SELECT value FROM metadata WHERE key=?', ('workspace',)).fetchone() != (binding,)
                 or con.execute('PRAGMA journal_mode').fetchone()[0] != 'delete'
                 or con.execute('PRAGMA quick_check').fetchone()[0] != 'ok'
                 or con.execute('PRAGMA foreign_key_check').fetchone() is not None
@@ -277,13 +282,14 @@ class JobStore:
             return dict(jobs=jobs, next_cursor=jobs[-1]['job_id'] if len(rows) > limit else None,
                         worker_enabled=False)
 
-    def _execution(self, con, job_id):
+    @staticmethod
+    def _execution(con, job_id):
         row = con.execute('SELECT status,record_json,record_sha256 FROM executions WHERE job_id=?', (job_id,)).fetchone()
         if row is None:
             raise JobError('job_store_unavailable')
         raw = read_json(row[1].encode())
         execution = parse_execution(raw)
-        bound = parse_job_record(self._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
+        bound = parse_job_record(JobStore._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
         if (execution.schema_version != (2 if bound.schema_version == 3 else 1)
                 or row[0] != execution.status or fingerprint(raw) != row[2]
                 or execution.result is not None and execution.result.run_id != 'result-' + job_id[4:]):
@@ -300,7 +306,33 @@ class JobStore:
     def _public(self, con, row):
         record = self._record(row)
         execution = self._execution(con, record['job_id'])
-        return {**record, 'status': execution.status, 'execution': execution.model_dump()}
+        held=self.restoration_hold(con,record['job_id'])
+        if held and execution.status!='queued':raise JobError('job_store_unavailable')
+        return {**record, 'status': execution.status, 'execution': execution.model_dump(),
+                'restoration_hold': held}
+
+    @staticmethod
+    def restoration_hold(con, job_id):
+        row=con.execute('SELECT value FROM metadata WHERE key=?',('restore_hold:'+job_id,)).fetchone()
+        if row is None:return False
+        value=read_json(row[0].encode())
+        if (value.get('schema_version')!=1 or type(value.get('held')) is not bool
+                or value.get('job_id')!=job_id or not isinstance(value.get('snapshot_id'),str)
+                or re.fullmatch(r'[a-f0-9]{32}',value['snapshot_id']) is None
+                or not isinstance(value.get('manifest_sha256'),str)
+                or re.fullmatch(r'[a-f0-9]{64}',value['manifest_sha256']) is None
+                or value['held'] and (value.get('reviewed_at') is not None or value.get('reason') is not None)
+                or not value['held'] and (not isinstance(value.get('reviewed_at'),str)
+                    or datetime.fromisoformat(value['reviewed_at']).utcoffset() is None
+                    or not isinstance(value.get('reason'),str) or not 1<=len(value['reason'])<=240)):
+            raise JobError('job_store_unavailable')
+        return value['held']
+
+    @staticmethod
+    def next_queued(con):
+        for row in con.execute("SELECT j.* FROM jobs j JOIN executions x ON x.job_id=j.job_id WHERE x.status='queued' ORDER BY j.sequence").fetchall():
+            if not JobStore.restoration_hold(con,row[1]):return row
+        return None
 
     def immutable(self, job_id):
         with self._connect(write=False) as con:
@@ -324,7 +356,7 @@ class JobStore:
 
     def claim_next(self):
         with self._write() as con:
-            row = con.execute("SELECT j.* FROM jobs j JOIN executions x ON x.job_id=j.job_id WHERE x.status='queued' ORDER BY j.sequence LIMIT 1").fetchone()
+            row = self.next_queued(con)
             if row is None:
                 return None
             record = parse_job_record(self._record(row))

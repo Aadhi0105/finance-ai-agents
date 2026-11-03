@@ -28,6 +28,13 @@ def main(argv=None):
     snapshot_input=commands.add_parser('snapshot-private',help='Capture a permission-checked local private workspace snapshot after stopping its server')
     snapshot_input.add_argument('--workspace',type=Path,required=True)
     snapshot_input.add_argument('--destination',type=Path,required=True)
+    restored=commands.add_parser('restore-private',help='Verify and restore a private snapshot to a fresh directory; hold queued work')
+    restored.add_argument('snapshot',type=Path)
+    restored.add_argument('--destination',type=Path,required=True)
+    resumed=commands.add_parser('release-restored-job',help='Recheck and release one never-started restored request; no processing')
+    resumed.add_argument('--workspace',type=Path,required=True)
+    resumed.add_argument('--job-id',required=True)
+    resumed.add_argument('--reason',required=True)
     project = commands.add_parser('project', help='Project registered synthetic evidence into a new native workspace')
     project.add_argument('--workspace', type=Path, required=True)
     project.add_argument('--destination', type=Path, required=True)
@@ -48,7 +55,30 @@ def main(argv=None):
     release.add_argument('--workspace', type=Path, required=True, help='Private workspace root')
     release.add_argument('--job-id', required=True)
     args = parser.parse_args(argv)
-    if args.command in {'prepare-private','install-source-permission','revoke-source-permission','recover-import','snapshot-private'}:
+    if args.command=='restore-private':
+        from .onboarding.recovery import restore_private
+        from .onboarding.contracts import InputError
+        try:
+            root=restore_private(args.snapshot,args.destination)
+            print(json.dumps(dict(restored=str(root),protection='local_restore_test_only',
+                                  queued_execution='held_for_operator_review',financial_approval=False)))
+        except Exception:
+            print(json.dumps(InputError('input_unavailable',503).envelope()),file=sys.stderr)
+            return 2
+    elif args.command=='release-restored-job':
+        from .onboarding.recovery import release_restored_job
+        from .job_store import JobStore
+        from .job_contract import JobError
+        store=None
+        try:
+            store=JobStore(args.workspace/'control',args.workspace/'reports',worker=True)
+            print(json.dumps(release_restored_job(store,args.job_id,args.reason)))
+        except Exception:
+            print(json.dumps(JobError('job_recovery_unavailable',409).envelope()),file=sys.stderr)
+            return 2
+        finally:
+            if store is not None:store.close()
+    elif args.command in {'prepare-private','install-source-permission','revoke-source-permission','recover-import','snapshot-private'}:
         from .onboarding.store import create_workspace,InputStore
         from .onboarding.contracts import InputError
         from .catalog import read_confined,read_json
@@ -86,7 +116,7 @@ def main(argv=None):
                         def check_source():
                             if inputs.backup_plan()!=plan:raise InputError('input_unavailable',503)
                         saved=snapshot(plan,args.destination,quiescent=True,verify_source=check_source)
-                        result={'snapshot':str(saved),'protection':'local_snapshot_only','portable_restart_acceptance':'pending_3D'}
+                        result={'snapshot':str(saved),'protection':'local_snapshot_only','restore_command':'keystone.workspace restore-private'}
                     finally:lease.close()
             print(json.dumps(result))
         except Exception:
@@ -146,7 +176,7 @@ def main(argv=None):
                 from .onboarding.service import PrivateAdmission
                 admission=PrivateAdmission(args.workspace,f'http://127.0.0.1:{args.port}',
                     enable_imports=args.enable_imports,enable_jobs=args.enable_job_admission,enable_worker=args.enable_worker)
-                print(json.dumps(dict(private_workspace=True,imports_enabled=args.enable_imports,
+                print(json.dumps(dict(private_workspace=True,web_url=f'http://127.0.0.1:{args.port}/',imports_enabled=args.enable_imports,
                     job_admission_enabled=args.enable_job_admission,token_file=str(admission.token_file),
                     next_action='Open this local address, connect with the current private token, and inspect inputs before processing.')),flush=True)
             elif args.enable_job_admission:

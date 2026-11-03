@@ -315,6 +315,10 @@ class InputStore:
         listing=meta['dataset']['listing']
         if (listing is not None and listing['ticker']!=entity['ticker'] or entity['ticker'] and listing is None):
             raise c.InputError()
+        # The current saved-source adapters do not establish an exchange/share
+        # class mapping. Refuse that unsupported substitution before retention.
+        if listing is not None and any(listing[k] is not None for k in ('exchange','share_class')):
+            raise c.InputError()
         if meta['dataset']['supersedes_version_id']:
             if self.object('version',meta['dataset']['supersedes_version_id'])['dataset_id']!=dataset['id']: raise c.InputError()
         return self.policies(meta,req.payload_sha256,entity)
@@ -510,7 +514,7 @@ class InputStore:
         members=[('workspace.json','file','configuration'),('inputs.sqlite3','file','logs'),
                  ('inputs','tree','inputs'),('staging','tree','inputs'),('permissions','tree','configuration'),
                  ('reports','tree','logs')]
-        for path,kind in [('control/jobs.sqlite3','file'),('control/jobs','tree'),('control/operations','tree')]:
+        for path,kind in [('control/jobs.sqlite3','file'),('control/jobs','tree'),('control/operations','tree'),('control/restore-history.json','file')]:
             if (self.root/path).exists():members.append((path,kind,'logs'))
         # A stopped/failed validator can leave a disposable database copy. It
         # must be inspected before backup; never copy a live DB as a tree member.
@@ -530,7 +534,7 @@ class InputStore:
                 db=directory/'state.duckdb';private_member(db)
                 members.append((str(db.relative_to(self.root)),'database','agent4_state'))
         sources=[dict(name=path,path=str((self.root/path).resolve()),kind=kind,role=role) for path,kind,role in members]
-        plan=dict(schema_version=1,scope='Private onboarding files and control receipts; local snapshot only, portable restart acceptance pending 3D.',
+        plan=dict(schema_version=1,scope='Private onboarding files and control receipts; local snapshot only; explicit restore-private and queued-work review required.',
             sources=sources,datasets=[dict(id=self.descriptor['id'],source='Operator-scoped input and permission records',
                 classification='confidential',period='Per-version retained dates',currency='Per-input declared currency',
                 units='Per-input contract',permission='reviewed',permission_evidence='Private operator records and payload-bound evidence',
