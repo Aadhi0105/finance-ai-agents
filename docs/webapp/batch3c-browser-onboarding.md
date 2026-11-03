@@ -2,8 +2,7 @@
 
 **3 November 2026.** Implements the browser flow specified in [3A](batch3a-input-contracts.md)
 on the [3B.1 saved-input backend](batch3b1-data-onboarding.md) and [3B.2 fresh-close backend](batch3b2-fresh-close.md).
-This is the local supervised analyst interface. Broader acceptance and portable
-queue restart remain 3D work. No production, source-use or financial approval is granted.
+This is the local supervised analyst interface. Broader acceptance and explicit portable recovery are recorded in [3D](batch3d-onboarding-acceptance.md). No production, source-use or financial approval is granted.
 
 ## What the analyst can do
 
@@ -193,7 +192,6 @@ under the preview output directory. Existing engine fixtures and the earlier
 3B.1/3B.2 rehearsals were read as references and preserved. No Git publication is
 part of this implementation request.
 
-This passes the bounded 3C implementation checks. It does not close 3D's broader
-browser failure/volume/portable-restore acceptance, human interpretation, real
-company FP&A acceptance, unresolved source licences, independent backup or
-clean-machine disaster recovery.
+This passes the bounded 3C implementation checks. [3D](batch3d-onboarding-acceptance.md) records the subsequent browser failure/volume/portable-restore acceptance. Human interpretation, real
+company FP&A acceptance, unresolved source licences, independent backup and
+clean-machine disaster recovery remain open.

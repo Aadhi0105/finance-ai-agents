@@ -2,8 +2,7 @@
 
 2 November 2026. This extends the [3B.1 private input backend](batch3b1-data-onboarding.md)
 and implements the new-close profile in the [3A design](batch3a-input-contracts.md).
-[3C](batch3c-browser-onboarding.md) implements browser onboarding; wider usability, capacity and portable-restart
-acceptance remain 3D. No production or financial approval is granted.
+[3C](batch3c-browser-onboarding.md) implements browser onboarding; [3D](batch3d-onboarding-acceptance.md) records wider local usability, capacity and explicit portable-restart acceptance. No production or financial approval is granted.
 
 ## What this adds
 
@@ -144,9 +143,7 @@ report/control evidence are included; the local access token is excluded.
 An abandoned disposable validation database holds backup for operator inspection
 instead of being copied as an ordinary tree member.
 
-Local snapshot/restoration of accounting state is tested. Private queue ownership
-still binds its original report directory: portable queue restart remains held
-for 3D. A local copy does not provide independent-device backup, encryption/key
+Local snapshot/restoration of accounting state is tested. Private queue ownership binds its report directory. [3D](batch3d-onboarding-acceptance.md) adds explicit verified restoration at a different path with queued-work holds; generic restore does not silently rebind it. A local copy does not provide independent-device backup, encryption/key
 recovery or clean-machine disaster recovery. Real-company FP&A acceptance,
 source-use permission review and analyst interpretation review remain open.
 
@@ -187,7 +184,7 @@ The owned server and worker stop at the end. The resulting `receipt.json`,
 | Independent arithmetic | June profit EUR 65.00 versus budget EUR 60.00; correction profit EUR 75.00; retained YTD and later-period delta cases pass |
 | Provider/model use in rehearsal | Zero provider requests and zero reserved model requests |
 | Existing evidence | Both Agent 4 fixture files preserved; the earlier 3B.1 workspace's five reports and five accepted versions remain readable |
-| Local snapshot and restoration | Accounting database declared explicitly and semantic state restored exactly; relocated private queue restart remains refused pending 3D |
+| Local snapshot and restoration | Accounting database declared explicitly and semantic state restored exactly; generic relocated queue restart was refused at this checkpoint; 3D subsequently adds explicit verified private recovery |
 
 The full regression preceded the final additional receipt/commit consistency
 guard. The complete 42-case fresh-close suite and actual HTTP rehearsal passed

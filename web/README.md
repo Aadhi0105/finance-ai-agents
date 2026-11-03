@@ -5,7 +5,7 @@ saved synthetic results from the four existing agents. The default server is
 read-only. [Batch 2C](../docs/webapp/batch2c-run-interface.md) adds **Run & jobs**
 over explicitly enabled protected admission and the supervised offline worker:
 temporary token access, bounded saved-source requests, recorded stages, history
-and result navigation. Uploads, corrections and financial approvals are absent.
+and result navigation. That original execution slice has no upload/correction or financial-approval controls; the later private interface adds supported JSON intake and separately versioned close corrections. Financial approval remains separate.
 [Batch 2D](../docs/webapp/batch2d-execution-acceptance.md) validates failure/recovery
 flows and larger histories, with guards against late navigation and stale page rows.
 
@@ -46,6 +46,8 @@ reading/print copies, pagination focus and controlled browser acceptance cases.
 News 1.2.0 also handles an early failed attempt without an analytical result;
 news 1.0.0/1.1.0 retain their original recipes. PDF/physical-print acceptance and
 human interpretation remain open.
+
+[3D](../docs/webapp/batch3d-onboarding-acceptance.md) adds explicit private restoration, queued-work holds, operator release and complete-path/fault/volume acceptance. Connection help explains the local token file and hidden Mac folders.
 
 See the [complete setup and acceptance guide](../docs/webapp/batch1-report-workspace.md).
 

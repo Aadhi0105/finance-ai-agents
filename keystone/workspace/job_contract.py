@@ -50,7 +50,7 @@ class JobError(ValueError):
             'job_source_unavailable': 'The registered synthetic source is unavailable or unsupported.',
             'job_request_conflict': 'This request key already identifies a different request.',
             'job_capacity_reached': 'Job admission is full. Preserve existing jobs and inspect their status.',
-            'job_control_busy': 'Local control is busy. Retry the same request key later.',
+            'job_control_busy': 'Another Keystone session or recovery task is using this workspace. Use its existing window, or stop that session before restarting. Preserve the request key and lock files.',
             'job_not_found': 'The saved job was not found.',
             'job_store_unavailable': 'Job control state is unavailable. Preserve it and inspect locally.',
             'job_worker_unavailable': 'The local worker could not start. Preserve the job ledger and inspect locally.',

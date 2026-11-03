@@ -5,7 +5,7 @@
 [Batch 3B.1](../batch3b1-data-onboarding.md) now implements the separate private
 saved-input backend. [Batch 3B.2](../batch3b2-fresh-close.md) implements the
 fresh-close example's validation, isolated accounting state and recovery profile.
-[3C](../batch3c-browser-onboarding.md) implements the protected browser onboarding flow; broader 3D acceptance remains pending.
+[3C](../batch3c-browser-onboarding.md) implements the protected browser onboarding flow; [3D](../batch3d-onboarding-acceptance.md) records the bounded engineering acceptance and explicit private restoration.
 
 - [Design and per-agent contracts](../batch3a-input-contracts.md)
 - [Version-1 package envelope schema](input-package.schema.json)

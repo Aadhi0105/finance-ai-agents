@@ -26,7 +26,7 @@ def offline_environment(root):
 def run_one(store):
     """Main-thread worker entry; the inherited CLI gate covers the entire attempt."""
     with store._connect(write=False) as con:
-        if con.execute("SELECT 1 FROM executions WHERE status='queued' LIMIT 1").fetchone() is None:
+        if store.next_queued(con) is None:
             return False, False
     with gate():
         record = store.claim_next()

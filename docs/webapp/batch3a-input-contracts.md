@@ -4,7 +4,7 @@
 [3B.1 implements the private saved-input backend](batch3b1-data-onboarding.md),
 and [3B.2 adds fresh-close execution and recovery](batch3b2-fresh-close.md).
 [3C implements browser onboarding](batch3c-browser-onboarding.md). Broader final
-acceptance remains 3D work. This design document itself adds no runtime capability or financial approval.
+acceptance is recorded in [3D](batch3d-onboarding-acceptance.md). This design document itself adds no runtime capability or financial approval.
 
 [Package envelope](data-onboarding/input-package.schema.json) ·
 [Acceptance matrix](data-onboarding/acceptance-matrix.md) ·
@@ -420,7 +420,7 @@ in 2C/2D. Do not display an enabled action for an unimplemented adapter.
 | **3B.1 — backend foundation** | Implemented: private workspace/ledger, permission preflight, bounded ingestion, immutable versions, strict saved-source validators, protected private reads, classification-aware projection and v2 job bindings for the five saved families. See the [verification record](batch3b1-data-onboarding.md#verification-and-repeatable-engineering-rehearsal). |
 | **3B.2 — fresh close input** | Implemented: shared source validation without a canonical close on upload, isolated accounting state and predecessor pins, fixed fresh-close profile, atomic attribution and delivery-only recovery, exact-cent/correction/permission/isolation/restore tests. See the [backend guide](batch3b2-fresh-close.md). |
 | **3C — interface** | Implemented: protected connection, company/dataset/import pages, read-only package inspection, validation/provenance panels, exact version/action selection, protected native readers/downloads and classification labels. See the [implementation and verification guide](batch3c-browser-onboarding.md). |
-| **3D — acceptance** | Execute the [matrix](data-onboarding/acceptance-matrix.md): five saved families plus fresh close, all negative boundaries, browser-to-report/restore tests and preservation of prior evidence. |
+| **3D — acceptance** | [Implementation and evidence](batch3d-onboarding-acceptance.md): explicit private restore, held queues, operator release, complete family/HTTP/browser/fault/volume checks and preservation of prior evidence. See the [matrix](data-onboarding/acceptance-matrix.md) for bounded engineering acceptance. |
 
 3B.1 must not claim fresh analysis for the snapshot/replay families. 3B.2 must not
 claim company acceptance using only fictional data. A family is enabled only when

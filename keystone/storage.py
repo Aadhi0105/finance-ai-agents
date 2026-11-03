@@ -210,7 +210,7 @@ def relocate(stage, final, m):
     return changes
 
 
-def restore(source, destination):
+def restore(source, destination, *, prepare=None):
     source=Path(source).absolute();dest=Path(destination).absolute()
     if dest.exists() or dest.is_symlink(): raise ValueError('Restore requires a new destination')
     if source.resolve() in dest.resolve().parents:raise ValueError('Restore destination overlaps snapshot')
@@ -227,11 +227,17 @@ def restore(source, destination):
             if fingerprint({name:stage/name for name in m['files']})!=m['files']:
                 raise ValueError('Restored bytes differ from snapshot')
             changes=relocate(stage,dest,m)
+            # Optional trusted application recovery runs inside the unpublished
+            # directory and exclusive maintenance lease. Any failure aborts it.
+            if prepare is not None:
+                changes.extend(prepare(stage,dest,m))
             # Verify source again to detect changes during restore.
             if verify(source)!=m:raise ValueError('Snapshot changed during restore')
             receipt={'schema_version':1,'snapshot_id':m['snapshot_id'],'snapshot_manifest_sha256':digest(source/'manifest.json'),
                      'restored_at':datetime.now(timezone.utc).isoformat(),'changes':changes,
                      'files':fingerprint({name:stage/name for name in m['files']}),
+                     'derived_files':fingerprint({str(p.relative_to(stage)):p for p in stage.rglob('*')
+                                                  if p.is_file() and str(p.relative_to(stage)) not in m['files']}),
                      'protection':'local_restore_test_only','permission_holds':m['permission_holds']}
             write_json(stage/'restore-receipt.json',receipt)
             flush_tree(stage)

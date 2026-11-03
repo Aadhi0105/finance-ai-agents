@@ -171,8 +171,8 @@ Preparation needs a new destination name and generates examples offline using th
 existing agent engines. Existing destinations are preserved. Provider credentials
 are unnecessary. Dependencies must be installed before offline use.
 
-This is a local synthetic workspace. Fresh live-data execution, uploads,
-authenticated approvals, shared access and production hosting remain separately
+This is a local synthetic workspace. Fresh live-data execution, enterprise authentication/approvals, shared access
+and production hosting remain separately
 scoped. It does not change the pilot's source-permission or independent
 backup dependencies. See the [workspace guide](docs/webapp/batch1-report-workspace.md)
 for architecture, setup, boundaries, and acceptance evidence; the earlier
@@ -236,7 +236,7 @@ adds fresh EUR budget/actuals close requests, company-specific accounting state,
 predecessor pins and explicit committed-close delivery recovery. [Batch 3C](docs/webapp/batch3c-browser-onboarding.md) adds the protected browser
 connection, company/dataset forms, package inspection/import, version-pinned
 processing requests and classification-aware native readers. Local snapshots cover
-the new input/control files; portable server restart after restore remains 3D work.
+the new input/control files. [Batch 3D](docs/webapp/batch3d-onboarding-acceptance.md) adds explicit private restoration at a new folder, preserved history, held restored queues, operator rechecks and cross-workflow failure/volume acceptance.
 
 ## Read the result before acting on it
 
