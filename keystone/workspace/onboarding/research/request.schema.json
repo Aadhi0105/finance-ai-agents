@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:keystone:local-research-request:3",
+  "title": "Prospective local research job request v3",
+  "$comment": "Runtime structural contract. Semantic, permission, identity, financial and durable execution checks are required separately; shape validity grants no approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow",
+    "source",
+    "analysis_plan",
+    "assumption_review",
+    "timeout_seconds"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "workflow": {
+      "const": "research"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "analysis_plan": {
+      "$ref": "#/$defs/analysis_plan"
+    },
+    "assumption_review": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/review"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "timeout_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "analysis_plan": {
+            "properties": {
+              "valuation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assumption_review": {
+            "const": null
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "assumption_review": {
+            "$ref": "#/$defs/review"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rate": {
+      "type": "string",
+      "maxLength": 12,
+      "pattern": "^-?(?:0|1)(?:\\.[0-9]{1,6})?$"
+    },
+    "valuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "horizon_years",
+        "discount_rate",
+        "terminal_growth",
+        "high_growth",
+        "scenario_deltas",
+        "weights",
+        "tax_basis",
+        "tax_rate",
+        "rationale"
+      ],
+      "properties": {
+        "method": {
+          "const": "fcff-linear-fade/1"
+        },
+        "horizon_years": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "discount_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "terminal_growth": {
+          "$ref": "#/$defs/rate"
+        },
+        "high_growth": {
+          "$ref": "#/$defs/rate"
+        },
+        "scenario_deltas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "properties": {
+            "bear": {
+              "const": "-0.04"
+            },
+            "base": {
+              "const": "0"
+            },
+            "bull": {
+              "const": "0.04"
+            }
+          }
+        },
+        "weights": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "properties": {
+            "bear": {
+              "$ref": "#/$defs/rate"
+            },
+            "base": {
+              "$ref": "#/$defs/rate"
+            },
+            "bull": {
+              "$ref": "#/$defs/rate"
+            }
+          }
+        },
+        "tax_basis": {
+          "enum": [
+            "explicit_rate",
+            "effective_rate"
+          ]
+        },
+        "tax_rate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "tax_basis": {
+                "const": "explicit_rate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tax_rate": {
+                "$ref": "#/$defs/rate"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "tax_rate": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    "analysis_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "financial_summary",
+        "annual_trends",
+        "quote_metrics",
+        "valuation"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "financial_summary": {
+          "const": true
+        },
+        "annual_trends": {
+          "const": true
+        },
+        "quote_metrics": {
+          "const": "if_eligible"
+        },
+        "valuation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/valuation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "dataset_id",
+        "version_id",
+        "contract_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "const": "dataset_version"
+        },
+        "dataset_id": {
+          "$ref": "#/$defs/id"
+        },
+        "version_id": {
+          "$ref": "#/$defs/id"
+        },
+        "contract_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledged",
+        "source_reference_sha256",
+        "analysis_plan_sha256"
+      ],
+      "properties": {
+        "acknowledged": {
+          "const": true
+        },
+        "source_reference_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "analysis_plan_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

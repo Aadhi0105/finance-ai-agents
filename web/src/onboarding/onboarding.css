@@ -5,3 +5,9 @@
 /* Keep parallel cards aligned; let the local-access controls wrap on small screens. */
 .private-workflows>.private-card{margin:0}
 @media(max-width:740px){.private-topbar{height:auto;min-height:76px;flex-wrap:wrap;align-items:center;gap:4px;padding:10px 20px}.private-topbar>.private-actions{gap:8px;flex-wrap:nowrap}.private-topbar .private-chip{white-space:nowrap}.private-topbar .text-button{min-height:32px}}
+
+.private-assumption-panel{margin:24px 0;padding:24px;background:#f5f6f0;border:1px solid #dce3d9;border-radius:16px}
+.private-assumption-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.private-assumption-grid label{min-width:0}.private-confirm-analysis{margin:24px 0;padding-top:20px;border-top:1px solid #dce3d9}
+.private-local-analysis details{margin:20px 0}.private-local-analysis textarea{min-height:90px}
+@media(max-width:900px){.private-assumption-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.private-assumption-grid{grid-template-columns:1fr}.private-assumption-panel{padding:16px}}

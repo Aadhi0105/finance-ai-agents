@@ -24,7 +24,8 @@ MAX_RETAINED_JOBS = 1000
 
 
 def canonical(value):
-    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False,
+                      ensure_ascii=not (isinstance(value,dict) and value.get('schema_version')==3 and 'analysis_plan' in value))
 
 
 def fingerprint(value):
@@ -185,7 +186,7 @@ class FreshCloseJobRecord(DatasetJobRecord):
 def parse_job_record(raw):
     if not isinstance(raw,dict) or type(raw.get('schema_version')) is not int:
         raise ValueError('Unsupported job record.')
-    model = {1:JobRecord,2:DatasetJobRecord,3:FreshCloseJobRecord}.get(raw['schema_version'])
+    model = {1:JobRecord,2:DatasetJobRecord,3:FreshCloseJobRecord,4:LocalResearchJobRecord}.get(raw['schema_version'])
     if model is None: raise ValueError('Unsupported job record.')
     return model.model_validate(raw)
 
@@ -200,3 +201,38 @@ def capabilities(enabled, worker=False, worker_requested=False):
                 max_requests=MAX_REQUESTS, max_output_tokens=MAX_OUTPUT_TOKENS,
                 max_pending_jobs=MAX_PENDING_JOBS, max_retained_jobs=MAX_RETAINED_JOBS,
                 scope='Supervised offline saved-evidence execution.' if worker else 'Admission only; the local worker is disabled.')
+
+
+class LocalResearchRequest(DatasetJobRequest):
+    schema_version: Literal[3] = 3
+    workflow: Literal['research']
+    timeout_seconds: int = Field(default=120,ge=1,le=120)
+    analysis_plan: dict
+    assumption_review: dict | None
+
+    @model_validator(mode='after')
+    def local_plan(self):
+        from .onboarding.research.contracts import plan
+        plan(self.model_dump())
+        return self
+
+
+class LocalResearchJobRecord(DatasetJobRecord):
+    schema_version: Literal[4] = 4
+    request: LocalResearchRequest
+    max_requests: Literal[0] = 0
+    max_output_tokens: Literal[0] = 0
+    evaluated_on: str
+    admission_readiness_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    producer_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+
+    @model_validator(mode='after')
+    def bound_identity(self):
+        from datetime import date
+        if (self.profile!='calculate-local-research' or self.operation_id!='web-'+self.job_id[4:]
+                or self.request_sha256!=fingerprint(self.request.model_dump())
+                or (self.source.dataset_id,self.source.version_id,self.source.contract_sha256)!=
+                   (self.request.source.dataset_id,self.request.source.version_id,self.request.source.contract_sha256)):
+            raise ValueError('Local research identity changed')
+        date.fromisoformat(self.evaluated_on)
+        return self

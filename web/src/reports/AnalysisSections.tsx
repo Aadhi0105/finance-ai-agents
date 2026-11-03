@@ -37,8 +37,9 @@ function Pager({ page, count, onPage, label }: { page: number; count: number; on
 }
 
 export function MetricTable({ metrics, onInspect, title = 'Saved financial measures' }: { metrics: Metric[]; onInspect: Inspect; title?: string }) {
+  const hasObservation=metrics.some(m=>m.as_of!==null);
   if (!metrics.length) return <Missing>No financial measures were retained for this section.</Missing>;
-  return <div className="nr-table-scroll" role="region" aria-label={title} tabIndex={0}><table className="nr-data-table"><caption>{title}</caption><thead><tr><th scope="col">Measure</th><th scope="col">Saved value</th><th scope="col">Period / scope</th><th scope="col">Evidence</th></tr></thead><tbody>{metrics.map(m => <tr key={m.id}><th scope="row">{m.label}{m.visibility === 'diagnostic' && <span className="nr-diagnostic-label">Diagnostic</span>}</th><td className={m.availability === 'available' ? 'nr-number' : 'nr-unavailable-cell'}>{formatMetric(m)}</td><td>{displaySourceText(calendarDate(m.period_label))}</td><td><SourceButton refs={m.evidence_refs} onInspect={onInspect} /></td></tr>)}</tbody></table></div>;
+  return <div className="nr-table-scroll" role="region" aria-label={title} tabIndex={0}><table className="nr-data-table"><caption>{title}</caption><thead><tr><th scope="col">Measure</th><th scope="col">Saved value</th><th scope="col">Period / scope</th>{hasObservation&&<th scope="col">Quote / observation date</th>}<th scope="col">Evidence</th></tr></thead><tbody>{metrics.map(m => <tr key={m.id}><th scope="row">{m.label}{m.visibility === 'diagnostic' && <span className="nr-diagnostic-label">Diagnostic</span>}</th><td className={m.availability === 'available' ? 'nr-number' : 'nr-unavailable-cell'}>{formatMetric(m)}</td><td>{displaySourceText(calendarDate(m.period_label))}</td>{hasObservation&&<td>{m.as_of?calendarDate(m.as_of):"Not applicable"}</td>}<td><SourceButton refs={m.evidence_refs} onInspect={onInspect} /></td></tr>)}</tbody></table></div>;
 }
 
 export function SavedTable({ table, report, onInspect }: Pick<Context, 'report' | 'onInspect'> & { table: TableData }) {
@@ -90,7 +91,10 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
     review={<LocalReviews refs={chart.review_refs} report={report} onReviews={onReviews} />} />;
   const isAvailable = (id: string) => section(id)?.availability === 'available';
   const renderTables = (id: string) => tables(id).map(t => <SavedTable key={t.id} table={t} report={report} onInspect={onInspect} />);
-  const valuationMetrics = metrics('valuation').filter(m => ['weighted-valuation', 'fcff-base'].includes(m.id));
+  const local=report.summary.template_id==='local-research-summary-v1';
+  const valuationReason=section('valuation')?.reason_codes||[];
+  const valuationExplanation=valuationReason.includes('excluded_by_plan')?'Valuation was excluded from this request.':valuationReason.includes('bridge_incomplete')?(metrics('performance').some(m=>m.id==='cash-and-equivalents'&&m.value===null)?'Cash was not supplied. The equity valuation is held; the financial summary remains available. Missing cash has not been replaced by zero.':'The equity bridge is incomplete. Inspect cash, debt and other claim observations; missing amounts have not been replaced by zero.'):valuationReason.includes('nonpositive_fcff')?'This growth-based valuation method is not applicable to a nonpositive FCFF base.':valuationReason.includes('tax_basis_unavailable')?'The selected tax treatment is unsupported by the supplied observations. Valuation is held.':'The selected evidence does not support this valuation. Inspect the linked restrictions; no price target is inferred.';
+  const valuationMetrics = metrics('valuation').filter(m => ['weighted-valuation', 'fcff-base','weighted-per-share','base-fcff'].includes(m.id));
   const marketArea = report.analyst_content.market_consensus;
   const brokerArea = report.analyst_content.external_research;
   return <>
@@ -105,8 +109,9 @@ export function AnalysisSections({ report, onInspect, onReviews }: Context) {
         <p className="nr-analysis-note">The reported free-cash-flow measure and the model’s unlevered FCFF input have different definitions. Assigned scenario weights are assumptions, not measured outcome probabilities.</p>
         {charts('valuation').map(figure)}
         {renderTables('valuation')}
+        {local&&<MetricTable metrics={metrics('valuation')} onInspect={onInspect} title="Retained valuation diagnostics"/>}
         {!tables('valuation').some(t => t.id === 'equity-bridge') && <Missing title="Detailed equity bridge not retained">This saved presentation does not include the enterprise, net-debt and equity bridge table. Its original model evidence remains available; no bridge has been reconstructed in the browser.</Missing>}
-      </> : <Missing>The saved valuation section cannot be displayed. No price target is inferred.</Missing>}
+      </> : <Missing title={local?"Valuation scope and eligibility":"Saved valuation unavailable"}>{local?valuationExplanation:"The saved valuation section cannot be displayed. No price target is inferred."}</Missing>}
     </ReportSection>
 
     <ReportSection id="peers" eyebrow="05 / A COMPARISON TO REVIEW" title="Peer comparison">

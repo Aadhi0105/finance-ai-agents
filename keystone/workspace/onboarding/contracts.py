@@ -21,7 +21,8 @@ TRANSFER_SECONDS = 60
 FORMATS = {'research': 'agent1.model/2', 'monitoring': 'agent2.snapshot/legacy-1',
            'events': 'agent3.events-bundle/1', 'news': 'agent3.news-bundle/1', 'close': 'agent4.close/1'}
 FRESH_CLOSE = 'agent4.close-request/1'
-SUPPORTED_FORMATS = {k: [v] + ([FRESH_CLOSE] if k == 'close' else []) for k, v in FORMATS.items()}
+FRESH_RESEARCH = 'agent1.financial-kit/1'
+SUPPORTED_FORMATS = {k: [v] + ([FRESH_CLOSE] if k == 'close' else [FRESH_RESEARCH] if k == 'research' else []) for k, v in FORMATS.items()}
 CLASSIFICATIONS = {'synthetic': 'synthetic', 'public_provider': 'provider', 'issuer': 'issuer', 'confidential': 'internal'}
 SCHEMA = json.loads(Path(__file__).with_name('package.schema.json').read_text())
 Draft202012Validator.check_schema(SCHEMA)
@@ -124,6 +125,10 @@ def bounded_json(data):
 
 def envelope(value):
     try:
+        if not isinstance(value,dict):raise ValueError('Object required')
+        if value.get('schema_version') == 2:
+            from .research.contracts import envelope as local_envelope
+            return local_envelope(value)
         ENVELOPE.validate(value)
         if type(value['schema_version']) is not int or value['payload_format'] not in SUPPORTED_FORMATS[value['workflow']]:
             raise ValueError('Unsupported saved input')
@@ -207,7 +212,7 @@ class Permission(Record):
 
 
 class Preflight(Record):
-    schema_version: int = Field(ge=1, le=1)
+    schema_version: int = Field(ge=1, le=2)
     dataset_id: str = Field(pattern=ID)
     package_bytes: int = Field(ge=1, le=MAX_PACKAGE)
     package_sha256: str = Field(pattern=SHA)
@@ -219,6 +224,10 @@ class Preflight(Record):
         # Preflight never carries the financial payload.
         if 'payload' in self.metadata: raise ValueError('Payload prohibited in preflight')
         envelope({**self.metadata, 'payload': {'preflight': True}})
+        if self.schema_version != self.metadata['schema_version']:
+            raise ValueError('Preflight version mismatch')
+        if self.schema_version == 2 and self.package_bytes > 1_000_000:
+            raise ValueError('Local kit size')
         return self
 
 
@@ -261,6 +270,9 @@ class CloseValidationReceipt(ValidationReceipt):
 
 
 def validation_receipt(raw):
+    if raw.get('schema_version') == 3:
+        from .research.receipt import LocalReceipt
+        return LocalReceipt.model_validate(raw)
     model = CloseValidationReceipt if raw.get('schema_version') == 2 else ValidationReceipt
     return model.model_validate(raw)
 

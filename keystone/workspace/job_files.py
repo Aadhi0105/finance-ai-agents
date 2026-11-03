@@ -47,7 +47,7 @@ def matching_source(catalog, record):
 
 
 def prepare_inputs(store, record):
-    if record.schema_version in {2, 3}:
+    if record.schema_version in {2, 3, 4}:
         from .onboarding.execution import prepare_inputs as prepare_dataset
         return prepare_dataset(store,record)
     catalog = Catalog(store.workspace)
@@ -86,7 +86,7 @@ def read_job(folder):
     record = parse_job_record(read_json(read_confined(folder, 'job.json', 65_536)))
     if folder.name != record.job_id:
         raise ValueError('Wrong job directory identity.')
-    if record.schema_version in {2, 3}:
+    if record.schema_version in {2, 3, 4}:
         from .onboarding.execution import read_inputs
         read_inputs(folder,record)
     else:

@@ -1,0 +1,1173 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.local-research-result",
+  "source_schema": "agent1.local-analysis/1",
+  "result_id": "result-11111111111111111111111111111111",
+  "identity": {
+    "entity_id": "entity-northstar",
+    "listing": {
+      "ticker": "NSTAR",
+      "exchange": "XPAR",
+      "quote_currency": "EUR",
+      "share_class": "ordinary"
+    },
+    "currency": "EUR",
+    "monetary_unit": "base",
+    "period_start": "2025-01-01",
+    "period_end": "2025-12-31"
+  },
+  "execution": {
+    "mode": "local_inputs",
+    "status": "completed",
+    "profile": "calculate-local-research",
+    "profile_version": 1,
+    "evaluated_on": "2026-11-03",
+    "financial_approval": false,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "provider_requests": 0,
+    "model_calls": 0,
+    "output_tokens": 0
+  },
+  "provenance": {
+    "classification": "synthetic",
+    "source_integrity": "matched",
+    "source_authenticity": "not_independently_verified",
+    "producer": {
+      "code_commit": null,
+      "code_worktree_dirty": true,
+      "python": "3.11.9",
+      "dependency_lock_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source_tree_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "validator_version": "financial-kit/1.0.0",
+      "recipe": "agent1-local-report/1.0.0"
+    }
+  },
+  "lineage": {
+    "workspace_id": "workspace-fictional-example",
+    "dataset_id": "dataset-northstar",
+    "version_id": "version-complete-example",
+    "job_id": "job-11111111111111111111111111111111",
+    "operation_id": "web-11111111111111111111111111111111",
+    "request_sha256": "825aaf666361350170465d4f183fe2fffd2cf4e27b30f50ae12311dfb42c392c",
+    "contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "payload_sha256": "95dd75c619b8b2019ae5d41b40b6cd17dd35f521ec6aa3d8184f120324f64cec",
+    "receipt_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "entity_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "policy_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "analysis_plan_sha256": "51fd84a8f16736b24e09de3fffad74c565ad34788d0bc39ede77f5d7f25959c4",
+    "source_reference_sha256": "c8c18f5b0a8d6e553bd7064582e9b5e4699ae49562a72a7f5cfbb2224cad389b",
+    "assumption_review_sha256": "957086f6cab65915eb045958e06868b0b837002e12f913f56b12d50ee36c1c4f"
+  },
+  "analysis_plan": {
+    "schema_version": 1,
+    "financial_summary": true,
+    "annual_trends": true,
+    "quote_metrics": "if_eligible",
+    "valuation": {
+      "method": "fcff-linear-fade/1",
+      "horizon_years": 1,
+      "discount_rate": "0.1",
+      "terminal_growth": "0.02",
+      "high_growth": "0.1",
+      "scenario_deltas": {
+        "bear": "-0.04",
+        "base": "0",
+        "bull": "0.04"
+      },
+      "weights": {
+        "bear": "0.25",
+        "base": "0.5",
+        "bull": "0.25"
+      },
+      "tax_basis": "explicit_rate",
+      "tax_rate": "0.25",
+      "rationale": "Fictional one-year arithmetic benchmark; not company investment assumptions."
+    }
+  },
+  "evidence_gate": "review_required",
+  "sections": [
+    {
+      "id": "summary",
+      "requested": true,
+      "availability": "available",
+      "reason_codes": [],
+      "metric_ids": [
+        "revenue-2025",
+        "operating-margin",
+        "revenue-yoy"
+      ]
+    },
+    {
+      "id": "performance",
+      "requested": true,
+      "availability": "available",
+      "reason_codes": [],
+      "metric_ids": [
+        "revenue-2025",
+        "operating-income",
+        "net-income",
+        "gross-margin",
+        "operating-margin",
+        "net-margin-2025",
+        "revenue-yoy",
+        "revenue-cagr",
+        "annual-pe",
+        "ev-operating-income",
+        "revenue-2023",
+        "revenue-2024",
+        "net-margin-2023",
+        "net-margin-2024"
+      ]
+    },
+    {
+      "id": "valuation",
+      "requested": true,
+      "availability": "available",
+      "reason_codes": [],
+      "metric_ids": [
+        "base-fcff",
+        "bear-ev",
+        "bear-equity",
+        "bear-per-share",
+        "bear-terminal-concentration",
+        "base-ev",
+        "base-equity",
+        "base-per-share",
+        "base-terminal-concentration",
+        "bull-ev",
+        "bull-equity",
+        "bull-per-share",
+        "bull-terminal-concentration",
+        "weighted-per-share",
+        "model-value-gap"
+      ]
+    },
+    {
+      "id": "peers",
+      "requested": false,
+      "availability": "unavailable",
+      "reason_codes": [
+        "unsupported_input_group"
+      ],
+      "metric_ids": []
+    },
+    {
+      "id": "market",
+      "requested": false,
+      "availability": "unavailable",
+      "reason_codes": [
+        "unsupported_input_group"
+      ],
+      "metric_ids": []
+    },
+    {
+      "id": "consensus",
+      "requested": false,
+      "availability": "unavailable",
+      "reason_codes": [
+        "unsupported_input_group"
+      ],
+      "metric_ids": []
+    },
+    {
+      "id": "external-research",
+      "requested": false,
+      "availability": "unavailable",
+      "reason_codes": [
+        "unsupported_input_group"
+      ],
+      "metric_ids": []
+    },
+    {
+      "id": "evidence",
+      "requested": true,
+      "availability": "available",
+      "reason_codes": [],
+      "metric_ids": []
+    }
+  ],
+  "metrics": [
+    {
+      "id": "revenue-2023",
+      "label": "Annual revenue 2023",
+      "value": "800000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2023-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-revenue-2023"
+    },
+    {
+      "id": "net-margin-2023",
+      "label": "Annual net margin 2023",
+      "value": "0.075",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2023-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-net-margin-2023"
+    },
+    {
+      "id": "revenue-2024",
+      "label": "Annual revenue 2024",
+      "value": "900000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2024-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-revenue-2024"
+    },
+    {
+      "id": "net-margin-2024",
+      "label": "Annual net margin 2024",
+      "value": "0.075",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2024-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-net-margin-2024"
+    },
+    {
+      "id": "revenue-2025",
+      "label": "Annual revenue 2025",
+      "value": "1000000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-revenue-2025"
+    },
+    {
+      "id": "net-margin-2025",
+      "label": "Annual net margin 2025",
+      "value": "0.075",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-net-margin-2025"
+    },
+    {
+      "id": "operating-income",
+      "label": "Operating income",
+      "value": "120000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-operating-income"
+    },
+    {
+      "id": "net-income",
+      "label": "Attributable ordinary net income",
+      "value": "75000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-net-income"
+    },
+    {
+      "id": "gross-margin",
+      "label": "Gross margin",
+      "value": "0.3",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-gross-margin"
+    },
+    {
+      "id": "operating-margin",
+      "label": "Operating margin",
+      "value": "0.12",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-operating-margin"
+    },
+    {
+      "id": "revenue-yoy",
+      "label": "Revenue growth",
+      "value": "0.1111",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-revenue-yoy"
+    },
+    {
+      "id": "revenue-cagr",
+      "label": "Revenue CAGR FY2023–FY2025",
+      "value": "0.118033988749894848",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "main",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-revenue-cagr"
+    },
+    {
+      "id": "annual-pe",
+      "label": "Dated quote / FY2025 earnings",
+      "value": "10.6667",
+      "unit": "multiple",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "supporting",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-annual-pe"
+    },
+    {
+      "id": "ev-operating-income",
+      "label": "Dated EV / FY2025 operating income",
+      "value": "7.5",
+      "unit": "multiple",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "supporting",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-ev-operating-income"
+    },
+    {
+      "id": "base-fcff",
+      "label": "Base FCFF",
+      "value": "80000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-base-fcff"
+    },
+    {
+      "id": "bear-ev",
+      "label": "Enterprise value · bear",
+      "value": "1060000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bear-ev"
+    },
+    {
+      "id": "bear-equity",
+      "label": "Equity value · bear",
+      "value": "960000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bear-equity"
+    },
+    {
+      "id": "bear-per-share",
+      "label": "Equity value per share · bear",
+      "value": "96",
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bear-per-share"
+    },
+    {
+      "id": "bear-terminal-concentration",
+      "label": "Terminal-value concentration · bear",
+      "value": "0.9273",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bear-terminal-concentration"
+    },
+    {
+      "id": "base-ev",
+      "label": "Enterprise value · base",
+      "value": "1100000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-base-ev"
+    },
+    {
+      "id": "base-equity",
+      "label": "Equity value · base",
+      "value": "1000000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-base-equity"
+    },
+    {
+      "id": "base-per-share",
+      "label": "Equity value per share · base",
+      "value": "100",
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-base-per-share"
+    },
+    {
+      "id": "base-terminal-concentration",
+      "label": "Terminal-value concentration · base",
+      "value": "0.9273",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-base-terminal-concentration"
+    },
+    {
+      "id": "bull-ev",
+      "label": "Enterprise value · bull",
+      "value": "1140000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bull-ev"
+    },
+    {
+      "id": "bull-equity",
+      "label": "Equity value · bull",
+      "value": "1040000000",
+      "unit": "currency",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bull-equity"
+    },
+    {
+      "id": "bull-per-share",
+      "label": "Equity value per share · bull",
+      "value": "104",
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bull-per-share"
+    },
+    {
+      "id": "bull-terminal-concentration",
+      "label": "Terminal-value concentration · bull",
+      "value": "0.9273",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": null,
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-bull-terminal-concentration"
+    },
+    {
+      "id": "weighted-per-share",
+      "label": "Scenario-weighted equity value per share",
+      "value": "100",
+      "unit": "currency_per_share",
+      "currency": "EUR",
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-weighted-per-share"
+    },
+    {
+      "id": "model-value-gap",
+      "label": "Conditional model-value gap",
+      "value": "0.25",
+      "unit": "fraction",
+      "currency": null,
+      "period_end": "2025-12-31",
+      "as_of": "2026-11-02",
+      "visibility": "diagnostic",
+      "availability": "available",
+      "reason_codes": [],
+      "derivation_id": "derive-model-value-gap"
+    }
+  ],
+  "series": [
+    {
+      "id": "revenue-history",
+      "label": "Annual revenue",
+      "kind": "bar",
+      "unit": "currency",
+      "currency": "EUR",
+      "points": [
+        {
+          "date": "2023-12-31",
+          "value": "800000000",
+          "metric_id": "revenue-2023",
+          "reason_codes": []
+        },
+        {
+          "date": "2024-12-31",
+          "value": "900000000",
+          "metric_id": "revenue-2024",
+          "reason_codes": []
+        },
+        {
+          "date": "2025-12-31",
+          "value": "1000000000",
+          "metric_id": "revenue-2025",
+          "reason_codes": []
+        }
+      ]
+    },
+    {
+      "id": "net-margin-history",
+      "label": "Annual net margin",
+      "kind": "line",
+      "unit": "fraction",
+      "currency": null,
+      "points": [
+        {
+          "date": "2023-12-31",
+          "value": "0.075",
+          "metric_id": "net-margin-2023",
+          "reason_codes": []
+        },
+        {
+          "date": "2024-12-31",
+          "value": "0.075",
+          "metric_id": "net-margin-2024",
+          "reason_codes": []
+        },
+        {
+          "date": "2025-12-31",
+          "value": "0.075",
+          "metric_id": "net-margin-2025",
+          "reason_codes": []
+        }
+      ]
+    }
+  ],
+  "derivations": [
+    {
+      "id": "derive-revenue-2023",
+      "method": "sourced_annual",
+      "input_pointers": [
+        "/periods/0/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "revenue-2023"
+      ],
+      "rounding": "source_decimal"
+    },
+    {
+      "id": "derive-net-margin-2023",
+      "method": "net_margin",
+      "input_pointers": [
+        "/periods/0/observations/net_income/value",
+        "/periods/0/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "net-margin-2023"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-revenue-2024",
+      "method": "sourced_annual",
+      "input_pointers": [
+        "/periods/1/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "revenue-2024"
+      ],
+      "rounding": "source_decimal"
+    },
+    {
+      "id": "derive-net-margin-2024",
+      "method": "net_margin",
+      "input_pointers": [
+        "/periods/1/observations/net_income/value",
+        "/periods/1/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "net-margin-2024"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-revenue-2025",
+      "method": "sourced_annual",
+      "input_pointers": [
+        "/periods/2/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "revenue-2025"
+      ],
+      "rounding": "source_decimal"
+    },
+    {
+      "id": "derive-net-margin-2025",
+      "method": "net_margin",
+      "input_pointers": [
+        "/periods/2/observations/net_income/value",
+        "/periods/2/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "net-margin-2025"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-operating-income",
+      "method": "sourced_annual",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "operating-income"
+      ],
+      "rounding": "source_decimal"
+    },
+    {
+      "id": "derive-net-income",
+      "method": "sourced_annual",
+      "input_pointers": [
+        "/periods/2/observations/net_income/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "net-income"
+      ],
+      "rounding": "source_decimal"
+    },
+    {
+      "id": "derive-gross-margin",
+      "method": "gross_margin",
+      "input_pointers": [
+        "/periods/2/observations/gross_profit/value",
+        "/periods/2/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "gross-margin"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-operating-margin",
+      "method": "operating_margin",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "operating-margin"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-revenue-yoy",
+      "method": "revenue_yoy",
+      "input_pointers": [
+        "/periods/2/observations/revenue/value",
+        "/periods/1/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "revenue-yoy"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-revenue-cagr",
+      "method": "revenue_cagr",
+      "input_pointers": [
+        "/periods/0/observations/revenue/value",
+        "/periods/1/observations/revenue/value",
+        "/periods/2/observations/revenue/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "revenue-cagr"
+      ],
+      "rounding": "engine_float_decimal"
+    },
+    {
+      "id": "derive-annual-pe",
+      "method": "annual_pe",
+      "input_pointers": [
+        "/quote/observations/market_cap/value",
+        "/periods/2/observations/net_income/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "annual-pe"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-ev-operating-income",
+      "method": "ev_operating_income",
+      "input_pointers": [
+        "/quote/observations/market_cap/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [],
+      "metric_ids": [
+        "ev-operating-income"
+      ],
+      "rounding": "engine_ratio_4dp"
+    },
+    {
+      "id": "derive-base-fcff",
+      "method": "fcff",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "base-fcff"
+      ],
+      "rounding": "engine_float_decimal"
+    },
+    {
+      "id": "derive-bear-ev",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bear-ev"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-bear-equity",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bear-equity"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-bear-per-share",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value",
+        "/quote/observations/shares_outstanding/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bear-per-share"
+      ],
+      "rounding": "engine_per_share_2dp"
+    },
+    {
+      "id": "derive-bear-terminal-concentration",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bear-terminal-concentration"
+      ],
+      "rounding": "engine_fraction_4dp"
+    },
+    {
+      "id": "derive-base-ev",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "base-ev"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-base-equity",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "base-equity"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-base-per-share",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value",
+        "/quote/observations/shares_outstanding/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "base-per-share"
+      ],
+      "rounding": "engine_per_share_2dp"
+    },
+    {
+      "id": "derive-base-terminal-concentration",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "base-terminal-concentration"
+      ],
+      "rounding": "engine_fraction_4dp"
+    },
+    {
+      "id": "derive-bull-ev",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bull-ev"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-bull-equity",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bull-equity"
+      ],
+      "rounding": "engine_amount_0dp"
+    },
+    {
+      "id": "derive-bull-per-share",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value",
+        "/quote/observations/shares_outstanding/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bull-per-share"
+      ],
+      "rounding": "engine_per_share_2dp"
+    },
+    {
+      "id": "derive-bull-terminal-concentration",
+      "method": "dcf_scenario",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "bull-terminal-concentration"
+      ],
+      "rounding": "engine_fraction_4dp"
+    },
+    {
+      "id": "derive-weighted-per-share",
+      "method": "dcf_weighted",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value",
+        "/quote/observations/shares_outstanding/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "weighted-per-share"
+      ],
+      "rounding": "engine_per_share_2dp"
+    },
+    {
+      "id": "derive-model-value-gap",
+      "method": "model_value_gap",
+      "input_pointers": [
+        "/periods/2/observations/operating_income/value",
+        "/periods/2/observations/depreciation_amortization/value",
+        "/periods/2/observations/capex/value",
+        "/periods/2/observations/change_in_working_capital/value",
+        "/periods/2/observations/total_debt/value",
+        "/periods/2/observations/cash_and_equivalents/value",
+        "/periods/2/observations/noncontrolling_interests/value",
+        "/periods/2/observations/preferred_equity/value",
+        "/periods/2/observations/other_equity_claims/value",
+        "/quote/observations/shares_outstanding/value",
+        "/quote/observations/current_price/value"
+      ],
+      "parameter_pointers": [
+        "/analysis_plan/valuation"
+      ],
+      "metric_ids": [
+        "model-value-gap"
+      ],
+      "rounding": "engine_fraction_4dp"
+    }
+  ],
+  "checks": [
+    {
+      "id": "fictional-source",
+      "status": "review",
+      "reason_code": "synthetic_evidence",
+      "section_ids": [
+        "summary",
+        "performance",
+        "valuation",
+        "peers",
+        "market",
+        "consensus",
+        "external-research",
+        "evidence"
+      ],
+      "detail": "Fictional expected-output example, not an actual calculation or independently verified filing."
+    },
+    {
+      "id": "unknown-source-times",
+      "status": "review",
+      "reason_code": "source_dates_unknown",
+      "section_ids": [
+        "evidence"
+      ],
+      "detail": "Publication and retrieval instants are unknown; observation dates remain separately supplied."
+    }
+  ]
+}

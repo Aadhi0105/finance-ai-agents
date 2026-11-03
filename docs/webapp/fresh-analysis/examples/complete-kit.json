@@ -1,0 +1,386 @@
+{
+  "schema_version": 2,
+  "kind": "keystone.input-package",
+  "workflow": "research",
+  "payload_format": "agent1.financial-kit/1",
+  "dataset": {
+    "title": "Northstar annual local research example",
+    "entity_id": "entity-northstar",
+    "listing": {
+      "ticker": "NSTAR",
+      "exchange": "XPAR",
+      "quote_currency": "EUR",
+      "share_class": "ordinary"
+    },
+    "upstream_id": null,
+    "supersedes_version_id": null
+  },
+  "sources": [
+    {
+      "source_id": "annual-source",
+      "role": "annual_statements",
+      "category": "synthetic",
+      "provider_or_owner": "Fictional Northstar example",
+      "reference": "4A.2 fictional design data; no external document",
+      "period_start": "2023-01-01",
+      "period_end": "2025-12-31",
+      "published_at": null,
+      "retrieved_at": null,
+      "currency": "EUR",
+      "units": "base",
+      "permission_record_id": "permission-fictional-example"
+    },
+    {
+      "source_id": "quote-source",
+      "role": "quote_snapshot",
+      "category": "synthetic",
+      "provider_or_owner": "Fictional Northstar example",
+      "reference": "4A.2 fictional design data; no external document",
+      "period_start": "2026-11-02",
+      "period_end": "2026-11-02",
+      "published_at": null,
+      "retrieved_at": null,
+      "currency": "EUR",
+      "units": "base",
+      "permission_record_id": "permission-fictional-example"
+    }
+  ],
+  "payload": {
+    "schema_version": 1,
+    "kind": "keystone.financial-kit",
+    "entity_id": "entity-northstar",
+    "listing": {
+      "ticker": "NSTAR",
+      "exchange": "XPAR",
+      "quote_currency": "EUR",
+      "share_class": "ordinary"
+    },
+    "company_type": "nonfinancial_operating",
+    "instrument_type": "ordinary_equity",
+    "financial_scope": "consolidated",
+    "currency": "EUR",
+    "monetary_unit": "base",
+    "period_type": "annual",
+    "periods": [
+      {
+        "period_start": "2023-01-01",
+        "period_end": "2023-12-31",
+        "currency": "EUR",
+        "monetary_unit": "base",
+        "capex_convention": "outflow_magnitude",
+        "working_capital_convention": "balance_change",
+        "debt_basis": "interest_bearing_including_leases",
+        "cash_basis": "unrestricted_cash_and_equivalents",
+        "observations": {
+          "revenue": {
+            "value": "800000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2023 table / revenue",
+            "missing_reason": null
+          },
+          "gross_profit": {
+            "value": "240000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2023 table / gross_profit",
+            "missing_reason": null
+          },
+          "operating_income": {
+            "value": "96000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2023 table / operating_income",
+            "missing_reason": null
+          },
+          "net_income": {
+            "value": "60000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2023 table / net_income",
+            "missing_reason": null
+          },
+          "pretax_income": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "tax_provision": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "depreciation_amortization": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "capex": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "change_in_working_capital": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "total_debt": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "cash_and_equivalents": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "noncontrolling_interests": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "preferred_equity": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "other_equity_claims": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          }
+        }
+      },
+      {
+        "period_start": "2024-01-01",
+        "period_end": "2024-12-31",
+        "currency": "EUR",
+        "monetary_unit": "base",
+        "capex_convention": "outflow_magnitude",
+        "working_capital_convention": "balance_change",
+        "debt_basis": "interest_bearing_including_leases",
+        "cash_basis": "unrestricted_cash_and_equivalents",
+        "observations": {
+          "revenue": {
+            "value": "900000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2024 table / revenue",
+            "missing_reason": null
+          },
+          "gross_profit": {
+            "value": "270000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2024 table / gross_profit",
+            "missing_reason": null
+          },
+          "operating_income": {
+            "value": "108000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2024 table / operating_income",
+            "missing_reason": null
+          },
+          "net_income": {
+            "value": "67500000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2024 table / net_income",
+            "missing_reason": null
+          },
+          "pretax_income": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "tax_provision": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "depreciation_amortization": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "capex": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "change_in_working_capital": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "total_debt": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "cash_and_equivalents": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "noncontrolling_interests": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "preferred_equity": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          },
+          "other_equity_claims": {
+            "value": null,
+            "source_id": null,
+            "locator": null,
+            "missing_reason": "not_provided"
+          }
+        }
+      },
+      {
+        "period_start": "2025-01-01",
+        "period_end": "2025-12-31",
+        "currency": "EUR",
+        "monetary_unit": "base",
+        "capex_convention": "outflow_magnitude",
+        "working_capital_convention": "balance_change",
+        "debt_basis": "interest_bearing_including_leases",
+        "cash_basis": "unrestricted_cash_and_equivalents",
+        "observations": {
+          "revenue": {
+            "value": "1000000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / revenue",
+            "missing_reason": null
+          },
+          "gross_profit": {
+            "value": "300000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / gross_profit",
+            "missing_reason": null
+          },
+          "operating_income": {
+            "value": "120000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / operating_income",
+            "missing_reason": null
+          },
+          "net_income": {
+            "value": "75000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / net_income",
+            "missing_reason": null
+          },
+          "pretax_income": {
+            "value": "100000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / pretax_income",
+            "missing_reason": null
+          },
+          "tax_provision": {
+            "value": "25000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / tax_provision",
+            "missing_reason": null
+          },
+          "depreciation_amortization": {
+            "value": "20000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / depreciation_amortization",
+            "missing_reason": null
+          },
+          "capex": {
+            "value": "25000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / capex",
+            "missing_reason": null
+          },
+          "change_in_working_capital": {
+            "value": "5000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / change_in_working_capital",
+            "missing_reason": null
+          },
+          "total_debt": {
+            "value": "200000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / total_debt",
+            "missing_reason": null
+          },
+          "cash_and_equivalents": {
+            "value": "100000000",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / cash_and_equivalents",
+            "missing_reason": null
+          },
+          "noncontrolling_interests": {
+            "value": "0",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / noncontrolling_interests",
+            "missing_reason": null
+          },
+          "preferred_equity": {
+            "value": "0",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / preferred_equity",
+            "missing_reason": null
+          },
+          "other_equity_claims": {
+            "value": "0",
+            "source_id": "annual-source",
+            "locator": "Fictional FY2025 table / other_equity_claims",
+            "missing_reason": null
+          }
+        }
+      }
+    ],
+    "quote": {
+      "listing": {
+        "ticker": "NSTAR",
+        "exchange": "XPAR",
+        "quote_currency": "EUR",
+        "share_class": "ordinary"
+      },
+      "monetary_unit": "base",
+      "share_basis": "ordinary_shares",
+      "as_of": "2026-11-02",
+      "observations": {
+        "current_price": {
+          "value": "80",
+          "source_id": "quote-source",
+          "locator": "Fictional 2026-11-02 snapshot / current_price",
+          "missing_reason": null
+        },
+        "market_cap": {
+          "value": "800000000",
+          "source_id": "quote-source",
+          "locator": "Fictional 2026-11-02 snapshot / market_cap",
+          "missing_reason": null
+        },
+        "shares_outstanding": {
+          "value": "10000000",
+          "source_id": "quote-source",
+          "locator": "Fictional 2026-11-02 snapshot / shares_outstanding",
+          "missing_reason": null
+        }
+      }
+    }
+  }
+}

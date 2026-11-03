@@ -49,6 +49,27 @@ human interpretation remain open.
 
 [3D](../docs/webapp/batch3d-onboarding-acceptance.md) adds explicit private restoration, queued-work holds, operator release and complete-path/fault/volume acceptance. Connection help explains the local token file and hidden Mac folders.
 
+[4A.1](../docs/webapp/batch4a1-fresh-analysis-scope.md) defines the next
+fresh-analysis product scope and user journey. Its isolated design preview lives
+under `docs/webapp/fresh-analysis-preview/`; it has no API integration and is not
+part of this application build.
+[4A.2](../docs/webapp/batch4a2-fresh-analysis-contracts.md) now specifies the
+local financial-kit/plan/result contracts, financial dependencies, exact review
+binding, fixed execution profile, recovery and pending acceptance. Its
+[design pack](../docs/webapp/fresh-analysis/README.md) does not enable new UI/API
+formats; actual Agent 1 implementation is 4B. The old preview remains a fictional
+4A.1 walkthrough, not the complete technical contract.
+
+[4B](../docs/webapp/batch4b-local-research.md) implements new local company
+analysis from annual EUR financial observations. Its exact-version page offers
+summary-only or conditional DCF scope, full assumption/review binding and
+separate confirmation. The native reader supports `agent1-local-report/1.0.0`
+beside the existing recipes, with interactive graphs, dated comparisons,
+complete retained valuation diagnostics and clear missing-cash holds. The
+demonstration uses an isolated fictional workspace on loopback port 8858.
+Keep the live preview beside the chat during future implementation work, as
+recorded in [the repository preference](../AGENTS.md).
+
 See the [complete setup and acceptance guide](../docs/webapp/batch1-report-workspace.md).
 
 Requires Node.js 24 and pnpm 11.25.0. From this directory:

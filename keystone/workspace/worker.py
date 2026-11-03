@@ -62,6 +62,9 @@ def run_one(store):
                 inputs = InputStore(store.workspace.parent)
                 _,proof = committed(inputs,record)
                 commit_values['accounting_commit_sha256'] = remember(inputs,proof)
+            if record.schema_version==4:
+                from .onboarding.research.delivery import commit_hash
+                commit_values['analysis_commit_sha256']=commit_hash(store,record)
             result, _, _ = verified_result(store, record)
             store.update_execution(record.job_id, event='prepared', result=result.model_dump(), operation_status=op['status'],**commit_values)
             publish_result(store, record, result)
@@ -76,13 +79,12 @@ def run_one(store):
                 finished_at=now(), reason='interrupted', operation_status='outcome_unknown')
             return True, True
         except Exception as error:
-            if result is not None:
+            if isinstance(error,JobError) and error.code=='job_source_unavailable':
+                store.update_execution(record.job_id,event='source_changed',status='source_changed',finished_at=now(),reason='source_changed')
+            elif result is not None:
                 store.update_execution(record.job_id, event='delivery_failed', status='delivery_failed',
                     finished_at=now(), reason='delivery_failed', result=result.model_dump(),
                     operation_status=op['status'])
-            elif not dispatched and isinstance(error, JobError) and error.code == 'job_source_unavailable':
-                store.update_execution(record.job_id, event='source_changed', status='source_changed',
-                    finished_at=now(), reason='source_changed')
             elif not dispatched and isinstance(error, JobError) and error.code == 'job_recovery_unavailable':
                 store.update_execution(record.job_id, event='interrupted', status='outcome_unknown',
                     finished_at=now(), reason='interrupted', operation_status='outcome_unknown')
@@ -109,7 +111,7 @@ def recover_delivery(store, job_id):
         record = store.immutable(job_id)
         if record.schema_version == 3:
             return recover_close_delivery(store,record,public)
-        if public['status'] not in {'delivery_failed','outcome_unknown','completed','review_required'}:
+        if public['status'] not in ({'failed'} if record.schema_version==4 else set())|{'delivery_failed','outcome_unknown','completed','review_required'}:
             raise JobError('job_recovery_unavailable', 409)
         record = store.immutable(job_id)
         from .job_execution import parse_execution
@@ -117,9 +119,14 @@ def recover_delivery(store, job_id):
         result, _, saved = verified_result(store, record, old.result)
         publish_result(store, record, result)
         if old.status not in {'completed','review_required'}:
+            commit_values={}
+            if record.schema_version==4:
+                from .onboarding.research.delivery import commit_hash
+                commit_values['analysis_commit_sha256']=commit_hash(store,record)
             store.update_execution(job_id, event='recovered', status='review_required', finished_at=now(),
                 reason='recovered', result=result.model_dump(), operation_status=saved['status'],
-                inputs_verified_at=old.inputs_verified_at or now())
+                inputs_verified_at=old.inputs_verified_at or now(),
+                **commit_values)
         return store.get(job_id)
 
 

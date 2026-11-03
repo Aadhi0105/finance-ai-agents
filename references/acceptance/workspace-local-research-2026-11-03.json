@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.local-research-engineering-evidence",
+  "date": "2026-11-03",
+  "code_commit": "7ff34d12386e088d9afe529cca51f3f5ed762aa4",
+  "worktree_dirty": true,
+  "tests": {
+    "python_passed": 1454,
+    "python_seconds": 547.94,
+    "frontend_passed": 282,
+    "focused_local_cases": 42,
+    "typecheck": "passed",
+    "production_build": "passed"
+  },
+  "browser": {
+    "checks_passed": 8,
+    "desktop_css_width": 1280,
+    "narrow_css_width": 320,
+    "viewport_override_reset": true
+  },
+  "demonstration": {
+    "workspace_id": "workspace-53d224fb05df41af98fb4ee2356745de",
+    "entities": 1,
+    "datasets": 1,
+    "accepted_input_versions": 2,
+    "runs": [
+      {
+        "job_id": "job-34119f8815124c51a8dd891639af5df0",
+        "result_id": "result-34119f8815124c51a8dd891639af5df0",
+        "version_id": "version-2dac8d9e8827430ea72b55b9ddac6497",
+        "classification": "synthetic",
+        "valuation": "available",
+        "revenue": "1000000000",
+        "operating_margin": "0.12",
+        "weighted_per_share": "100.0",
+        "provider_requests": 0,
+        "model_calls": 0,
+        "artifacts": {
+          "payload.json": {
+            "sha256": "c3513a7f0e4b3bc396013374d5d7ccd7960001ff21e1418f9434035232aaf539",
+            "bytes": 27641
+          },
+          "financial-kit.json": {
+            "sha256": "e66249a700d0534873e5bacccf750589acbe9279fe184888cf625ed88bca0e69",
+            "bytes": 6946
+          },
+          "analysis-request.json": {
+            "sha256": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7",
+            "bytes": 1033
+          },
+          "input-contract.json": {
+            "sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+            "bytes": 3338
+          },
+          "report_REVIEW.html": {
+            "sha256": "710be8253006f1a3656ec923958299a6efe858cbcdbc310894929b13401daa61",
+            "bytes": 9565
+          },
+          "native-series.json": {
+            "sha256": "c97ed958a0895a45cded58ebb04c5e0e418669e2ad42597bcc69a046da8e369e",
+            "bytes": 250
+          },
+          "native-report.json": {
+            "sha256": "7b5933774c010a19afad2d7fe2a022c43be715405693257e40fdc800b2aa516b",
+            "bytes": 35364
+          },
+          "analysis-commit.json": {
+            "sha256": "ce2425e836ff5e34bdce32cae9b0899530875e3639e0a6d157371bedb48c28b3",
+            "bytes": 1795
+          }
+        }
+      },
+      {
+        "job_id": "job-93dc3fd8aaf14ebe853d0f4d3b9a8e07",
+        "result_id": "result-93dc3fd8aaf14ebe853d0f4d3b9a8e07",
+        "version_id": "version-c31c2f10b4304a8c99d49f5d62463ace",
+        "classification": "synthetic",
+        "valuation": "withheld",
+        "revenue": "1000000000",
+        "operating_margin": "0.12",
+        "weighted_per_share": null,
+        "provider_requests": 0,
+        "model_calls": 0,
+        "artifacts": {
+          "payload.json": {
+            "sha256": "c2f129ad600489e35b2b43a6aa48178066b3b6e446a3fa1430ad169786fe57d7",
+            "bytes": 17238
+          },
+          "financial-kit.json": {
+            "sha256": "8857c4c237df2f2c8a1354b5795d890dbc32b28855a943651af8e56e889a5d05",
+            "bytes": 6895
+          },
+          "analysis-request.json": {
+            "sha256": "0fa8279475726e6a91d32a74cbf6f596fb1283eab35a7528f7677c04cfc427ca",
+            "bytes": 1037
+          },
+          "input-contract.json": {
+            "sha256": "4a0d393a82bb7543b97973481530532d39d243eef7771e5ce85d77acce98b827",
+            "bytes": 3359
+          },
+          "report_REVIEW.html": {
+            "sha256": "4be9c15a6a0690fa24c6fcd415f03af2f0aef9ae8fab85a56dbc16688419c3e0",
+            "bytes": 10735
+          },
+          "native-series.json": {
+            "sha256": "156a68ad67b5f2fbaa6b2033306767977aeb063ea76cb2423253992336e44efa",
+            "bytes": 250
+          },
+          "native-report.json": {
+            "sha256": "68d72b282755f95bceb0a29f54147f1afa2f9d389a92c16c069f6a2416ec6709",
+            "bytes": 36793
+          },
+          "analysis-commit.json": {
+            "sha256": "10e17558524429b5e678021f15c516153c807764f14df9107018f0a88c0e4355",
+            "bytes": 1796
+          }
+        }
+      }
+    ]
+  },
+  "scope": "Bounded synthetic local implementation; broader 4D acceptance remains separate.",
+  "production_release_approved": false,
+  "remaining": [
+    "Broader maximum-volume and combined disk-fault acceptance for the new profile.",
+    "Real-source permission and human financial interpretation.",
+    "Independent backup, key recovery and clean-machine disaster recovery."
+  ]
+}

@@ -13,7 +13,7 @@ from starlette.concurrency import run_in_threadpool
 from keystone.maintenance import ROOT, control_write_gate
 from ..catalog import read_confined, read_json,run_identity
 from ..jobs import Admission
-from ..job_contract import (JobError,DatasetJobRequest,DatasetJobRecord,FreshCloseJobRecord,DatasetBinding,
+from ..job_contract import (JobError,DatasetJobRequest,DatasetJobRecord,FreshCloseJobRecord,DatasetBinding,LocalResearchRequest,LocalResearchJobRecord,
                             DATASET_PROFILES,MAX_PENDING_JOBS,MAX_RETAINED_JOBS,MAX_REQUESTS,MAX_OUTPUT_TOKENS,
                             MAX_TIMEOUT_SECONDS,fingerprint as job_fingerprint,now)
 from ..job_files import write_new
@@ -56,6 +56,8 @@ class PrivateAdmission(Admission):
                     max_pending_jobs=MAX_PENDING_JOBS,max_retained_jobs=MAX_RETAINED_JOBS,
                     input_formats=c.FORMATS if self.imports_enabled else {},
                     supported_input_formats=c.SUPPORTED_FORMATS if self.imports_enabled else {},
+                    fresh_research_supported=True,fresh_research_profile='calculate-local-research' if self.jobs_enabled else None,
+                    fresh_research_limits=dict(timeout_seconds=120,max_package_bytes=1_000_000,max_requests=0,max_output_tokens=0),
                     fresh_close_profile='calculate-imported-close' if self.jobs_enabled else None,
                     live_data_enabled=False,paid_models_enabled=False,financial_approval=False,
                     scope='Private local input onboarding and supervised offline processing.',
@@ -67,11 +69,16 @@ class PrivateAdmission(Admission):
             value['next_action']='Restored request held. A local operator must recheck and release this exact never-started job.'
         if job.get('profile') == 'calculate-imported-close' and job['status'] == 'failed':
             value['recovery_required'] = True
-        return {**value,'schema_version':3,'admission_schema_version':2}
+        return {**value,'schema_version':3,'admission_schema_version':3 if job.get('profile')=='calculate-local-research' else 2}
 
     def submit(self,value,key):
         if not self.jobs_enabled: raise JobError('job_request_invalid',405)
-        try: request=DatasetJobRequest.model_validate(value);kh=c.request_key(key)
+        try:
+            model=LocalResearchRequest if isinstance(value,dict) and value.get('schema_version')==3 else DatasetJobRequest
+            if model is LocalResearchRequest:
+                from .research.contracts import plan
+                plan(value)
+            request=model.model_validate(value);kh=c.request_key(key)
         except (ValueError,TypeError): raise JobError('job_request_invalid',422) from None
         fp=job_fingerprint(request.model_dump())
         old=self._safe(lambda:self.store.existing(kh,fp))
@@ -83,15 +90,22 @@ class PrivateAdmission(Admission):
             source=binding(self.inputs,version)
         except Exception: raise JobError('job_source_unavailable',409) from None
         id_=uuid.uuid4().hex
+        local=version['contract']['metadata']['payload_format']==c.FRESH_RESEARCH
+        if local != isinstance(request,LocalResearchRequest):raise JobError('job_request_invalid',422)
         fresh = version['contract']['metadata']['payload_format'] == c.FRESH_CLOSE
         extra = {}
         if fresh:
             from .close_state import current
             try: extra['accounting_source'] = current(self.inputs,version['contract']['validation']['accounting_source'])
             except Exception: raise JobError('job_source_unavailable',409) from None
-        model = FreshCloseJobRecord if fresh else DatasetJobRecord
+        if local:
+            from .research.contracts import readiness,producer
+            payload=read_json(self.inputs.read('inputs/'+version['id']+'/payload.json'))
+            ready=readiness(payload)
+            extra.update(evaluated_on=ready['evaluated_on'],admission_readiness_sha256=c.fingerprint(ready),producer_sha256=c.fingerprint(producer()))
+        model = LocalResearchJobRecord if local else FreshCloseJobRecord if fresh else DatasetJobRecord
         record=model(job_id='job-'+id_,operation_id='web-'+id_,request=request,request_sha256=fp,
-                     created_at=now(),profile='calculate-imported-close' if fresh else DATASET_PROFILES[request.workflow],source=source,**extra)
+                     created_at=now(),profile='calculate-local-research' if local else 'calculate-imported-close' if fresh else DATASET_PROFILES[request.workflow],source=source,**extra)
         job,replayed=self._safe(lambda:self.store.admit(kh,record))
         return self.public_job(job),replayed
 
@@ -103,7 +117,7 @@ class PrivateAdmission(Admission):
             if getattr(origin,name)!=getattr(source,name): raise c.InputError('input_unavailable',503)
         record=self.store.immutable(origin.job_id)
         public=self.store.get(origin.job_id)['job']
-        if (record.schema_version not in {2,3} or record.source!=source or record.request_sha256!=origin.request_sha256
+        if (record.schema_version not in {2,3,4} or record.source!=source or record.request_sha256!=origin.request_sha256
                 or record.profile!=origin.profile or public['status'] not in {'completed','review_required'}
                 or public['execution']['result'] is None
                 or public['execution']['result']['run_sha256']!=job_fingerprint(run_identity(run))):
@@ -126,7 +140,11 @@ class PrivateAdmission(Admission):
         descriptor,receipt=self.inputs.attempt(id_)
         entity=self.inputs.object('entity',descriptor['metadata']['dataset']['entity_id'])
         policy=self.inputs.policies(descriptor['metadata'],descriptor['payload_sha256'],entity)
-        return descriptor,receipt,dict(entity=entity,policy=policy)
+        context=dict(entity=entity,policy=policy)
+        if descriptor['metadata']['payload_format']==c.FRESH_RESEARCH:
+            context['research_candidate_version_id']='version-'+uuid.uuid4().hex
+            context['research_scope']=self.inputs.research_scope(entity['id'])
+        return descriptor,receipt,context
 
     async def transfer(self,id_,request,key):
         descriptor,receipt,context=await run_in_threadpool(self.authorize_transfer,id_,key)

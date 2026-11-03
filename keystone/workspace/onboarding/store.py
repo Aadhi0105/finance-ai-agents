@@ -317,7 +317,7 @@ class InputStore:
             raise c.InputError()
         # The current saved-source adapters do not establish an exchange/share
         # class mapping. Refuse that unsupported substitution before retention.
-        if listing is not None and any(listing[k] is not None for k in ('exchange','share_class')):
+        if meta['payload_format'] != c.FRESH_RESEARCH and listing is not None and any(listing[k] is not None for k in ('exchange','share_class')):
             raise c.InputError()
         if meta['dataset']['supersedes_version_id']:
             if self.object('version',meta['dataset']['supersedes_version_id'])['dataset_id']!=dataset['id']: raise c.InputError()
@@ -329,7 +329,8 @@ class InputStore:
         No reservation, retention, semantic validation, accounting write or job.
         """
         value=c.envelope(c.bounded_json(data))
-        descriptor=c.Preflight(schema_version=1,dataset_id=ident(dataset_id),package_bytes=len(data),
+        if value['schema_version']==2 and len(data)>1_000_000:raise c.InputError('input_too_large',413)
+        descriptor=c.Preflight(schema_version=value['schema_version'],dataset_id=ident(dataset_id),package_bytes=len(data),
             package_sha256=c.sha(data),payload_sha256=c.fingerprint(value['payload']),
             metadata={k:v for k,v in value.items() if k!='payload'})
         policy=self.check_preflight(descriptor)
@@ -369,6 +370,23 @@ class InputStore:
             self._transition(con,id_,result)
             return result
 
+    def research_scope(self,entity_id,con=None):
+        if con is None:
+            with self.connect() as connection:return self.research_scope(entity_id,connection)
+        for row in con.execute("SELECT id FROM objects WHERE kind='version' ORDER BY sequence"):
+            v=self._object(con,'version',row[0]);contract=v['contract']
+            if contract['metadata']['payload_format']==c.FRESH_RESEARCH and contract['metadata']['dataset']['entity_id']==entity_id:
+                if contract['listing_scope']['first_version_id']!=v['id']:raise c.InputError('input_unavailable',503)
+                return contract['listing_scope']
+        return None
+
+    def verify_research_scope(self,con,contract,version_id=None):
+        from .research.contracts import scope
+        pin=contract['listing_scope'];old=self.research_scope(contract['metadata']['dataset']['entity_id'],con)
+        if (pin!=contract['validation']['listing_scope'] or pin['scope_sha256']!=c.fingerprint(scope(contract['metadata']))
+                or old is not None and old!=pin or old is None and version_id is not None and pin['first_version_id']!=version_id):
+            raise c.InputError('input_conflict',409)
+
     def version(self,id_,*,processing=False):
         version=self.object('version',id_)
         for name,proof in version['files'].items():
@@ -383,6 +401,8 @@ class InputStore:
         if c.fingerprint(entity)!=contract['entity_sha256']: raise c.InputError('input_unavailable',503)
         policy=self.policies(contract['metadata'],contract['payload_sha256'],entity)
         if policy!=contract['policy']: raise c.InputError('input_policy_refused',403)
+        if contract['metadata']['payload_format']==c.FRESH_RESEARCH:
+            with self.connect() as con:self.verify_research_scope(con,contract,id_)
         if processing and not contract['validation']['eligible']: raise c.InputError('input_invalid',409)
         return version
 
@@ -401,8 +421,11 @@ class InputStore:
                       dataset_sha256=c.fingerprint(self.object('dataset',descriptor['dataset_id'])),
                       payload_sha256=descriptor['payload_sha256'],entity_sha256=c.fingerprint(entity),
                       policy=policy,validation=validation)
+        local=descriptor['metadata']['payload_format']==c.FRESH_RESEARCH
+        if local:contract['listing_scope']=validation['listing_scope']
         fp=c.fingerprint(contract)
         with self.write() as con:
+            if local:self.verify_research_scope(con,contract)
             _,current=self._attempt(con,id_)
             if current['state'] not in {'validating','interrupted','delivery_failed'}: raise c.InputError('input_conflict',409)
             for v_id, in con.execute("SELECT id FROM objects WHERE kind='version'"):
@@ -415,7 +438,7 @@ class InputStore:
             if (folder/'contract.json').exists():
                 if read_confined(folder,'contract.json')!=c.canonical(contract):raise c.InputError('input_conflict',409)
             else:write_new(folder/'contract.json',c.canonical(contract))
-            id_v='version-'+uuid.uuid4().hex
+            id_v=read_json(read_confined(folder,'context.json'))['research_candidate_version_id'] if local else 'version-'+uuid.uuid4().hex
             if {p.name for p in folder.iterdir()}!={'package.json','preflight.json','context.json','payload.json','validation.json','contract.json'}:
                 raise c.InputError('input_unavailable',503)
             files={p.name:{'bytes':p.stat().st_size,'sha256':c.sha(p.read_bytes())} for p in folder.iterdir()}
@@ -450,6 +473,7 @@ class InputStore:
         if contract['metadata']['payload_format'] == c.FRESH_CLOSE:
             from .close_state import current
             current(self,contract['validation']['accounting_source'])
+        if contract['metadata']['payload_format']==c.FRESH_RESEARCH:self.verify_research_scope(con,contract,version['id'])
         target=self.root/'inputs'/ident(version['id'])
         source=self.root/'staging'/ident(id_)/ident(prepared['transfer_id'])
         if target.exists() and source.exists():raise c.InputError('input_unavailable',503)

@@ -135,17 +135,19 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             lengths = request.headers.getlist('content-length')
             if len(lengths) > 1 or lengths and not re.fullmatch(r'[0-9]{1,10}', lengths[0]):
                 raise JobError('job_request_invalid', 422)
-            if lengths and int(lengths[0]) > MAX_REQUEST_BYTES:
+            transport_limit=8192 if private is not None else MAX_REQUEST_BYTES
+            if lengths and int(lengths[0]) > transport_limit:
                 raise JobError('job_request_too_large', 413)
             data = bytearray()
             async for chunk in request.stream():
-                if len(data) + len(chunk) > MAX_REQUEST_BYTES:
+                if len(data) + len(chunk) > transport_limit:
                     raise JobError('job_request_too_large', 413)
                 data.extend(chunk)
             try:
                 value = read_json(bytes(data))
             except ValueError:
                 raise JobError('job_request_invalid', 422) from None
+            if len(data)>MAX_REQUEST_BYTES and (not isinstance(value,dict) or value.get('schema_version')!=3):raise JobError('job_request_too_large',413)
             job, replayed = await run_in_threadpool(admission.submit, value, request.headers['idempotency-key'])
             return JSONResponse(dict(job=job, replayed=replayed, worker_enabled=job['worker_enabled'],
                 next_action='Queued; the local worker is disabled.'

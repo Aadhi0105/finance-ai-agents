@@ -14,6 +14,7 @@ def prepare_series(run, source, source_artifact):
               'adapter_id': adapter_id, 'adapter_version': version,
               'source_artifact_id': source_artifact.id,
               'source_sha256': source_artifact.sha256, 'derivations': {}}
+    if adapter_id=='agent1-local-report':return result
     if run.workflow == 'research':
         _research(source, result['derivations'])
     elif run.workflow == 'close':

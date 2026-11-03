@@ -21,7 +21,7 @@ def deny_network(*args, **kwargs):
 
 def render(folder):
     record = read_job(folder)
-    if record.schema_version in {2, 3}:
+    if record.schema_version in {2, 3, 4}:
         from .onboarding.execution import render as render_dataset
         return render_dataset(folder,record)
     catalog = Catalog(folder / 'inputs')

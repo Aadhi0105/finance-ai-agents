@@ -10,6 +10,10 @@ BUILDERS = {'research': research.build, 'monitoring': monitoring.build,
 def build_view(run, source, series, artifacts):
     check_source(run, source)
     builder = Builder(run, source, series, artifacts, adapter_for(run)[2])
+    if adapter_for(run)[0]=='agent1-local-report':
+        from .local_research import build
+        build(builder)
+        return builder.finish()
     BUILDERS[run.workflow](builder)
     if run.workflow == 'close' and adapter_for(run)[1] in {'1.1.0','2.0.0'}:
         close_context.extend(builder)

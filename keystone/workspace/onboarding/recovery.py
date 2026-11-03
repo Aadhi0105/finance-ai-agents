@@ -82,7 +82,7 @@ def prepare_restore(stage, final, manifest):
         records={}
         for row in rows:
             raw=JobStore._record(row);record=parse_job_record(raw)
-            if record.schema_version not in {2,3} or record.source.workspace_id!=inputs.descriptor['id']:
+            if record.schema_version not in {2,3,4} or record.source.workspace_id!=inputs.descriptor['id']:
                 raise ValueError('Restored job identity mismatch')
             execution=JobStore._execution(con,record.job_id)
             if JobStore.restoration_hold(con,record.job_id) and execution.status!='queued':
@@ -144,7 +144,7 @@ def release_restored_job(store,job_id,reason):
             raise JobError('job_recovery_unavailable',409)
         record=parse_job_record(store._record(con.execute('SELECT * FROM jobs WHERE job_id=?',(job_id,)).fetchone()))
         from .execution import current_version
-        inputs,_=current_version(store,record)
+        inputs,_=current_version(store,record,executing=record.schema_version==4)
         if record.schema_version==3:
             from .close_state import current
             current(inputs,record.accounting_source)
