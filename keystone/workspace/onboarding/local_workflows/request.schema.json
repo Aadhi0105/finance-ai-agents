@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "DatasetReference": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "dataset_version",
+          "title": "Kind",
+          "type": "string"
+        },
+        "dataset_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "version_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Version Id",
+          "type": "string"
+        },
+        "contract_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Contract Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "dataset_id",
+        "version_id",
+        "contract_sha256"
+      ],
+      "title": "DatasetReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 4,
+      "default": 4,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "workflow": {
+      "enum": [
+        "monitoring",
+        "events",
+        "news"
+      ],
+      "title": "Workflow",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/DatasetReference"
+    },
+    "timeout_seconds": {
+      "default": 120,
+      "maximum": 120,
+      "minimum": 1,
+      "title": "Timeout Seconds",
+      "type": "integer"
+    },
+    "processing_plan": {
+      "additionalProperties": true,
+      "title": "Processing Plan",
+      "type": "object"
+    }
+  },
+  "required": [
+    "workflow",
+    "source",
+    "processing_plan"
+  ],
+  "title": "LocalWorkflowRequest",
+  "type": "object"
+}

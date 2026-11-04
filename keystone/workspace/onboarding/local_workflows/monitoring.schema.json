@@ -1,0 +1,158 @@
+{
+  "$defs": {
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Date",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maxLength": 22,
+              "pattern": "^-?(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,8})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "source_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "value",
+        "source_id"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "WatchItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "metric": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "fraction",
+            "multiple",
+            "score",
+            "currency"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "const": "EUR",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Currency"
+        },
+        "threshold": {
+          "maxLength": 22,
+          "pattern": "^-?(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,8})?$",
+          "title": "Threshold",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "above",
+            "below"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/Observation"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "metric",
+        "unit",
+        "currency",
+        "threshold",
+        "direction",
+        "observations"
+      ],
+      "title": "WatchItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.monitoring-observations",
+      "title": "Kind",
+      "type": "string"
+    },
+    "entity_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "as_of": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "title": "As Of",
+      "type": "string"
+    },
+    "threshold_basis": {
+      "const": "analyst_policy",
+      "title": "Threshold Basis",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/WatchItem"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "entity_id",
+    "as_of",
+    "threshold_basis",
+    "items"
+  ],
+  "title": "Monitoring",
+  "type": "object"
+}

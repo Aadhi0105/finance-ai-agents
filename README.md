@@ -254,6 +254,16 @@ section holds. The fixed profile uses zero provider/model requests, preserves
 one-attempt jobs and supports delivery-only recovery and held-queue restoration.
 Real-source permission and financial approval remain separate requirements.
 
+[4C](docs/webapp/batch4c-other-workflows.md) adds three separate supplied-input
+actions: evaluate company observation histories against analyst policies, analyse
+historical event return windows, and filter/cluster supplied news text with an
+explicit local word list. Each confirmed version-pinned request creates a new
+native report with interactive numerical charts, coverage and review limits.
+The zero-call profiles preserve atomic evidence, one-attempt jobs, delivery-only
+recovery and held restored queues. Monitoring histories are self-contained;
+cross-job monitoring continuity, event inference approval and advanced text
+models remain separately scoped. Broader new-workflow acceptance remains 4D.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

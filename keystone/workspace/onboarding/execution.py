@@ -17,6 +17,9 @@ def current_version(store,record,*,executing=False):
         inputs=InputStore(store.workspace.parent)
         version=inputs.version(record.source.version_id,processing=True)
         if binding(inputs,version)!=record.source:raise ValueError()
+        if record.schema_version==5 and executing:
+            from .local_workflows.contracts import producer
+            if c.fingerprint(producer())!=record.producer_sha256:raise ValueError('Producer changed')
         if record.schema_version==4 and executing:
             from .research.contracts import readiness,producer
             payload=read_json(inputs.read('inputs/'+version['id']+'/payload.json'))
@@ -68,10 +71,14 @@ def read_inputs(folder,record):
             or validation.get('accounting_source') != record.accounting_source):
         raise JobError('job_source_unavailable')
     if record.schema_version==4 and contract['metadata']['payload_format']!=c.FRESH_RESEARCH:raise JobError('job_source_unavailable')
+    if record.schema_version==5 and contract['metadata']['payload_format']!=c.LOCAL_FORMATS[record.request.workflow]:raise JobError('job_source_unavailable')
     return read_json(raw['payload.json']),contract,entity
 
 
 def render(folder,record, *, saved_close=None):
+    if record.schema_version==5:
+        from .local_workflows.delivery import render as render_local
+        return render_local(folder,record)
     if record.schema_version==4:
         from .research.delivery import render as render_local
         return render_local(folder,record)
@@ -147,6 +154,9 @@ def render(folder,record, *, saved_close=None):
 
 
 def verified_result(store,record,expected=None):
+    if record.schema_version==5:
+        from .local_workflows.delivery import verified_result as verify_local
+        return verify_local(store,record,expected)
     if record.schema_version==4:
         from .research.delivery import verified_result as verify_local
         return verify_local(store,record,expected)

@@ -66,10 +66,11 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   const monitoring = run.agent === 'agent2' && run.workflow === 'monitoring';
   const close = run.agent === 'agent4' && run.workflow === 'close';
   const local=imported&&reg?.adapter_id==='agent1-local-report'&&run.agent==='agent1'&&run.workflow==='research';
-  const family = local?'agent1-local-report':run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
+  const localFlow=imported&&((monitoring&&reg?.adapter_id==='local-monitoring-report')||(events&&reg?.adapter_id==='local-events-report')||(news&&reg?.adapter_id==='local-news-report'));
+  const family = localFlow?'local-'+run.workflow+'-report':local?'agent1-local-report':run.agent === 'agent1' && run.workflow === 'research' ? 'agent1-native-report'
     : events ? 'agent3-event-report' : news ? 'agent3-news-report' : monitoring ? 'agent2-native-report' : close ? 'agent4-native-report' : null;
   if (raw.schema_version !== 1 || raw.kind !== 'keystone.report-view'
-      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !(local?['1.0.0']:imported?['2.0.0']:news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
+      || !family || !reg || reg.view_schema_version !== 1 || reg.adapter_id !== family || !((local||localFlow)?['1.0.0']:imported?['2.0.0']:news?['1.0.0','1.1.0','1.2.0']:['1.0.0', '1.1.0']).includes(reg.adapter_version)) {
     throw new ReportFailure('unsupported_report_schema');
   }
   if (raw.agent !== run.agent || raw.workflow !== run.workflow) fail();
@@ -85,7 +86,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   if (artifacts.length !== 2 || reg.source_artifact_ids.length !== 2
       || artifacts.some((a, i) => a.id !== reg.source_artifact_ids[i])
-      || artifacts[0].source_schema !== (local?'agent1.local-analysis/1':events || news ? 'agent3.run_bundle/1' : monitoring ? 'agent2.snapshot/unversioned' : close ? 'agent4.close/1' : 'agent1.model/2') || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
+      || artifacts[0].source_schema !== (localFlow?'keystone.local-workflow-result/1':local?'agent1.local-analysis/1':events || news ? 'agent3.run_bundle/1' : monitoring ? 'agent2.snapshot/unversioned' : close ? 'agent4.close/1' : 'agent1.model/2') || artifacts[1].source_schema !== 'keystone.report-series/1') fail();
   const native = run.artifacts.find(a => a.id === reg.artifact_id);
   if (!native || native.kind !== 'report_view') fail();
   const sources = array(raw.sources, 40).map(value => {
@@ -115,7 +116,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
   });
   const block = (value: unknown): TextBlock => {
     const b = object(value);
-    const templates = [...(local?['local-research-summary-v1']:[]),'saved-summary-v1', 'metric-observation-v1', ...(events && modern ? ['event-study-summary-v1'] : []),
+    const templates = [...(localFlow?['local-workflow-summary-v1']:[]),...(local?['local-research-summary-v1']:[]),'saved-summary-v1', 'metric-observation-v1', ...(events && modern ? ['event-study-summary-v1'] : []),
       ...(news && (imported||['1.1.0','1.2.0'].includes(reg.adapter_version)) ? ['news-study-summary-v1'] : []),
       ...(news && (imported||reg.adapter_version === '1.2.0') ? ['news-retrieval-summary-v1'] : []),
       ...(monitoring && modern ? ['monitoring-summary-v1'] : []),
@@ -270,7 +271,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
       });
     }
   }
-  if (monitoring) {
+  if (monitoring && !localFlow) {
     for (const m of metrics) {
       if (['cycle-items','effective-items','surfaced-items','cycle-breaches','effective-breaches','reviews-count','decisions-count'].includes(m.id)) {
         if (m.unit !== 'count' || m.visibility !== 'main') fail();
@@ -286,7 +287,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
           || c.availability === 'available' && (c.x_axis.kind !== 'date' || c.y_axis.unit !== 'multiple')) fail();
     }
   }
-  if (events) {
+  if (events && !localFlow) {
     if (metrics.some(m => !['event-count', 'issuer-count'].includes(m.id) && m.visibility !== 'diagnostic')) fail();
     for (const c of charts) {
       if (!['event-cases', 'event-path'].includes(c.id) || c.visibility !== 'diagnostic' || c.y_axis.unit !== 'fraction') fail();
@@ -295,7 +296,7 @@ export function parseReport(value: unknown, run: Run): NativeReport {
     }
     if (metrics.some(m => m.id === 'p-value' && (m.unit !== 'p_value' || m.value !== null && !/^(?:0(?:\.[0-9]+)?|1(?:\.0+)?)$/.test(m.value)))) fail();
   }
-  if (news) {
+  if (news && !localFlow) {
     const scoreInRange = (value: string) => /^-?(?:0(?:\.[0-9]+)?|1(?:\.0+)?)$/.test(value);
     if(summary.template_id==='news-retrieval-summary-v1' && (!['failed','unavailable','refused'].includes(run.execution_status)
         || metrics.some(m=>m.value!==null) || charts.some(c=>c.availability==='available')
@@ -317,6 +318,12 @@ export function parseReport(value: unknown, run: Run): NativeReport {
         if (c.y_axis.unit !== 'score' || c.visibility !== 'diagnostic' || c.series.some(s=>s.points.some(p=>p.y !== null && !scoreInRange(p.y)))) fail();
       } else fail();
     }
+  }
+  if(localFlow){
+    if(summary.template_id!=='local-workflow-summary-v1'||state.evidence_gate!=='held_for_review'||run.execution_status!=='held')fail();
+    if(events&&(metrics.some(m=>m.unit!=='count'&&!(m.id==='p-value'&&m.unit==='p_value'&&m.value===null)&&m.visibility!=='diagnostic')||charts.some(c=>c.type!=='dot_plot'||c.y_axis.unit!=='fraction'||c.visibility!=='diagnostic')||metrics.some(m=>m.id==='p-value'&&m.value!==null)))fail();
+    if(news&&(metrics.some(m=>!['count','score'].includes(m.unit)||m.unit==='score'&&(m.visibility!=='diagnostic'||m.value!==null&&Math.abs(Number(m.value))>1))||charts.some(c=>c.type!=='dot_plot'||c.y_axis.unit!=='score'||c.visibility!=='diagnostic'||c.series.some(s=>s.points.some(p=>p.y!==null&&Math.abs(Number(p.y))>1)))))fail();
+    if(monitoring&&charts.some(c=>c.type!=='line'||c.x_axis.kind!=='date'))fail();
   }
   evidence.forEach(e => { if (!artifacts.some(a => a.id === e.artifact_id) || !sources.some(s => s.id === e.source_id)) fail(); });
   const review_refs = strings(state.review_refs); references(review_refs, ids.reviews);

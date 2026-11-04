@@ -186,6 +186,7 @@ real-company human interpretation, source-use authorisation and independent
 recovery retain separate acceptance requirements. No production release gate
 is advanced by this implementation.
 
-Next product work is **4C**, separately scoped new monitoring, event and news
-processing. The existing source-rights review and deferred external-drive decision
-remain unchanged.
+[4C](batch4c-other-workflows.md) now implements bounded supplied-history,
+event-window and news-text calculation paths. Broader new-workflow acceptance
+remains **4D**. The existing source-rights review and deferred external-drive
+decision remain unchanged.

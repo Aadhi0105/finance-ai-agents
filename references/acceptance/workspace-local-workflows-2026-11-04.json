@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "scope": "Webapp 4C bounded supplied monitoring/event/news calculations",
+  "classification": "synthetic",
+  "base_commit": "113e258cf7fbc7f5103f405fabba41b207d4ba54",
+  "worktree_dirty": true,
+  "financial_approval": false,
+  "production_release_approved": false,
+  "input_formats": [
+    "agent2.observations/1",
+    "agent3.event-windows/1",
+    "agent3.news-text/1"
+  ],
+  "verification": {
+    "python": {
+      "command": ".venv/bin/python -m pytest -o addopts= -q",
+      "passed": 1507,
+      "failed": 0,
+      "seconds": 581.82,
+      "new_workflow_cases": 53
+    },
+    "frontend": {
+      "command": "pnpm --dir web test",
+      "passed": 324,
+      "failed": 0,
+      "new_workflow_checks": 42
+    },
+    "production_build": "passed",
+    "browser_checks": [
+      {
+        "case": "monitoring_requires_confirmation",
+        "passed": true
+      },
+      {
+        "case": "monitoring_exact_counts_and_missing_state",
+        "passed": true
+      },
+      {
+        "case": "monitoring_keyboard_last_observation",
+        "passed": true
+      },
+      {
+        "case": "monitoring_missing_point_preserved",
+        "passed": true
+      },
+      {
+        "case": "events_require_confirmation",
+        "passed": true
+      },
+      {
+        "case": "events_six_percent_and_inference_unavailable",
+        "passed": true
+      },
+      {
+        "case": "news_requires_confirmation",
+        "passed": true
+      },
+      {
+        "case": "news_coverage_counts_and_exclusions",
+        "passed": true
+      },
+      {
+        "case": "news_320px_no_page_overflow",
+        "passed": true
+      },
+      {
+        "case": "news_desktop_no_page_overflow_or_embed",
+        "passed": true
+      },
+      {
+        "case": "news_reading_copy_business_limits_and_rows",
+        "passed": true
+      },
+      {
+        "case": "monitoring_320px_no_page_overflow",
+        "passed": true
+      },
+      {
+        "case": "events_320px_no_page_overflow",
+        "passed": true
+      },
+      {
+        "case": "events_desktop_native_no_overflow",
+        "passed": true
+      },
+      {
+        "case": "monitoring_desktop_native_no_overflow",
+        "passed": true
+      },
+      {
+        "case": "news_fixed_score_axis_labels",
+        "passed": true
+      },
+      {
+        "case": "news_pointer_label_has_date_and_exact_value",
+        "passed": true
+      }
+    ],
+    "registered_artifacts": {
+      "schema_version": 1,
+      "classification": "synthetic",
+      "runs": [
+        {
+          "workflow": "monitoring",
+          "run_id": "result-99202266b1204d6c8d4ee1e1072b8fdf",
+          "artifacts": 8,
+          "registered_artifacts_matched": true,
+          "model_requests": 0,
+          "model_output_tokens": 0
+        },
+        {
+          "workflow": "events",
+          "run_id": "result-0afb7456139b4ef9b6f113c5ccddddd0",
+          "artifacts": 8,
+          "registered_artifacts_matched": true,
+          "model_requests": 0,
+          "model_output_tokens": 0
+        },
+        {
+          "workflow": "news",
+          "run_id": "result-0327fcc711df45bdb213f841b25efcf2",
+          "artifacts": 8,
+          "registered_artifacts_matched": true,
+          "model_requests": 0,
+          "model_output_tokens": 0
+        }
+      ],
+      "total_registered_artifacts": 24
+    }
+  },
+  "observed_examples": {
+    "monitoring": {
+      "latest_assessed": 1,
+      "active_policy_breaches": 1,
+      "latest_missing": 1,
+      "statuses": [
+        "BASELINE",
+        "NEW_BREACH",
+        "KNOWN_STABLE"
+      ]
+    },
+    "events": {
+      "historical_mean_car": "0.06",
+      "inference": "unavailable",
+      "forward_scenarios": "withheld"
+    },
+    "news": {
+      "raw_articles": 5,
+      "relevant_articles": 3,
+      "text_clusters": 2,
+      "scored_clusters": 1,
+      "excluded_records": 2,
+      "positive_tokens": 2,
+      "word_tokens": 6,
+      "no_matching_words": "unavailable"
+    }
+  },
+  "remaining": [
+    "Cross-job monitoring continuity and correction admission",
+    "Independently reviewed event inference",
+    "Advanced/model-based news scoring",
+    "4D broader maximum-volume and storage-fault acceptance",
+    "Real-source permissions and human financial interpretation",
+    "Independent backup and clean-machine recovery",
+    "Physical touch/screen-reader and actual print/download completion"
+  ],
+  "notes": [
+    "All three jobs were explicitly confirmed in the visible browser and had one claimed attempt.",
+    "All report files were reread against their registered hashes; zero provider/model requests and zero model output tokens.",
+    "The first broad run collided with concurrent demonstration intake at the cooperative gate. The final complete suite passed without overlapping writes.",
+    "An exploratory browser reading-copy assertion was corrected to inspect the readable No Tone Evidence row rather than require an internal raw reason-code label."
+  ]
+}

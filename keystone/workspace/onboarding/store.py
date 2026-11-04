@@ -329,7 +329,7 @@ class InputStore:
         No reservation, retention, semantic validation, accounting write or job.
         """
         value=c.envelope(c.bounded_json(data))
-        if value['schema_version']==2 and len(data)>1_000_000:raise c.InputError('input_too_large',413)
+        if value['schema_version'] in {2,3} and len(data)>1_000_000:raise c.InputError('input_too_large',413)
         descriptor=c.Preflight(schema_version=value['schema_version'],dataset_id=ident(dataset_id),package_bytes=len(data),
             package_sha256=c.sha(data),payload_sha256=c.fingerprint(value['payload']),
             metadata={k:v for k,v in value.items() if k!='payload'})

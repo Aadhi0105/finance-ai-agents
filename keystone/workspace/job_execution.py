@@ -84,7 +84,7 @@ def parse_execution(raw):
 
 
 def initial_execution(record):
-    return LocalResearchExecution() if record.schema_version==4 else CloseExecution() if record.schema_version == 3 else JobExecution()
+    return LocalResearchExecution() if record.schema_version in {4,5} else CloseExecution() if record.schema_version == 3 else JobExecution()
 
 
 def claimed(record):

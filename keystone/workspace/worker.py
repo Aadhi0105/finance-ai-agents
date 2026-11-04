@@ -62,8 +62,10 @@ def run_one(store):
                 inputs = InputStore(store.workspace.parent)
                 _,proof = committed(inputs,record)
                 commit_values['accounting_commit_sha256'] = remember(inputs,proof)
-            if record.schema_version==4:
-                from .onboarding.research.delivery import commit_hash
+            if record.schema_version in {4,5}:
+                from .onboarding.research.delivery import commit_hash as research_commit_hash
+                from .onboarding.local_workflows.delivery import commit_hash as workflow_commit_hash
+                commit_hash=workflow_commit_hash if record.schema_version==5 else research_commit_hash
                 commit_values['analysis_commit_sha256']=commit_hash(store,record)
             result, _, _ = verified_result(store, record)
             store.update_execution(record.job_id, event='prepared', result=result.model_dump(), operation_status=op['status'],**commit_values)
@@ -111,7 +113,7 @@ def recover_delivery(store, job_id):
         record = store.immutable(job_id)
         if record.schema_version == 3:
             return recover_close_delivery(store,record,public)
-        if public['status'] not in ({'failed'} if record.schema_version==4 else set())|{'delivery_failed','outcome_unknown','completed','review_required'}:
+        if public['status'] not in ({'failed'} if record.schema_version in {4,5} else set())|{'delivery_failed','outcome_unknown','completed','review_required'}:
             raise JobError('job_recovery_unavailable', 409)
         record = store.immutable(job_id)
         from .job_execution import parse_execution
@@ -120,8 +122,10 @@ def recover_delivery(store, job_id):
         publish_result(store, record, result)
         if old.status not in {'completed','review_required'}:
             commit_values={}
-            if record.schema_version==4:
-                from .onboarding.research.delivery import commit_hash
+            if record.schema_version in {4,5}:
+                from .onboarding.research.delivery import commit_hash as research_commit_hash
+                from .onboarding.local_workflows.delivery import commit_hash as workflow_commit_hash
+                commit_hash=workflow_commit_hash if record.schema_version==5 else research_commit_hash
                 commit_values['analysis_commit_sha256']=commit_hash(store,record)
             store.update_execution(job_id, event='recovered', status='review_required', finished_at=now(),
                 reason='recovered', result=result.model_dump(), operation_status=saved['status'],

@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "ticker": {
+          "pattern": "^[A-Z0-9][A-Z0-9.^=-]{0,31}$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "event_date": {
+          "title": "Event Date",
+          "type": "string"
+        },
+        "anchor_date": {
+          "title": "Anchor Date",
+          "type": "string"
+        },
+        "est_dates": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 250,
+          "minItems": 250,
+          "title": "Est Dates",
+          "type": "array"
+        },
+        "window_dates": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Window Dates",
+          "type": "array"
+        },
+        "est_stock": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 250,
+          "minItems": 250,
+          "title": "Est Stock",
+          "type": "array"
+        },
+        "est_market": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 250,
+          "minItems": 250,
+          "title": "Est Market",
+          "type": "array"
+        },
+        "evt_stock": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Evt Stock",
+          "type": "array"
+        },
+        "evt_market": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Evt Market",
+          "type": "array"
+        },
+        "source_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "benchmark": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Benchmark",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "event_date",
+        "anchor_date",
+        "est_dates",
+        "window_dates",
+        "est_stock",
+        "est_market",
+        "evt_stock",
+        "evt_market",
+        "source_id",
+        "benchmark"
+      ],
+      "title": "Event",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.event-windows",
+      "title": "Kind",
+      "type": "string"
+    },
+    "entity_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "event_type": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Event Type",
+      "type": "string"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Events",
+      "type": "array"
+    },
+    "controls": {
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "maxItems": 20,
+      "title": "Controls",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "entity_id",
+    "event_type",
+    "events",
+    "controls"
+  ],
+  "title": "Events",
+  "type": "object"
+}

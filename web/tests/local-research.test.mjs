@@ -41,7 +41,7 @@ test('local kit byte limit refuses oversized files before transfer',async()=>{
  const {formats}=await import('../src/onboarding/data.ts');let calls=0;
  const client=new PrivateClient(async()=>{calls++;return new Response(JSON.stringify({schema_version:2,classification:'private',local_token_required:true,
   imports_enabled:true,admission_enabled:true,worker_enabled:true,live_data_enabled:false,paid_models_enabled:false,financial_approval:false,
-  max_package_bytes:20_000_000,timeout_seconds_max:600,supported_input_formats:formats,fresh_research_supported:true}),{headers:{'Content-Type':'application/json'}});});
+  max_package_bytes:20_000_000,timeout_seconds_max:600,supported_input_formats:formats,local_workflows_supported:true,fresh_research_supported:true}),{headers:{'Content-Type':'application/json'}});});
  await client.discover();
  await assert.rejects(()=>client.inspect({id:'dataset-test',entity_id:'entity-test',workflow:'research',title:'Test',payload_format:'agent1.financial-kit/1'},new File([' '.repeat(1_000_001)],'too-large.json')),/1 MB/);
  assert.equal(calls,1);client.disconnect();
