@@ -8,6 +8,7 @@ import { AnalysisSections } from './AnalysisSections';
 import { EventSections, EventGateDetails } from './EventSections';
 import { NewsSections, NewsReviewDetails } from './NewsSections';
 import { CloseSections } from './CloseSections';
+import {LocalWorkflowSections} from './LocalWorkflowSections';
 import { MonitoringSections } from './MonitoringSections';
 import { EvidenceClass } from './data-basis';
 import { classificationLabels } from '../onboarding/data';
@@ -25,7 +26,8 @@ const newsLinks = [['summary', 'News summary'], ['stories', 'Retained stories'],
   ['tone', 'Tone evidence'], ['review', 'Why review is required'], ['evidence', 'Saved evidence']] as const;
 const monitoringLinks = [['summary','Monitoring summary'],['observations','Observations & policies'],['history','Retained history'],['effective','Effective state'],['corrections','Corrections & recovery'],['review','Review requirements'],['evidence','Saved evidence']] as const;
 const closeLinks = [['summary','Close summary'],['bridge','Variance bridge'],['accounts','Account review'],['forecast','Forecast & limitations'],['versions','Source versions'],['review','Review requirements'],['evidence','Saved evidence']] as const;
-type SectionId = typeof researchLinks[number][0] | typeof eventLinks[number][0] | typeof newsLinks[number][0] | typeof monitoringLinks[number][0] | typeof closeLinks[number][0];
+const localLinks=[['summary','At a glance'],['observations','Calculated observations'],['coverage','Coverage and exclusions'],['method','Method and limits'],['review','Review requirements'],['evidence','Saved evidence']] as const;
+type SectionId = 'method' | typeof researchLinks[number][0] | typeof eventLinks[number][0] | typeof newsLinks[number][0] | typeof monitoringLinks[number][0] | typeof closeLinks[number][0];
 const categoryLabel: Record<string, string> = { data_basis: 'Data basis', observation_dates: 'Dates & recency', valuation_assumptions: 'Valuation assumptions',
   peer_comparability: 'Peer comparison', narrative_support: 'Supported narrative', statistical_eligibility: 'Statistical eligibility', delivery: 'Saved files' };
 
@@ -130,7 +132,8 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
   const isMonitoring = report.workflow === 'monitoring';
   const isEvents = report.workflow === 'events';
   const isNews = report.workflow === 'news', isMarket = isEvents || isNews;
-  const sectionLinks = isClose ? closeLinks : isMonitoring ? monitoringLinks : isNews ? newsLinks : isEvents ? eventLinks : researchLinks;
+  const localFlow=report.summary.template_id==='local-workflow-summary-v1';
+  const sectionLinks = localFlow?localLinks.filter(([id])=>['review','evidence'].includes(id)||report.sections.some(s=>s.id===id)):isClose ? closeLinks : isMonitoring ? monitoringLinks : isNews ? newsLinks : isEvents ? eventLinks : researchLinks;
   const [active, setActive] = useState<SectionId>('summary');
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence[]>([]);
   const returnControl = useRef<HTMLElement | null>(null);
@@ -165,12 +168,12 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
   }
   return <>
     <ReportHeader title={isClose ? 'Financial close' : isMonitoring ? 'Financial monitoring' : isNews ? 'Company news' : isEvents ? 'Past event reactions' : report.identity.title} entity={report.identity.entity}
-      eyebrow={isClose ? <>AGENT 04 <span>/</span> SAVED FINANCIAL CLOSE</> : isMonitoring ? <>AGENT 02 <span>/</span> SAVED MONITORING</> : isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
+      eyebrow={localFlow ? <>SUPPLIED LOCAL EVIDENCE / NEW CALCULATIONS</> :isClose ? <>AGENT 04 <span>/</span> SAVED FINANCIAL CLOSE</> : isMonitoring ? <>AGENT 02 <span>/</span> SAVED MONITORING</> : isMarket ? <>AGENT 03 <span>/</span> {isNews ? 'SAVED COMPANY NEWS' : 'HISTORICAL EVENT RESEARCH'}</> : <>AGENT 01 <span>/</span> COMPANY RESEARCH <span>/</span> {report.identity.ticker || 'SAVED COMPANY'}</>}
       period={<>{(isMarket || isMonitoring || isClose) && <>{report.identity.title}<span>·</span></>}{report.identity.period_end ? <>Period ending <time dateTime={report.identity.period_end}>{calendarDate(report.identity.period_end)}</time></> : report.identity.period_label}<span>·</span>{dataBasis}</>}
       action={<div className="nr-header-actions"><button className="nr-secondary-button" onClick={event=>onReadingCopy(event.currentTarget)} disabled={copyBusy||!!downloading}>{copyBusy?'Checking saved evidence…':'Reading & print copy'}</button><button className="nr-secondary-button" onClick={() => onDownload(original)} disabled={!!downloading||copyBusy}><Icon name="download" size={16} />{downloading === original.id ? 'Checking download…' : 'Original HTML'}</button></div>} />
     <ReportStates execution={report.state.execution} evidenceGate={report.state.evidence_gate} />
-    <ReviewNotice title={isClose ? 'Saved close — financial review required' : isMonitoring ? 'Saved analyst policies — review required' : isNews ? (synthetic?'Synthetic news — published tone withheld':'Retained news — published tone withheld') : isEvents ? 'Historical diagnostics — review required' : synthetic?'Read as illustrative research':'Saved research — financial review required'} action={<button onClick={() => jumpTo('review')}>{isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
-      {isClose ? 'Internal accounting checks establish agreement within supplied panels. They do not authenticate a ledger, verify budget approval or establish calibrated forecasts.' : isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These retained observations do not establish contractual compliance or calibrated financial risk.' : isNews ? (synthetic?'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.':'Scores describe retained document text. They do not establish company-specific sentiment, market direction or financial approval.') : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
+    <ReviewNotice title={localFlow?'Calculated local assessment · review required':isClose ? 'Saved close — financial review required' : isMonitoring ? 'Saved analyst policies — review required' : isNews ? (synthetic?'Synthetic news — published tone withheld':'Retained news — published tone withheld') : isEvents ? 'Historical diagnostics — review required' : synthetic?'Read as illustrative research':'Saved research — financial review required'} action={<button onClick={() => jumpTo('review')}>{isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}<Icon name="arrow" size={15} /></button>}>
+      {localFlow?'These calculations use the exact supplied input. Source authenticity and financial accuracy require separate review. No provider retrieval, paid model inference or financial approval was performed.':isClose ? 'Internal accounting checks establish agreement within supplied panels. They do not authenticate a ledger, verify budget approval or establish calibrated forecasts.' : isMonitoring ? 'Original cycle results, effective state and correction records have separate scopes. These retained observations do not establish contractual compliance or calibrated financial risk.' : isNews ? (synthetic?'Fictional retained text illustrates this workflow. Document scores do not establish company-specific sentiment, market direction or financial approval.':'Scores describe retained document text. They do not establish company-specific sentiment, market direction or financial approval.') : isEvents ? 'These saved cases describe past observations. They do not predict the next event, establish causality or grant financial approval.' : 'These saved figures require financial review. Matching files do not establish verified company facts or approval.'}
     </ReviewNotice>
 
     <div className="nr-report-grid">
@@ -179,7 +182,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
       </SectionNavigation>
 
       <div className="nr-report-body" data-workspace-run={run.id}>
-        {isClose ? <CloseSections report={report} onInspect={inspect} onReviews={showReviews}/> : isMonitoring ? <MonitoringSections report={report} onInspect={inspect} onReviews={showReviews} /> : isNews ? <NewsSections report={report} onInspect={inspect} onReviews={showReviews} /> : isEvents ? <EventSections report={report} onInspect={inspect} onReviews={showReviews} /> : <>
+        {localFlow?<LocalWorkflowSections report={report} onInspect={inspect}/>:isClose ? <CloseSections report={report} onInspect={inspect} onReviews={showReviews}/> : isMonitoring ? <MonitoringSections report={report} onInspect={inspect} onReviews={showReviews} /> : isNews ? <NewsSections report={report} onInspect={inspect} onReviews={showReviews} /> : isEvents ? <EventSections report={report} onInspect={inspect} onReviews={showReviews} /> : <>
         <ReportSection id="summary" eyebrow="01 / THE SAVED OBSERVATIONS" title="Research summary">
           <p className="nr-summary-text">{report.summary.text}</p>
           {findings.length ? <ol className="nr-findings">{findings.map((finding, i) => <li key={finding.id}><span className="nr-finding-number">{String(i + 1).padStart(2, '0')}</span><div><p>{finding.content.text}</p><button className="nr-source-button" onClick={() => inspect(finding.content.evidence_refs)}><Icon name="evidence" size={13} />View saved source</button></div></li>)}</ol>
@@ -200,8 +203,8 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
           <p className="nr-section-intro">Saved review notes and their source findings remain attached to this report. Completing a process does not approve its financial conclusions.</p>
           {report.review_items.length ? <div className="nr-review-list">{report.review_items.map(item => <details key={item.id} ref={node => { if (node) reviewPanels.current.set(item.id, node); else reviewPanels.current.delete(item.id); }} className="nr-review-item"><summary><Icon name="info" size={17} /><span>{item.title}</span><small>{item.impact === 'publication_block' ? 'Publication restricted' : 'Section requires review'}</small><span className="nr-expand-mark" aria-hidden="true">+</span></summary><div className="nr-review-detail"><p className="eyebrow">{categoryLabel[item.category] || 'Saved review requirement'}</p><p>{item.explanation}</p><p><strong>Next review:</strong> {item.action}</p>{item.section_refs.length > 0 && <p className="nr-affected">Applies to: {item.section_refs.map(id => report.sections.find(s => s.id === id)?.title || id).join(' · ')}</p>}<button className="nr-source-button" onClick={() => inspect(item.evidence_refs)}>Inspect original findings<Icon name="arrow" size={14} /></button><details className="nr-reference-details"><summary>Saved check references ({item.source_check_refs.length})</summary><ul>{item.source_check_refs.map(ref => <li key={ref}><code>{ref}</code></li>)}</ul></details></div></details>)}</div>
             : <div className="nr-empty"><p>No additional review notes were saved. Financial approval remains unavailable in this workspace.</p></div>}
-          {isEvents && <EventGateDetails report={report} onInspect={inspect} />}
-          {isNews && <NewsReviewDetails report={report} onInspect={inspect} />}
+          {isEvents && !localFlow && <EventGateDetails report={report} onInspect={inspect} />}
+          {isNews && !localFlow && <NewsReviewDetails report={report} onInspect={inspect} />}
         </ReportSection>
 
         <ReportSection id="evidence" eyebrow={isClose || isMonitoring ? '07 / TRACE THE SAVED RECORD' : isMarket ? '06 / TRACE THE SAVED RECORD' : '10 / TRACE THE SAVED RECORD'} title="Saved evidence">

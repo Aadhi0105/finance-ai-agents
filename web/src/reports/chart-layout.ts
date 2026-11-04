@@ -56,7 +56,7 @@ export function plotGeometry(chart: ChartData, rows: ChartRow[], width: number, 
     if (geometry.kind !== 'bar' || low < 0n) low -= pad;
     if (geometry.kind !== 'bar' || high > 0n) high += pad;
   }
-  if (chart.id === 'news-story-tone' && chart.y_axis.unit === 'score') {
+  if (['news-story-tone','daily-tone'].includes(chart.id) && chart.y_axis.unit === 'score') {
     low = -(10n ** BigInt(places)); high = 10n ** BigInt(places);
   }
   const countAxis = chart.id === 'news-coverage' && chart.y_axis.unit === 'count';

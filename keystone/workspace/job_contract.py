@@ -186,7 +186,7 @@ class FreshCloseJobRecord(DatasetJobRecord):
 def parse_job_record(raw):
     if not isinstance(raw,dict) or type(raw.get('schema_version')) is not int:
         raise ValueError('Unsupported job record.')
-    model = {1:JobRecord,2:DatasetJobRecord,3:FreshCloseJobRecord,4:LocalResearchJobRecord}.get(raw['schema_version'])
+    model = {1:JobRecord,2:DatasetJobRecord,3:FreshCloseJobRecord,4:LocalResearchJobRecord,5:LocalWorkflowJobRecord}.get(raw['schema_version'])
     if model is None: raise ValueError('Unsupported job record.')
     return model.model_validate(raw)
 
@@ -235,4 +235,37 @@ class LocalResearchJobRecord(DatasetJobRecord):
                    (self.request.source.dataset_id,self.request.source.version_id,self.request.source.contract_sha256)):
             raise ValueError('Local research identity changed')
         date.fromisoformat(self.evaluated_on)
+        return self
+
+
+class LocalWorkflowRequest(DatasetJobRequest):
+    schema_version: Literal[4] = 4
+    workflow: Literal['monitoring','events','news']
+    timeout_seconds: int = Field(default=120,ge=1,le=120)
+    processing_plan: dict
+
+    @model_validator(mode='after')
+    def fixed_method(self):
+        from .onboarding.local_workflows.contracts import processing_plan
+        if self.processing_plan!=processing_plan(self.workflow):raise ValueError('Unsupported processing plan')
+        if type(self.schema_version) is not int or type(self.processing_plan['schema_version']) is not int or self.processing_plan['financial_approval'] is not False:
+            raise ValueError('Strict processing plan required')
+        return self
+
+
+class LocalWorkflowJobRecord(DatasetJobRecord):
+    schema_version: Literal[5] = 5
+    request: LocalWorkflowRequest
+    max_requests: Literal[0] = 0
+    max_output_tokens: Literal[0] = 0
+    producer_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+
+    @model_validator(mode='after')
+    def bound_identity(self):
+        from .onboarding.local_workflows.contracts import PROFILES
+        if (self.profile!=PROFILES[self.request.workflow] or self.operation_id!='web-'+self.job_id[4:]
+                or self.request_sha256!=fingerprint(self.request.model_dump())
+                or (self.source.dataset_id,self.source.version_id,self.source.contract_sha256)!=
+                   (self.request.source.dataset_id,self.request.source.version_id,self.request.source.contract_sha256)
+                or datetime.fromisoformat(self.created_at).utcoffset() is None):raise ValueError('Local workflow binding changed')
         return self

@@ -246,8 +246,8 @@ class JobStore:
             pending = con.execute("SELECT count(*) FROM executions WHERE status IN ('queued','running')").fetchone()[0]
             if count >= MAX_RETAINED_JOBS or pending >= MAX_PENDING_JOBS:
                 raise JobError('job_capacity_reached', 409)
-            if record.schema_version==4:
-                reserved=con.execute("SELECT count(*) FROM jobs j JOIN executions e USING(job_id) WHERE json_extract(j.record_json,'$.schema_version')=4 AND e.status IN ('queued','running')").fetchone()[0]*16_000_000
+            if record.schema_version in {4,5}:
+                reserved=con.execute("SELECT count(*) FROM jobs j JOIN executions e USING(job_id) WHERE json_extract(j.record_json,'$.schema_version') IN (4,5) AND e.status IN ('queued','running')").fetchone()[0]*16_000_000
                 total=0;files=0
                 for root in (self.root/'jobs',self.root/'operations',self.workspace):
                     if root.exists():
@@ -299,7 +299,7 @@ class JobStore:
         raw = read_json(row[1].encode())
         execution = parse_execution(raw)
         bound = parse_job_record(JobStore._record(con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()))
-        if (execution.schema_version != (3 if bound.schema_version==4 else 2 if bound.schema_version == 3 else 1)
+        if (execution.schema_version != (3 if bound.schema_version in {4,5} else 2 if bound.schema_version == 3 else 1)
                 or row[0] != execution.status or fingerprint(raw) != row[2]
                 or execution.result is not None and execution.result.run_id != 'result-' + job_id[4:]):
             raise JobError('job_store_unavailable')

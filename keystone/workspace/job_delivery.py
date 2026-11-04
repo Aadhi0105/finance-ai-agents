@@ -25,7 +25,7 @@ def operation_proof(store, record, *, committed_close=False,committed_local=Fals
         raise JobError('job_recovery_unavailable', 409)
     expected = request_fingerprint('workspace-saved', [original_folder], False, False,
         record.request.timeout_seconds, record.max_requests, record.max_output_tokens)
-    committed=(committed_close and record.schema_version==3) or (committed_local and record.schema_version==4)
+    committed=(committed_close and record.schema_version==3) or (committed_local and record.schema_version in {4,5})
     orphaned = committed and saved.get('status') in {'admitted','running'}
     usage_ok = not any(saved.get('model_control', {}).get(k) != 0
                        for k in ('requests_reserved','output_tokens_reserved','unknown_usage_calls'))
@@ -49,7 +49,7 @@ def operation_proof(store, record, *, committed_close=False,committed_local=Fals
 
 
 def verified_result(store, record, expected=None):
-    if record.schema_version in {2, 3, 4}:
+    if record.schema_version in {2, 3, 4, 5}:
         from .onboarding.execution import verified_result as verified_dataset
         return verified_dataset(store,record,expected)
     folder = store.root / 'jobs' / record.job_id

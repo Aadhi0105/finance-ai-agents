@@ -1,0 +1,88 @@
+{
+  "schema_version": 3,
+  "kind": "keystone.input-package",
+  "workflow": "monitoring",
+  "payload_format": "agent2.observations/1",
+  "dataset": {
+    "entity_id": "entity-example",
+    "title": "Fictional monitoring inputs",
+    "listing": {
+      "ticker": "NSTAR",
+      "exchange": null,
+      "quote_currency": null,
+      "share_class": null
+    },
+    "upstream_id": null,
+    "supersedes_version_id": null
+  },
+  "sources": [
+    {
+      "source_id": "observations",
+      "role": "observations",
+      "category": "synthetic",
+      "provider_or_owner": "Fictional local workflow example",
+      "reference": "Fictional engineering example; no market evidence",
+      "period_start": "2024-01-01",
+      "period_end": "2026-10-31",
+      "published_at": null,
+      "retrieved_at": null,
+      "currency": null,
+      "units": "multiple",
+      "permission_record_id": "permission-example"
+    }
+  ],
+  "payload": {
+    "schema_version": 1,
+    "kind": "keystone.monitoring-observations",
+    "entity_id": "entity-example",
+    "as_of": "2026-10-31",
+    "threshold_basis": "analyst_policy",
+    "items": [
+      {
+        "id": "leverage",
+        "metric": "Net debt / EBITDA",
+        "unit": "multiple",
+        "currency": null,
+        "threshold": "3",
+        "direction": "below",
+        "observations": [
+          {
+            "date": "2026-01-31",
+            "value": "2",
+            "source_id": "observations"
+          },
+          {
+            "date": "2026-04-30",
+            "value": "3.5",
+            "source_id": "observations"
+          },
+          {
+            "date": "2026-07-31",
+            "value": "3.5",
+            "source_id": "observations"
+          }
+        ]
+      },
+      {
+        "id": "coverage",
+        "metric": "Interest coverage",
+        "unit": "multiple",
+        "currency": null,
+        "threshold": "2",
+        "direction": "above",
+        "observations": [
+          {
+            "date": "2026-01-31",
+            "value": "4",
+            "source_id": "observations"
+          },
+          {
+            "date": "2026-07-31",
+            "value": null,
+            "source_id": "observations"
+          }
+        ]
+      }
+    ]
+  }
+}

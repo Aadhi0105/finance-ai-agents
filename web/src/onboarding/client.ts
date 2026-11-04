@@ -1,4 +1,4 @@
-import { InputFailure, safeError, responseError, obj, id, list, parseCapabilities, parseWorkspace, parseEntity, parseDataset, parsePage, parseVersion, parsePreview, parseReceipt, parseJob, jobRequest } from './data.ts';
+import { InputFailure, safeError, responseError, obj, id, list, parseCapabilities, parseWorkspace, parseEntity, parseDataset, parsePage, parseVersion, parsePreview, parseReceipt, parseJob, jobRequest, localFormats } from './data.ts';
 import type { Capabilities, Entity, Dataset, Version, Preview, Receipt, PrivateJob, JobRequest, Page } from './data.ts';
 
 export function canonicalLocal(v:unknown):string {if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonicalLocal).join(',')+']';return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonicalLocal((v as Record<string,unknown>)[k])).join(',')+'}';}
@@ -86,7 +86,7 @@ export class PrivateClient {
   async receipt(ident:string){const r=parseReceipt(await this.read('/api/imports/'+id(ident)));if(r.id!==ident)throw new InputFailure('unsupported_response');return r;}
   async inspect(dataset:Dataset,file:File):Promise<Preview>{
     if(!this.state.caps?.imports)throw new InputFailure('input_disabled');
-    if(this.importing||!file.name.toLowerCase().endsWith('.json')||file.size<1||file.size>(dataset.payload_format==='agent1.financial-kit/1'?1_000_000:20_000_000))throw new InputFailure(this.importing?'input_busy':'input_too_large');
+    if(this.importing||!file.name.toLowerCase().endsWith('.json')||file.size<1||file.size>((dataset.payload_format==='agent1.financial-kit/1'||localFormats.includes(dataset.payload_format))?1_000_000:20_000_000))throw new InputFailure(this.importing?'input_busy':'input_too_large');
     const epoch=this.epoch;
     // The server computes Python's exact canonical payload hash. Browsers never
     // reinterpret integers/floats or rewrite the submitted JSON package.

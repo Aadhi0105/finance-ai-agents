@@ -1,0 +1,390 @@
+{
+  "$defs": {
+    "CalculatedMetric": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 160,
+          "title": "Label",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "enum": [
+            "count",
+            "fraction",
+            "multiple",
+            "score",
+            "currency",
+            "p_value"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "const": "EUR",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Currency"
+        },
+        "period": {
+          "maxLength": 160,
+          "title": "Period",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "visibility": {
+          "enum": [
+            "main",
+            "supporting",
+            "diagnostic"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "value",
+        "unit",
+        "currency",
+        "period",
+        "reason",
+        "visibility"
+      ],
+      "title": "CalculatedMetric",
+      "type": "object"
+    },
+    "Chart": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 160,
+          "title": "Title",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "fraction",
+            "multiple",
+            "score",
+            "currency"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "const": "EUR",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Currency"
+        },
+        "x_kind": {
+          "enum": [
+            "date",
+            "category"
+          ],
+          "title": "X Kind",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "line",
+            "bar",
+            "dot_plot"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/Point"
+          },
+          "maxItems": 100,
+          "title": "Points",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "unit",
+        "currency",
+        "x_kind",
+        "type",
+        "points"
+      ],
+      "title": "Chart",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "maxLength": 120,
+          "title": "X",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 240,
+          "title": "Label",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "x",
+        "label",
+        "value"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "ResultRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "maxLength": 1000,
+          "title": "Label",
+          "type": "string"
+        },
+        "date": {
+          "maxLength": 10,
+          "title": "Date",
+          "type": "string"
+        },
+        "status": {
+          "maxLength": 80,
+          "title": "Status",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "related_metric_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Related Metric Id"
+        },
+        "detail": {
+          "maxLength": 1000,
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "date",
+        "status",
+        "metric_id",
+        "related_metric_id",
+        "detail"
+      ],
+      "title": "ResultRow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.local-workflow-result",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workflow": {
+      "enum": [
+        "monitoring",
+        "events",
+        "news"
+      ],
+      "title": "Workflow",
+      "type": "string"
+    },
+    "result_id": {
+      "pattern": "^result-[a-f0-9]{32}$",
+      "title": "Result Id",
+      "type": "string"
+    },
+    "method": {
+      "title": "Method",
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "synthetic",
+        "provider",
+        "issuer",
+        "internal",
+        "mixed",
+        "unknown"
+      ],
+      "title": "Classification",
+      "type": "string"
+    },
+    "source": {
+      "additionalProperties": true,
+      "title": "Source",
+      "type": "object"
+    },
+    "request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "job_id": {
+      "pattern": "^job-[a-f0-9]{32}$",
+      "title": "Job Id",
+      "type": "string"
+    },
+    "producer_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Producer Sha256",
+      "type": "string"
+    },
+    "execution_status": {
+      "const": "held",
+      "title": "Execution Status",
+      "type": "string"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/CalculatedMetric"
+      },
+      "maxItems": 200,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "charts": {
+      "items": {
+        "$ref": "#/$defs/Chart"
+      },
+      "maxItems": 20,
+      "title": "Charts",
+      "type": "array"
+    },
+    "rows": {
+      "items": {
+        "$ref": "#/$defs/ResultRow"
+      },
+      "maxItems": 100,
+      "title": "Rows",
+      "type": "array"
+    },
+    "details": {
+      "additionalProperties": true,
+      "title": "Details",
+      "type": "object"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Limitations",
+      "type": "array"
+    },
+    "period": {
+      "maxLength": 160,
+      "title": "Period",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "workflow",
+    "result_id",
+    "method",
+    "classification",
+    "source",
+    "request_sha256",
+    "job_id",
+    "producer_sha256",
+    "execution_status",
+    "financial_approval",
+    "metrics",
+    "charts",
+    "rows",
+    "details",
+    "limitations",
+    "period"
+  ],
+  "title": "Result",
+  "type": "object"
+}

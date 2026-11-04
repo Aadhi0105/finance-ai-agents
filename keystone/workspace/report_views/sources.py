@@ -13,6 +13,11 @@ ADAPTERS = {
 
 def adapter_for(run):
     try:
+        from ..onboarding.local_workflows.contracts import PROFILES
+        if getattr(getattr(run,'input_origin',None),'profile',None) in PROFILES.values():
+            ident='local-'+run.workflow+'-report';reg=getattr(run,'native_view',None)
+            if reg and (reg.adapter_id!=ident or reg.adapter_version!='1.0.0'):raise NativeViewError('unsupported_report_schema')
+            return ident,'1.0.0','keystone.local-workflow-result/1'
         if getattr(getattr(run,'input_origin',None),'profile',None)=='calculate-local-research':
             reg=getattr(run,'native_view',None)
             if reg and (reg.adapter_id!='agent1-local-report' or reg.adapter_version!='1.0.0'):raise NativeViewError('unsupported_report_schema')
@@ -39,6 +44,16 @@ def check_source(run, source):
     workflow = run.workflow
     origin = getattr(run, 'input_origin', None)
     private = origin is not None
+    from ..onboarding.local_workflows.contracts import PROFILES,Result
+    if getattr(origin,'profile',None) in PROFILES.values():
+        try:
+            Result.model_validate(source)
+            if (source['workflow']!=workflow or source['result_id']!=run.id or run.source_run_id!=run.id
+                    or run.execution_status!='held' or source['classification']!=origin.classification
+                    or source['job_id']!=origin.job_id or source['request_sha256']!=origin.request_sha256
+                    or any(source['source'][k]!=getattr(origin,k) for k in ('dataset_id','version_id','contract_sha256','payload_sha256','receipt_sha256','entity_sha256'))):raise ValueError()
+        except Exception as error:raise NativeViewError() from error
+        return
     if getattr(origin,'profile',None)=='calculate-local-research':
         from ..onboarding.research.contracts import validate_shape
         try:

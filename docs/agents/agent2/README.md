@@ -190,10 +190,19 @@ signatures. See the [complete review contract](../../agent2-review-recovery.md).
 ## Saved reports and recovery
 
 The local Keystone workspace also has a [native monitoring reader](../../webapp/native-reports/part4a-monitoring.md)
-for registered **saved synthetic** snapshots: separate cycle/export summaries,
+for supported registered snapshots: separate cycle/export summaries,
 policy cards, interactive original histories and read-only correction evidence.
-It also provides a complete reading copy and verified original downloads. This
-does not enable importing arbitrary live exports or running monitoring in the browser.
+It also provides a complete reading copy and verified original downloads.
+Private imports require the supported format and current source-use evidence.
+
+[Webapp 4C](../../webapp/batch4c-other-workflows.md) adds a separate **Evaluate
+supplied observations** action. Import structured company histories and analyst
+thresholds, confirm an exact accepted version and receive newly calculated
+outcomes with interactive history charts. A missing latest observation stays
+unavailable; a quiet change does not erase an active breach. This first web-input
+slice assesses each supplied history independently. It does not advance the CLI
+database, approve cross-job corrections, retrieve provider observations or run
+model triage. All results require review.
 
 ```bash
 python monitor.py --report output/stadler-cycle-2.html --report-cycle 2   --audit-dir output/monitor-triage --db state/stadler-live.duckdb

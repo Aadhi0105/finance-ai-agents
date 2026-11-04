@@ -10,6 +10,10 @@ BUILDERS = {'research': research.build, 'monitoring': monitoring.build,
 def build_view(run, source, series, artifacts):
     check_source(run, source)
     builder = Builder(run, source, series, artifacts, adapter_for(run)[2])
+    if adapter_for(run)[0].startswith('local-'):
+        from .local_workflows import build
+        build(builder)
+        return builder.finish()
     if adapter_for(run)[0]=='agent1-local-report':
         from .local_research import build
         build(builder)

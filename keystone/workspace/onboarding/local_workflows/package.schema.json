@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:keystone:local-workflow-package:3",
+  "title": "Supplied local-workflow package envelope",
+  "$comment": "Outer envelope only. Payload-specific bounded semantic validation, source-use checks, entity binding, resource limits and durable admission are required separately. Passing this schema grants no import, execution or financial approval. Raw close requests are designed here but not enabled in Batch 3B.1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "workflow",
+    "payload_format",
+    "dataset",
+    "sources",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "kind": {
+      "const": "keystone.input-package"
+    },
+    "workflow": {
+      "enum": [
+        "monitoring",
+        "events",
+        "news"
+      ]
+    },
+    "payload_format": {
+      "enum": [
+        "agent2.observations/1",
+        "agent3.event-windows/1",
+        "agent3.news-text/1"
+      ]
+    },
+    "dataset": {
+      "$ref": "#/$defs/dataset"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "payload": {
+      "type": "object",
+      "minProperties": 1,
+      "$comment": "Exactly one selected source-family object. This deliberately does not claim to validate legacy analytical payloads; the selected adapter must do so. Never dispatch arbitrary object fields as code, tools, paths or URLs."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "const": "monitoring"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload_format": {
+            "const": "agent2.observations/1"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "const": "events"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload_format": {
+            "const": "agent3.event-windows/1"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {
+            "const": "news"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload_format": {
+            "const": "agent3.news-text/1"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "reference_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "$comment": "References must resolve inside the authenticated workspace. A syntactically valid identifier is not an existing entity, permission record or accepted version."
+    },
+    "nullable_label": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "nullable_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "nullable_instant": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "maxLength": 80,
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "nullable_currency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{3}$",
+      "$comment": "Lexical form only; the selected engine must recognise and support the declared currency and any unit semantics."
+    },
+    "listing": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "exchange",
+        "quote_currency",
+        "share_class"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "exchange": {
+          "$ref": "#/$defs/nullable_label"
+        },
+        "quote_currency": {
+          "$ref": "#/$defs/nullable_currency"
+        },
+        "share_class": {
+          "$ref": "#/$defs/nullable_label"
+        }
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "entity_id",
+        "listing",
+        "upstream_id",
+        "supersedes_version_id"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "entity_id": {
+          "$ref": "#/$defs/reference_id"
+        },
+        "listing": {
+          "$ref": "#/$defs/listing"
+        },
+        "upstream_id": {
+          "$ref": "#/$defs/nullable_label"
+        },
+        "supersedes_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reference_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "role",
+        "category",
+        "provider_or_owner",
+        "reference",
+        "period_start",
+        "period_end",
+        "published_at",
+        "retrieved_at",
+        "currency",
+        "units",
+        "permission_record_id"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/reference_id"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "category": {
+          "enum": [
+            "synthetic",
+            "public_provider",
+            "issuer",
+            "confidential",
+            null
+          ]
+        },
+        "provider_or_owner": {
+          "$ref": "#/$defs/nullable_label"
+        },
+        "reference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 2048,
+          "$comment": "Inert provenance label, never a server filesystem location or a request to fetch a URL."
+        },
+        "period_start": {
+          "$ref": "#/$defs/nullable_date"
+        },
+        "period_end": {
+          "$ref": "#/$defs/nullable_date"
+        },
+        "published_at": {
+          "$ref": "#/$defs/nullable_instant"
+        },
+        "retrieved_at": {
+          "$ref": "#/$defs/nullable_instant"
+        },
+        "currency": {
+          "$ref": "#/$defs/nullable_currency"
+        },
+        "units": {
+          "$ref": "#/$defs/nullable_label"
+        },
+        "permission_record_id": {
+          "$ref": "#/$defs/reference_id"
+        }
+      },
+      "$comment": "Source IDs must be unique and role/binding/period metadata must agree with the selected payload. The server derives effective classification and permission from operator evidence, never from this declaration alone."
+    }
+  }
+}

@@ -1,0 +1,1207 @@
+{
+  "run": {
+    "id": "result-0327fcc711df45bdb213f841b25efcf2",
+    "agent": "agent3",
+    "workflow": "news",
+    "title": "Local news \u00b7 Northstar Components \u00b7 news \u00b7 fictional",
+    "entity": "Northstar Components \u00b7 news \u00b7 fictional",
+    "period": "2026-10-31",
+    "prepared_at": "2026-11-04T08:18:07.236706+00:00",
+    "execution_status": "held",
+    "review_status": "review_required",
+    "summary": "New calculations from supplied local evidence. Financial review remains required.",
+    "limitations": [
+      "Score = (positive token count \u2212 negative token count) / all English word tokens, using the exact supplied word list.",
+      "This simple method does not understand negation, context or entity-specific sentiment. A missing match is unavailable, not neutral.",
+      "Headline aliases establish relevance; provider tags alone do not. Identical text can cluster; independent stories are not established.",
+      "No FinBERT, Loughran\u2013McDonald dictionary, model download or return forecast is implied. All tone is diagnostic and requires review."
+    ],
+    "checks": [
+      "Exact input, source-use scope and fixed method verified."
+    ],
+    "metrics": [],
+    "artifacts": [
+      {
+        "id": "local-result",
+        "name": "payload.json",
+        "label": "New local calculation evidence",
+        "kind": "evidence",
+        "sha256": "79f4e6ea1fb293afca4e8b7d75345df74370e5665cff0b9a2eed645c55e21984",
+        "bytes": 11320,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/payload.json"
+      },
+      {
+        "id": "supplied-input",
+        "name": "supplied-input.json",
+        "label": "Exact supplied observations and parameters",
+        "kind": "evidence",
+        "sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d",
+        "bytes": 1628,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/supplied-input.json"
+      },
+      {
+        "id": "analysis-request",
+        "name": "analysis-request.json",
+        "label": "Exact confirmed processing request",
+        "kind": "evidence",
+        "sha256": "6e83e25a94f94169e522738d47df030f2d6ceecaaf6d3b79b311057303f4e1bf",
+        "bytes": 424,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/analysis-request.json"
+      },
+      {
+        "id": "input-contract",
+        "name": "input-contract.json",
+        "label": "Source-use contract and validation",
+        "kind": "evidence",
+        "sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf",
+        "bytes": 13114,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/input-contract.json"
+      },
+      {
+        "id": "local-report",
+        "name": "report_REVIEW.html",
+        "label": "Local workflow review export",
+        "kind": "report",
+        "sha256": "a90ef24eb7d064dc7d9681948b18437fce5b5a52016ff91e80ad7cc157d44a52",
+        "bytes": 2123,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/report_REVIEW.html"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "label": "Retained native chart series",
+        "kind": "evidence",
+        "sha256": "aedf40e470f1c3eb0b8ecc6536e5abbcf368dfa168f96074bc1d000926f98433",
+        "bytes": 248,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/native-series.json"
+      },
+      {
+        "id": "native-view",
+        "name": "native-report.json",
+        "label": "Native report view",
+        "kind": "report_view",
+        "sha256": "e4b4de479538e2463a90ea30185e663ce8d8eb9cd9830ad936c3d4cf23a8434e",
+        "bytes": 15246,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/native-report.json"
+      },
+      {
+        "id": "analysis-commit",
+        "name": "analysis-commit.json",
+        "label": "Atomic analytical completion proof",
+        "kind": "evidence",
+        "sha256": "162e169d35733ebcf6e97a0a27daef07777d0936ee8156c8cbc4764e9126063c",
+        "bytes": 1706,
+        "url": "/api/runs/result-0327fcc711df45bdb213f841b25efcf2/files/analysis-commit.json"
+      }
+    ],
+    "report_id": "local-report",
+    "source_run_id": "result-0327fcc711df45bdb213f841b25efcf2",
+    "native_view": {
+      "artifact_id": "native-view",
+      "view_schema_version": 1,
+      "adapter_id": "local-news-report",
+      "adapter_version": "1.0.0",
+      "source_artifact_ids": [
+        "local-result",
+        "native-series"
+      ]
+    },
+    "input_origin": {
+      "dataset_id": "dataset-e712ef128164494eb9c53fc0bae74fae",
+      "version_id": "version-0269d6e0fa484229a3b15461f5892ac4",
+      "contract_sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf",
+      "payload_sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d",
+      "receipt_sha256": "eaa7c8530191c341ea872cee4d5ea1dba10ce6de9ed5b05cd9250773fc486a9d",
+      "entity_sha256": "790bbef153812768f575cef1184baa2baff7c894f484452cac8fc4a6b39cb91f",
+      "classification": "synthetic",
+      "job_id": "job-0327fcc711df45bdb213f841b25efcf2",
+      "request_sha256": "6e83e25a94f94169e522738d47df030f2d6ceecaaf6d3b79b311057303f4e1bf",
+      "profile": "calculate-local-news"
+    }
+  },
+  "report": {
+    "agent": "agent3",
+    "analyst_content": {
+      "external_research": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      },
+      "keystone_scope": "not_applicable",
+      "market_consensus": {
+        "availability": "not_applicable",
+        "evidence_refs": [],
+        "metric_refs": [],
+        "reason_codes": [
+          "workflow_not_research"
+        ]
+      }
+    },
+    "artifacts": [
+      {
+        "id": "local-result",
+        "name": "payload.json",
+        "sha256": "79f4e6ea1fb293afca4e8b7d75345df74370e5665cff0b9a2eed645c55e21984",
+        "source_schema": "keystone.local-workflow-result/1"
+      },
+      {
+        "id": "native-series",
+        "name": "native-series.json",
+        "sha256": "aedf40e470f1c3eb0b8ecc6536e5abbcf368dfa168f96074bc1d000926f98433",
+        "source_schema": "keystone.report-series/1"
+      }
+    ],
+    "charts": [
+      {
+        "availability": "available",
+        "id": "daily-tone",
+        "purpose": "Retained numerical observations. Use the exact table or select a point for its label and value.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-5ebf7b36c39a18afca5b",
+          "review-ab79cafa28f6aa55b41b",
+          "review-c54c81df505c8ae5f065",
+          "review-dfd121ed1940f0b343da",
+          "review-ef2c5608591938e31e19"
+        ],
+        "series": [
+          {
+            "id": "daily-tone-series",
+            "label": "Document word tone by publication day",
+            "points": [
+              {
+                "evidence_refs": [
+                  "e-6b85b9db8dd85c247440c9"
+                ],
+                "id": "daily-tone-0",
+                "label": "2026-10-30",
+                "reason_codes": [],
+                "x": "2026-10-30",
+                "y": "0.3333333333333333"
+              }
+            ]
+          }
+        ],
+        "title": "Document word tone by publication day",
+        "type": "dot_plot",
+        "visibility": "diagnostic",
+        "x_axis": {
+          "kind": "date",
+          "label": "Observation date"
+        },
+        "y_axis": {
+          "currency": null,
+          "label": "score",
+          "unit": "score"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "artifact_id": "local-result",
+        "id": "e-ea1d0f795f4fabbb024302",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-5788cd03709121e4da19ab",
+        "label": "Supplied articles",
+        "method": null,
+        "pointer": "/metrics/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-a82fa2f5468aad6be1c192",
+        "label": "Relevant articles",
+        "method": null,
+        "pointer": "/metrics/1/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-3a23197371941660bda550",
+        "label": "Distinct text clusters",
+        "method": null,
+        "pointer": "/metrics/2/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-64a965971f88a28dced484",
+        "label": "Clusters with word-list evidence",
+        "method": null,
+        "pointer": "/metrics/3/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-bf60129d4fe6467b66b729",
+        "label": "Excluded records",
+        "method": null,
+        "pointer": "/metrics/4/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c5a7506603bf43072cb4a6",
+        "label": "Document word tone \u00b7 2026-10-30",
+        "method": null,
+        "pointer": "/metrics/5/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-4fee68529fdbfd09e81d99",
+        "label": "Word tone \u00b7 document 1",
+        "method": null,
+        "pointer": "/metrics/6/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-591cacd50a9392b8d642d4",
+        "label": "Word tone \u00b7 document 2",
+        "method": null,
+        "pointer": "/metrics/7/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-6b85b9db8dd85c247440c9",
+        "label": "2026-10-30",
+        "method": null,
+        "pointer": "/charts/0/points/0/value",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-24363536bccf9aff5ee031",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/rows/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-e525ec0d37414629f9ef52",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/rows/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-4ac31691031d5b3cc78c8e",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/details/exclusions/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-e01e44f7a1817856add4d5",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/details/exclusions/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-c3b97f60fed1ab3b124b45",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/limitations/0",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-0b3e4edc9e83f16985f3f0",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/limitations/1",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-73a0a9b1bcd21b7ccd303a",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/limitations/2",
+        "source_id": "saved-source",
+        "transform": "identity"
+      },
+      {
+        "artifact_id": "local-result",
+        "id": "e-ec78d94511ddb1a362ae44",
+        "label": "Saved source field",
+        "method": null,
+        "pointer": "/limitations/3",
+        "source_id": "saved-source",
+        "transform": "identity"
+      }
+    ],
+    "findings": [],
+    "glossary": [
+      {
+        "definition": "Structured input selected by the analyst. No new provider retrieval or paid model inference was performed.",
+        "term": "Supplied local evidence"
+      },
+      {
+        "definition": "A descriptive calculation held for review, without a prediction or approval claim.",
+        "term": "Diagnostic"
+      }
+    ],
+    "identity": {
+      "entity": "Northstar Components \u00b7 news \u00b7 fictional",
+      "period_end": null,
+      "period_label": "2026-10-31",
+      "prepared_at": "2026-11-04T08:18:07.236706+00:00",
+      "source_run_id": "result-0327fcc711df45bdb213f841b25efcf2",
+      "ticker": null,
+      "title": "Local news \u00b7 Northstar Components \u00b7 news \u00b7 fictional"
+    },
+    "kind": "keystone.report-view",
+    "metrics": [
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-5788cd03709121e4da19ab"
+        ],
+        "id": "articles",
+        "label": "Supplied articles",
+        "period_label": "2026-10-31",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "5",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-a82fa2f5468aad6be1c192"
+        ],
+        "id": "relevant",
+        "label": "Relevant articles",
+        "period_label": "2026-10-31",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "3",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-3a23197371941660bda550"
+        ],
+        "id": "clusters",
+        "label": "Distinct text clusters",
+        "period_label": "2026-10-31",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-64a965971f88a28dced484"
+        ],
+        "id": "scored",
+        "label": "Clusters with word-list evidence",
+        "period_label": "2026-10-31",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "1",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-bf60129d4fe6467b66b729"
+        ],
+        "id": "excluded",
+        "label": "Excluded records",
+        "period_label": "2026-10-31",
+        "reason_codes": [],
+        "unit": "count",
+        "value": "2",
+        "visibility": "main"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-c5a7506603bf43072cb4a6"
+        ],
+        "id": "day-0",
+        "label": "Document word tone \u00b7 2026-10-30",
+        "period_label": "2026-10-30",
+        "reason_codes": [],
+        "unit": "score",
+        "value": "0.3333333333333333",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "available",
+        "currency": null,
+        "evidence_refs": [
+          "e-4fee68529fdbfd09e81d99"
+        ],
+        "id": "story-0",
+        "label": "Word tone \u00b7 document 1",
+        "period_label": "2026-10-30",
+        "reason_codes": [],
+        "unit": "score",
+        "value": "0.3333333333333333",
+        "visibility": "diagnostic"
+      },
+      {
+        "as_of": null,
+        "availability": "unavailable",
+        "currency": null,
+        "evidence_refs": [
+          "e-591cacd50a9392b8d642d4"
+        ],
+        "id": "story-1",
+        "label": "Word tone \u00b7 document 2",
+        "period_label": "2026-10-30",
+        "reason_codes": [
+          "no_matching_tone_words"
+        ],
+        "unit": "score",
+        "value": null,
+        "visibility": "diagnostic"
+      }
+    ],
+    "report_id": "report-339b2bdb06da503f84f9f469",
+    "review_items": [
+      {
+        "action": "Inspect the retained input contract, source evidence and all financial review requirements.",
+        "category": "data_basis",
+        "evidence_refs": [
+          "e-ea1d0f795f4fabbb024302"
+        ],
+        "explanation": "Source-use permission and matching files do not establish financial accuracy, authenticity or approval.",
+        "id": "review-ab79cafa28f6aa55b41b",
+        "impact": "publication_block",
+        "section_refs": [
+          "summary",
+          "observations",
+          "coverage",
+          "method"
+        ],
+        "source_check_refs": [
+          "policy:input-contract/b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf"
+        ],
+        "title": "Imported evidence requires review"
+      },
+      {
+        "action": "Inspect the supplied input and retained calculation before relying on this result.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-c3b97f60fed1ab3b124b45"
+        ],
+        "explanation": "Score = (positive token count \u2212 negative token count) / all English word tokens, using the exact supplied word list.",
+        "id": "review-c54c81df505c8ae5f065",
+        "impact": "section_restriction",
+        "section_refs": [
+          "observations",
+          "method"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/limitations/0"
+        ],
+        "title": "Method boundary 1"
+      },
+      {
+        "action": "Inspect the supplied input and retained calculation before relying on this result.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-0b3e4edc9e83f16985f3f0"
+        ],
+        "explanation": "This simple method does not understand negation, context or entity-specific sentiment. A missing match is unavailable, not neutral.",
+        "id": "review-ef2c5608591938e31e19",
+        "impact": "section_restriction",
+        "section_refs": [
+          "observations",
+          "method"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/limitations/1"
+        ],
+        "title": "Method boundary 2"
+      },
+      {
+        "action": "Inspect the supplied input and retained calculation before relying on this result.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-73a0a9b1bcd21b7ccd303a"
+        ],
+        "explanation": "Headline aliases establish relevance; provider tags alone do not. Identical text can cluster; independent stories are not established.",
+        "id": "review-5ebf7b36c39a18afca5b",
+        "impact": "section_restriction",
+        "section_refs": [
+          "observations",
+          "method"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/limitations/2"
+        ],
+        "title": "Method boundary 3"
+      },
+      {
+        "action": "Inspect the supplied input and retained calculation before relying on this result.",
+        "category": "statistical_eligibility",
+        "evidence_refs": [
+          "e-ec78d94511ddb1a362ae44"
+        ],
+        "explanation": "No FinBERT, Loughran\u2013McDonald dictionary, model download or return forecast is implied. All tone is diagnostic and requires review.",
+        "id": "review-dfd121ed1940f0b343da",
+        "impact": "section_restriction",
+        "section_refs": [
+          "observations",
+          "method"
+        ],
+        "source_check_refs": [
+          "artifact:local-result#/limitations/3"
+        ],
+        "title": "Method boundary 4"
+      }
+    ],
+    "schema_version": 1,
+    "sections": [
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "summary",
+        "metric_refs": [
+          "articles",
+          "relevant",
+          "clusters",
+          "scored",
+          "excluded"
+        ],
+        "purpose": "New calculations from this exact supplied input; held for review.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [],
+        "title": "At a glance"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [
+          "daily-tone"
+        ],
+        "finding_refs": [],
+        "id": "observations",
+        "metric_refs": [
+          "day-0",
+          "story-0",
+          "story-1"
+        ],
+        "purpose": "Document-level lexical diagnostics",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-c54c81df505c8ae5f065",
+          "review-ef2c5608591938e31e19",
+          "review-5ebf7b36c39a18afca5b",
+          "review-dfd121ed1940f0b343da"
+        ],
+        "table_refs": [
+          "observations"
+        ],
+        "title": "Which stories were assessed?"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "coverage",
+        "metric_refs": [],
+        "purpose": "A missing, stale or irrelevant document does not become neutral tone.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "table_refs": [
+          "excluded-inputs"
+        ],
+        "title": "Coverage and exclusions"
+      },
+      {
+        "availability": "available",
+        "chart_refs": [],
+        "finding_refs": [],
+        "id": "method",
+        "metric_refs": [],
+        "purpose": "The method and exact supplied parameters are retained with this report.",
+        "reason_codes": [],
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b",
+          "review-c54c81df505c8ae5f065",
+          "review-ef2c5608591938e31e19",
+          "review-5ebf7b36c39a18afca5b",
+          "review-dfd121ed1940f0b343da"
+        ],
+        "table_refs": [],
+        "title": "Method and limits"
+      }
+    ],
+    "sources": [
+      {
+        "date_reason": "Each value retains its supplied observation or publication date. Upload and calculation dates do not verify the source.",
+        "id": "saved-source",
+        "label": "New calculations from supplied local evidence",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "fixture",
+        "url": null
+      },
+      {
+        "date_reason": "Operator-prepared from the registered saved evidence; not new observations.",
+        "id": "derived-source",
+        "label": "Retained Python chart series",
+        "observed_at": null,
+        "published_at": null,
+        "retrieved_at": null,
+        "source_type": "derived",
+        "url": null
+      }
+    ],
+    "state": {
+      "data_classification": "synthetic",
+      "evidence_gate": "held_for_review",
+      "execution": "held",
+      "financial_approval": false,
+      "integrity": "matched",
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-c54c81df505c8ae5f065",
+        "review-ef2c5608591938e31e19",
+        "review-5ebf7b36c39a18afca5b",
+        "review-dfd121ed1940f0b343da"
+      ]
+    },
+    "summary": {
+      "evidence_refs": [
+        "e-ea1d0f795f4fabbb024302"
+      ],
+      "metric_refs": [],
+      "review_refs": [
+        "review-ab79cafa28f6aa55b41b",
+        "review-c54c81df505c8ae5f065",
+        "review-ef2c5608591938e31e19",
+        "review-5ebf7b36c39a18afca5b",
+        "review-dfd121ed1940f0b343da"
+      ],
+      "template_id": "local-workflow-summary-v1",
+      "text": "See which supplied articles mention this company, which text repeats, and which words contribute to the diagnostic tone. Financial review is required."
+    },
+    "tables": [
+      {
+        "columns": [
+          {
+            "id": "observation",
+            "label": "Observation"
+          },
+          {
+            "id": "date",
+            "label": "Date"
+          },
+          {
+            "id": "value",
+            "label": "Observed / calculated value"
+          },
+          {
+            "id": "status",
+            "label": "Outcome"
+          },
+          {
+            "id": "detail",
+            "label": "Meaning"
+          }
+        ],
+        "id": "observations",
+        "review_refs": [
+          "review-5ebf7b36c39a18afca5b",
+          "review-ab79cafa28f6aa55b41b",
+          "review-c54c81df505c8ae5f065",
+          "review-dfd121ed1940f0b343da",
+          "review-ef2c5608591938e31e19"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "observation",
+                "kind": "text",
+                "text": "Northstar Components reports growth"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-10-30"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "story-0"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "Lexical Diagnostic"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "2 article record(s) in this text cluster \u00b7 supplied_text"
+              }
+            ],
+            "evidence_refs": [
+              "e-24363536bccf9aff5ee031"
+            ],
+            "id": "observation-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "observation",
+                "kind": "text",
+                "text": "Northstar Components appoints director"
+              },
+              {
+                "column_id": "date",
+                "kind": "text",
+                "text": "2026-10-30"
+              },
+              {
+                "column_id": "value",
+                "kind": "metric_ref",
+                "metric_id": "story-1"
+              },
+              {
+                "column_id": "status",
+                "kind": "text",
+                "text": "No Tone Evidence"
+              },
+              {
+                "column_id": "detail",
+                "kind": "text",
+                "text": "1 article record(s) in this text cluster \u00b7 supplied_text"
+              }
+            ],
+            "evidence_refs": [
+              "e-e525ec0d37414629f9ef52"
+            ],
+            "id": "observation-1"
+          }
+        ],
+        "title": "Supplied evidence and calculated outcomes"
+      },
+      {
+        "columns": [
+          {
+            "id": "record",
+            "label": "Record"
+          },
+          {
+            "id": "stage",
+            "label": "Stage"
+          },
+          {
+            "id": "reason",
+            "label": "Reason"
+          }
+        ],
+        "id": "excluded-inputs",
+        "review_refs": [
+          "review-ab79cafa28f6aa55b41b"
+        ],
+        "rows": [
+          {
+            "cells": [
+              {
+                "column_id": "record",
+                "kind": "text",
+                "text": "story-old"
+              },
+              {
+                "column_id": "stage",
+                "kind": "text",
+                "text": "ingest"
+              },
+              {
+                "column_id": "reason",
+                "kind": "text",
+                "text": "stale publication"
+              }
+            ],
+            "evidence_refs": [
+              "e-4ac31691031d5b3cc78c8e"
+            ],
+            "id": "excluded-0"
+          },
+          {
+            "cells": [
+              {
+                "column_id": "record",
+                "kind": "text",
+                "text": "bfa3f6edcd7e0db8e7e62b378b10f4b3f3e41ac1deb76ede7ad940c745338316"
+              },
+              {
+                "column_id": "stage",
+                "kind": "text",
+                "text": "relevance"
+              },
+              {
+                "column_id": "reason",
+                "kind": "text",
+                "text": "no headline entity evidence"
+              }
+            ],
+            "evidence_refs": [
+              "e-e01e44f7a1817856add4d5"
+            ],
+            "id": "excluded-1"
+          }
+        ],
+        "title": "Excluded news evidence"
+      }
+    ],
+    "workflow": "news"
+  },
+  "job": {
+    "schema_version": 3,
+    "job_id": "job-0327fcc711df45bdb213f841b25efcf2",
+    "operation_id": "web-0327fcc711df45bdb213f841b25efcf2",
+    "request": {
+      "schema_version": 4,
+      "workflow": "news",
+      "source": {
+        "kind": "dataset_version",
+        "dataset_id": "dataset-e712ef128164494eb9c53fc0bae74fae",
+        "version_id": "version-0269d6e0fa484229a3b15461f5892ac4",
+        "contract_sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf"
+      },
+      "timeout_seconds": 120,
+      "processing_plan": {
+        "financial_approval": false,
+        "method": "supplied-word-list/1",
+        "schema_version": 1,
+        "scope": "supplied_evidence_only"
+      }
+    },
+    "request_sha256": "6e83e25a94f94169e522738d47df030f2d6ceecaaf6d3b79b311057303f4e1bf",
+    "created_at": "2026-11-04T08:18:06.400279+00:00",
+    "profile": "calculate-local-news",
+    "profile_version": 1,
+    "status": "review_required",
+    "source": {
+      "workspace_id": "workspace-f1ff6acf7f3643ad8970129f8469c49b",
+      "dataset_id": "dataset-e712ef128164494eb9c53fc0bae74fae",
+      "version_id": "version-0269d6e0fa484229a3b15461f5892ac4",
+      "contract_sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf",
+      "payload_sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d",
+      "receipt_sha256": "eaa7c8530191c341ea872cee4d5ea1dba10ce6de9ed5b05cd9250773fc486a9d",
+      "entity_sha256": "790bbef153812768f575cef1184baa2baff7c894f484452cac8fc4a6b39cb91f",
+      "policy_sha256": "6c32e438d6dd6398765e52df65317cb7abb5a6116302f8d0587ab19b2b43234e",
+      "classification": "synthetic"
+    },
+    "input_validation": "matched_at_admission",
+    "worker_enabled": true,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "financial_approval": false,
+    "max_requests": 0,
+    "max_output_tokens": 0,
+    "producer_sha256": "6cd42952656a3522f05ca3c426317573f0adedca58b70b9c0954f0c418d23cae",
+    "execution": {
+      "schema_version": 3,
+      "status": "review_required",
+      "attempt": 1,
+      "started_at": "2026-11-04T08:18:06.646858+00:00",
+      "inputs_verified_at": "2026-11-04T08:18:06.761584+00:00",
+      "finished_at": "2026-11-04T08:18:07.421240+00:00",
+      "operation_status": "review_required",
+      "reason": "registered",
+      "result": {
+        "run_id": "result-0327fcc711df45bdb213f841b25efcf2",
+        "manifest_sha256": "7d600b6724b783b2ad59077243108ec93aed40e727d06c80af78ed77f0bea8f9",
+        "run_sha256": "b73b1f69a9cff1d2b6d51f1d522573b2079617ced487278ad39dfdee553b8064",
+        "operation_receipt_sha256": "0d8e5080e6f63f11697aa2519f05a7e0e600b3c9421c976bd81709692509eea4"
+      },
+      "analysis_commit_sha256": "162e169d35733ebcf6e97a0a27daef07777d0936ee8156c8cbc4764e9126063c"
+    },
+    "restoration_hold": false,
+    "admission_schema_version": 4,
+    "recovery_required": false,
+    "result_url": "#/runs/result-0327fcc711df45bdb213f841b25efcf2"
+  },
+  "version": {
+    "contract": {
+      "dataset_id": "dataset-e712ef128164494eb9c53fc0bae74fae",
+      "dataset_sha256": "74f7eb08bb7ae1c6b818a91f1c6f06edf5c0a397d9d4a9593a403a44fe8e0c8b",
+      "entity_sha256": "790bbef153812768f575cef1184baa2baff7c894f484452cac8fc4a6b39cb91f",
+      "metadata": {
+        "dataset": {
+          "entity_id": "entity-eb8ee0204b174df99cad55f1606e4c9e",
+          "listing": {
+            "exchange": null,
+            "quote_currency": null,
+            "share_class": null,
+            "ticker": "NSTAR"
+          },
+          "supersedes_version_id": null,
+          "title": "Fictional news inputs",
+          "upstream_id": null
+        },
+        "kind": "keystone.input-package",
+        "payload_format": "agent3.news-text/1",
+        "schema_version": 3,
+        "sources": [
+          {
+            "category": "synthetic",
+            "currency": null,
+            "period_end": "2026-10-31",
+            "period_start": "2024-01-01",
+            "permission_record_id": "permission-b3947aad636b4c778d887cb2abed6732",
+            "provider_or_owner": "Fictional local workflow example",
+            "published_at": null,
+            "reference": "Fictional engineering example; no market evidence",
+            "retrieved_at": null,
+            "role": "news_text",
+            "source_id": "articles",
+            "units": "text"
+          },
+          {
+            "category": "synthetic",
+            "currency": null,
+            "period_end": "2026-10-31",
+            "period_start": "2024-01-01",
+            "permission_record_id": "permission-b3947aad636b4c778d887cb2abed6732",
+            "provider_or_owner": "Fictional local workflow example",
+            "published_at": null,
+            "reference": "Fictional engineering example; no market evidence",
+            "retrieved_at": null,
+            "role": "word_list",
+            "source_id": "dictionary",
+            "units": "tokens"
+          }
+        ],
+        "workflow": "news"
+      },
+      "payload_sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d",
+      "policy": {
+        "backup_holds": [],
+        "classification": "synthetic",
+        "permission_pins": [
+          {
+            "id": "permission-b3947aad636b4c778d887cb2abed6732",
+            "sha256": "818f636d2f4a268c21afbb5de005ad0d99b2eef64334ce8acf0a7dc64bed1d45"
+          }
+        ]
+      },
+      "schema_version": 1,
+      "validation": {
+        "analytical_execution": "not_started",
+        "eligible": true,
+        "execution_status": "held",
+        "payload_sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d",
+        "period": "2026-10-31",
+        "producer": {
+          "code_commit": "113e258cf7fbc7f5103f405fabba41b207d4ba54",
+          "code_worktree_dirty": true,
+          "python": "3.11.9",
+          "source_sha256": {
+            "agent3/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "agent3/bundles.py": "0cc59869726a5bf84ff75f487c431c871a010f170e2c29165e18bea656933e93",
+            "agent3/catalyst_state.py": "8f52d9c0e736ebb36414853999f6621fcc305aee701e951503e3ae342e07cc55",
+            "agent3/execution.py": "233e5abab7d47bb0127e128aec12af01a267f9e37edf511ced5ac01eaad7689e",
+            "agent3/lm_lexicon.py": "cfdcb81edeadc7896f4ab74e6e5be6e54da3a3a222aff0e37ac48e8e8ea3436b",
+            "agent3/news_contracts.py": "4b3af2cddf836e867b814f05175e7a281dd05db0ced7d26d3ad0e0c9e9787999",
+            "agent3/news_execution.py": "d6e59d734b8cf8ab4bc24aed172fb89325c9bd2aa3f7c45d8ca4f683c482626f",
+            "agent3/news_funnel.py": "bb8db5839e9a6ced67463c9bbe69097ffa25ce88091a4bc84c5df2553a03d330",
+            "agent3/news_live.py": "e37ebe089db678d323efd998284052ee62fb2bbbfc3ba2e5621efd61d7462673",
+            "agent3/orchestrator.py": "a74bdfff61c5fe3a7271ddcc5ba8523761eab30ea3778e73717f12f9a7ed3c21",
+            "agent3/peers.py": "0435dc8072187c7f220c1bc81a42cd8b7f3462ec6a7c6a06037c124867808716",
+            "agent3/run_live.py": "9e403550a3488c0cac8773bc1bc86c149fae48497614506963fa7ec6f6bf4c09",
+            "agent3/run_news.py": "89021ee3d2b9db7be5cf627b6cb4c926aaf3ed1ec2c2348b6abbca36e96f7c0a",
+            "agent3/scenario.py": "669661dc9812f610670a4096a1ecd0e0e5e002f210610a287a4ae12de306e4d8",
+            "agent3/sentiment.py": "e0715accc0f3528b825d2d38ab138c4fd6f5934baeafefeafa593222d000f97b",
+            "agent3/study_plan.py": "47266a309ecc8c3e34611acfe335258d93712c3c7dc832b6b203b8cae75f3d19",
+            "agent3/track_a.py": "142f974c2ae579f994289e0cf129b8805e5d04b58a94c2bc636499e68b345dd5",
+            "agent3/track_a_live.py": "2414819549d50a3e7f37c047893cbb22250ccdbee392be54dc6d272fd4bd8ac8",
+            "agent3/validation.py": "5d3915220ce3b175c2aa936e26fb1e08e49beca75c8b3b20e542fa0ec7ca20cd",
+            "agent4/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "agent4/close.py": "923246543695e51148ebf11599f6dc43e35f90f1a25ffeb1ea2f0db2116464a3",
+            "agent4/commentary.py": "05b60a66f40a4c49110748aa56bbd509a5ba41e1dc66a675571a36cfb134acc8",
+            "agent4/contracts.py": "16e51aad230655a69ef2379ba60fd4e501e253a96894116693cadb844b4cd283",
+            "agent4/decomposition.py": "3453ebd883cd59910f35f44c309a7eddc7d4812021c3625d3a82c910d2a2b48c",
+            "agent4/hierarchy.py": "7ee006bc722e48ca66442294674e15a611c818d9c510c69fab8b006600db1549",
+            "agent4/history.py": "7f0a7dee937e0ccfb893b4f639e383b24b013f0b53486b48a247164e9fc9c184",
+            "agent4/materiality.py": "4c2ac05e783b415ac78efc0e58dabab0530e46d75cea479168f06264d036235a",
+            "agent4/output.py": "a9a7c5ae6a181253331bcf6ce4c6bce17e5545e2d50bf410d64fc5053e299b82",
+            "agent4/persistence.py": "a0a82f0cb6d084eb50fdc00ad4c074a6739b3e8116e230349d6db1a879d49911",
+            "agent4/reforecast.py": "e0e4d174a181a5cef57c12c21e1f1cfcfddd4d7a76e50010c7b802645d4c1a04",
+            "agent4/report.py": "b0cd38e563487611170f8902f5a7f291dddf5766cae5f4faf93588cb843ff26a",
+            "agent4/state.py": "a41f03fc7447aa735445f96334e4e4f1ce34f799aadb17573267852fcf596001",
+            "composer.py": "5389c5da847073e0faa00535b6e1c9c60bbff2ff4f80ddd0c4ca572b6a08dbb5",
+            "keystone/workspace/__init__.py": "2aa997542bd3310d834befd50a362ef1beb5e9d837ba90b9f386aceed1c53048",
+            "keystone/workspace/__main__.py": "d2292b236e86c8ead4b341bf58c7df67a805c6965b973cc9d910d75346be5ae5",
+            "keystone/workspace/api.py": "aeacbd5f963e5a3f6c6976aa3f4a2cba223ec346f6cae8715e5447af5f8c9957",
+            "keystone/workspace/catalog.py": "c8dfab4375477c8ea25bac432e2c3d4b3d935c0093aa3954058bfb36dce62215",
+            "keystone/workspace/job_contract.py": "605b38be4894b7e6d7e52bc2f93ff1f5a1faa3ade253b135c758ca3ccdebb19c",
+            "keystone/workspace/job_delivery.py": "e6c8f255141ff1a37a1dac3abdce9e0461dbb9edad2de108c4513dca5101ff60",
+            "keystone/workspace/job_execution.py": "47ec3bc43c91b95c6d377356939cd88e581e06c6b2fe7f4b41026a1072a18522",
+            "keystone/workspace/job_files.py": "38670f796668efda4f297db9c817851ddd7b4d648243085725984a3a2e2f98de",
+            "keystone/workspace/job_store.py": "fb797a3020a05d21913d1edc299c62afc8c1046863c92119a2dd72acb72e6c16",
+            "keystone/workspace/jobs.py": "fe0bc859da0b757b56ae46e7b3fd5de0ee0438ef77226066ebbd2f7e0982f730",
+            "keystone/workspace/onboarding/__init__.py": "99645329e2c0365809e08e4742d4caed5a01fb6e313c5669d7e2523795383f06",
+            "keystone/workspace/onboarding/api.py": "4a493a0f5e3da5cfac129537fe250c5f171f7d562409227201492c000d31e492",
+            "keystone/workspace/onboarding/close_state.py": "e278bffb026ff9a2bd3b584eb9980dd6a42d2767026e644b159b0b4e06f14346",
+            "keystone/workspace/onboarding/contracts.py": "93744ce763690aa49df772336c2e42406c1c1f56093f9717efc1057592a59313",
+            "keystone/workspace/onboarding/execution.py": "7ca1561a28339ea7b41d9777a246c4a683752a283fbcf378c31349176fa791d9",
+            "keystone/workspace/onboarding/local_workflows/__init__.py": "edb0d4878914d8c784be00a62a60fc6fc136219a486401abbd70363c1b736866",
+            "keystone/workspace/onboarding/local_workflows/calculate.py": "4c8efb52b7f5dda4980d03db4b78bcec6ae7e9fef7d114f322a288b9d3dfe381",
+            "keystone/workspace/onboarding/local_workflows/contracts.py": "16f63b2e9b11acd15de42e4b04f191a0bfb0e46518ffd518dee2d28666916731",
+            "keystone/workspace/onboarding/local_workflows/delivery.py": "cec25bb3ad8f4d7855d183a1dc03e74e82404b8dd1cc4e42bb051448b2a4e788",
+            "keystone/workspace/onboarding/package.schema.json": "fd7b61af5a2cfab9c6d2f0e689297d71ce8e31179fb7827208756d3f2237f93e",
+            "keystone/workspace/onboarding/recovery.py": "2e54e8022759a981ca90dddbca59070c29521238a0945711b083f432f72c60ea",
+            "keystone/workspace/onboarding/research/__init__.py": "d3c4852275109780aa4eb8980f3ac97d169d4a81998de356de242dc87dc1449c",
+            "keystone/workspace/onboarding/research/calculate.py": "a683963478210518f56079f1f2822eaeac82e332d98e5313344635d56590a375",
+            "keystone/workspace/onboarding/research/contracts.py": "914a6df50269fba84e5079a742e75f12c054a18dc9563a663b5c858641addc8b",
+            "keystone/workspace/onboarding/research/delivery.py": "76ef2352c076d59e4014c4b84dad184173e46edb470da8794a57ac4dca40c6f6",
+            "keystone/workspace/onboarding/research/receipt.py": "86ac63d149f0206fd8a081c560981d0f7b48d7258730befca28547f8036b6de9",
+            "keystone/workspace/onboarding/service.py": "5521b1aa224c20410bde17e0a3c0644915b969d0a6a495907df32534f51a6e16",
+            "keystone/workspace/onboarding/store.py": "68910a1b40583780a6750374bbeec9f786a2c3d175de7737dbef64114e4b9a7d",
+            "keystone/workspace/onboarding/validate.py": "6f77d462a7178f7dc951cf210a04120435060c7e16d23050a3acd3167741a131",
+            "keystone/workspace/prepare.py": "c6fa262cd83a81a0653a6f2e9b61803bd9847b30036d78b49e73a2e9e31a2b73",
+            "keystone/workspace/report_views/__init__.py": "c1d06b788179545d1f8096c3a10de9723590fad695d1527c294f3e60a018b00f",
+            "keystone/workspace/report_views/close.py": "db39c7ce0ceb622cf3e47c3e20eb579dea0a95986a0dcf7464271a099d190472",
+            "keystone/workspace/report_views/close_context.py": "e746a5f62c15b66f415ab3599529c3efd347f02b715f530121962a960921adff",
+            "keystone/workspace/report_views/common.py": "d005d0915a54ab42c422bed91a1a1888dd71817940e945a6df0ee1d0b22fbd3d",
+            "keystone/workspace/report_views/delivery.py": "46b483a7fae8a224347150af544036fb171c32a8660bfef45ccb5bc57fd9f5e2",
+            "keystone/workspace/report_views/errors.py": "62f6aa0592bc92b599ef2e1bc7a310fe0eba6bc65a6c53f065fac0f6719c0849",
+            "keystone/workspace/report_views/event_context.py": "40a3e3099e9cbce4ff47128314fb2e11753d07b69c182e628f4fa4f04924723d",
+            "keystone/workspace/report_views/events.py": "99a532939716284185cee0dd40ac7f44362e84403b6a5cf35ae286c934e6b522",
+            "keystone/workspace/report_views/local_research.py": "e15b6cb64613c446ff890c2b4b48521860a839ba84ac2dda478010eae9af1a87",
+            "keystone/workspace/report_views/local_workflows.py": "f51f73e06876849697ad83ebe7a084de1c08d01cce80f500304290d86199ae15",
+            "keystone/workspace/report_views/monitoring.py": "630a83d862103af581085c3ad264d3694a0984eee03cf4d34f76366fce96deb5",
+            "keystone/workspace/report_views/monitoring_context.py": "b8ee36e4868c91670ebefaa7b71c9a8dab12590dec3cf7cbeea7df2056ecab3a",
+            "keystone/workspace/report_views/news.py": "8e1694d3a8f0bd4236534cde30228bda62b15f8de9e6a84f88f16991042eae75",
+            "keystone/workspace/report_views/news_context.py": "4c87987c02a6182960c12ad7b973d8213034ab1547a9323b5779ae95228835e9",
+            "keystone/workspace/report_views/news_recovery.py": "b57b340755130e0cd43ad3382ac546d650fbd5c15850888a43818f23743907fe",
+            "keystone/workspace/report_views/projection.py": "c41e40358e5b5eb3e85583393104de3fbdad96f7f22b1e5ac63b195fe227ecb9",
+            "keystone/workspace/report_views/publish.py": "376c0d0208b5035f5d78f2bf78562fa78141c5f625eef211ccf836ed05fb60e4",
+            "keystone/workspace/report_views/research.py": "8548bc4e2cc12766ea63f02abf57e987f3fe8a02d63727239d430248a74184e1",
+            "keystone/workspace/report_views/research_context.py": "ebe5ac9993e6aabdf1c63b36fdefef3cd6e2892cb780ac9297a73fc946a27599",
+            "keystone/workspace/report_views/series.py": "dbb20ba79a1b4c2445bd5e7b90e32b60928bb50a38271ef26617f979cf5f2f16",
+            "keystone/workspace/report_views/sources.py": "e0780481a43566fa3524837111607977334c058c334a009c9636dd2f0b70fcd1",
+            "keystone/workspace/report_views/validation.py": "8fbec85f8747486ddeb35be95282187a9f807af9068ec5e0ae2649241803a85c",
+            "keystone/workspace/report_views/values.py": "5ce0e36c2fded82da4e14e0ced4e93f6bceb20240fb2c4eb94bcc74bb5ab5bf4",
+            "keystone/workspace/saved_job.py": "091a016180dbfa7ba181ce75252537e57042e8a3f468f959d4ddf89dc118a0a0",
+            "keystone/workspace/worker.py": "25f4a8e35869c5ab4b78cd3823aeed4f173d0d48ad0996922f5c8de6eb7004be",
+            "keystone/workspace/worker_process.py": "462935ba5afd6cde432649e15acf636a560dd1b81ba0f5050e6f5009bcf255f6",
+            "tools/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "tools/analytical.py": "820a37850736b9abbfabfb9fc313c430cfe4853d4d5705d645b4b6e3a396627b",
+            "tools/covenant_checks.py": "3bdd5db9651d9fecc46747cc142b7c9f41e03f08882f68ca8155157f40329cde",
+            "tools/data.py": "0957b2c669363f94a216fb31cc9bd0f97168d7537c95babaf99f76296234e553",
+            "tools/event_contracts.py": "ee5595960517130ffbe8d10784ce4410f088483e9311cf12aa4841856e81e3ae",
+            "tools/event_study.py": "30e0e2c4dbdcaca42ffc57fa4b6ffb553ba6d97af827134c550d4579ae25c7f7",
+            "tools/financial_contract.py": "c8f16abb18c5dc1dd9af07950c81073bb1d09b2e2937f06d30234a0a88f46101",
+            "tools/input_validation.py": "2e6f5f16691854864949590c96ff38823d7ae246e0600c0f9a96225649dd2ae5",
+            "tools/issuer_reconciliation.py": "9802af562fc01832ac76a7c428a61609c7e29915f9d007011e8cb8137e572c34",
+            "tools/price_history.py": "e70429da1aa880a4c0846217f25ed6452b9c1ae35e0e081ea7cfb60c54425cbb",
+            "tools/registry.py": "5304bda67370e2171a102b32db3936db74597cdaa40263f057623e3b5179a872",
+            "tools/significance.py": "0a425f0f2f37d046249707830f0aed4ca8b2d5d05f6c39316daa64884455b9a9",
+            "tools/statistical_checks.py": "5240114f566a5ca8fdf9210843e2ca014b828f9ef543b63d28071aaf3e0680dd",
+            "tools/statistical_contract.py": "3f40946668b84caca36f010e718db81d09fb2d9a04105f5165a08b2eaad91350",
+            "validation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validation/gate.py": "0f5e4c7de6754998d757217ebf3bb402cf264384f7f52847453f1f3c99d95f7e",
+            "validation/note_grounding.py": "f0df22f35e9547b41ad964f9aa38d4275f7f5f6fe92f5a33a915b3a4762ae1c6",
+            "validation/publication.py": "1eff3a2f2d9a8041a401abcced66e3ef9cbfb9a934ef021dee626cfe6131312c",
+            "validation/qualitative_claims.py": "b9ea1290d239eccc273bf06fd45c22ba3b25267573354383c02958916039c7f6"
+          }
+        },
+        "reasons": [
+          "supplied_evidence_requires_review"
+        ],
+        "schema_version": 4,
+        "upstream_id": "new-local-input",
+        "validator_version": "local-workflows/1.0.0"
+      }
+    },
+    "contract_sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf",
+    "created_at": "2026-11-04T08:13:37.149855+00:00",
+    "dataset_id": "dataset-e712ef128164494eb9c53fc0bae74fae",
+    "files": {
+      "context.json": {
+        "bytes": 412,
+        "sha256": "d0af578766dabb18e6206c11f52f81721f54e59512a123b90defa00f4689a5e4"
+      },
+      "contract.json": {
+        "bytes": 13114,
+        "sha256": "b75565879a433a2d7d67b53b128df1c7192061ea52764a5a33e7ad85abd78bdf"
+      },
+      "package.json": {
+        "bytes": 2755,
+        "sha256": "c35f77050505dfa0634b1150741e535f254989c1474684623f367f24faccb463"
+      },
+      "payload.json": {
+        "bytes": 1628,
+        "sha256": "ae2970c6664a5db265631ab4f31bf2d0992c6b6460d7cc54cf3e2bf18a67285d"
+      },
+      "preflight.json": {
+        "bytes": 1393,
+        "sha256": "f3995851fcdbfbb3c5186eb7db21d4860d545736f950a414c57beef671654eac"
+      },
+      "validation.json": {
+        "bytes": 11438,
+        "sha256": "eaa7c8530191c341ea872cee4d5ea1dba10ce6de9ed5b05cd9250773fc486a9d"
+      }
+    },
+    "id": "version-0269d6e0fa484229a3b15461f5892ac4",
+    "import_id": "import-5051b2a7713e4ec9bbb6b390d95bc408"
+  }
+}

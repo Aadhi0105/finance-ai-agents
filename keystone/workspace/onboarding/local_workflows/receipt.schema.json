@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "Producer": {
+      "additionalProperties": false,
+      "properties": {
+        "code_commit": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Code Commit"
+        },
+        "code_worktree_dirty": {
+          "title": "Code Worktree Dirty",
+          "type": "boolean"
+        },
+        "python": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Python",
+          "type": "string"
+        },
+        "source_sha256": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "maxProperties": 500,
+          "minProperties": 1,
+          "title": "Source Sha256",
+          "type": "object"
+        }
+      },
+      "required": [
+        "code_commit",
+        "code_worktree_dirty",
+        "python",
+        "source_sha256"
+      ],
+      "title": "Producer",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 4,
+      "default": 4,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "validator_version": {
+      "const": "local-workflows/1.0.0",
+      "title": "Validator Version",
+      "type": "string"
+    },
+    "producer": {
+      "$ref": "#/$defs/Producer"
+    },
+    "payload_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Payload Sha256",
+      "type": "string"
+    },
+    "upstream_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Upstream Id",
+      "type": "string"
+    },
+    "period": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Period",
+      "type": "string"
+    },
+    "execution_status": {
+      "enum": [
+        "completed",
+        "held",
+        "refused",
+        "unavailable",
+        "failed"
+      ],
+      "title": "Execution Status",
+      "type": "string"
+    },
+    "eligible": {
+      "title": "Eligible",
+      "type": "boolean"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 30,
+      "title": "Reasons",
+      "type": "array"
+    },
+    "analytical_execution": {
+      "const": "not_started",
+      "title": "Analytical Execution",
+      "type": "string"
+    }
+  },
+  "required": [
+    "validator_version",
+    "producer",
+    "payload_sha256",
+    "upstream_id",
+    "period",
+    "execution_status",
+    "eligible",
+    "reasons",
+    "analytical_execution"
+  ],
+  "title": "LocalValidation",
+  "type": "object"
+}

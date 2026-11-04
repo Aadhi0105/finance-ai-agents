@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "Article": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "headline": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Headline",
+          "type": "string"
+        },
+        "body": {
+          "maxLength": 5000,
+          "title": "Body",
+          "type": "string"
+        },
+        "published_at": {
+          "maxLength": 80,
+          "title": "Published At",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "maxLength": 80,
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "source_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "language": {
+          "const": "en",
+          "title": "Language",
+          "type": "string"
+        },
+        "text_scope": {
+          "enum": [
+            "headline_only",
+            "supplied_text"
+          ],
+          "title": "Text Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "headline",
+        "body",
+        "published_at",
+        "retrieved_at",
+        "url",
+        "source_id",
+        "language",
+        "text_scope"
+      ],
+      "title": "Article",
+      "type": "object"
+    },
+    "WordList": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "positive": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Positive",
+          "type": "array"
+        },
+        "negative": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Negative",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "positive",
+        "negative"
+      ],
+      "title": "WordList",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.news-text",
+      "title": "Kind",
+      "type": "string"
+    },
+    "entity_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "ticker": {
+      "pattern": "^[A-Z0-9][A-Z0-9.^=-]{0,31}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "as_of": {
+      "maxLength": 80,
+      "title": "As Of",
+      "type": "string"
+    },
+    "max_age_days": {
+      "maximum": 30,
+      "minimum": 1,
+      "title": "Max Age Days",
+      "type": "integer"
+    },
+    "aliases": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Aliases",
+      "type": "array"
+    },
+    "word_list": {
+      "$ref": "#/$defs/WordList"
+    },
+    "articles": {
+      "items": {
+        "$ref": "#/$defs/Article"
+      },
+      "maxItems": 100,
+      "title": "Articles",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "entity_id",
+    "ticker",
+    "as_of",
+    "max_age_days",
+    "aliases",
+    "word_list",
+    "articles"
+  ],
+  "title": "News",
+  "type": "object"
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 3,
+  "kind": "keystone.input-package",
+  "workflow": "news",
+  "payload_format": "agent3.news-text/1",
+  "dataset": {
+    "entity_id": "entity-example",
+    "title": "Fictional news inputs",
+    "listing": {
+      "ticker": "NSTAR",
+      "exchange": null,
+      "quote_currency": null,
+      "share_class": null
+    },
+    "upstream_id": null,
+    "supersedes_version_id": null
+  },
+  "sources": [
+    {
+      "source_id": "articles",
+      "role": "news_text",
+      "category": "synthetic",
+      "provider_or_owner": "Fictional local workflow example",
+      "reference": "Fictional engineering example; no market evidence",
+      "period_start": "2024-01-01",
+      "period_end": "2026-10-31",
+      "published_at": null,
+      "retrieved_at": null,
+      "currency": null,
+      "units": "text",
+      "permission_record_id": "permission-example"
+    },
+    {
+      "source_id": "dictionary",
+      "role": "word_list",
+      "category": "synthetic",
+      "provider_or_owner": "Fictional local workflow example",
+      "reference": "Fictional engineering example; no market evidence",
+      "period_start": "2024-01-01",
+      "period_end": "2026-10-31",
+      "published_at": null,
+      "retrieved_at": null,
+      "currency": null,
+      "units": "tokens",
+      "permission_record_id": "permission-example"
+    }
+  ],
+  "payload": {
+    "schema_version": 1,
+    "kind": "keystone.news-text",
+    "entity_id": "entity-example",
+    "ticker": "NSTAR",
+    "as_of": "2026-10-31T12:00:00Z",
+    "max_age_days": 7,
+    "aliases": [
+      "Northstar Components"
+    ],
+    "word_list": {
+      "source_id": "dictionary",
+      "positive": [
+        "growth",
+        "profit"
+      ],
+      "negative": [
+        "loss",
+        "risk"
+      ]
+    },
+    "articles": [
+      {
+        "id": "story-a",
+        "headline": "Northstar Components reports growth",
+        "body": "Profit improved.",
+        "published_at": "2026-10-30T09:00:00Z",
+        "retrieved_at": "2026-10-31T10:00:00Z",
+        "url": "https://example.com/story-a",
+        "source_id": "articles",
+        "language": "en",
+        "text_scope": "supplied_text"
+      },
+      {
+        "id": "story-b",
+        "headline": "Northstar Components reports growth",
+        "body": "Profit improved.",
+        "published_at": "2026-10-30T09:00:00Z",
+        "retrieved_at": "2026-10-31T10:00:00Z",
+        "url": "https://example.com/story-b",
+        "source_id": "articles",
+        "language": "en",
+        "text_scope": "supplied_text"
+      },
+      {
+        "id": "story-c",
+        "headline": "Northstar Components appoints director",
+        "body": "",
+        "published_at": "2026-10-30T09:00:00Z",
+        "retrieved_at": "2026-10-31T10:00:00Z",
+        "url": "https://example.com/story-c",
+        "source_id": "articles",
+        "language": "en",
+        "text_scope": "supplied_text"
+      },
+      {
+        "id": "story-d",
+        "headline": "Unrelated company reports a loss",
+        "body": "",
+        "published_at": "2026-10-30T09:00:00Z",
+        "retrieved_at": "2026-10-31T10:00:00Z",
+        "url": "https://example.com/story-d",
+        "source_id": "articles",
+        "language": "en",
+        "text_scope": "supplied_text"
+      },
+      {
+        "id": "story-old",
+        "headline": "Northstar Components reports profit",
+        "body": "",
+        "published_at": "2026-10-01T09:00:00Z",
+        "retrieved_at": "2026-10-31T10:00:00Z",
+        "url": "https://example.com/story-old",
+        "source_id": "articles",
+        "language": "en",
+        "text_scope": "supplied_text"
+      }
+    ]
+  }
+}

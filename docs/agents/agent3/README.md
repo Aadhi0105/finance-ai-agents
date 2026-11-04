@@ -201,6 +201,16 @@ with `python -m agent3.run_live --help` and `python -m agent3.run_news --help`.
 
 ## Evidence, HTML, and recovery
 
+[Webapp 4C](../../webapp/batch4c-other-workflows.md) adds two bounded **new local
+calculation** actions alongside saved-bundle replay. **Analyse supplied events**
+uses explicitly supplied estimation/event return windows and keeps inference
+held while dates, benchmarks and design are unreviewed. **Analyse supplied news
+text** filters and clusters local English text and calculates diagnostic tone
+from an exact supplied word list. The browser does not acquire market/news data,
+download a model or imply FinBERT/LLM analysis. Each accepted input version needs
+a separate confirmed job; native charts, exact tables, exclusions and method
+limits stay attached to the resulting review-required report.
+
 A terminal CLI attempt retains a `run.json` checkpoint and sealed `bundle.json`
 where persistence succeeds. The bundle includes normalized inputs, available
 provider snapshots, settings, peer decisions, result, provenance, and integrity
