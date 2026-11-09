@@ -1,9 +1,11 @@
 # Fresh local research — implementation acceptance matrix
 
-**3 November 2026 · All rows pending implementation.**
-This is the frozen 4A.2 design checklist. [4B](../batch4b-local-research.md) now
-records bounded implementation evidence; these rows are retained for broader
-4D acceptance and are not automatically all-pass from a local demonstration.
+**3 November 2026 · Frozen 4A.2 design checkpoint.**
+The Pending status column below records the original design checkpoint, not a
+current runtime verdict. [4B](../batch4b-local-research.md) records initial
+implementation evidence; [4D](../batch4d-workflow-acceptance.md) records subsequent
+count-bound, fault/recovery and browser acceptance and the remaining coverage
+limits. A demonstration does not automatically pass every variant in these rows.
 [4A.2 specification](../batch4a2-fresh-analysis-contracts.md) ·
 [Financial semantics](financial-semantics.md) ·
 [Execution/recovery](execution-and-recovery.md).

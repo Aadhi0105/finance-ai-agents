@@ -189,8 +189,9 @@ fictional inputs; they are not human financial interpretation or real-source
 validation. Physical touch/screen-reader, real print/download completion and
 general browser compatibility are not claimed by this review.
 
-Broader maximum-volume/disk-fault combinations, real-source permissions and
-human financial interpretation remain **4D acceptance or separate release
-dependencies**. Continuous monitoring, approved correction intake, independently
+The subsequent **[4D acceptance](batch4d-workflow-acceptance.md)** records larger
+count-bound inputs and cross-workflow storage-fault, capacity and recovery checks.
+Real-source permissions and human financial interpretation remain separate
+release dependencies. Continuous monitoring, approved correction intake, independently
 reviewed event inference and advanced language-model scoring remain separately
 scoped extensions. No production release approval is granted by this batch.

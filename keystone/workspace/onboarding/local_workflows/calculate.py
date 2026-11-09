@@ -23,7 +23,7 @@ def calculate(package,entity,record):
     if w=='monitoring':
         from scheduler.cycle import calculate_observation, _surfaces
         from state.classify import classify
-        result['period']=p['as_of'];assessed=breaches=missing=exceptions=0;details=[]
+        result['period']=p['as_of'];assessed=breaches=missing=exceptions=0;details=[];methods={};method_refs={}
         for index,item in enumerate(p['items']):
             cov=dict(item_id=item['id'],entity=entity['name'],metric=item['metric'],covenant_type='analyst_policy',
                 threshold=float(item['threshold']),direction=item['direction'])
@@ -40,7 +40,21 @@ def calculate(package,entity,record):
                 row.update(breached=margin>0,margin=str(margin),status=classify(
                     prior,margin>0,float(margin),last is None))
                 history.append(dict(value=v,data_ts=day,cycle=cycle));last=row
-                rows.append({**row,'data_ts':day.isoformat()})
+                # Keep every calculated diagnostic, but retain repeated policy
+                # context in the supplied input and method prose once per result.
+                # Twenty full histories must fit the same bounded evidence path
+                # as smaller inputs, without dropping points or raising its cap.
+                saved={k:v for k,v in row.items() if k not in {
+                    'item_id','entity','covenant_type','metric','threshold','direction',
+                    'anomaly_significant','anomaly_z','drifting','drift_slope','drift_tstat','breach_prob','breach_tail'}}
+                saved['data_ts']=day.isoformat()
+                for key in ('_anomaly_detail','_drift_detail','_breach_detail'):
+                    metadata={k:v for k,v in saved[key].items() if k in {'method','caveat','computed_by'}}
+                    signature=c.fingerprint(metadata)
+                    ref=method_refs.setdefault(signature,'method-'+str(len(method_refs)))
+                    methods[ref]=metadata
+                    saved[key]={**{k:v for k,v in saved[key].items() if k not in metadata},'method_ref':ref}
+                rows.append(saved)
             latest=item['observations'][-1];valid=latest['value'] is not None
             assessed+=valid;missing+=not valid
             breaches+=int(valid and last['breached']);exceptions+=int(valid and last['status']!='BASELINE' and _surfaces(last))
@@ -51,10 +65,10 @@ def calculate(package,entity,record):
             result['rows'].append(dict(label=item['metric'],date=latest['date'],status=status,metric_id=prefix+'-value',related_metric_id=prefix+'-threshold',detail='Policy requires value to stay '+item['direction']+' threshold'))
             chart(prefix+'-history',item['metric']+' · supplied history',
                 [dict(x=o['date'],label=o['date'],value=o['value']) for o in item['observations']],item['unit'],'date',item['currency'],'line')
-            details.append(dict(id=item['id'],rows=rows,latest_status=status))
+            details.append(dict(id=item['id'],input_pointer='/items/'+str(index),rows=rows,latest_status=status))
         metric('assessed','Latest observations assessed',assessed);metric('breaches','Active policy breaches in assessed observations',breaches)
         metric('exceptions','Newly surfaced changes or diagnostics',exceptions);metric('missing','Missing latest observations',missing)
-        result['details']=dict(items=details)
+        result['details']=dict(items=details,diagnostic_encoding='interned-method-metadata/1',diagnostic_methods=methods)
         result['limitations']=['Thresholds are supplied analyst policies, not contractual covenant conclusions.',
             'Each request evaluates its supplied history independently. Earlier web jobs are not a monitoring predecessor or an approved correction.',
             'The first usable observation establishes a baseline; it does not generate a new-breach alert.',
