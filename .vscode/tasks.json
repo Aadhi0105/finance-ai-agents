@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Keystone",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["${workspaceFolder}/scripts/open_keystone.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "presentation": {"reveal": "always", "panel": "dedicated", "clear": false},
+      "runOptions": {"instanceLimit": 2},
+      "problemMatcher": []
+    }
+  ]
+}
