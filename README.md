@@ -148,6 +148,12 @@ history links and evidence downloads. A valid close can contain a held forecast.
 
 ## Browse the local report workspace
 
+For an already configured private workspace, open this repository folder in VS
+Code and choose **Tasks: Run Task → Open Keystone**. The [launcher guide](docs/webapp/open-keystone.md)
+covers local settings, build tools, startup, repeat opening and stopping. The
+launcher rebuilds local code, waits for the protected workspace and opens the
+browser; it does not retrieve new code/data or submit new analysis requests.
+
 The React/TypeScript workspace provides native reports for all four agents, with
 interactive charts, separate execution/financial-review states and registered
 evidence. FastAPI serves the selected saved inventory; browsing starts no agent
