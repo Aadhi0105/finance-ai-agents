@@ -262,7 +262,14 @@ native report with interactive numerical charts, coverage and review limits.
 The zero-call profiles preserve atomic evidence, one-attempt jobs, delivery-only
 recovery and held restored queues. Monitoring histories are self-contained;
 cross-job monitoring continuity, event inference approval and advanced text
-models remain separately scoped. Broader new-workflow acceptance remains 4D.
+models remain separately scoped.
+[4D](docs/webapp/batch4d-workflow-acceptance.md) exercises the new paths at their
+supported count limits, injects input/result/delivery storage failures, checks
+mixed-workflow capacity and local restoration, and reviews the larger native
+reports in the browser. It also fixes repeated monitoring diagnostics exceeding
+the result-size limit, without dropping observations or increasing the limit.
+These are fictional engineering checks; source rights, human financial review
+and independent disaster recovery retain their separate release dependencies.
 
 ## Read the result before acting on it
 

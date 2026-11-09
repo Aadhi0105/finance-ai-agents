@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.fresh-workflow-engineering-acceptance",
+  "date": "2026-11-04",
+  "base_code_commit": "ef0ef937ac5965252a3b8efc971dfd4f023370b9",
+  "worktree_dirty": true,
+  "source_sha256": {
+    "keystone/workspace/onboarding/local_workflows/calculate.py": "3c91f57ef1efce33d481ac7a9c27697d8e85df76e18ccdf0b8b3b9c729899a87",
+    "tests/test_workspace_fresh_workflow_acceptance.py": "7c19c3285c68dff426dd9faf44659ccfa5f39034d59d6d634966a24747730ec5",
+    "scripts/fresh_workflow_acceptance_cases.py": "c123ed00c13714b4c039abb8ae0c0e3fac358ce1a7837db317daec64644800e4",
+    "scripts/prepare_fresh_workflow_acceptance_preview.py": "687a9079b8799c103e4a46f42a9523170eec5c82ab87ad5ccbacbd0b3ed7d11e",
+    "scripts/verify_fresh_workflow_acceptance_preview.py": "3a01106af094a7984b5bbbe15c394ab7b77c63cd923684e74f6980723765822a",
+    "requirements-macos-arm64-py311.lock": "a29f15bc4bf65d773fc01d847b1ed7942bcbb2fda502239cc9e2337fbb3c9349"
+  },
+  "scope": "Bounded fictional count-volume, storage-fault, recovery and native-reader acceptance for the four newly enabled supplied-input calculation profiles.",
+  "acceptance_cases": [
+    {
+      "id": "FW-01",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-02",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-03",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-04",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-05",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-06",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-07",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-08",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-09",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-10",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-11",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    },
+    {
+      "id": "FW-12",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py",
+        "visible_browser"
+      ]
+    },
+    {
+      "id": "FW-13",
+      "status": "passed_bounded",
+      "evidence": [
+        "tests/test_workspace_fresh_workflow_acceptance.py"
+      ]
+    }
+  ],
+  "tests": {
+    "python": {
+      "passed": 1612,
+      "seconds": 686.063
+    },
+    "new_cross_workflow_cases": 105,
+    "final_unique_record_boundary_subset": {
+      "passed": 8,
+      "seconds": 3.259
+    },
+    "frontend_passed": 324,
+    "typecheck": "passed",
+    "production_build": "passed"
+  },
+  "browser": {
+    "checks_passed": 27,
+    "checks": [
+      {
+        "case": "research-browser-confirmation",
+        "passed": true,
+        "job_id": "job-8d95dc42d15e4357a1592e627c1ae997"
+      },
+      {
+        "case": "monitoring-all-charts",
+        "passed": true
+      },
+      {
+        "case": "monitoring-keyboard-last-point",
+        "passed": true
+      },
+      {
+        "case": "monitoring-exact-table-last-page",
+        "passed": true
+      },
+      {
+        "case": "monitoring-missing-point",
+        "passed": true
+      },
+      {
+        "case": "event-twenty-issuer-count",
+        "passed": true
+      },
+      {
+        "case": "event-diagnostic-six-percent",
+        "passed": true
+      },
+      {
+        "case": "event-inference-held",
+        "passed": true
+      },
+      {
+        "case": "event-last-point",
+        "passed": true
+      },
+      {
+        "case": "news-all-four-pages",
+        "passed": true,
+        "rows": 100
+      },
+      {
+        "case": "news-fixed-score-scale",
+        "passed": true
+      },
+      {
+        "case": "news-reading-copy-all-headlines",
+        "passed": true,
+        "rows": 100
+      },
+      {
+        "case": "news-reading-copy-limits",
+        "passed": true
+      },
+      {
+        "case": "news-desktop-layout",
+        "passed": true,
+        "scroll": 1280,
+        "width": 1280
+      },
+      {
+        "case": "news-narrow-layout",
+        "passed": true,
+        "scroll": 320,
+        "width": 320
+      },
+      {
+        "case": "events-desktop-layout",
+        "passed": true,
+        "scroll": 1280,
+        "width": 1280
+      },
+      {
+        "case": "events-narrow-layout",
+        "passed": true,
+        "scroll": 320,
+        "width": 320
+      },
+      {
+        "case": "monitoring-desktop-layout",
+        "passed": true,
+        "scroll": 1280,
+        "width": 1280
+      },
+      {
+        "case": "monitoring-narrow-layout",
+        "passed": true,
+        "scroll": 320,
+        "width": 320
+      },
+      {
+        "case": "research-desktop-layout",
+        "passed": true,
+        "scroll": 1280,
+        "width": 1280
+      },
+      {
+        "case": "research-narrow-layout",
+        "passed": true,
+        "scroll": 320,
+        "width": 320
+      },
+      {
+        "case": "research-tenth-year-chart",
+        "passed": true
+      },
+      {
+        "case": "research-reading-copy-ten-years",
+        "passed": true
+      },
+      {
+        "case": "research-fcff-visible",
+        "passed": true
+      },
+      {
+        "case": "research-conditional-value-visible",
+        "passed": true
+      },
+      {
+        "case": "reload-clears-private-view",
+        "passed": true
+      },
+      {
+        "case": "reconnection-finds-original-report",
+        "passed": true
+      }
+    ],
+    "desktop_css_width": 1280,
+    "narrow_css_width": 320,
+    "viewport_override_reset": true,
+    "limitations": [
+      "Physical touch and screen-reader acceptance not performed.",
+      "HTTP artifact retrieval verified; browser download-folder placement and physical print completion not claimed."
+    ]
+  },
+  "demonstration": {
+    "workspace_id": "workspace-6b89bcda0dae48d0846e4c8e8c68f9f6",
+    "workspace": "output/fresh-workflows-4d-preview/workspace",
+    "url": "http://127.0.0.1:8862/",
+    "runs": [
+      {
+        "artifact_bytes": 124046,
+        "artifacts": {
+          "analysis-commit.json": {
+            "bytes": 1797,
+            "sha256": "409ef1bd8e703dfb25ae7bf8446731404c0f0db30716511988d816b135c9d3bd"
+          },
+          "analysis-request.json": {
+            "bytes": 1037,
+            "sha256": "1d7b68d4e6f5dd30b8e612146c33a5eee53b161032e5e02a900fee0b9b384169"
+          },
+          "financial-kit.json": {
+            "bytes": 23795,
+            "sha256": "5f3abf32414572e70d54282a4ff5f122ac0e775b2c44a3a6eeb5b0198dea6319"
+          },
+          "input-contract.json": {
+            "bytes": 3338,
+            "sha256": "71a3f1e42ecdb506d230eee42257356bf38dedcb2d9b0d41febd0ec13f44c0be"
+          },
+          "native-report.json": {
+            "bytes": 46484,
+            "sha256": "aa210d824ea7f3d52c7426acefea94b385766f49f3c8212ac266a0ec39072dc8"
+          },
+          "native-series.json": {
+            "bytes": 250,
+            "sha256": "244e832a6465d262b90c162531bdfd39c358a7421d28df0690a63c07a9abe22b"
+          },
+          "payload.json": {
+            "bytes": 35956,
+            "sha256": "99b51003cb89c656ce1be6a5740f608c9e6498429726bb2dbcbf62b5e0301150"
+          },
+          "report_REVIEW.html": {
+            "bytes": 11389,
+            "sha256": "1ceb9d08da05f04a9573fa726a67f57938a2d7c173e883841fb42048fc2b9f35"
+          }
+        },
+        "duration_seconds": 0.759,
+        "job_id": "job-8d95dc42d15e4357a1592e627c1ae997",
+        "model_control": {
+          "cost_status": "unpriced",
+          "last_refusal": null,
+          "output_tokens_reserved": 0,
+          "requests_reserved": 0,
+          "unknown_usage_calls": 0
+        },
+        "result_bytes": 35956,
+        "run_id": "result-8d95dc42d15e4357a1592e627c1ae997",
+        "version_id": "version-bee31dc5836b499aa099a3168b91cf87",
+        "workflow": "research",
+        "dataset_id": "dataset-a4c149ad38c34ed5a4cbfef53fc2d0c4",
+        "package_bytes": 24965,
+        "package_sha256": "665d103001dc8bb50c528590ef3268f53f2cf540e190cadfeaed815cb1bb7aaf",
+        "payload_sha256": "5f3abf32414572e70d54282a4ff5f122ac0e775b2c44a3a6eeb5b0198dea6319",
+        "classification": "synthetic",
+        "attempt": 1,
+        "status": "review_required",
+        "financial_approval": false,
+        "protected_downloads_verified": 8
+      },
+      {
+        "artifact_bytes": 2537803,
+        "artifacts": {
+          "analysis-commit.json": {
+            "bytes": 1711,
+            "sha256": "b84f05155787427b005e36deb828a5383b2cde76112236bbee015b0115441e8b"
+          },
+          "analysis-request.json": {
+            "bytes": 439,
+            "sha256": "8edbec3f2eeb8adc889265644c108ba22ebb8a0361c12ff77b2d0779ae8b3def"
+          },
+          "input-contract.json": {
+            "bytes": 12756,
+            "sha256": "81ad7d41a18aefdeefa426b85ec0ed6966b7579bbd56b6fffca4e59bd86b9f82"
+          },
+          "native-report.json": {
+            "bytes": 706200,
+            "sha256": "8009d13e4f4448f8f6180aeabff64c71fba4c0ce685b6628e43ac9b2447e6b64"
+          },
+          "native-series.json": {
+            "bytes": 254,
+            "sha256": "ad74433f751db6c8ffee67d64b9e7af1e052bc792bcd95540fa6ecf73e948115"
+          },
+          "payload.json": {
+            "bytes": 1681713,
+            "sha256": "bc322057e0e9d86baff8eb1689f3e7077b124ca06f3acd0c384d2c789a4fc449"
+          },
+          "report_REVIEW.html": {
+            "bytes": 5818,
+            "sha256": "3e326894d3bb4aa100372f173ab37d8f694d9ed6246101007f7973abbd3b909d"
+          },
+          "supplied-input.json": {
+            "bytes": 128912,
+            "sha256": "020678096b8ce82637db4451ec2506a1b59bce2d96276daf8c574ced24b51a75"
+          }
+        },
+        "duration_seconds": 3.195,
+        "job_id": "job-748083cdaac640cdadb69fbf3388b61c",
+        "model_control": {
+          "cost_status": "unpriced",
+          "last_refusal": null,
+          "output_tokens_reserved": 0,
+          "requests_reserved": 0,
+          "unknown_usage_calls": 0
+        },
+        "result_bytes": 1681713,
+        "run_id": "result-748083cdaac640cdadb69fbf3388b61c",
+        "version_id": "version-c57ba33e9e9d44ef97e5a51ec6273486",
+        "workflow": "monitoring",
+        "dataset_id": "dataset-280872dae4584d2e99203038e1b38d67",
+        "package_bytes": 129681,
+        "package_sha256": "4ee8344d1ac4a99b3006ae8a1fddb53907cd760a4c5a8276de2cdc17855db3ea",
+        "payload_sha256": "020678096b8ce82637db4451ec2506a1b59bce2d96276daf8c574ced24b51a75",
+        "classification": "synthetic",
+        "attempt": 1,
+        "status": "review_required",
+        "financial_approval": false,
+        "protected_downloads_verified": 8
+      },
+      {
+        "artifact_bytes": 565431,
+        "artifacts": {
+          "analysis-commit.json": {
+            "bytes": 1709,
+            "sha256": "397bff8d49572afaf728ac153deb23ce748dab71dc469bcd7928dc66a4f28e03"
+          },
+          "analysis-request.json": {
+            "bytes": 429,
+            "sha256": "496fdba6dc66a9def86108318df90dad27015bfd7ee1885379e778ca72ad81d2"
+          },
+          "input-contract.json": {
+            "bytes": 12703,
+            "sha256": "2bff9057ba9f345a2904ba50a686c342e66da3cd2161fa601dba35b710131b96"
+          },
+          "native-report.json": {
+            "bytes": 39757,
+            "sha256": "4ea8df9539a3d6900e6a37ad9b262df4d8f3bff4dc21e6c03e526fcb62fa7120"
+          },
+          "native-series.json": {
+            "bytes": 250,
+            "sha256": "1e81e0deb4dc5e8904e8f0f8fae8d1f94558ec3d357e50fe99cfc06fee19ad10"
+          },
+          "payload.json": {
+            "bytes": 160860,
+            "sha256": "83383c91b0991e866a6f5932a7968fd0199fc7528bea179215d53c6d6e18a00a"
+          },
+          "report_REVIEW.html": {
+            "bytes": 4122,
+            "sha256": "1cd309d0358ded0e8420d1ac5505263ba70a1c70a57b2cf87ac9707869785c10"
+          },
+          "supplied-input.json": {
+            "bytes": 345601,
+            "sha256": "c359ef6c9e3693c997b154fa7ae47e9a470b4a593b6afa61bdd569da15a5c019"
+          }
+        },
+        "duration_seconds": 1.577,
+        "job_id": "job-05bc68a3153c43f9b2617025baafbb84",
+        "model_control": {
+          "cost_status": "unpriced",
+          "last_refusal": null,
+          "output_tokens_reserved": 0,
+          "requests_reserved": 0,
+          "unknown_usage_calls": 0
+        },
+        "result_bytes": 160860,
+        "run_id": "result-05bc68a3153c43f9b2617025baafbb84",
+        "version_id": "version-2da979a3c1bb49e2a8839ed0f7f7a607",
+        "workflow": "events",
+        "dataset_id": "dataset-3340ff7a870c415c8f7eb1403524a319",
+        "package_bytes": 346294,
+        "package_sha256": "ff4c2a63bf1347ab988669f6870fe35c8ffe55867bde3d1c9bc528ed46c4c18c",
+        "payload_sha256": "c359ef6c9e3693c997b154fa7ae47e9a470b4a593b6afa61bdd569da15a5c019",
+        "classification": "synthetic",
+        "attempt": 1,
+        "status": "review_required",
+        "financial_approval": false,
+        "protected_downloads_verified": 8
+      },
+      {
+        "artifact_bytes": 2479648,
+        "artifacts": {
+          "analysis-commit.json": {
+            "bytes": 1712,
+            "sha256": "1144fc97b2c58a85720f52128213843f33129f9282ea6377560067d35a4e4cb3"
+          },
+          "analysis-request.json": {
+            "bytes": 424,
+            "sha256": "c0ef8d5d5a0e43c6bd8a431dde9ec0ff963c97f0472be021d559357f28a57bd7"
+          },
+          "input-contract.json": {
+            "bytes": 13114,
+            "sha256": "164e1ccd97244a2621ab47a48385e2b47563e82b8aaba39ee00a1dae1f1a199f"
+          },
+          "native-report.json": {
+            "bytes": 123944,
+            "sha256": "c02d2eacd6609c4ee3e49e7fecda08138ff621cacb145527f56c02344d59003e"
+          },
+          "native-series.json": {
+            "bytes": 248,
+            "sha256": "6b8add59e7dce5006d3f54af60a80372dffa86b12eba2f592654a3e570a86dc6"
+          },
+          "payload.json": {
+            "bytes": 1797441,
+            "sha256": "959cba39cfec1dd85a26166722496470ae36f83d7e2b994c04024b0cba8c04d9"
+          },
+          "report_REVIEW.html": {
+            "bytes": 12302,
+            "sha256": "66b56dd6b3b7e9d33695d07b5afd718bb9a176383e5c5e6c49815374005324dc"
+          },
+          "supplied-input.json": {
+            "bytes": 530463,
+            "sha256": "31bda5d3472bfc7824bc769c144c455f75cae02cbb879593003f38330d68aed1"
+          }
+        },
+        "duration_seconds": 0.9,
+        "job_id": "job-b5929b83142a4a38bc5f577654421638",
+        "model_control": {
+          "cost_status": "unpriced",
+          "last_refusal": null,
+          "output_tokens_reserved": 0,
+          "requests_reserved": 0,
+          "unknown_usage_calls": 0
+        },
+        "result_bytes": 1797441,
+        "run_id": "result-b5929b83142a4a38bc5f577654421638",
+        "version_id": "version-ce2850c5600d44dfb4302b5723eb5546",
+        "workflow": "news",
+        "dataset_id": "dataset-3feda2ce8c57400a81363639df4f2613",
+        "package_bytes": 531590,
+        "package_sha256": "aa3b36212918b5e5cab27312dea95307c475971d97499d3f7fb2e68a917c4b46",
+        "payload_sha256": "31bda5d3472bfc7824bc769c144c455f75cae02cbb879593003f38330d68aed1",
+        "classification": "synthetic",
+        "attempt": 1,
+        "status": "review_required",
+        "financial_approval": false,
+        "protected_downloads_verified": 8
+      }
+    ]
+  },
+  "monitoring_fix": {
+    "reason": "Repeated diagnostics exceeded the 2000000-byte result limit at 20 policies by 100 observations.",
+    "diagnostic_encoding": "interned-method-metadata/1",
+    "result_bytes": 1681713,
+    "retained_chart_points": 2000,
+    "result_limit_bytes": 2000000,
+    "threshold_calculations_changed": false
+  },
+  "private_http": {
+    "downloads_verified": 32,
+    "exact_original_jobs": 4,
+    "cache_control": "no-store"
+  },
+  "recovery": {
+    "protection": "local_restore_test_only",
+    "mixed_results": 4,
+    "mixed_held_queues": 4,
+    "new_access_token": true,
+    "original_evidence_unchanged": true
+  },
+  "remaining": [
+    "Real-source authorisation and human financial interpretation.",
+    "Independent external backup, encryption/key recovery and clean-machine disaster recovery.",
+    "Authorised real-company Agent 4 acceptance inputs.",
+    "Enterprise/customer deployment and authentication.",
+    "Exhaustive field-volume-fault combinations, physical power-loss durability, missing-handler installation variants, every near-overflow parameter and first-listing race."
+  ],
+  "production_release_approved": false
+}

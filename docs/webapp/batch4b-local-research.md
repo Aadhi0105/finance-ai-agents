@@ -179,7 +179,7 @@ production build passed. **Eight visible browser checks passed**, including
 exact-value keyboard selection, parameter-review reset, held valuation, native
 SVG/no embed, and bounded 1,280/320 CSS-pixel layouts. All 16 registered artifacts
 across the two actual browser-requested reports were re-read and hash-verified.
-See the [machine-readable evidence](../../references/acceptance/workspace-local-research-2026-11-03.json). The design matrix remains the broader 4D checklist; it is
+See the [machine-readable evidence](../../references/acceptance/workspace-local-research-2026-11-03.json). The design matrix remains the broader checklist; it is
 not automatically marked all-pass by schema/example or a two-case browser run.
 In particular, broad maximum-volume/disk-fault combinations for the new profile,
 real-company human interpretation, source-use authorisation and independent
@@ -188,5 +188,5 @@ is advanced by this implementation.
 
 [4C](batch4c-other-workflows.md) now implements bounded supplied-history,
 event-window and news-text calculation paths. Broader new-workflow acceptance
-remains **4D**. The existing source-rights review and deferred external-drive
+is recorded in **[4D](batch4d-workflow-acceptance.md)**. The existing source-rights review and deferred external-drive
 decision remain unchanged.
