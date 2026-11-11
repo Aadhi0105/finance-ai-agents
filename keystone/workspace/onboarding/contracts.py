@@ -56,6 +56,14 @@ class InputError(ValueError):
             'review_note_conflict': 'This submission identity belongs to a different note. Preserve the original request.',
             'review_note_capacity': 'The review-note limit has been reached. Existing notes and reports are preserved.',
             'review_notes_unavailable': 'Saved review notes could not be verified. Preserve the workspace and ask the operator to inspect it.',
+            'review_correction_unsupported': 'Corrections require a private report with an accepted input version.',
+            'review_correction_invalid': 'Select a validated successor in the same dataset and recheck its exact change comparison.',
+            'review_correction_conflict': 'This submission identity belongs to another correction. Preserve the original request.',
+            'review_correction_already_linked': 'This input already has a recorded correction. Inspect its replacement and continue from that version.',
+            'review_correction_unchanged': 'The successor contains no source or input changes beyond its lineage pointer.',
+            'review_correction_diff_limit': 'This replacement exceeds the 200-change comparison limit. Its accepted input is preserved; inspect it separately.',
+            'review_correction_capacity': 'The correction record limit has been reached. Existing inputs and reports are preserved.',
+            'review_corrections_unavailable': 'Correction history could not be verified. Preserve the workspace and inspect its saved evidence.',
         })
         return {'error': {'code': self.code, 'message': messages[self.code]}}
 

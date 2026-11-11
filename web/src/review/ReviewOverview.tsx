@@ -1,3 +1,4 @@
+import type {ReviewCorrectionClient} from './correction-client';
 import {useEffect,useMemo,useState} from 'react';
 import type {Run} from '../workspace-types';
 import type {NativeReport} from '../reports/report-data';
@@ -7,8 +8,8 @@ import {ReviewNoteClient} from './note-client';
 import {ReviewWorkspace} from './ReviewWorkspace';
 
 type State={kind:'loading'}|{kind:'ready';snapshot:ReviewSnapshot}|{kind:'unavailable'};
-export function ReviewOverview({run,report,fetcher,notesClient,onInspect,onReviews,onSection}:{
-  run:Run;report:NativeReport;fetcher:typeof fetch;notesClient?:ReviewNoteClient;
+export function ReviewOverview({run,report,fetcher,notesClient,correctionsClient,onInspect,onReviews,onSection}:{
+  run:Run;report:NativeReport;fetcher:typeof fetch;notesClient?:ReviewNoteClient;correctionsClient?:ReviewCorrectionClient;
   onInspect:(refs:string[])=>void;onReviews:(refs:string[])=>void;onSection:(id:string)=>void;
 }){
   const client=useMemo(()=>notesClient||new ReviewNoteClient(),[notesClient]);
@@ -39,7 +40,7 @@ export function ReviewOverview({run,report,fetcher,notesClient,onInspect,onRevie
       return <li key={kind}><div><strong>{reviewLabels[kind]}</strong><span>{available?`${available} ${available===1?'item':'items'} awaiting review`:'Not recorded for this report'}</span></div>{kind==='financial_mappings'&&<p>Saved source fields and transformations. Document extraction has not been performed.</p>}</li>;
     })}</ul>
     <p className="review-boundary">Notes record observations and questions. Financial decisions and source corrections remain separate.</p>
-    <ReviewWorkspace snapshot={s} report={report} fetcher={fetcher} client={client} onActivity={setActivity} onInspect={onInspect} onReviews={onReviews} onSection={onSection}/>
+    <ReviewWorkspace snapshot={s} report={report} fetcher={fetcher} client={client} correctionsClient={correctionsClient} onActivity={setActivity} onInspect={onInspect} onReviews={onReviews} onSection={onSection}/>
     <details className="nr-technical-record"><summary>Exact review version</summary><dl><dt>Snapshot</dt><dd><code>{s.snapshot_id}</code></dd><dt>Input version</dt><dd>{s.binding.version_id||'Retained saved evidence'}</dd><dt>Binding</dt><dd>Run, registered files, input version, request and presentation. Changes require a new review scope.</dd></dl></details>
   </div>;
 }

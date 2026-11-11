@@ -139,7 +139,7 @@ def probe(config):
         token = (config['workspace'] / 'control/access-token.key').read_text().strip()
         info = get('/api/workspace', token)
         return (info.get('workspace_id') == config['workspace_id'] and info.get('kind') == 'keystone.private-workspace-reports'
-                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled'))
+                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled', 'review_corrections_enabled'))
                 and all(info.get(k) is False for k in ('live_data_enabled', 'paid_models_enabled')))
     except (OSError, ValueError, HTTPError, URLError):
         return False
@@ -192,7 +192,7 @@ def open_workspace(config, browser=True):
         build_website(config)
         if before != revision(): raise LaunchError('Local files changed during the build. Save your edits and run Open Keystone again.')
         command = [str(ROOT / '.venv/bin/python'), '-m', 'keystone.workspace', 'serve', '--workspace', str(config['workspace']),
-                   '--port', str(config['port']), '--enable-imports', '--enable-job-admission', '--enable-worker', '--enable-review-notes']
+                   '--port', str(config['port']), '--enable-imports', '--enable-job-admission', '--enable-worker', '--enable-review-notes', '--enable-review-corrections']
         child = subprocess.Popen(command, cwd=ROOT)
         record.write_text(json.dumps({'workspace_id': config['workspace_id'], 'revision': before}))
         wait_ready(config, child)

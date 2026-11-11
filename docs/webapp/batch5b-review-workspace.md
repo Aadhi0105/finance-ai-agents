@@ -5,7 +5,8 @@
 
 An analyst can now work through a report's review subjects, inspect their sources
 and keep questions and follow-up work beside the exact evidence. This implements
-the review workspace; source corrections and financial dispositions remain 5C/5D.
+the review workspace. [5C](batch5c-corrections-lineage.md) adds a separate input
+correction workflow; formal review dispositions remain 5D.
 
 ## Analyst journey
 

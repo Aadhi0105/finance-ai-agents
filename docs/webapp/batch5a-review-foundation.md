@@ -120,7 +120,7 @@ perform no financial computation or external requests and persist no review data
 ## Scope boundaries and next stages
 
 - **5B:** the analyst review workspace, notes and evidence navigation.
-- **5C:** supported corrections, new input versions and affected-report lineage.
+- **5C:** [implemented corrections, new input versions and affected-report lineage](batch5c-corrections-lineage.md).
 - **5D:** durable review dispositions and complete acceptance of the review flow.
 - **Document intake:** future document candidates and mappings need their own
   contracts and evidence locations; no PDF/OCR or provider acquisition is added.

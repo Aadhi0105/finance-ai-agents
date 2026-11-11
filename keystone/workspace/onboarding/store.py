@@ -537,6 +537,8 @@ class InputStore:
         for id_ in version_ids:self.version(id_)
         from ..review.notes import validate_notes
         validate_notes(self)
+        from ..review.corrections import validate_corrections
+        validate_corrections(self)
         members=[('workspace.json','file','configuration'),('inputs.sqlite3','file','logs'),
                  ('inputs','tree','inputs'),('staging','tree','inputs'),('permissions','tree','configuration'),
                  ('reports','tree','logs')]

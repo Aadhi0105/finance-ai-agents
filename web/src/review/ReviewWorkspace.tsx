@@ -1,3 +1,5 @@
+import {CorrectionWorkspace} from './CorrectionWorkspace';
+import type {ReviewCorrectionClient} from './correction-client';
 import {useEffect,useState,useSyncExternalStore} from 'react';
 import type {NativeReport} from '../reports/report-data';
 import {formatMetric,savedInstant} from '../reports/format';
@@ -9,8 +11,8 @@ type Draft={text:string;note_type:NoteRequest['note_type'];evidence_refs:string[
 const emptyDraft=():Draft=>({text:'',note_type:'question',evidence_refs:[]});
 const noteLabels={observation:'Observation',question:'Question',follow_up:'Follow-up work'};
 
-export function ReviewWorkspace({snapshot,report,fetcher,client,onActivity,onInspect,onReviews,onSection}:{
-  snapshot:ReviewSnapshot;report:NativeReport;fetcher:typeof fetch;client:ReviewNoteClient;
+export function ReviewWorkspace({snapshot,report,fetcher,client,correctionsClient,onActivity,onInspect,onReviews,onSection}:{
+  snapshot:ReviewSnapshot;report:NativeReport;fetcher:typeof fetch;client:ReviewNoteClient;correctionsClient?:ReviewCorrectionClient;
   onActivity:(state:'checking'|'not_started'|'in_review'|'unavailable')=>void;
   onInspect:(refs:string[])=>void;onReviews:(refs:string[])=>void;onSection:(id:string)=>void;
 }){
@@ -109,6 +111,7 @@ export function ReviewWorkspace({snapshot,report,fetcher,client,onActivity,onIns
       <div className="review-note-history"><h4>Saved notes for this item</h4>{book?.notes.filter(n=>n.request.target_id===target.id).map(n=>renderNote(n))}
         {book&&!book.notes.some(n=>n.request.target_id===target.id)&&<p>No note has been recorded for this item.</p>}</div>
     </>:<p>No review items match this search.</p>}</div></div>
+    {correctionsClient&&snapshot.binding.version_id&&<CorrectionWorkspace snapshot={snapshot} target={target} fetcher={fetcher} client={correctionsClient}/>}
     <p role="status" className="review-save-notice">{notice}</p>
     {book&&<details className="review-all-notes"><summary>All notes for this review scope ({book.notes.length})</summary>{book.notes.map(n=>renderNote(n))}{book.notes.length===0&&<p>No notes have been recorded for this scope.</p>}</details>}
     {book&&book.earlier_scope_notes.length>0&&<details className="review-all-notes"><summary>Earlier scope notes ({book.earlier_scope_notes.length})</summary><p>Retained history. These notes have not been carried into the current review scope.</p>{book.earlier_scope_notes.map(n=>renderNote(n,true))}</details>}

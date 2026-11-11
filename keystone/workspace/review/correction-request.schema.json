@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "VersionPin": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "version_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Version Id",
+          "type": "string"
+        },
+        "contract_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Contract Sha256",
+          "type": "string"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Payload Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "version_id",
+        "contract_sha256",
+        "payload_sha256"
+      ],
+      "title": "VersionPin",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "snapshot_id": {
+      "pattern": "^review-[a-f0-9]{64}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "target_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+      "title": "Target Id",
+      "type": "string"
+    },
+    "target_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Target Sha256",
+      "type": "string"
+    },
+    "replacement": {
+      "$ref": "#/$defs/VersionPin"
+    },
+    "change_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Change Sha256",
+      "type": "string"
+    },
+    "reviewer_label": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Reviewer Label",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "target_id",
+    "target_sha256",
+    "replacement",
+    "change_sha256",
+    "reviewer_label",
+    "reason"
+  ],
+  "title": "CorrectionRequest",
+  "type": "object"
+}
