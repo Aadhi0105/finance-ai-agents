@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.review-notebook",
+  "snapshot_id": "review-b125a764b0633fae040b620db07ee4325616aa571668b5890baad541088a26f6",
+  "workspace_id": "workspace-fictional-review",
+  "run_id": "result-34119f8815124c51a8dd891639af5df0",
+  "notes_enabled": true,
+  "notes": [
+    {
+      "schema_version": 1,
+      "kind": "keystone.review-note",
+      "id": "note-11111111111111111111111111111111",
+      "sequence": 1,
+      "recorded_at": "2026-11-11T12:00:00Z",
+      "binding": {
+        "workspace_id": "workspace-fictional-review",
+        "run_id": "result-34119f8815124c51a8dd891639af5df0",
+        "run_sha256": "4a50a6a2742279d5c7d4e74735a7cb5dc57ad96e596826d34a80fcebe781adac",
+        "report_view_sha256": "7b5933774c010a19afad2d7fe2a022c43be715405693257e40fdc800b2aa516b",
+        "artifact_hashes": {
+          "local-result": "c3513a7f0e4b3bc396013374d5d7ccd7960001ff21e1418f9434035232aaf539",
+          "financial-kit": "e66249a700d0534873e5bacccf750589acbe9279fe184888cf625ed88bca0e69",
+          "analysis-request": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7",
+          "input-contract": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+          "research-report": "710be8253006f1a3656ec923958299a6efe858cbcdbc310894929b13401daa61",
+          "native-series": "c97ed958a0895a45cded58ebb04c5e0e418669e2ad42597bcc69a046da8e369e",
+          "native-view": "7b5933774c010a19afad2d7fe2a022c43be715405693257e40fdc800b2aa516b",
+          "analysis-commit": "ce2425e836ff5e34bdce32cae9b0899530875e3639e0a6d157371bedb48c28b3"
+        },
+        "dataset_id": "dataset-3c937f111e01489485263166adf77148",
+        "version_id": "version-2dac8d9e8827430ea72b55b9ddac6497",
+        "contract_sha256": "af120862e9c3ba0b0434e50d1157c81c01e8789931084313dea1355f28887793",
+        "request_sha256": "d8fb9f7c2c08829142c171bfcdba3eb9329e4dfeb7673cfacaffbe10cc7d66d7"
+      },
+      "request": {
+        "schema_version": 1,
+        "snapshot_id": "review-b125a764b0633fae040b620db07ee4325616aa571668b5890baad541088a26f6",
+        "target_id": "issue-review-ab79cafa28f6aa55b41b",
+        "target_sha256": "048e2457cdd35a298c78fb8c6be52828761962fc2498e623341eae569ee7957e",
+        "reviewer_label": "Fictional analyst",
+        "note_type": "question",
+        "text": "Which source supports this accounting definition?",
+        "evidence_refs": [
+          "e-ea1d0f795f4fabbb024302"
+        ]
+      },
+      "target_title": "Imported evidence requires review",
+      "target_kind": "review_issue",
+      "request_key_sha256": "027ae90edf1321f3dc1ce0c6ef88949fe6fbca2a4dae553e9cb620c451ea2a35",
+      "request_sha256": "2c0948752f06bef47babd4b23fadc968772b9d207598e35e0da6beed9402339a",
+      "identity_assurance": "local_operator_unverified",
+      "financial_approval": false
+    }
+  ],
+  "earlier_scope_notes": [],
+  "analyst_review": "in_review",
+  "decision_count": 0,
+  "financial_approval": false
+}

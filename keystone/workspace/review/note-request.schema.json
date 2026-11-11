@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "snapshot_id": {
+      "pattern": "^review-[a-f0-9]{64}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "target_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+      "title": "Target Id",
+      "type": "string"
+    },
+    "target_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Target Sha256",
+      "type": "string"
+    },
+    "reviewer_label": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Reviewer Label",
+      "type": "string"
+    },
+    "note_type": {
+      "enum": [
+        "observation",
+        "question",
+        "follow_up"
+      ],
+      "title": "Note Type",
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Evidence Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "target_id",
+    "target_sha256",
+    "reviewer_label",
+    "note_type",
+    "text",
+    "evidence_refs"
+  ],
+  "title": "NoteRequest",
+  "type": "object"
+}

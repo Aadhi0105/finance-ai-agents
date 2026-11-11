@@ -1,0 +1,258 @@
+{
+  "$defs": {
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "run_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Run Sha256",
+          "type": "string"
+        },
+        "report_view_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Report View Sha256",
+          "type": "string"
+        },
+        "artifact_hashes": {
+          "maxProperties": 40,
+          "minProperties": 1,
+          "patternProperties": {
+            "^[a-z0-9][a-z0-9_-]{0,99}$": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "title": "Artifact Hashes",
+          "type": "object"
+        },
+        "dataset_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dataset Id"
+        },
+        "version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version Id"
+        },
+        "contract_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Contract Sha256"
+        },
+        "request_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Request Sha256"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "run_id",
+        "run_sha256",
+        "report_view_sha256",
+        "artifact_hashes",
+        "dataset_id",
+        "version_id",
+        "contract_sha256",
+        "request_sha256"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "NoteRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot_id": {
+          "pattern": "^review-[a-f0-9]{64}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "target_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "target_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Target Sha256",
+          "type": "string"
+        },
+        "reviewer_label": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Reviewer Label",
+          "type": "string"
+        },
+        "note_type": {
+          "enum": [
+            "observation",
+            "question",
+            "follow_up"
+          ],
+          "title": "Note Type",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Evidence Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "snapshot_id",
+        "target_id",
+        "target_sha256",
+        "reviewer_label",
+        "note_type",
+        "text",
+        "evidence_refs"
+      ],
+      "title": "NoteRequest",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.review-note",
+      "title": "Kind",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^note-[a-f0-9]{32}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 1,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "recorded_at": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "binding": {
+      "$ref": "#/$defs/Binding"
+    },
+    "request": {
+      "$ref": "#/$defs/NoteRequest"
+    },
+    "target_title": {
+      "maxLength": 240,
+      "minLength": 1,
+      "title": "Target Title",
+      "type": "string"
+    },
+    "target_kind": {
+      "enum": [
+        "source_inputs",
+        "financial_mappings",
+        "calculation_assumptions",
+        "report_section",
+        "review_issue"
+      ],
+      "title": "Target Kind",
+      "type": "string"
+    },
+    "request_key_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Request Key Sha256",
+      "type": "string"
+    },
+    "request_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "identity_assurance": {
+      "const": "local_operator_unverified",
+      "title": "Identity Assurance",
+      "type": "string"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "id",
+    "sequence",
+    "recorded_at",
+    "binding",
+    "request",
+    "target_title",
+    "target_kind",
+    "request_key_sha256",
+    "request_sha256",
+    "identity_assurance",
+    "financial_approval"
+  ],
+  "title": "Note",
+  "type": "object"
+}

@@ -1,0 +1,282 @@
+{
+  "$defs": {
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "run_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Run Sha256",
+          "type": "string"
+        },
+        "report_view_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Report View Sha256",
+          "type": "string"
+        },
+        "artifact_hashes": {
+          "maxProperties": 40,
+          "minProperties": 1,
+          "patternProperties": {
+            "^[a-z0-9][a-z0-9_-]{0,99}$": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            }
+          },
+          "title": "Artifact Hashes",
+          "type": "object"
+        },
+        "dataset_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dataset Id"
+        },
+        "version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version Id"
+        },
+        "contract_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Contract Sha256"
+        },
+        "request_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Request Sha256"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "run_id",
+        "run_sha256",
+        "report_view_sha256",
+        "artifact_hashes",
+        "dataset_id",
+        "version_id",
+        "contract_sha256",
+        "request_sha256"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "Target": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "source_inputs",
+            "financial_mappings",
+            "calculation_assumptions",
+            "report_section",
+            "review_issue"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 240,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "detail": {
+          "maxLength": 1600,
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "not_recorded"
+          ],
+          "title": "Availability",
+          "type": "string"
+        },
+        "section_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Section Refs",
+          "type": "array"
+        },
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 5000,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "issue_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9_-]{0,99}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Issue Refs",
+          "type": "array"
+        },
+        "scope_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Scope Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "detail",
+        "availability",
+        "section_refs",
+        "evidence_refs",
+        "issue_refs",
+        "scope_sha256"
+      ],
+      "title": "Target",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.review-snapshot",
+      "title": "Kind",
+      "type": "string"
+    },
+    "policy_version": {
+      "const": "review/1.0.0",
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "pattern": "^review-[a-f0-9]{64}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "binding": {
+      "$ref": "#/$defs/Binding"
+    },
+    "input_acceptance": {
+      "enum": [
+        "accepted_for_processing",
+        "retained_evidence"
+      ],
+      "title": "Input Acceptance",
+      "type": "string"
+    },
+    "execution": {
+      "enum": [
+        "completed",
+        "held",
+        "refused",
+        "unavailable",
+        "failed"
+      ],
+      "title": "Execution",
+      "type": "string"
+    },
+    "evidence_gate": {
+      "enum": [
+        "held_for_review",
+        "passed_evidence_checks",
+        "unavailable"
+      ],
+      "title": "Evidence Gate",
+      "type": "string"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "authenticated_reviewer": {
+      "const": false,
+      "title": "Authenticated Reviewer",
+      "type": "boolean"
+    },
+    "decisions_enabled": {
+      "const": false,
+      "title": "Decisions Enabled",
+      "type": "boolean"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/Target"
+      },
+      "maxItems": 223,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "policy_version",
+    "snapshot_id",
+    "binding",
+    "input_acceptance",
+    "execution",
+    "evidence_gate",
+    "financial_approval",
+    "authenticated_reviewer",
+    "decisions_enabled",
+    "targets"
+  ],
+  "title": "Snapshot",
+  "type": "object"
+}
