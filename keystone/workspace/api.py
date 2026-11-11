@@ -68,6 +68,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
               admission is not None and request.method == 'POST' and request.url.path == '/api/jobs'
               or private is not None and private.review_notes_enabled and request.method == 'POST'
                  and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-notes', request.url.path)
+              or private is not None and private.review_corrections_enabled and request.method == 'POST'
+                 and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-corrections', request.url.path)
               or private is not None and private.imports_enabled and (
                   request.method == 'POST' and request.url.path in {'/api/entities','/api/datasets','/api/imports'}
                   or request.method == 'POST' and re.fullmatch(r'/api/datasets/[a-z0-9_-]+/inspect',request.url.path)
@@ -177,12 +179,13 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
         manifest = load_catalog()
         if private is not None:
             for run in manifest.runs: private.source_version(run)
-        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled or private.review_notes_enabled) if private else True,
+        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled or private.review_notes_enabled or private.review_corrections_enabled) if private else True,
                 'live_data_enabled': False, 'paid_models_enabled': False,
                 'input_admission_enabled': private.imports_enabled if private else False,
                 'job_admission_enabled': private.jobs_enabled if private else admission is not None,
                 'job_worker_enabled': admission.worker_enabled if admission is not None else False,
                 'review_notes_enabled': private.review_notes_enabled if private else False,
+                'review_corrections_enabled': private.review_corrections_enabled if private else False,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])
@@ -220,10 +223,10 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             raise ReviewError('review_request_invalid', 422)
         return review_context(run_id)
 
-    def review_context(run_id):
+    def review_context(run_id, manifest=None):
         from .report_views.delivery import load_view
         from .review.projection import project_review
-        manifest = load_catalog()
+        manifest = load_catalog() if manifest is None else manifest
         run = next((r for r in manifest.runs if r.id == run_id), None)
         if run is None:
             raise ReviewError('review_run_not_found', 404)
@@ -261,6 +264,48 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             note, replayed = await run_in_threadpool(NotesStore(private.inputs).append,
                 lambda: review_context(run_id), c.bounded_json(bytes(data)), request.headers['idempotency-key'])
             return JSONResponse(dict(note=note, replayed=replayed, financial_approval=False),
+                                status_code=200 if replayed else 201)
+
+    @app.api_route('/api/runs/{run_id}/review-corrections', methods=['GET', 'HEAD'])
+    def review_corrections(run_id: str, request: Request):
+        from .onboarding import contracts as c
+        from .review.corrections import CorrectionsStore
+        query = request.query_params
+        if (any(k != 'replacement_version_id' or len(query.getlist(k)) != 1 for k in query)
+                or 'replacement_version_id' in query and not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,99}', query['replacement_version_id'])):
+            raise ReviewError('review_request_invalid', 422)
+        manifest = load_catalog()
+        checked = {}
+        def context(ident):
+            if ident not in checked:
+                checked[ident] = review_context(ident, manifest)
+            return checked[ident]
+        snapshot = context(run_id)['snapshot']
+        if private is None:
+            return JSONResponse(c.InputError('review_correction_unsupported', 409).envelope(), status_code=409)
+        return CorrectionsStore(private.inputs).lineage(snapshot, context, manifest,
+            enabled=private.review_corrections_enabled, replacement_version_id=query.get('replacement_version_id'))
+
+    if private is not None and private.review_corrections_enabled:
+        @app.post('/api/runs/{run_id}/review-corrections')
+        async def append_review_correction(run_id: str, request: Request):
+            import asyncio
+            from .onboarding.api import media
+            from .onboarding import contracts as c
+            from .review.corrections import CorrectionsStore, MAX_CORRECTION_BYTES
+            media(request, MAX_CORRECTION_BYTES, key=True)
+            data = bytearray()
+            try:
+                async with asyncio.timeout(c.TRANSFER_SECONDS):
+                    async for chunk in request.stream():
+                        if len(data) + len(chunk) > MAX_CORRECTION_BYTES:
+                            raise c.InputError('input_too_large', 413)
+                        data.extend(chunk)
+            except TimeoutError:
+                raise c.InputError('input_interrupted', 408) from None
+            record, replayed = await run_in_threadpool(CorrectionsStore(private.inputs).append,
+                review_context, run_id, c.bounded_json(bytes(data)), request.headers['idempotency-key'])
+            return JSONResponse(dict(correction=record, replayed=replayed, financial_approval=False),
                                 status_code=200 if replayed else 201)
 
     @app.api_route('/api/runs/{run_id}/files/{name:path}', methods=['GET', 'HEAD'])

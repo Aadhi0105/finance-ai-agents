@@ -34,3 +34,20 @@
 .review-note-text{white-space:pre-wrap;overflow-wrap:anywhere}.review-all-notes{margin:1.5rem 0}.review-alert{padding:1rem;background:#fbf2df;border:1px solid #d8c28a;border-radius:6px;margin:1rem 0;font-size:.88rem}
 .review-save-notice{font-size:.88rem;color:#345c48;overflow-wrap:anywhere}.review-workspace button:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:1000px){.review-workspace-grid{grid-template-columns:1fr}.review-target-list{max-height:240px}}
+
+/* Corrections keep the input comparison and report lineage together. */
+.review-corrections{margin-top:2rem;padding-top:2rem;border-top:1px solid var(--line,#d9e3e3);min-width:0}
+.review-correction-guide,.review-correction-record{margin:1.2rem 0;padding:1.2rem;background:#f4f7f5;border:1px solid #d7e2dc;border-radius:12px;min-width:0}
+.review-correction-guide summary,.review-correction-record summary{cursor:pointer;font-weight:600;line-height:1.5}
+.review-correction-guide code{overflow-wrap:anywhere}
+.review-correction-select{display:grid;gap:.6rem;font-weight:600;margin:1.4rem 0}
+.review-correction-select select{width:100%;min-width:0;padding:.8rem;border:1px solid #bbc9c5;border-radius:8px;background:#fff;color:#193b42}
+.review-change-comparison{min-width:0}
+.review-change-table{max-width:100%;overflow:auto;border:1px solid #d9e3df;border-radius:10px;margin-top:1rem}
+.review-change-table table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:.85rem;text-align:left}
+.review-change-table th,.review-change-table td{padding:.85rem;vertical-align:top;border-bottom:1px solid #e3eae6;overflow-wrap:anywhere;white-space:normal}
+.review-change-table th{width:34%;font-weight:600;background:#f4f7f5}
+.review-change-table code{white-space:normal;overflow-wrap:anywhere;font-size:.75rem}
+.review-change-value{white-space:pre-wrap;overflow-wrap:anywhere}.review-change-value em{display:block;font-size:.8rem;color:#526762}
+.review-correction-record h4{margin:.5rem 0}.review-correction-record details{margin-top:1rem}.review-correction-record li{margin:.6rem 0;overflow-wrap:anywhere}
+.review-correction-record .review-context-actions a{white-space:normal}

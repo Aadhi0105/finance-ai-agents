@@ -125,6 +125,20 @@ A manually started private server enables note writes explicitly with
 notes. Note recording does not require enabling imports, jobs or a worker.
 Existing source-use checks, local-token access and financial restrictions apply.
 
+## Input corrections — Batch 5C
+
+Open Keystone also enables `--enable-review-corrections` and verifies that
+capability when reusing a server. In the report's review workspace, use
+**A new version. A clear reason.** to inspect the source version, import a
+successor, compare its changes and record the correction. The original report
+then links to the replacement input; processing still needs an explicit request.
+Reports generated from that replacement link back to the original evidence.
+
+A manual private server without this flag can read retained correction history
+but cannot record new links. This is independent of note, import and job flags.
+The [5C guide](batch5c-corrections-lineage.md) describes supported packages,
+source permissions, retry recovery and the distinction from accounting decisions.
+
 ## Local verification — 9 November 2026
 
 Twenty launcher tests passed, covering settings, process ownership, build failures,

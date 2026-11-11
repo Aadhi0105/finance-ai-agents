@@ -281,7 +281,8 @@ and independent disaster recovery retain their separate release dependencies.
 overview and strict version-bound review contracts. Input acceptance, execution,
 analyst review and financial approval remain separate. Saved sections and review
 requirements receive explicit review subjects; changed evidence requires a new
-scope. Recording notes, decisions and corrections belongs to later Batch 5 parts.
+scope. Notes and corrections are implemented in the following Batch 5 parts;
+formal review dispositions remain separate.
 
 [Batch 5B](docs/webapp/batch5b-review-workspace.md) implements the analyst
 workspace: filter review items, inspect linked evidence, attach sources and save
@@ -289,7 +290,16 @@ version-bound observations, questions and follow-up notes. Notes are append-only
 private ledger records with same-key retries and snapshot/restore coverage.
 They start review activity without resolving financial restrictions or granting
 approval. Open Keystone enables note recording; manual private servers opt in
-with `--enable-review-notes`. Corrections and dispositions remain for 5C/5D.
+with `--enable-review-notes`.
+
+[Batch 5C](docs/webapp/batch5c-corrections-lineage.md) adds input correction
+lineage: import an authorised successor package, inspect its field comparison,
+record the reason and follow the affected original/replacement reports. The
+original evidence is retained and the next calculation requires an explicit
+request. New reports start a separate review. Open Keystone enables protected
+correction recording; manual servers opt in with `--enable-review-corrections`.
+PDF extraction, inline financial overrides and authenticated approval are not
+part of this workflow. Formal review dispositions and final acceptance remain 5D.
 
 ## Read the result before acting on it
 
