@@ -50,6 +50,13 @@ class InputError(ValueError):
             'input_too_large': 'The input exceeds the supported size or structure limits.',
             'input_media_refused': 'Inputs require uncompressed UTF-8 application/json.',
         }
+        messages.update({
+            'review_scope_changed': 'The selected review scope changed or this source does not belong to the item. Recheck the report.',
+            'review_note_invalid': 'Check the note text, attribution, source references and exact review scope.',
+            'review_note_conflict': 'This submission identity belongs to a different note. Preserve the original request.',
+            'review_note_capacity': 'The review-note limit has been reached. Existing notes and reports are preserved.',
+            'review_notes_unavailable': 'Saved review notes could not be verified. Preserve the workspace and ask the operator to inspect it.',
+        })
         return {'error': {'code': self.code, 'message': messages[self.code]}}
 
 

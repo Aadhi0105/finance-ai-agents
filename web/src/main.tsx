@@ -5,7 +5,7 @@ import { PrivateWorkspace } from './onboarding/PrivateWorkspace';
 
 import type { Artifact, Run, Workspace } from './workspace-types';
 import { Icon, type IconName } from './icons';
-import { NativeReportReader } from './reports/NativeReportReader';
+import { ReportReader as NativeReportReader } from './reports/ReportLoader';
 import { responseFailure } from './reports/report-data';
 import { ExecutionWorkspace } from './execution/ExecutionWorkspace';
 import { JobClient } from './execution/job-client';

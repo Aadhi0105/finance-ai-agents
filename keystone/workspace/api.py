@@ -10,6 +10,7 @@ from starlette.concurrency import run_in_threadpool
 from .catalog import Catalog, CatalogError, read_confined, read_json
 from .job_contract import JobError, MAX_REQUEST_BYTES, capabilities
 from .report_views.errors import NativeViewError
+from .review.contracts import ReviewError
 
 ROOT = Path(__file__).resolve().parents[2]
 APP_CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
@@ -65,6 +66,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 response = JSONResponse(NativeViewError('local_access_required').envelope(), status_code=403)
         elif (request.method not in {'GET', 'HEAD'} and not (
               admission is not None and request.method == 'POST' and request.url.path == '/api/jobs'
+              or private is not None and private.review_notes_enabled and request.method == 'POST'
+                 and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-notes', request.url.path)
               or private is not None and private.imports_enabled and (
                   request.method == 'POST' and request.url.path in {'/api/entities','/api/datasets','/api/imports'}
                   or request.method == 'POST' and re.fullmatch(r'/api/datasets/[a-z0-9_-]+/inspect',request.url.path)
@@ -110,6 +113,10 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
     async def job_error(request, error):
         return JSONResponse(error.envelope(), status_code=error.status,
                             headers={'Retry-After': '1'} if error.code == 'job_control_busy' else None)
+
+    @app.exception_handler(ReviewError)
+    async def review_error(request, error):
+        return JSONResponse(error.envelope(), status_code=error.status)
 
     @app.api_route('/api/execution', methods=['GET', 'HEAD'])
     def execution_capabilities():
@@ -170,11 +177,12 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
         manifest = load_catalog()
         if private is not None:
             for run in manifest.runs: private.source_version(run)
-        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled) if private else True,
+        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled or private.review_notes_enabled) if private else True,
                 'live_data_enabled': False, 'paid_models_enabled': False,
                 'input_admission_enabled': private.imports_enabled if private else False,
                 'job_admission_enabled': private.jobs_enabled if private else admission is not None,
                 'job_worker_enabled': admission.worker_enabled if admission is not None else False,
+                'review_notes_enabled': private.review_notes_enabled if private else False,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])
@@ -205,6 +213,55 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             raise NativeViewError('saved_run_not_found')
         if private is not None: private.source_version(run)
         return load_view(catalog, run)
+
+    @app.api_route('/api/runs/{run_id}/review', methods=['GET', 'HEAD'])
+    def review_snapshot(run_id: str, request: Request):
+        if request.query_params:
+            raise ReviewError('review_request_invalid', 422)
+        return review_context(run_id)
+
+    def review_context(run_id):
+        from .report_views.delivery import load_view
+        from .review.projection import project_review
+        manifest = load_catalog()
+        run = next((r for r in manifest.runs if r.id == run_id), None)
+        if run is None:
+            raise ReviewError('review_run_not_found', 404)
+        if private is not None:
+            private.source_version(run)
+        view = load_view(catalog, run)
+        return project_review(manifest, run, view)
+
+    @app.api_route('/api/runs/{run_id}/review-notes', methods=['GET', 'HEAD'])
+    def review_notebook(run_id: str, request: Request):
+        from .review.notes import NotesStore, notebook
+        if request.query_params:
+            raise ReviewError('review_request_invalid', 422)
+        snapshot = review_context(run_id)['snapshot']
+        return (NotesStore(private.inputs).notebook(snapshot, enabled=private.review_notes_enabled)
+                if private else notebook(snapshot))
+
+    if private is not None and private.review_notes_enabled:
+        @app.post('/api/runs/{run_id}/review-notes')
+        async def append_review_note(run_id: str, request: Request):
+            import asyncio
+            from .onboarding.api import media
+            from .onboarding import contracts as c
+            from .review.notes import MAX_NOTE_BYTES, NotesStore
+            media(request, MAX_NOTE_BYTES, key=True)
+            data = bytearray()
+            try:
+                async with asyncio.timeout(c.TRANSFER_SECONDS):
+                    async for chunk in request.stream():
+                        if len(data) + len(chunk) > MAX_NOTE_BYTES:
+                            raise c.InputError('input_too_large', 413)
+                        data.extend(chunk)
+            except TimeoutError:
+                raise c.InputError('input_interrupted', 408) from None
+            note, replayed = await run_in_threadpool(NotesStore(private.inputs).append,
+                lambda: review_context(run_id), c.bounded_json(bytes(data)), request.headers['idempotency-key'])
+            return JSONResponse(dict(note=note, replayed=replayed, financial_approval=False),
+                                status_code=200 if replayed else 201)
 
     @app.api_route('/api/runs/{run_id}/files/{name:path}', methods=['GET', 'HEAD'])
     def get_file(run_id: str, name: str):

@@ -108,6 +108,23 @@ Launching does not weaken the private connection or change source-use/release
 approval. The private worker remains offline and bounded; actual analysis still
 requires an explicit request inside Keystone.
 
+## Analyst review notes — Batch 5B
+
+Open Keystone now also enables protected review-note recording and checks that
+capability before reopening a session. An older server must be stopped and
+restarted; it is not presented as the updated review workspace. Launching still
+records no note or financial decision automatically.
+
+Open a report, choose **Review priorities / requirements**, then **Open review
+workspace**. Notes remain bound to the exact report and item. They are saved in
+the private workspace ledger and included in its consistent snapshots. The
+[review-workspace guide](batch5b-review-workspace.md) explains retries and scope.
+
+A manually started private server enables note writes explicitly with
+`--enable-review-notes`. Omitting it preserves note reads while refusing new
+notes. Note recording does not require enabling imports, jobs or a worker.
+Existing source-use checks, local-token access and financial restrictions apply.
+
 ## Local verification — 9 November 2026
 
 Twenty launcher tests passed, covering settings, process ownership, build failures,

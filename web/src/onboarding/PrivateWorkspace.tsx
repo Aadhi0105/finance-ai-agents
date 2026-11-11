@@ -1,10 +1,11 @@
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {Icon} from '../icons';
-import {NativeReportReader} from '../reports/NativeReportReader';
+import {ReportReader as NativeReportReader} from '../reports/ReportLoader';
 import {PrivateClient} from './client';
 import {DataPage,DatasetPage,VersionPage} from './DataPages';
 import {Overview,Reports,ImportHistory,ReceiptPage,JobHistory,JobPage} from './HistoryPages';
 import {Alert} from './ui';
+import {ReviewPending} from '../review/ReviewPending';
 import './onboarding.css';
 export function PrivateWorkspace(){
  const [client]=useState(()=>new PrivateClient()),state=useSyncExternalStore(client.subscribe,client.getSnapshot);
@@ -23,7 +24,7 @@ export function PrivateWorkspace(){
  :<><div className="private-workspace-line"><span>{state.workspace?.name||'Private workspace · records unavailable'}</span><button className="text-button" disabled={state.refreshing} onClick={async()=>{await client.refresh();setRevision(n=>n+1);}}><Icon name="history" size={14}/>{state.refreshing?'Refreshing…':'Refresh workspace'}</button></div>{state.error&&<Alert>{state.error} Records stay held until a successful recheck.</Alert>}
  {state.importState!=='idle'&&<div className="private-pending" role="status"><strong>{state.importState==='sending'?'Import in progress':'Import confirmation needs attention'}</strong><p>{state.importError||'Acceptance is separate from processing.'}</p>{state.importReceipt&&<a className="text-button" href={'#/imports/'+state.importReceipt.id}>Open saved import receipt</a>}{state.importState!=='sending'&&<button className="text-button" onClick={()=>void client.importPackage()}>Retrieve / retry same import</button>}</div>}
  {state.jobState!=='idle'&&<div className="private-pending" role="status"><strong>{state.jobState==='sending'?'Sending the selected job':'Job confirmation needs attention'}</strong><p>{state.jobError||'The exact selected version is pinned to this request.'}</p>{state.jobState==='unconfirmed'&&<button className="text-button" onClick={()=>{const route=location.hash;void client.submit().then(job=>{if(job&&client.getSnapshot().connected&&location.hash===route)location.hash='#/jobs/'+job.id;});}}>Retrieve same job request</button>}{state.jobState==='refused'&&<button className="text-button" onClick={()=>client.clearRefusedJob()}>Acknowledge refusal and reselect input</button>}</div>}
- <PrivatePage key={route+revision} client={client} route={route}/></>}
+ <ReviewPending client={client.reviewNotes}/><PrivatePage key={route+revision} client={client} route={route}/></>}
  <footer className="private-footer"><span>KEYSTONE <span>/</span> Traceable analysis, thoughtful review.</span><span>Local pilot · financial review required</span></footer></main></div></div>;
 }
 function PrivatePage({client,route}:{client:PrivateClient;route:string}){
@@ -33,7 +34,7 @@ function PrivatePage({client,route}:{client:PrivateClient;route:string}){
  if(parts[0]==='inputs')return <DataPage client={client}/>;
  if(parts[0]==='imports')return parts[1]?<ReceiptPage client={client} ident={parts[1]}/>:<ImportHistory client={client}/>;
  if(parts[0]==='jobs')return parts[1]?<JobPage client={client} ident={parts[1]}/>:<JobHistory client={client}/>;
- if(parts[0]==='runs'&&parts[1]){const run=state.workspace?.runs.find(r=>r.id===parts[1]);return run?<NativeReportReader run={run} fetcher={client.authenticatedFetch} onReloadWorkspace={()=>void client.refresh()}/>:<Alert>Report unavailable. Refresh and inspect its saved job.</Alert>;}
+ if(parts[0]==='runs'&&parts[1]){const run=state.workspace?.runs.find(r=>r.id===parts[1]);return run?<NativeReportReader run={run} fetcher={client.authenticatedFetch} notesClient={client.reviewNotes} onReloadWorkspace={()=>void client.refresh()}/>:<Alert>Report unavailable. Refresh and inspect its saved job.</Alert>;}
  if(parts[0]==='reports'||parts[0]==='agent')return <Reports runs={state.workspace?.runs||[]} agent={parts[0]==='agent'?parts[1]:undefined}/>;
  return <Overview client={client}/>;
 }

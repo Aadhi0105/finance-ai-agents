@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Icon } from '../icons';
 import type { Artifact, Run } from '../workspace-types';
+import type {ReviewNoteClient} from '../review/note-client';
 import { coreMetricIds, fetchArtifact, fetchReport, pointMetric, ReportFailure, summaryFindings, verifyOriginal } from './report-data';
 import type { Evidence, NativeReport } from './report-data';
 import { calendarDate, formatMetric, savedInstant } from './format';
@@ -15,6 +16,8 @@ import { classificationLabels } from '../onboarding/data';
 import { ReadingCopy } from './ReadingCopy';
 import { MetricCard, ReportHeader, ReportSection, ReportStates, ReviewNotice, SectionNavigation } from './ReportFrame';
 import './report-reader.css';
+
+const ReviewOverview = lazy(() => import('../review/ReviewOverview').then(module => ({default: module.ReviewOverview})));
 
 type LoadState = { kind: 'loading' } | { kind: 'ready'; report: NativeReport } | { kind: 'error'; error: ReportFailure; originalVerified: boolean };
 const researchLinks = [ ['summary', 'Research summary'], ['figures', 'Key figures'], ['performance', 'Business performance'],
@@ -38,7 +41,7 @@ function jumpTo(section: SectionId) {
 }
 
 const publicFetch:typeof fetch=(...args)=>fetch(...args);
-export function NativeReportReader({ run, onReloadWorkspace, fetcher=publicFetch }: { run: Run; onReloadWorkspace: () => void; fetcher?:typeof fetch }) {
+export function NativeReportReader({ run, onReloadWorkspace, fetcher=publicFetch, notesClient }: { run: Run; onReloadWorkspace: () => void; fetcher?:typeof fetch;notesClient?:ReviewNoteClient }) {
   const isClose = run.workflow === 'close';
   const isMonitoring = run.workflow === 'monitoring';
   const isEvents = run.workflow === 'events';
@@ -117,14 +120,14 @@ export function NativeReportReader({ run, onReloadWorkspace, fetcher=publicFetch
         <div className="nr-error-actions"><button className="primary-button" onClick={retry}>Try reading again</button><button className="nr-secondary-button" onClick={onReloadWorkspace}>Reload workspace</button></div>
         {state.originalVerified && original && <div className="nr-original-available"><h2>Original saved report</h2><p>The registered original passed the workspace checks. It retains its original restrictions.</p><button className="text-button" onClick={() => download(original)} disabled={!!downloading}><Icon name="download" size={16} />{downloading ? 'Checking download…' : 'Download original HTML'}</button></div>}
       </section>
-      : <EvidenceClass.Provider value={state.report.state.data_classification}><div hidden={copyOpen}><ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} onReadingCopy={openCopy} copyBusy={copyBusy}/></div>
+      : <EvidenceClass.Provider value={state.report.state.data_classification}><div hidden={copyOpen}><ReportContent report={state.report} run={run} downloading={downloading} onDownload={download} onRecheck={retry} onReadingCopy={openCopy} copyBusy={copyBusy} fetcher={fetcher} notesClient={notesClient}/></div>
         {copyOpen&&<ReadingCopy report={state.report} run={run} busy={copyBusy} onClose={closeCopy} onPrint={()=>openCopy(undefined,true)}/>}</EvidenceClass.Provider>}
     <p className="nr-download-notice" role="status">{downloadNotice}</p>
   </div>;
 }
 
-function ReportContent({ report, run, downloading, onDownload, onRecheck, onReadingCopy, copyBusy }: {
-  report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;onReadingCopy:(control:HTMLElement)=>void;copyBusy:boolean;
+function ReportContent({ report, run, downloading, onDownload, onRecheck, onReadingCopy, copyBusy, fetcher, notesClient }: {
+  report: NativeReport; run: Run; downloading: string | null; onDownload: (artifact: Artifact) => void; onRecheck: () => void;onReadingCopy:(control:HTMLElement)=>void;copyBusy:boolean;fetcher:typeof fetch;notesClient?:ReviewNoteClient;
 }) {
   const synthetic=report.state.data_classification==='synthetic';
   const dataBasis=classificationLabels[report.state.data_classification];
@@ -200,6 +203,7 @@ function ReportContent({ report, run, downloading, onDownload, onRecheck, onRead
         </>}
 
         <ReportSection id="review" eyebrow={isClose || isMonitoring ? '06 / BEFORE ACTING ON THE RESULT' : isMarket ? '05 / UNDERSTAND THE RESTRICTIONS' : '09 / BEFORE RELYING ON THE RESULT'} title={isClose || isMonitoring ? 'Review requirements' : isMarket ? 'Why review is required' : 'Review priorities'}>
+          <Suspense fallback={<p role="status">Opening the review overview…</p>}><ReviewOverview run={run} report={report} fetcher={fetcher} notesClient={notesClient} onInspect={inspect} onReviews={showReviews} onSection={id=>{if(sectionLinks.some(([section])=>section===id)){setActive(id as SectionId);jumpTo(id as SectionId);}}}/></Suspense>
           <p className="nr-section-intro">Saved review notes and their source findings remain attached to this report. Completing a process does not approve its financial conclusions.</p>
           {report.review_items.length ? <div className="nr-review-list">{report.review_items.map(item => <details key={item.id} ref={node => { if (node) reviewPanels.current.set(item.id, node); else reviewPanels.current.delete(item.id); }} className="nr-review-item"><summary><Icon name="info" size={17} /><span>{item.title}</span><small>{item.impact === 'publication_block' ? 'Publication restricted' : 'Section requires review'}</small><span className="nr-expand-mark" aria-hidden="true">+</span></summary><div className="nr-review-detail"><p className="eyebrow">{categoryLabel[item.category] || 'Saved review requirement'}</p><p>{item.explanation}</p><p><strong>Next review:</strong> {item.action}</p>{item.section_refs.length > 0 && <p className="nr-affected">Applies to: {item.section_refs.map(id => report.sections.find(s => s.id === id)?.title || id).join(' · ')}</p>}<button className="nr-source-button" onClick={() => inspect(item.evidence_refs)}>Inspect original findings<Icon name="arrow" size={14} /></button><details className="nr-reference-details"><summary>Saved check references ({item.source_check_refs.length})</summary><ul>{item.source_check_refs.map(ref => <li key={ref}><code>{ref}</code></li>)}</ul></details></div></details>)}</div>
             : <div className="nr-empty"><p>No additional review notes were saved. Financial approval remains unavailable in this workspace.</p></div>}

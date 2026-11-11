@@ -277,6 +277,20 @@ the result-size limit, without dropping observations or increasing the limit.
 These are fictional engineering checks; source rights, human financial review
 and independent disaster recovery retain their separate release dependencies.
 
+[Webapp Batch 5A](docs/webapp/batch5a-review-foundation.md) adds a read-only review
+overview and strict version-bound review contracts. Input acceptance, execution,
+analyst review and financial approval remain separate. Saved sections and review
+requirements receive explicit review subjects; changed evidence requires a new
+scope. Recording notes, decisions and corrections belongs to later Batch 5 parts.
+
+[Batch 5B](docs/webapp/batch5b-review-workspace.md) implements the analyst
+workspace: filter review items, inspect linked evidence, attach sources and save
+version-bound observations, questions and follow-up notes. Notes are append-only
+private ledger records with same-key retries and snapshot/restore coverage.
+They start review activity without resolving financial restrictions or granting
+approval. Open Keystone enables note recording; manual private servers opt in
+with `--enable-review-notes`. Corrections and dispositions remain for 5C/5D.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

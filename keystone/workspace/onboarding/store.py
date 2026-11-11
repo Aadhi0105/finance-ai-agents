@@ -535,6 +535,8 @@ class InputStore:
             accounting_entities={self._object(con,'close_intent',x[0])['entity_id']
                                  for x in con.execute("SELECT id FROM objects WHERE kind='close_intent'").fetchall()}
         for id_ in version_ids:self.version(id_)
+        from ..review.notes import validate_notes
+        validate_notes(self)
         members=[('workspace.json','file','configuration'),('inputs.sqlite3','file','logs'),
                  ('inputs','tree','inputs'),('staging','tree','inputs'),('permissions','tree','configuration'),
                  ('reports','tree','logs')]
