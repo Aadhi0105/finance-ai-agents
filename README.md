@@ -299,7 +299,16 @@ original evidence is retained and the next calculation requires an explicit
 request. New reports start a separate review. Open Keystone enables protected
 correction recording; manual servers opt in with `--enable-review-corrections`.
 PDF extraction, inline financial overrides and authenticated approval are not
-part of this workflow. Formal review dispositions and final acceptance remain 5D.
+part of this workflow.
+
+[Batch 5D](docs/webapp/batch5d-review-decisions.md) completes bounded review-flow
+acceptance and adds saved analyst decisions: acknowledge an item, request changes
+or reopen it with an explanation and optional same-item notes/correction links.
+The overview derives progress from exact-version history; all items acknowledged
+means reviewed with limitations. Financial approval and evidence gates remain
+separate. Decisions have atomic retry receipts, stale-tab protection, paged
+history and snapshot/restore validation. Open Keystone enables recording; manual
+servers opt in with `--enable-review-decisions`.
 
 ## Read the result before acting on it
 

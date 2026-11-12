@@ -51,3 +51,14 @@
 .review-change-value{white-space:pre-wrap;overflow-wrap:anywhere}.review-change-value em{display:block;font-size:.8rem;color:#526762}
 .review-correction-record h4{margin:.5rem 0}.review-correction-record details{margin-top:1rem}.review-correction-record li{margin:.6rem 0;overflow-wrap:anywhere}
 .review-correction-record .review-context-actions a{white-space:normal}
+
+.review-decisions{margin-top:2rem;padding-top:2rem;border-top:1px solid #d9e3df;min-width:0}
+.review-decision-item,.review-decision-history{margin-top:1.2rem;min-width:0}
+.review-decision-item>h4{font-size:1.2rem;line-height:1.4;margin:.6rem 0}
+.review-decision-state{display:inline-block;background:#eaf1eb;border:1px solid #ccdcd0;padding:.5rem .8rem;border-radius:7px;font-weight:600}
+.review-decision-latest{background:#f4f7f5;padding:1rem;border-radius:8px;border-left:3px solid #95afa1;margin:1rem 0;overflow-wrap:anywhere}
+.review-decision-reference{padding:.8rem 0;border-bottom:1px solid #e3eae6;min-width:0}
+.review-saved-decision{border:1px solid #d9e3df;border-radius:10px;padding:1rem;margin:.8rem 0;background:#fafbf9;overflow-wrap:anywhere}
+.review-saved-decision>div{display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;justify-content:space-between}.review-saved-decision>div>span{font-size:.8rem;color:#526762}
+.review-saved-decision details{margin-top:.7rem}.review-saved-decision code{overflow-wrap:anywhere}
+.review-decisions .review-note-form details summary{cursor:pointer;font-weight:600;padding:.7rem 0}

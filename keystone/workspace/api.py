@@ -70,6 +70,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                  and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-notes', request.url.path)
               or private is not None and private.review_corrections_enabled and request.method == 'POST'
                  and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-corrections', request.url.path)
+              or private is not None and private.review_decisions_enabled and request.method == 'POST'
+                 and re.fullmatch(r'/api/runs/[a-z0-9_-]+/review-decisions', request.url.path)
               or private is not None and private.imports_enabled and (
                   request.method == 'POST' and request.url.path in {'/api/entities','/api/datasets','/api/imports'}
                   or request.method == 'POST' and re.fullmatch(r'/api/datasets/[a-z0-9_-]+/inspect',request.url.path)
@@ -179,13 +181,14 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
         manifest = load_catalog()
         if private is not None:
             for run in manifest.runs: private.source_version(run)
-        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled or private.review_notes_enabled or private.review_corrections_enabled) if private else True,
+        return {**manifest.model_dump(exclude={'runs'}), **({'workspace_name':private.inputs.descriptor['name']} if private else {}), 'read_only': not (private.imports_enabled or private.jobs_enabled or private.review_notes_enabled or private.review_corrections_enabled or private.review_decisions_enabled) if private else True,
                 'live_data_enabled': False, 'paid_models_enabled': False,
                 'input_admission_enabled': private.imports_enabled if private else False,
                 'job_admission_enabled': private.jobs_enabled if private else admission is not None,
                 'job_worker_enabled': admission.worker_enabled if admission is not None else False,
                 'review_notes_enabled': private.review_notes_enabled if private else False,
                 'review_corrections_enabled': private.review_corrections_enabled if private else False,
+                'review_decisions_enabled': private.review_decisions_enabled if private else False,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])
@@ -307,6 +310,48 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 review_context, run_id, c.bounded_json(bytes(data)), request.headers['idempotency-key'])
             return JSONResponse(dict(correction=record, replayed=replayed, financial_approval=False),
                                 status_code=200 if replayed else 201)
+
+    @app.api_route('/api/runs/{run_id}/review-decisions', methods=['GET', 'HEAD'])
+    def review_decisions(run_id: str, request: Request):
+        from .review.decisions import DecisionsStore, journal
+        query = request.query_params
+        if (any(k not in {'before','revision'} or len(query.getlist(k)) != 1 for k in query)
+                or 'before' in query and re.fullmatch(r'decision-[a-f0-9]{32}', query['before']) is None
+                or 'revision' in query and re.fullmatch(r'[0-9]{1,6}', query['revision']) is None):
+            raise ReviewError('review_request_invalid', 422)
+        manifest = load_catalog(); checked = {}
+        def context(ident):
+            if ident not in checked:
+                checked[ident] = review_context(ident, manifest)
+            return checked[ident]
+        snapshot = context(run_id)['snapshot']
+        options = dict(before=query.get('before'), revision=int(query['revision']) if 'revision' in query else None)
+        if private is None:
+            if query:
+                raise ReviewError('review_request_invalid', 422)
+            return journal(snapshot)
+        return DecisionsStore(private.inputs).journal(snapshot, context, enabled=private.review_decisions_enabled, **options)
+
+    if private is not None and private.review_decisions_enabled:
+        @app.post('/api/runs/{run_id}/review-decisions')
+        async def append_review_decision(run_id: str, request: Request):
+            import asyncio
+            from .onboarding.api import media
+            from .onboarding import contracts as c
+            from .review.decisions import MAX_DECISION_BYTES, DecisionsStore
+            media(request, MAX_DECISION_BYTES, key=True)
+            data = bytearray()
+            try:
+                async with asyncio.timeout(c.TRANSFER_SECONDS):
+                    async for chunk in request.stream():
+                        if len(data) + len(chunk) > MAX_DECISION_BYTES:
+                            raise c.InputError('input_too_large', 413)
+                        data.extend(chunk)
+            except TimeoutError:
+                raise c.InputError('input_interrupted', 408) from None
+            record, replayed = await run_in_threadpool(DecisionsStore(private.inputs).append,
+                review_context, run_id, c.bounded_json(bytes(data)), request.headers['idempotency-key'])
+            return JSONResponse(dict(record=record, replayed=replayed, financial_approval=False), status_code=200 if replayed else 201)
 
     @app.api_route('/api/runs/{run_id}/files/{name:path}', methods=['GET', 'HEAD'])
     def get_file(run_id: str, name: str):

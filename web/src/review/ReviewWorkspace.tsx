@@ -1,3 +1,7 @@
+import {DecisionWorkspace} from './DecisionWorkspace';
+import type {ReviewDecisionClient} from './decision-client';
+import {subjectLabels,type JournalState} from './decisions-data';
+import type {CorrectionHistory} from './corrections-data';
 import {CorrectionWorkspace} from './CorrectionWorkspace';
 import type {ReviewCorrectionClient} from './correction-client';
 import {useEffect,useState,useSyncExternalStore} from 'react';
@@ -11,12 +15,13 @@ type Draft={text:string;note_type:NoteRequest['note_type'];evidence_refs:string[
 const emptyDraft=():Draft=>({text:'',note_type:'question',evidence_refs:[]});
 const noteLabels={observation:'Observation',question:'Question',follow_up:'Follow-up work'};
 
-export function ReviewWorkspace({snapshot,report,fetcher,client,correctionsClient,onActivity,onInspect,onReviews,onSection}:{
-  snapshot:ReviewSnapshot;report:NativeReport;fetcher:typeof fetch;client:ReviewNoteClient;correctionsClient?:ReviewCorrectionClient;
+export function ReviewWorkspace({snapshot,report,fetcher,client,correctionsClient,decisionsClient,decisionState,onDecisions,onActivity,onInspect,onReviews,onSection}:{
+  snapshot:ReviewSnapshot;report:NativeReport;fetcher:typeof fetch;client:ReviewNoteClient;correctionsClient?:ReviewCorrectionClient;decisionsClient:ReviewDecisionClient;decisionState:JournalState;onDecisions:(state:JournalState)=>void;
   onActivity:(state:'checking'|'not_started'|'in_review'|'unavailable')=>void;
   onInspect:(refs:string[])=>void;onReviews:(refs:string[])=>void;onSection:(id:string)=>void;
 }){
   const status=useSyncExternalStore(client.subscribe,client.getSnapshot);
+  const [corrections,setCorrections]=useState<CorrectionHistory|null>(null);
   const [book,setBook]=useState<Notebook|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState('');
   const [revision,setRevision]=useState(0),[kind,setKind]=useState('review_issue'),[search,setSearch]=useState(''),[selected,setSelected]=useState('');
   const [drafts,setDrafts]=useState<Record<string,Draft>>({}),[reviewer,setReviewer]=useState(''),[notice,setNotice]=useState('');
@@ -85,7 +90,7 @@ export function ReviewWorkspace({snapshot,report,fetcher,client,correctionsClien
       <label>Review area<select aria-label="Review area" value={kind} onChange={e=>{setKind(e.target.value);setSelected('');}}><option value="all">All review items</option>{reviewKinds.map(k=><option key={k} value={k}>{reviewLabels[k]}</option>)}</select></label>
       <label>Find a review item<input value={search} onChange={e=>{setSearch(e.target.value);setSelected('');}} placeholder="Search sources, sections or issues" maxLength={160}/></label>
       <p className="review-note-meta">{filtered.length} items · restrictions remain attached</p>
-      <div className="review-target-list" role="group" aria-label="Review items">{filtered.map(t=><button className="review-target" aria-pressed={target?.id===t.id} key={t.id} onClick={()=>setSelected(t.id)}><strong>{t.title}</strong><span>{reviewLabels[t.kind]} · {t.availability==='available'?'Awaiting review':'Not recorded'}</span></button>)}</div>
+      <div className="review-target-list" role="group" aria-label="Review items">{filtered.map(t=><button className="review-target" data-review-target={t.id} aria-pressed={target?.id===t.id} key={t.id} onClick={()=>setSelected(t.id)}><strong>{t.title}</strong><span>{reviewLabels[t.kind]} · {decisionState.kind==='ready'?subjectLabels[decisionState.journal.progress.targets[t.id]]:'Review status unavailable'}</span></button>)}</div>
     </div><div className="review-item-detail">{target?<>
       <p className="eyebrow">{reviewLabels[target.kind]}</p><h4>{target.title}</h4><p>{target.detail}</p>
       {target.kind==='review_issue'&&<p className="review-alert">{report.review_items.find(i=>target.issue_refs.includes(i.id))?.impact==='publication_block'?'Publication remains restricted.':'The linked section requires financial review.'} Notes do not clear this restriction.</p>}
@@ -111,7 +116,8 @@ export function ReviewWorkspace({snapshot,report,fetcher,client,correctionsClien
       <div className="review-note-history"><h4>Saved notes for this item</h4>{book?.notes.filter(n=>n.request.target_id===target.id).map(n=>renderNote(n))}
         {book&&!book.notes.some(n=>n.request.target_id===target.id)&&<p>No note has been recorded for this item.</p>}</div>
     </>:<p>No review items match this search.</p>}</div></div>
-    {correctionsClient&&snapshot.binding.version_id&&<CorrectionWorkspace snapshot={snapshot} target={target} fetcher={fetcher} client={correctionsClient}/>}
+    <DecisionWorkspace snapshot={snapshot} target={target} fetcher={fetcher} client={decisionsClient} notes={book?.notes||[]} corrections={corrections} referencesReady={!!book&&!loading&&!error&&(!correctionsClient||!!corrections)} onJournal={onDecisions} onInspect={onInspect}/>
+    {correctionsClient&&snapshot.binding.version_id&&<CorrectionWorkspace snapshot={snapshot} target={target} fetcher={fetcher} client={correctionsClient} onHistory={setCorrections}/>}
     <p role="status" className="review-save-notice">{notice}</p>
     {book&&<details className="review-all-notes"><summary>All notes for this review scope ({book.notes.length})</summary>{book.notes.map(n=>renderNote(n))}{book.notes.length===0&&<p>No notes have been recorded for this scope.</p>}</details>}
     {book&&book.earlier_scope_notes.length>0&&<details className="review-all-notes"><summary>Earlier scope notes ({book.earlier_scope_notes.length})</summary><p>Retained history. These notes have not been carried into the current review scope.</p>{book.earlier_scope_notes.map(n=>renderNote(n,true))}</details>}

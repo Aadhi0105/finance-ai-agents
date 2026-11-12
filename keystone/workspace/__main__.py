@@ -47,6 +47,7 @@ def main(argv=None):
     serve.add_argument('--enable-imports',action='store_true',help='Accept protected input packages in a private workspace')
     serve.add_argument('--enable-review-notes',action='store_true',help='Record protected analyst notes; no financial decisions or approval')
     serve.add_argument('--enable-review-corrections',action='store_true',help='Link validated replacement inputs to reviewed reports; no automatic execution or approval')
+    serve.add_argument('--enable-review-decisions',action='store_true',help='Record analyst dispositions with history; no authenticated financial approval')
     serve.add_argument('--jobs-dir', type=Path,
                        help='Private control directory outside the report workspace (default state/workspace-jobs)')
     recover = commands.add_parser('recover-job', help='Recover verified saved delivery without executing the job again')
@@ -169,6 +170,8 @@ def main(argv=None):
             parser.error('--enable-review-notes requires a separately prepared private workspace.')
         if args.enable_review_corrections and not is_private:
             parser.error('--enable-review-corrections requires a separately prepared private workspace.')
+        if args.enable_review_decisions and not is_private:
+            parser.error('--enable-review-decisions requires a separately prepared private workspace.')
         if is_private and args.jobs_dir is not None:
             parser.error('Private workspace job control has a fixed private location; omit --jobs-dir.')
         if not is_private and Catalog(args.workspace).load().schema_version==3:
@@ -182,7 +185,8 @@ def main(argv=None):
                 from .onboarding.service import PrivateAdmission
                 admission=PrivateAdmission(args.workspace,f'http://127.0.0.1:{args.port}',
                     enable_imports=args.enable_imports,enable_jobs=args.enable_job_admission,enable_worker=args.enable_worker,
-                    enable_review_notes=args.enable_review_notes,enable_review_corrections=args.enable_review_corrections)
+                    enable_review_notes=args.enable_review_notes,enable_review_corrections=args.enable_review_corrections,
+                    enable_review_decisions=args.enable_review_decisions)
                 print(json.dumps(dict(private_workspace=True,web_url=f'http://127.0.0.1:{args.port}/',imports_enabled=args.enable_imports,
                     job_admission_enabled=args.enable_job_admission,token_file=str(admission.token_file),
                     next_action='Open this local address, connect with the current private token, and inspect inputs before processing.')),flush=True)

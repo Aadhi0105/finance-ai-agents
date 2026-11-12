@@ -121,7 +121,7 @@ perform no financial computation or external requests and persist no review data
 
 - **5B:** the analyst review workspace, notes and evidence navigation.
 - **5C:** [implemented corrections, new input versions and affected-report lineage](batch5c-corrections-lineage.md).
-- **5D:** durable review dispositions and complete acceptance of the review flow.
+- **5D:** [implemented durable review dispositions and bounded review-flow acceptance](batch5d-review-decisions.md).
 - **Document intake:** future document candidates and mappings need their own
   contracts and evidence locations; no PDF/OCR or provider acquisition is added.
 

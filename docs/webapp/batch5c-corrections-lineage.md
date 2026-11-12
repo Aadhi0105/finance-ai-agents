@@ -104,8 +104,8 @@ successors to the same input. IDs, sequence and time are server-assigned. The
 local analyst label remains `local_operator_unverified`.
 
 Recording a correction link creates neither a review decision nor a review note.
-The existing review-activity overview continues to reflect notes until the
-separate 5D disposition workflow is implemented.
+The separate [5D disposition workflow](batch5d-review-decisions.md) now records
+formal analyst decisions and derives progress independently of correction links.
 
 Original inputs, report artifacts, operation receipts, calculations and notes
 are unchanged. Correction links do not mark requirements resolved, change job
@@ -161,7 +161,7 @@ full catalogue validation per lineage request while retaining each linked run's
 source authorisation and file checks.
 
 Formal durable review dispositions, reopening decisions and full review-flow
-acceptance remain **5D**. This implementation is not authenticated financial
+acceptance are implemented in [5D](batch5d-review-decisions.md). This implementation is not authenticated financial
 approval, a production release or issuer-data accuracy certification.
 
 The ignored `output/analyst-review-5c-preview` evidence folder retains test/build
