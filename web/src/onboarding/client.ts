@@ -1,3 +1,4 @@
+import {ReviewDecisionClient} from '../review/decision-client.ts';
 import {ReviewCorrectionClient} from '../review/correction-client.ts';
 import { InputFailure, safeError, responseError, obj, id, list, parseCapabilities, parseWorkspace, parseEntity, parseDataset, parsePage, parseVersion, parsePreview, parseReceipt, parseJob, jobRequest, localFormats } from './data.ts';
 import type { Capabilities, Entity, Dataset, Version, Preview, Receipt, PrivateJob, JobRequest, Page } from './data.ts';
@@ -21,6 +22,7 @@ export class PrivateClient {
   private fetcher:typeof fetch;private key:()=>string;private timeout:number;
   readonly reviewNotes:ReviewNoteClient;
   readonly reviewCorrections:ReviewCorrectionClient;
+  readonly reviewDecisions:ReviewDecisionClient;
   constructor(fetcher:typeof fetch=(...args)=>fetch(...args),key=()=> 'ui-'+crypto.randomUUID(),timeout=12000){
     this.fetcher=fetcher;this.key=key;this.timeout=timeout;
     this.reviewNotes=new ReviewNoteClient(async(path,body,key,workspaceId)=>{
@@ -36,12 +38,18 @@ export class PrivateClient {
       const epoch=this.epoch,result=await this.post(path,body,key);
       if(epoch!==this.epoch)throw new InputFailure('access_required');return result;
     });
+    this.reviewDecisions=new ReviewDecisionClient(async(path,body,key,workspaceId)=>{
+      if(!this.state.connected||!this.token||this.state.workspace?.id!==workspaceId)throw new InputFailure('access_required');
+      if(!/^\/api\/runs\/[a-z0-9_-]+\/review-decisions$/.test(path))throw new InputFailure('unsupported_response');
+      const epoch=this.epoch,result=await this.post(path,body,key);
+      if(epoch!==this.epoch)throw new InputFailure('access_required');return result;
+    });
   }
   getSnapshot=()=>this.state;
   subscribe=(listener:()=>void)=>{this.listeners.add(listener);return()=>{this.listeners.delete(listener);};};
   private update(patch:Partial<Snapshot>){this.state={...this.state,...patch};this.listeners.forEach(f=>f());}
   disconnect=()=>{
-    this.reviewNotes.clearAccess();this.reviewCorrections.clearAccess();
+    this.reviewNotes.clearAccess();this.reviewCorrections.clearAccess();this.reviewDecisions.clearAccess();
     this.epoch++;this.readSequence++;this.token='';this.reads.forEach(c=>c.abort());this.reads.clear();
     this.objects.forEach(url=>URL.revokeObjectURL(url));this.objects.clear();
     this.update({...empty,caps:this.state.caps,mutationUnknown:this.state.mutationUnknown,
@@ -83,7 +91,7 @@ export class PrivateClient {
       const workspace=parseWorkspace(await this.json('/api/workspace',{},secret));
       const [entities,datasets]=await Promise.all([this.json('/api/entities?limit=100',{},secret),this.json('/api/datasets?limit=100',{},secret)]);
       if(epoch!==this.epoch)return;
-      this.token=secret;this.reviewNotes.activate(workspace.id);this.reviewCorrections.activate(workspace.id);this.update({caps,connected:true,connecting:false,workspace,entities:parsePage(entities,parseEntity).items,datasets:parsePage(datasets,parseDataset).items,error:''});
+      this.token=secret;this.reviewNotes.activate(workspace.id);this.reviewCorrections.activate(workspace.id);this.reviewDecisions.activate(workspace.id);this.update({caps,connected:true,connecting:false,workspace,entities:parsePage(entities,parseEntity).items,datasets:parsePage(datasets,parseDataset).items,error:''});
     }catch(e){if(epoch===this.epoch)this.update({connecting:false,error:safeError(e).message});}
   }
   async refresh(){if(!this.state.connected)return;const epoch=this.epoch,seq=++this.readSequence;this.update({refreshing:true,error:''});

@@ -117,7 +117,7 @@ class Decision(ReviewRecord):
     schema_version: Literal[1]
     kind: Literal['keystone.review-decision']
     id: str = Field(pattern=r'^decision-[a-f0-9]{32}$')
-    sequence: int = Field(ge=1)
+    sequence: int = Field(ge=1, strict=True)
     snapshot_id: SnapshotId
     target_id: Identifier
     target_sha256: Hash
@@ -133,6 +133,7 @@ class Decision(ReviewRecord):
     def nonblank(cls, value):
         if not value.strip():
             raise ValueError('Review explanation and attribution must not be blank.')
+        value.encode('utf-8')
         return value
 
     @field_validator('recorded_at')

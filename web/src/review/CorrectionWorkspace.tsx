@@ -4,20 +4,20 @@ import {fetchCorrections,type CorrectionHistory,type CorrectionRequest,type Corr
 import type {ReviewCorrectionClient} from './correction-client';
 import {savedInstant} from '../reports/format';
 
-export function CorrectionWorkspace({snapshot,target,fetcher,client}:{snapshot:ReviewSnapshot;target:ReviewTarget|undefined;fetcher:typeof fetch;client:ReviewCorrectionClient}){
+export function CorrectionWorkspace({snapshot,target,fetcher,client,onHistory}:{snapshot:ReviewSnapshot;target:ReviewTarget|undefined;fetcher:typeof fetch;client:ReviewCorrectionClient;onHistory?:(value:CorrectionHistory|null)=>void}){
   const status=useSyncExternalStore(client.subscribe,client.getSnapshot);
   const [history,setHistory]=useState<CorrectionHistory|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[revision,setRevision]=useState(0);
   const [replacement,setReplacement]=useState(''),[reviewer,setReviewer]=useState(''),[reason,setReason]=useState(''),[checked,setChecked]=useState(false),[notice,setNotice]=useState(''),[page,setPage]=useState(0);
   useEffect(()=>{setChecked(false);},[target?.id]);
   useEffect(()=>{
-    const controller=new AbortController();setLoading(true);setError('');setHistory(null);setChecked(false);setPage(0);
+    const controller=new AbortController();setLoading(true);setError('');setHistory(null);onHistory?.(null);setChecked(false);setPage(0);
     fetchCorrections(snapshot,fetcher,controller.signal,replacement||undefined).then(async h=>{
-      const saved=await client.reconcile(h);if(controller.signal.aborted)return;setHistory(h);
+      const saved=await client.reconcile(h);if(controller.signal.aborted)return;setHistory(h);onHistory?.(h);
       if(saved){setReason('');setNotice('The original correction is confirmed in saved history. No job was started by recording it.');}
     }).catch(()=>{if(!controller.signal.aborted)setError('Correction history or the selected comparison is unavailable. Recheck the input, validation and current source permissions.');})
       .finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return()=>controller.abort();
-  },[snapshot,fetcher,client,replacement,revision]);
+  },[snapshot,fetcher,client,replacement,revision,onHistory]);
   const locked=status.phase!=='idle'||status.foreignPending;
   const pending=status.runId===snapshot.binding.run_id?client.pendingRequest(status.snapshotId||''):null;
   const comparison=history?.comparison;

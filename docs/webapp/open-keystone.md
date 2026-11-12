@@ -139,6 +139,21 @@ but cannot record new links. This is independent of note, import and job flags.
 The [5C guide](batch5c-corrections-lineage.md) describes supported packages,
 source permissions, retry recovery and the distinction from accounting decisions.
 
+## Review decisions — Batch 5D
+
+Open Keystone enables `--enable-review-decisions` and checks the capability when
+reusing a server. An older server needs a restart through the normal launcher.
+In a report's review workspace, select an item and use **Your review decision**
+to acknowledge it, request changes or reopen it. Supply an explanation and local
+analyst label; optionally attach saved notes/corrections for the same item.
+
+A manual private server without this flag can read history but cannot save new
+decisions. It is independent of note, correction, import and worker flags.
+Confirmed decisions persist in the workspace ledger. Keep the original tab open
+if a save is unconfirmed, and recheck history or retry the same decision.
+The [5D guide](batch5d-review-decisions.md) explains scope, stale-tab refusals,
+history pages and restoration. Financial approval remains separate throughout.
+
 ## Local verification — 9 November 2026
 
 Twenty launcher tests passed, covering settings, process ownership, build failures,

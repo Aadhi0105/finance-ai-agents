@@ -34,13 +34,14 @@ def binding(inputs,version):
 
 
 class PrivateAdmission(Admission):
-    def __init__(self,root,origin,*,enable_imports=False,enable_jobs=False,enable_worker=False,enable_review_notes=False,enable_review_corrections=False):
+    def __init__(self,root,origin,*,enable_imports=False,enable_jobs=False,enable_worker=False,enable_review_notes=False,enable_review_corrections=False,enable_review_decisions=False):
         if enable_worker and not enable_jobs: raise c.InputError()
         self.inputs=InputStore(root,recover=True)
         self.imports_enabled=enable_imports
         self.jobs_enabled=enable_jobs
         self.review_notes_enabled=enable_review_notes
         self.review_corrections_enabled=enable_review_corrections
+        self.review_decisions_enabled=enable_review_decisions
         self._intake_lock=threading.Lock()
         super().__init__(self.inputs.root/'reports',self.inputs.root/'control',origin,enable_worker=enable_worker)
         try:
@@ -54,6 +55,7 @@ class PrivateAdmission(Admission):
                     admission_enabled=self.jobs_enabled,imports_enabled=self.imports_enabled,
                     review_notes_enabled=self.review_notes_enabled,
                     review_corrections_enabled=self.review_corrections_enabled,
+                    review_decisions_enabled=self.review_decisions_enabled,
                     worker_enabled=self.worker_enabled,worker_status='running' if self.worker_enabled else
                        'stopped' if self.worker_requested else 'not_enabled',
                     workflows=list(c.FORMATS) if self.jobs_enabled else [],

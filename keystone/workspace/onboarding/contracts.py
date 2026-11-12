@@ -64,6 +64,13 @@ class InputError(ValueError):
             'review_correction_diff_limit': 'This replacement exceeds the 200-change comparison limit. Its accepted input is preserved; inspect it separately.',
             'review_correction_capacity': 'The correction record limit has been reached. Existing inputs and reports are preserved.',
             'review_corrections_unavailable': 'Correction history could not be verified. Preserve the workspace and inspect its saved evidence.',
+            'review_decision_invalid': 'Check the review item, decision, explanation and exact history version.',
+            'review_decision_stale': 'Review history changed. Recheck saved decisions before recording a new one; preserve any unconfirmed submission.',
+            'review_decision_transition': 'This action would repeat the current decision or reopen an item already awaiting review.',
+            'review_decision_reference': 'Attached notes or corrections must belong to this exact report, review scope and item.',
+            'review_decision_conflict': 'This submission identity belongs to another decision. Preserve the original request.',
+            'review_decision_capacity': 'The decision or storage limit was reached. Existing review history is preserved.',
+            'review_decisions_unavailable': 'Saved review decisions could not be verified. Preserve the workspace and inspect its records.',
         })
         return {'error': {'code': self.code, 'message': messages[self.code]}}
 
