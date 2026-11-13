@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.installation",
+  "workspace_id": "workspace-2a5a88c2952f406a99d432448dc3116d",
+  "observed_at": "2026-11-13T11:22:12.948863+00:00",
+  "state": "checked",
+  "running_source": {
+    "mode": "checkout",
+    "commit": "3bac1d645f33ea92d6a885db255b27efdcde2cd6",
+    "dirty": true,
+    "sha256": "7f689b5d6f77248c40e684b9d889a453c8e2ae5d32bb40308341434c333070e1"
+  },
+  "current_source": {
+    "mode": "checkout",
+    "commit": "3bac1d645f33ea92d6a885db255b27efdcde2cd6",
+    "dirty": true,
+    "sha256": "7f689b5d6f77248c40e684b9d889a453c8e2ae5d32bb40308341434c333070e1"
+  },
+  "restart_required": false,
+  "runtime": {
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "python": "3.11.9",
+    "supported": true,
+    "dependency_mismatches": [],
+    "lock_sha256": "329df06050f61296e9ec82b89f4bcbc05199c04098093cd65365c4bcdbb743f7"
+  },
+  "frontend": {
+    "state": "matched",
+    "source_sha256": "f1af8675464ae53e94a7f43388c9ad1552074deb5e6c9df1e6922bc54cfeb91a",
+    "built_at": "2026-11-13T11:11:22.790Z"
+  },
+  "compatibility": {
+    "state": "compatible",
+    "versions": {
+      "inputs": 1,
+      "jobs": 2,
+      "catalog": 3
+    },
+    "expected": {
+      "inputs": 1,
+      "jobs": 2,
+      "catalog": 3
+    },
+    "automatic_migration": false
+  },
+  "automatic_update": false,
+  "automatic_migration": false,
+  "financial_approval": false,
+  "production_release_approved": false
+}

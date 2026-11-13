@@ -8,7 +8,7 @@ the declared local pilot. Completing one part is not a production-release claim.
 | --- | --- | --- |
 | **6A — Operational visibility** | Application checks, job stages/outcomes, failures, capacity and actionable operator diagnostics | [Implemented local scope](batch6a-operational-visibility.md) |
 | **6B — Storage and evidence lifecycle** | Full workspace footprint, preserved history, stopped evidence audit, snapshot completeness and explicit no-deletion policy | [Implemented local scope](batch6b-storage-and-evidence.md) |
-| **6C — Installation and updates** | Repeatable setup, compatibility, release identity, safe updates and failed-update recovery | Planned; builds on Open Keystone |
+| **6C — Installation and updates** | Offline staged setup, source/runtime/build identity, compatibility gates and snapshot-copy update/recovery rehearsal | [Implemented local scope](batch6c-installation-and-updates.md) |
 | **6D — Access and privacy controls** | Local access, tokens/secrets, private delivery, source permissions and diagnostic redaction review | Planned; existing protections remain in force |
 | **6E — Recovery and support** | Interrupted work, restoration, troubleshooting and explicit independent-backup/key/clean-machine requirements | Planned; reuse existing recovery evidence |
 

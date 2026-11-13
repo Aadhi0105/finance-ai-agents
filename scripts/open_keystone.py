@@ -18,6 +18,7 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 import webbrowser
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 STATE = ROOT / 'state/launcher'
 SETTINGS = STATE / 'settings.json'
 
@@ -66,16 +67,10 @@ def lease(path):
 
 
 def revision():
-    result = subprocess.run(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z'],
-                            cwd=ROOT, capture_output=True, check=True)
-    names = sorted(set(result.stdout.decode().split('\0')) - {''})
-    digest = hashlib.sha256()
-    for name in names:
-        if Path(name).suffix not in {'.py', '.json', '.yaml', '.yml', '.lock', '.ts', '.tsx', '.css', '.html'}: continue
-        path = ROOT / name
-        if path.is_file():
-            digest.update(name.encode() + b'\0' + hashlib.sha256(path.read_bytes()).digest())
-    return digest.hexdigest()
+    from keystone.installation import source_identity
+    identity=source_identity(ROOT)
+    if identity['sha256'] is None:raise LaunchError('Source identity is unavailable; preserve the existing installation and check its preparation receipt.')
+    return identity['sha256']
 
 
 def publish_build(source, destination):
@@ -138,9 +133,12 @@ def probe(config):
         if capabilities.get('classification') != 'private' or capabilities.get('local_token_required') is not True: return False
         token = (config['workspace'] / 'control/access-token.key').read_text().strip()
         info = get('/api/workspace', token)
+        installed=get('/api/installation',token)
         return (info.get('workspace_id') == config['workspace_id'] and info.get('kind') == 'keystone.private-workspace-reports'
-                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled', 'review_corrections_enabled', 'review_decisions_enabled', 'operations_supported', 'storage_supported'))
-                and all(info.get(k) is False for k in ('live_data_enabled', 'paid_models_enabled')))
+                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled', 'review_corrections_enabled', 'review_decisions_enabled', 'operations_supported', 'storage_supported', 'installation_supported'))
+                and all(info.get(k) is False for k in ('live_data_enabled', 'paid_models_enabled'))
+                and installed.get('workspace_id')==config['workspace_id'] and installed.get('kind')=='keystone.installation'
+                and installed.get('state')=='checked' and installed.get('restart_required') is False)
     except (OSError, ValueError, HTTPError, URLError):
         return False
 
@@ -165,7 +163,20 @@ def announce(config, browser):
         if not opened: print('Open the address above in your browser.', flush=True)
 
 
+def check_installation(*,website=False):
+    from keystone.installation import source_identity,runtime,frontend_identity
+    code=source_identity(ROOT);environment=runtime(ROOT)
+    if code['sha256'] is None or not environment['supported'] or environment['dependency_mismatches']:
+        raise LaunchError('Installation identity or pinned runtime needs review. Complete the isolated setup and doctor checks before starting a worker.')
+    if website and frontend_identity(ROOT/'web/dist',ROOT)['state']!='matched':
+        raise LaunchError('The website build identity does not match. Preserve the current installation and complete a fresh build before starting a worker.')
+
+
 def open_workspace(config, browser=True):
+    check_installation()
+    from keystone.installation import compatibility
+    if compatibility(config['workspace'])['state']!='compatible':
+        raise LaunchError('Workspace format needs review before launch. Preserve the existing installation and rehearse a verified snapshot copy; no automatic migration was attempted.')
     key = hashlib.sha256((str(config['workspace']) + ':' + str(config['port'])).encode()).hexdigest()[:24]
     record = STATE / (key + '.json')
     lock = lease(STATE / (key + '.lock'))
@@ -180,6 +191,7 @@ def open_workspace(config, browser=True):
             raise LaunchError('Local code has changed. Stop the existing Open Keystone task with Ctrl+C, then run it again to load the update.')
         build_website(config)
         if saved['revision'] != revision(): raise LaunchError('Local files changed during the build. Run Open Keystone again after saving your edits.')
+        check_installation(website=True)
         wait_ready(config)
         print('Reusing the matching running Open Keystone session.', flush=True)
         announce(config, browser)
@@ -191,6 +203,7 @@ def open_workspace(config, browser=True):
         before = revision()
         build_website(config)
         if before != revision(): raise LaunchError('Local files changed during the build. Save your edits and run Open Keystone again.')
+        check_installation(website=True)
         command = [str(ROOT / '.venv/bin/python'), '-m', 'keystone.workspace', 'serve', '--workspace', str(config['workspace']),
                    '--port', str(config['port']), '--enable-imports', '--enable-job-admission', '--enable-worker', '--enable-review-notes', '--enable-review-corrections', '--enable-review-decisions']
         child = subprocess.Popen(command, cwd=ROOT)

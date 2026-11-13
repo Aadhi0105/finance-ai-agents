@@ -29,6 +29,9 @@ def configured(tmp_path, monkeypatch):
     settings = state / 'settings.json'
     value = dict(schema_version=1, workspace=str(workspace), port=8765, node=str(node), pnpm_js=str(manager))
     settings.write_text(json.dumps(value))
+    import keystone.installation
+    monkeypatch.setattr(keystone.installation,'compatibility',lambda _:dict(state='compatible'))
+    monkeypatch.setattr(launcher,'check_installation',lambda **_:None)
     monkeypatch.setattr(launcher, 'ROOT', root)
     monkeypatch.setattr(launcher, 'STATE', state)
     return launcher.load_settings(settings), settings
@@ -178,7 +181,7 @@ def test_failed_readiness_closes_only_owned_child_and_never_opens_browser(config
     assert sorted(p.name for p in launcher.STATE.glob('*.json')) == ['settings.json']
 
 
-@pytest.mark.parametrize('mutation', ['wrong_workspace','paid','no_worker','no_notes','no_corrections','no_decisions','no_operations','no_storage','redirect'])
+@pytest.mark.parametrize('mutation', ['wrong_workspace','paid','no_worker','no_notes','no_corrections','no_decisions','no_operations','no_storage','no_installation','stale_installation','redirect'])
 def test_readiness_refuses_wrong_workspace_or_execution_boundary(configured, monkeypatch, mutation):
     config, _ = configured
     class Response:
@@ -194,8 +197,10 @@ def test_readiness_refuses_wrong_workspace_or_execution_boundary(configured, mon
                 assert request.get_header('Authorization') is None
                 return Response(dict(classification='private',local_token_required=True))
             assert request.get_header('Authorization') == 'Bearer fictional-token'
+            if request.full_url.endswith('/api/installation'):
+                return Response(dict(workspace_id=config['workspace_id'],kind='keystone.installation',state='attention' if mutation=='stale_installation' else 'checked',restart_required=False))
             value=dict(workspace_id=config['workspace_id'],kind='keystone.private-workspace-reports',
-                       input_admission_enabled=True,job_admission_enabled=True,job_worker_enabled=True,review_notes_enabled=True,review_corrections_enabled=True,review_decisions_enabled=True,operations_supported=True,storage_supported=True,
+                       input_admission_enabled=True,job_admission_enabled=True,job_worker_enabled=True,review_notes_enabled=True,review_corrections_enabled=True,review_decisions_enabled=True,operations_supported=True,storage_supported=True,installation_supported=True,
                        live_data_enabled=False,paid_models_enabled=False)
             if mutation=='wrong_workspace': value['workspace_id']='other-workspace'
             if mutation=='paid': value['paid_models_enabled']=True
@@ -205,6 +210,7 @@ def test_readiness_refuses_wrong_workspace_or_execution_boundary(configured, mon
             if mutation=='no_decisions': value['review_decisions_enabled']=False
             if mutation=='no_operations': value['operations_supported']=False
             if mutation=='no_storage': value['storage_supported']=False
+            if mutation=='no_installation': value['installation_supported']=False
             return Response(value)
     def opener(*handlers):
         assert any(isinstance(h, launcher.NoRedirect) for h in handlers)

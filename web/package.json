@@ -6,7 +6,7 @@
   "packageManager": "pnpm@11.25.0",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/build.mjs",
     "dev": "vite --host 127.0.0.1"
   },
   "dependencies": {

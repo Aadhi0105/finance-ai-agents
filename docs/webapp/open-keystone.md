@@ -13,10 +13,11 @@ This first launcher supports the existing macOS local pilot; Windows is not supp
 
 ## First launch on this Mac
 
-The initial private settings select the existing Adidas workspace on port 8864.
-If the original manually started server is still running there, stop **that
-terminal** with Ctrl+C once, then run the task. The launcher will not terminate an
-unmanaged process or delete lock files. No new copy of Adidas data is created.
+Private settings select the existing workspace and local port deliberately.
+The installer selects no company or workspace and preserves existing settings.
+If a manually started server already uses that workspace/port, stop **its original
+terminal** with Ctrl+C, then run the task. The launcher will not terminate an
+unmanaged process or delete lock files.
 
 After a successful build, the browser opens at the configured loopback address.
 Connect with the workspace's current `control/access-token.key` file if prompted.
@@ -182,6 +183,20 @@ command against that workspace. It checks retained references without executing
 or repairing work. A live inventory is neither that audit nor a consistent
 backup. See the [6B guide](batch6b-storage-and-evidence.md) for retention,
 snapshot completeness, command outcomes and remaining recovery requirements.
+
+## Installation and updates — Batch 6C
+
+The [6C guide](batch6c-installation-and-updates.md) provides offline setup into a
+new installation, the installation doctor, and candidate/previous-code recovery
+rehearsals against separate snapshot copies. Choose **Installation & updates**
+in the connected webapp to inspect source, runtime, web build and schema identity.
+
+Open Keystone now checks the pinned runtime, source preparation and known schema
+versions before starting a worker. After building it also checks the source-bound
+website stamp, and requires protected installation readiness before opening the
+browser. Unsupported/legacy formats require explicit review, not automatic
+migration. The original doctor command remains available for the earlier CLI
+pilot; use `python -m keystone.installation doctor` for the complete web runtime.
 
 ## Local verification — 9 November 2026
 

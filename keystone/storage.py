@@ -13,7 +13,6 @@ import json
 import os
 import shutil
 import stat
-import subprocess
 import tempfile
 import uuid
 
@@ -154,10 +153,11 @@ def snapshot(plan, destination, *, quiescent=False, verify_source=None):
                 raise ValueError('Source changed during snapshot; no snapshot published')
             if verify_source is not None:
                 verify_source()
-            git=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True)
+            from keystone.installation import source_identity
+            code_source=source_identity(ROOT)
             m={'schema_version':1,'snapshot_id':uuid.uuid4().hex,'created_at':datetime.now(timezone.utc).isoformat(),
-               'plan':plan,'files':hashes,'excluded_lock_files':excluded,'code_commit':git.stdout.strip() if git.returncode==0 else None,
-               'worktree_dirty':bool(subprocess.run(['git','status','--porcelain'],cwd=ROOT,capture_output=True,text=True).stdout.strip()),
+               'plan':plan,'files':hashes,'excluded_lock_files':excluded,'code_commit':code_source['commit'],'code_source':code_source,
+               'worktree_dirty':code_source['dirty'],
                'runtime':{'python':platform.python_version(),'platform':platform.platform(),
                           'duckdb':importlib.metadata.version('duckdb'),'filelock':importlib.metadata.version('filelock')},
                'source_hashes':{str(p.relative_to(ROOT)):digest(p) for folder in ('keystone','agent','tools','validation','monitoring','scheduler','state','agent3','agent4','mcp_server','scripts') for p in sorted((ROOT/folder).glob('*.py'))},

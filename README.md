@@ -322,6 +322,13 @@ snapshot/restore cycles. Nothing is automatically deleted. The
 [Batch 6 roadmap](docs/webapp/batch6-operational-readiness.md) retains the subsequent
 installation, privacy and recovery work.
 
+[Batch 6C](docs/webapp/batch6c-installation-and-updates.md) adds **Installation &
+updates**, a complete hash-locked web runtime, offline setup into a new source/
+Python/site installation, pre-worker compatibility and identity checks, and a
+snapshot-copy candidate/previous-version rehearsal. The operator retains the
+previous installation and reviews the evidence before selecting a workspace;
+there is no automatic activation, migration or production approval.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source
