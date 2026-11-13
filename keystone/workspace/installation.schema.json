@@ -1,0 +1,388 @@
+{
+  "$defs": {
+    "Compatibility": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "compatible",
+            "migration_required",
+            "unsupported",
+            "unavailable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "versions": {
+          "$ref": "#/$defs/Versions"
+        },
+        "expected": {
+          "$ref": "#/$defs/Expected"
+        },
+        "automatic_migration": {
+          "const": false,
+          "title": "Automatic Migration",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "state",
+        "versions",
+        "expected",
+        "automatic_migration"
+      ],
+      "title": "Compatibility",
+      "type": "object"
+    },
+    "Expected": {
+      "additionalProperties": false,
+      "properties": {
+        "inputs": {
+          "const": 1,
+          "title": "Inputs",
+          "type": "integer"
+        },
+        "jobs": {
+          "const": 2,
+          "title": "Jobs",
+          "type": "integer"
+        },
+        "catalog": {
+          "const": 3,
+          "title": "Catalog",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "inputs",
+        "jobs",
+        "catalog"
+      ],
+      "title": "Expected",
+      "type": "object"
+    },
+    "Frontend": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "matched",
+            "stale",
+            "unavailable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Sha256"
+        },
+        "built_at": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Built At"
+        }
+      },
+      "required": [
+        "state",
+        "source_sha256",
+        "built_at"
+      ],
+      "title": "Frontend",
+      "type": "object"
+    },
+    "Mismatch": {
+      "additionalProperties": false,
+      "properties": {
+        "package": {
+          "maxLength": 80,
+          "title": "Package",
+          "type": "string"
+        },
+        "expected": {
+          "maxLength": 80,
+          "title": "Expected",
+          "type": "string"
+        },
+        "installed": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Installed"
+        }
+      },
+      "required": [
+        "package",
+        "expected",
+        "installed"
+      ],
+      "title": "Mismatch",
+      "type": "object"
+    },
+    "Runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "platform": {
+          "maxLength": 80,
+          "title": "Platform",
+          "type": "string"
+        },
+        "architecture": {
+          "maxLength": 80,
+          "title": "Architecture",
+          "type": "string"
+        },
+        "python": {
+          "maxLength": 80,
+          "title": "Python",
+          "type": "string"
+        },
+        "supported": {
+          "title": "Supported",
+          "type": "boolean"
+        },
+        "dependency_mismatches": {
+          "items": {
+            "$ref": "#/$defs/Mismatch"
+          },
+          "maxItems": 100,
+          "title": "Dependency Mismatches",
+          "type": "array"
+        },
+        "lock_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Lock Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "platform",
+        "architecture",
+        "python",
+        "supported",
+        "dependency_mismatches",
+        "lock_sha256"
+      ],
+      "title": "Runtime",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "checkout",
+            "staged",
+            "unavailable"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "commit": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Commit"
+        },
+        "dirty": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dirty"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sha256"
+        }
+      },
+      "required": [
+        "mode",
+        "commit",
+        "dirty",
+        "sha256"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Versions": {
+      "additionalProperties": false,
+      "properties": {
+        "inputs": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Inputs"
+        },
+        "jobs": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Jobs"
+        },
+        "catalog": {
+          "anyOf": [
+            {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Catalog"
+        }
+      },
+      "required": [
+        "inputs",
+        "jobs",
+        "catalog"
+      ],
+      "title": "Versions",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.installation",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "maxLength": 80,
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "checked",
+        "attention"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "running_source": {
+      "$ref": "#/$defs/Source"
+    },
+    "current_source": {
+      "$ref": "#/$defs/Source"
+    },
+    "restart_required": {
+      "title": "Restart Required",
+      "type": "boolean"
+    },
+    "runtime": {
+      "$ref": "#/$defs/Runtime"
+    },
+    "frontend": {
+      "$ref": "#/$defs/Frontend"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/Compatibility"
+    },
+    "automatic_update": {
+      "const": false,
+      "title": "Automatic Update",
+      "type": "boolean"
+    },
+    "automatic_migration": {
+      "const": false,
+      "title": "Automatic Migration",
+      "type": "boolean"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "production_release_approved": {
+      "const": false,
+      "title": "Production Release Approved",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "workspace_id",
+    "observed_at",
+    "state",
+    "running_source",
+    "current_source",
+    "restart_required",
+    "runtime",
+    "frontend",
+    "compatibility",
+    "automatic_update",
+    "automatic_migration",
+    "financial_approval",
+    "production_release_approved"
+  ],
+  "title": "Installation",
+  "type": "object"
+}

@@ -1,3 +1,4 @@
+import {MAX_INSTALLATION_BYTES,parseInstallation} from '../operations/installation.ts';
 import {MAX_STORAGE_BYTES,parseStorage} from '../operations/storage.ts';
 import {ReviewDecisionClient} from '../review/decision-client.ts';
 import {ReviewCorrectionClient} from '../review/correction-client.ts';
@@ -119,6 +120,12 @@ export class PrivateClient {
     const workspace=this.state.workspaceId,epoch=this.epoch;
     const value=await this.json('/api/storage',{signal},this.token,false,MAX_STORAGE_BYTES);
     if(epoch!==this.epoch)throw new InputFailure('access_required');return parseStorage(value,workspace);
+  }
+  async installation(signal?:AbortSignal){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const workspace=this.state.workspaceId,epoch=this.epoch;
+    const value=await this.json('/api/installation',{signal},this.token,false,MAX_INSTALLATION_BYTES);
+    if(epoch!==this.epoch)throw new InputFailure('access_required');return parseInstallation(value,workspace);
   }
   private async mutation(path:string,value:unknown){
     if(!this.state.connected||!this.state.caps?.imports||this.state.mutationUnknown||this.creating)throw new InputFailure('input_disabled');const epoch=this.epoch;this.creating=true;

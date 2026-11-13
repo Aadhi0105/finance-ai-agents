@@ -52,7 +52,7 @@ class PrivateAdmission(Admission):
 
     def capabilities(self):
         return dict(schema_version=2,classification='private',local_token_required=True,
-                    operations_supported=True,storage_supported=True,
+                    operations_supported=True,storage_supported=True,installation_supported=True,
                     admission_enabled=self.jobs_enabled,imports_enabled=self.imports_enabled,
                     review_notes_enabled=self.review_notes_enabled,
                     review_corrections_enabled=self.review_corrections_enabled,

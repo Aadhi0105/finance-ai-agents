@@ -28,6 +28,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
     if isinstance(raw,dict) and raw.get('schema_version') == 3 and private is None:
         raise ValueError('A private catalogue requires its authenticated workspace session.')
     frontend = Path(frontend) if frontend is not None else ROOT / 'web/dist'
+    from keystone.installation import source_identity
+    installation_started=source_identity() if private is not None else None
     @asynccontextmanager
     async def lifespan(app):
         try:
@@ -149,6 +151,15 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 raise InputError()
             return observe_storage(private.inputs)
 
+        @app.api_route('/api/installation',methods=['GET','HEAD'])
+        def installation_observation(request: Request):
+            from keystone.installation import observe
+            from .installation_contract import Installation
+            from .onboarding.contracts import InputError
+            if request.query_params:raise InputError()
+            try:return Installation.model_validate(observe(private.inputs,installation_started,frontend)).model_dump()
+            except Exception:raise InputError('input_unavailable',503) from None
+
     if admission is not None:
         @app.post('/api/jobs')
         async def submit_job(request: Request):
@@ -207,6 +218,7 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 'review_decisions_enabled': private.review_decisions_enabled if private else False,
                 'operations_supported': private is not None,
                 'storage_supported': private is not None,
+                'installation_supported': private is not None,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])
