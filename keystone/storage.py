@@ -1,6 +1,6 @@
 """Explicit-inventory local snapshots and new-directory restoration.
 
-No automatic discovery, deletion/retention, encryption, upload, or source approval.
+No automatic discovery, pruning, encryption, upload, or source approval.
 Quiescence is required for API/other-checkout writers outside the CLI gate.
 """
 from contextlib import ExitStack
@@ -231,14 +231,29 @@ def restore(source, destination, *, prepare=None):
             # directory and exclusive maintenance lease. Any failure aborts it.
             if prepare is not None:
                 changes.extend(prepare(stage,dest,m))
+            # A restored workspace can itself be backed up. Preserve its prior
+            # receipt inside the staged copy before issuing this restore's new
+            # receipt; never overwrite the original recovery history.
+            prior_receipt=stage/'restore-receipt.json'
+            prior=prior_receipt.exists()
+            if prior:
+                prior_sha=digest(prior_receipt)
+                archived='recovery/restore-receipts/'+prior_sha+'.json'
+                archive_path=stage/archived
+                if archive_path.exists():
+                    if digest(archive_path)!=prior_sha:raise ValueError('Prior recovery receipt mismatch')
+                else:copy_file(prior_receipt,archive_path)
+                changes.append(dict(kind='prior_restore_receipt_retained',original_name='restore-receipt.json',
+                                    archive_name=archived,sha256=prior_sha))
             # Verify source again to detect changes during restore.
             if verify(source)!=m:raise ValueError('Snapshot changed during restore')
             receipt={'schema_version':1,'snapshot_id':m['snapshot_id'],'snapshot_manifest_sha256':digest(source/'manifest.json'),
                      'restored_at':datetime.now(timezone.utc).isoformat(),'changes':changes,
-                     'files':fingerprint({name:stage/name for name in m['files']}),
+                     'files':fingerprint({name:stage/name for name in m['files'] if not (prior and name=='restore-receipt.json')}),
                      'derived_files':fingerprint({str(p.relative_to(stage)):p for p in stage.rglob('*')
                                                   if p.is_file() and str(p.relative_to(stage)) not in m['files']}),
                      'protection':'local_restore_test_only','permission_holds':m['permission_holds']}
+            if prior:prior_receipt.unlink()
             write_json(stage/'restore-receipt.json',receipt)
             flush_tree(stage)
             if dest.exists() or dest.is_symlink():raise ValueError('Restore destination changed during restore')

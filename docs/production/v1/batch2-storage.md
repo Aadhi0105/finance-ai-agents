@@ -91,6 +91,13 @@ Verification checks every member and rejects missing/extra files. A failed final
 filesystem durability step may leave a published directory but reports failure;
 verify it before use. No successful device-loss protection is claimed.
 
+The later [webapp Batch 6B](../../webapp/batch6b-storage-and-evidence.md) extends
+private workspace capture to include recovery receipts. An exact file/log entry
+for an existing `restore-receipt.json` can be backed up; directories and other
+substitutions under that reserved name remain refused. Repeated restoration
+archives the incoming receipt in the new destination before issuing its next
+receipt. Earlier receipts and source snapshots remain preserved.
+
 ## Controlled relocation
 
 Restoration first reproduces snapshot bytes, then performs two documented mutable

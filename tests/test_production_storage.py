@@ -25,6 +25,38 @@ def plan_for(entries):
             freshness_policy='frozen acceptance',source_names=[e['name'] for e in entries])])
 
 
+def test_prior_restore_receipt_requires_exact_file_log_declaration(tmp_path):
+    receipt=tmp_path/'restore-receipt.json';receipt.write_text('{}')
+    valid=plan_for([dict(path=str(receipt),name='restore-receipt.json',kind='file',role='logs')])
+    validate_plan(valid)
+    for change in ({'kind':'tree'},{'role':'inputs'},{'name':'restore-receipt.json/nested'},{'path':str(tmp_path/'other.json')}):
+        invalid=deepcopy(valid);invalid['sources'][0].update(change)
+        with pytest.raises(ValueError,match='Reserved'):validate_plan(invalid)
+
+
+@pytest.mark.parametrize('failure',['archive_space','archive_collision'])
+def test_recovery_receipt_archiving_failure_preserves_snapshot_and_source(tmp_path,monkeypatch,failure):
+    from keystone import storage
+    root=tmp_path/'source';root.mkdir();receipt=root/'restore-receipt.json';receipt.write_text('{"historical":"fictional"}')
+    original=receipt.read_bytes();sha=digest(receipt)
+    sources=[entry(receipt,'restore-receipt.json','file','logs')]
+    if failure=='archive_collision':
+        history=root/'recovery';archive=history/'restore-receipts'/f'{sha}.json'
+        archive.parent.mkdir(parents=True);archive.write_bytes(b'conflicting archive')
+        sources.append(entry(history,'recovery','tree','logs'))
+    saved=snapshot(plan_for(sources),tmp_path/'snapshots',quiescent=True);before=verify(saved)
+    if failure=='archive_space':
+        import errno
+        copy=storage.copy_file
+        def full(src,dst):
+            if dst.parent.name=='restore-receipts':raise OSError(errno.ENOSPC,'fictional archive full')
+            return copy(src,dst)
+        monkeypatch.setattr(storage,'copy_file',full)
+    with pytest.raises((OSError,ValueError)):restore(saved,tmp_path/'restored')
+    assert not (tmp_path/'restored').exists()
+    assert receipt.read_bytes()==original and verify(saved)==before
+
+
 def entry(path,name='evidence',kind='tree',role='inputs'):
     return dict(path=str(Path(path).resolve()),name=name,kind=kind,role=role)
 

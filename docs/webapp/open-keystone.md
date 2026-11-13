@@ -154,6 +154,35 @@ if a save is unconfirmed, and recheck history or retry the same decision.
 The [5D guide](batch5d-review-decisions.md) explains scope, stale-tab refusals,
 history pages and restoration. Financial approval remains separate throughout.
 
+## Operating checks — Batch 6A
+
+Choose **Operations** after connecting to inspect saved job stages, component
+checks, import outcomes and local capacities. **Recheck operations** performs a
+read; optional refresh every 15 seconds runs while the page is visible. No check
+starts a calculation, restarts a worker or grants financial approval.
+
+When ordinary report loading fails after server startup, select **Open Operations
+only** on the connection screen and reconnect with the same current local access
+file. That view can show independent diagnostics without loading reports or
+offering analysis controls. Disconnect and connect normally to return.
+
+Open Keystone now checks the server's `operations_supported` capability before
+reusing a session. See the [6A guide](batch6a-operational-visibility.md) for what
+is measured, failure guidance and the limits of an operating observation.
+
+## Storage and retained evidence — Batch 6B
+
+Choose **Storage & evidence** for file counts and sizes across the entire selected
+private workspace, including permissions, accounting and recovery history. This
+view also works in the Operations-only connection. It preserves all evidence and
+offers no deletion control. Operating reservations/limits stay on **Operations**.
+
+For a deeper check, stop the server/worker and run the documented `audit-private`
+command against that workspace. It checks retained references without executing
+or repairing work. A live inventory is neither that audit nor a consistent
+backup. See the [6B guide](batch6b-storage-and-evidence.md) for retention,
+snapshot completeness, command outcomes and remaining recovery requirements.
+
 ## Local verification — 9 November 2026
 
 Twenty launcher tests passed, covering settings, process ownership, build failures,

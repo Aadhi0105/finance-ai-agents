@@ -133,6 +133,22 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
         from .onboarding.api import add_routes
         add_routes(app,private)
 
+        @app.api_route('/api/operations',methods=['GET','HEAD'])
+        def operations(request: Request):
+            from .operations import observe
+            if request.query_params:
+                from .onboarding.contracts import InputError
+                raise InputError()
+            return observe(private)
+
+        @app.api_route('/api/storage',methods=['GET','HEAD'])
+        def storage_observation(request: Request):
+            from .lifecycle import observe_storage
+            if request.query_params:
+                from .onboarding.contracts import InputError
+                raise InputError()
+            return observe_storage(private.inputs)
+
     if admission is not None:
         @app.post('/api/jobs')
         async def submit_job(request: Request):
@@ -189,6 +205,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 'review_notes_enabled': private.review_notes_enabled if private else False,
                 'review_corrections_enabled': private.review_corrections_enabled if private else False,
                 'review_decisions_enabled': private.review_decisions_enabled if private else False,
+                'operations_supported': private is not None,
+                'storage_supported': private is not None,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])

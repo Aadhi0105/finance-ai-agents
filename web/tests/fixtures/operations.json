@@ -1,0 +1,526 @@
+{
+  "empty": {
+    "schema_version": 1,
+    "kind": "keystone.operations",
+    "workspace_id": "workspace-d87fd55dba5944ec9856e76cafae1b87",
+    "observed_at": "2026-11-12T12:05:39.031106+00:00",
+    "state": "ok",
+    "checks": [
+      {
+        "key": "jobs",
+        "state": "ok",
+        "code": "job_records_checked"
+      },
+      {
+        "key": "inputs",
+        "state": "ok",
+        "code": "input_database_readable"
+      },
+      {
+        "key": "reports",
+        "state": "ok",
+        "code": "report_sources_checked"
+      },
+      {
+        "key": "worker",
+        "state": "disabled",
+        "code": "worker_not_enabled"
+      },
+      {
+        "key": "storage",
+        "state": "ok",
+        "code": "storage_observed"
+      }
+    ],
+    "capacities": [
+      {
+        "key": "pending_jobs",
+        "used": 0,
+        "limit": 20,
+        "state": "ok"
+      },
+      {
+        "key": "retained_jobs",
+        "used": 0,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "pending_imports",
+        "used": 0,
+        "limit": 5,
+        "state": "ok"
+      },
+      {
+        "key": "retained_imports",
+        "used": 0,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "datasets",
+        "used": 0,
+        "limit": 100,
+        "state": "ok"
+      },
+      {
+        "key": "versions",
+        "used": 0,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "notes",
+        "used": 0,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "corrections",
+        "used": 0,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "decisions",
+        "used": 0,
+        "limit": 2000,
+        "state": "ok"
+      },
+      {
+        "key": "input_ledger",
+        "used": 40960,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "job_ledger",
+        "used": 45056,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "input_storage",
+        "used": 0,
+        "limit": 200000000,
+        "state": "ok"
+      },
+      {
+        "key": "analysis_evidence",
+        "used": 377,
+        "limit": 100000000,
+        "state": "ok"
+      }
+    ],
+    "jobs": [],
+    "job_total": 0,
+    "unreadable_jobs": 0,
+    "job_counts": {
+      "queued": 0,
+      "running": 0,
+      "completed": 0,
+      "review_required": 0,
+      "source_changed": 0,
+      "failed": 0,
+      "outcome_unknown": 0,
+      "delivery_failed": 0
+    },
+    "imports": [],
+    "import_total": 0,
+    "unreadable_imports": 0,
+    "report_total": 0,
+    "held_reports": [],
+    "disk_free_bytes": 32806281216,
+    "disk_total_bytes": 245107195904,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  },
+  "mixed": {
+    "schema_version": 1,
+    "kind": "keystone.operations",
+    "workspace_id": "workspace-d87fd55dba5944ec9856e76cafae1b87",
+    "observed_at": "2026-11-12T12:05:40.588325+00:00",
+    "state": "attention",
+    "checks": [
+      {
+        "key": "jobs",
+        "state": "attention",
+        "code": "recovery_inspection_required"
+      },
+      {
+        "key": "inputs",
+        "state": "ok",
+        "code": "input_database_readable"
+      },
+      {
+        "key": "reports",
+        "state": "ok",
+        "code": "report_sources_checked"
+      },
+      {
+        "key": "worker",
+        "state": "attention",
+        "code": "worker_queue_waiting"
+      },
+      {
+        "key": "storage",
+        "state": "ok",
+        "code": "storage_observed"
+      }
+    ],
+    "capacities": [
+      {
+        "key": "pending_jobs",
+        "used": 1,
+        "limit": 20,
+        "state": "ok"
+      },
+      {
+        "key": "retained_jobs",
+        "used": 4,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "pending_imports",
+        "used": 0,
+        "limit": 5,
+        "state": "ok"
+      },
+      {
+        "key": "retained_imports",
+        "used": 1,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "datasets",
+        "used": 1,
+        "limit": 100,
+        "state": "ok"
+      },
+      {
+        "key": "versions",
+        "used": 1,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "notes",
+        "used": 0,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "corrections",
+        "used": 0,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "decisions",
+        "used": 0,
+        "limit": 2000,
+        "state": "ok"
+      },
+      {
+        "key": "input_ledger",
+        "used": 45056,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "job_ledger",
+        "used": 61440,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "input_storage",
+        "used": 26306,
+        "limit": 200000000,
+        "state": "ok"
+      },
+      {
+        "key": "analysis_evidence",
+        "used": 16160208,
+        "limit": 100000000,
+        "state": "ok"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job-3bee9d3599b54c6195ab246fec8c91a4",
+        "workflow": "research",
+        "status": "queued",
+        "created_at": "2026-11-12T12:05:40.572885+00:00",
+        "started_at": null,
+        "finished_at": null,
+        "stage": "admitted",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      },
+      {
+        "id": "job-e71ed2dc39c544d19328d5686e78f8c2",
+        "workflow": "research",
+        "status": "outcome_unknown",
+        "created_at": "2026-11-12T12:05:40.514191+00:00",
+        "started_at": "2026-11-12T12:05:40.520352+00:00",
+        "finished_at": "2026-11-12T12:05:40.522183+00:00",
+        "stage": "interrupted",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": true
+      },
+      {
+        "id": "job-239ebbbb939e4cfaaff9d2545513bf8a",
+        "workflow": "research",
+        "status": "failed",
+        "created_at": "2026-11-12T12:05:40.451019+00:00",
+        "started_at": "2026-11-12T12:05:40.460738+00:00",
+        "finished_at": "2026-11-12T12:05:40.461777+00:00",
+        "stage": "failed",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      },
+      {
+        "id": "job-a8062de97ef843a0a4c7b0375b3b7a88",
+        "workflow": "research",
+        "status": "review_required",
+        "created_at": "2026-11-12T12:05:39.602914+00:00",
+        "started_at": "2026-11-12T12:05:39.608031+00:00",
+        "finished_at": "2026-11-12T12:05:40.396022+00:00",
+        "stage": "registered",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      }
+    ],
+    "job_total": 4,
+    "unreadable_jobs": 0,
+    "job_counts": {
+      "queued": 1,
+      "running": 0,
+      "completed": 0,
+      "review_required": 1,
+      "source_changed": 0,
+      "failed": 1,
+      "outcome_unknown": 1,
+      "delivery_failed": 0
+    },
+    "imports": [
+      {
+        "id": "import-ef5757410041475e9051f97e5c0c9801",
+        "state": "accepted",
+        "created_at": "2026-11-12T12:05:39.074671+00:00"
+      }
+    ],
+    "import_total": 1,
+    "unreadable_imports": 0,
+    "report_total": 1,
+    "held_reports": [],
+    "disk_free_bytes": 32806178816,
+    "disk_total_bytes": 245107195904,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  },
+  "unavailable": {
+    "schema_version": 1,
+    "kind": "keystone.operations",
+    "workspace_id": "workspace-d87fd55dba5944ec9856e76cafae1b87",
+    "observed_at": "2026-11-12T12:05:40.593116+00:00",
+    "state": "unavailable",
+    "checks": [
+      {
+        "key": "jobs",
+        "state": "attention",
+        "code": "recovery_inspection_required"
+      },
+      {
+        "key": "inputs",
+        "state": "ok",
+        "code": "input_database_readable"
+      },
+      {
+        "key": "reports",
+        "state": "unavailable",
+        "code": "report_inventory_unavailable"
+      },
+      {
+        "key": "worker",
+        "state": "attention",
+        "code": "worker_queue_waiting"
+      },
+      {
+        "key": "storage",
+        "state": "ok",
+        "code": "storage_observed"
+      }
+    ],
+    "capacities": [
+      {
+        "key": "pending_jobs",
+        "used": 1,
+        "limit": 20,
+        "state": "ok"
+      },
+      {
+        "key": "retained_jobs",
+        "used": 4,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "pending_imports",
+        "used": 0,
+        "limit": 5,
+        "state": "ok"
+      },
+      {
+        "key": "retained_imports",
+        "used": 1,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "datasets",
+        "used": 1,
+        "limit": 100,
+        "state": "ok"
+      },
+      {
+        "key": "versions",
+        "used": 1,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "notes",
+        "used": 0,
+        "limit": 1000,
+        "state": "ok"
+      },
+      {
+        "key": "corrections",
+        "used": 0,
+        "limit": 200,
+        "state": "ok"
+      },
+      {
+        "key": "decisions",
+        "used": 0,
+        "limit": 2000,
+        "state": "ok"
+      },
+      {
+        "key": "input_ledger",
+        "used": 45056,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "job_ledger",
+        "used": 61440,
+        "limit": 64000000,
+        "state": "ok"
+      },
+      {
+        "key": "input_storage",
+        "used": 26306,
+        "limit": 200000000,
+        "state": "ok"
+      },
+      {
+        "key": "analysis_evidence",
+        "used": 16160208,
+        "limit": 100000000,
+        "state": "ok"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job-3bee9d3599b54c6195ab246fec8c91a4",
+        "workflow": "research",
+        "status": "queued",
+        "created_at": "2026-11-12T12:05:40.572885+00:00",
+        "started_at": null,
+        "finished_at": null,
+        "stage": "admitted",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      },
+      {
+        "id": "job-e71ed2dc39c544d19328d5686e78f8c2",
+        "workflow": "research",
+        "status": "outcome_unknown",
+        "created_at": "2026-11-12T12:05:40.514191+00:00",
+        "started_at": "2026-11-12T12:05:40.520352+00:00",
+        "finished_at": "2026-11-12T12:05:40.522183+00:00",
+        "stage": "interrupted",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": true
+      },
+      {
+        "id": "job-239ebbbb939e4cfaaff9d2545513bf8a",
+        "workflow": "research",
+        "status": "failed",
+        "created_at": "2026-11-12T12:05:40.451019+00:00",
+        "started_at": "2026-11-12T12:05:40.460738+00:00",
+        "finished_at": "2026-11-12T12:05:40.461777+00:00",
+        "stage": "failed",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      },
+      {
+        "id": "job-a8062de97ef843a0a4c7b0375b3b7a88",
+        "workflow": "research",
+        "status": "review_required",
+        "created_at": "2026-11-12T12:05:39.602914+00:00",
+        "started_at": "2026-11-12T12:05:39.608031+00:00",
+        "finished_at": "2026-11-12T12:05:40.396022+00:00",
+        "stage": "registered",
+        "timeout_seconds": 120,
+        "restoration_hold": false,
+        "recovery_required": false
+      }
+    ],
+    "job_total": 4,
+    "unreadable_jobs": 0,
+    "job_counts": {
+      "queued": 1,
+      "running": 0,
+      "completed": 0,
+      "review_required": 1,
+      "source_changed": 0,
+      "failed": 1,
+      "outcome_unknown": 1,
+      "delivery_failed": 0
+    },
+    "imports": [
+      {
+        "id": "import-ef5757410041475e9051f97e5c0c9801",
+        "state": "accepted",
+        "created_at": "2026-11-12T12:05:39.074671+00:00"
+      }
+    ],
+    "import_total": 1,
+    "unreadable_imports": 0,
+    "report_total": null,
+    "held_reports": [],
+    "disk_free_bytes": 32806178816,
+    "disk_total_bytes": 245107195904,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  }
+}

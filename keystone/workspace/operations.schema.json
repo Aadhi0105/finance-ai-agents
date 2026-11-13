@@ -1,0 +1,489 @@
+{
+  "$defs": {
+    "Capacity": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "pending_jobs",
+            "retained_jobs",
+            "pending_imports",
+            "retained_imports",
+            "datasets",
+            "versions",
+            "notes",
+            "corrections",
+            "decisions",
+            "input_ledger",
+            "job_ledger",
+            "input_storage",
+            "analysis_evidence"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "used": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Used"
+        },
+        "limit": {
+          "exclusiveMinimum": 0,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "ok",
+            "attention",
+            "unavailable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "used",
+        "limit",
+        "state"
+      ],
+      "title": "Capacity",
+      "type": "object"
+    },
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "jobs",
+            "inputs",
+            "reports",
+            "worker",
+            "storage"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "ok",
+            "attention",
+            "unavailable",
+            "disabled"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "code": {
+          "enum": [
+            "job_records_checked",
+            "job_records_unavailable",
+            "input_database_readable",
+            "input_database_unavailable",
+            "report_sources_checked",
+            "report_sources_held",
+            "report_inventory_unavailable",
+            "worker_process_running",
+            "worker_not_enabled",
+            "worker_queue_waiting",
+            "worker_process_stopped",
+            "storage_observed",
+            "storage_near_limit",
+            "storage_unavailable",
+            "recovery_inspection_required"
+          ],
+          "title": "Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "state",
+        "code"
+      ],
+      "title": "Check",
+      "type": "object"
+    },
+    "Import": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^import-[a-f0-9]{32}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "reserved",
+            "receiving",
+            "validating",
+            "accepted",
+            "rejected",
+            "interrupted",
+            "delivery_failed"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "state",
+        "created_at"
+      ],
+      "title": "Import",
+      "type": "object"
+    },
+    "Job": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^job-[a-f0-9]{32}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "workflow": {
+          "enum": [
+            "research",
+            "monitoring",
+            "events",
+            "news",
+            "close"
+          ],
+          "title": "Workflow",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "review_required",
+            "source_changed",
+            "failed",
+            "outcome_unknown",
+            "delivery_failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Started At"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        },
+        "stage": {
+          "enum": [
+            "admitted",
+            "claimed",
+            "inputs_verified",
+            "prepared",
+            "registered",
+            "failed",
+            "source_changed",
+            "interrupted",
+            "delivery_failed",
+            "recovered"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "maximum": 600,
+          "minimum": 1,
+          "title": "Timeout Seconds",
+          "type": "integer"
+        },
+        "restoration_hold": {
+          "title": "Restoration Hold",
+          "type": "boolean"
+        },
+        "recovery_required": {
+          "title": "Recovery Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "workflow",
+        "status",
+        "created_at",
+        "started_at",
+        "finished_at",
+        "stage",
+        "timeout_seconds",
+        "restoration_hold",
+        "recovery_required"
+      ],
+      "title": "Job",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.operations",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "ok",
+        "attention",
+        "unavailable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/Check"
+      },
+      "maxItems": 5,
+      "minItems": 5,
+      "title": "Checks",
+      "type": "array"
+    },
+    "capacities": {
+      "items": {
+        "$ref": "#/$defs/Capacity"
+      },
+      "maxItems": 13,
+      "minItems": 13,
+      "title": "Capacities",
+      "type": "array"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/Job"
+      },
+      "maxItems": 1000,
+      "title": "Jobs",
+      "type": "array"
+    },
+    "job_total": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Job Total"
+    },
+    "unreadable_jobs": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Unreadable Jobs"
+    },
+    "job_counts": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "enum": [
+              "queued",
+              "running",
+              "completed",
+              "review_required",
+              "source_changed",
+              "failed",
+              "outcome_unknown",
+              "delivery_failed"
+            ]
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Job Counts"
+    },
+    "imports": {
+      "items": {
+        "$ref": "#/$defs/Import"
+      },
+      "maxItems": 1000,
+      "title": "Imports",
+      "type": "array"
+    },
+    "import_total": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Import Total"
+    },
+    "unreadable_imports": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Unreadable Imports"
+    },
+    "report_total": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Report Total"
+    },
+    "held_reports": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Held Reports",
+      "type": "array"
+    },
+    "disk_free_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Free Bytes"
+    },
+    "disk_total_bytes": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Total Bytes"
+    },
+    "live_data_enabled": {
+      "const": false,
+      "title": "Live Data Enabled",
+      "type": "boolean"
+    },
+    "paid_models_enabled": {
+      "const": false,
+      "title": "Paid Models Enabled",
+      "type": "boolean"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "production_release_approved": {
+      "const": false,
+      "title": "Production Release Approved",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "workspace_id",
+    "observed_at",
+    "state",
+    "checks",
+    "capacities",
+    "jobs",
+    "job_total",
+    "unreadable_jobs",
+    "job_counts",
+    "imports",
+    "import_total",
+    "unreadable_imports",
+    "report_total",
+    "held_reports",
+    "disk_free_bytes",
+    "disk_total_bytes",
+    "live_data_enabled",
+    "paid_models_enabled",
+    "financial_approval",
+    "production_release_approved"
+  ],
+  "title": "Snapshot",
+  "type": "object"
+}
