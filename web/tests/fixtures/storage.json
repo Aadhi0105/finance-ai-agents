@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.storage",
+  "workspace_id": "workspace-96e39f073aca4ef699e9703a2a8f0558",
+  "observed_at": "2026-11-12T16:21:12.965813+00:00",
+  "state": "observed",
+  "areas": [
+    {
+      "key": "configuration",
+      "files": 1,
+      "bytes": 236,
+      "state": "observed"
+    },
+    {
+      "key": "input_ledger",
+      "files": 1,
+      "bytes": 40960,
+      "state": "observed"
+    },
+    {
+      "key": "inputs",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "staging",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "permissions",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "reports",
+      "files": 1,
+      "bytes": 377,
+      "state": "observed"
+    },
+    {
+      "key": "job_ledger",
+      "files": 1,
+      "bytes": 45056,
+      "state": "observed"
+    },
+    {
+      "key": "job_evidence",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "operation_evidence",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "accounting",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "recovery",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    },
+    {
+      "key": "runtime",
+      "files": 2,
+      "bytes": 44,
+      "state": "observed"
+    },
+    {
+      "key": "unrecognised",
+      "files": 0,
+      "bytes": 0,
+      "state": "observed"
+    }
+  ],
+  "total_files": 6,
+  "total_bytes": 86673,
+  "disk_free_bytes": 34644230144,
+  "disk_total_bytes": 245107195904,
+  "retention_policy": "preserve_until_operator_review",
+  "automatic_deletion": false,
+  "deletion_supported": false,
+  "document_intake_supported": false,
+  "reference_check": "requires_stopped_audit",
+  "backup_protection": "not_established_by_inventory",
+  "financial_approval": false,
+  "production_release_approved": false
+}

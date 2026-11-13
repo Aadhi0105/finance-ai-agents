@@ -21,6 +21,9 @@ from .job_contract import parse_job_record
 
 APPLICATION_ID = 0x4B534A31
 MAX_STORE_BYTES = 64_000_000
+MAX_ANALYSIS_BYTES = 100_000_000
+ANALYSIS_RESERVATION_BYTES = 16_000_000
+MAX_ANALYSIS_FILES = 60000
 
 
 def private_member(path, *, directory=False):
@@ -37,6 +40,21 @@ def exclusive_file(path):
 
 
 class JobStore:
+    @classmethod
+    def reader(cls, directory, workspace):
+        """Existing ledger only; no leases, migrations, recovery or writable DB."""
+        value=cls.__new__(cls)
+        value.root=Path(directory).absolute();value.workspace=Path(workspace).absolute()
+        if any(p.is_symlink() for p in (value.root,*value.root.parents,value.workspace)):
+            raise JobError('job_store_unavailable')
+        value.path=value.root/'jobs.sqlite3';value._lease=None;value.closed=False
+        value.worker=False;value.queue_only=False;value._read_only=True
+        value.binding=hashlib.sha256(str(value.workspace.resolve()).encode()).hexdigest()
+        value._root_identity=private_member(value.root,directory=True)
+        value._db_identity=private_member(value.path)
+        with value._connect(write=False):pass
+        return value
+
     def __init__(self, directory, workspace, *, worker=False):
         self.root = Path(directory).absolute()
         self.workspace = Path(workspace).absolute()
@@ -165,6 +183,8 @@ class JobStore:
 
     @contextmanager
     def _connect(self, *, write=True, initial=False):
+        if getattr(self,'_read_only',False) and (write or initial):
+            raise JobError('job_store_unavailable')
         if (self.closed or private_member(self.root, directory=True) != self._root_identity
                 or private_member(self.path) != self._db_identity
                 or self.path.stat().st_size > MAX_STORE_BYTES):
@@ -247,14 +267,14 @@ class JobStore:
             if count >= MAX_RETAINED_JOBS or pending >= MAX_PENDING_JOBS:
                 raise JobError('job_capacity_reached', 409)
             if record.schema_version in {4,5}:
-                reserved=con.execute("SELECT count(*) FROM jobs j JOIN executions e USING(job_id) WHERE json_extract(j.record_json,'$.schema_version') IN (4,5) AND e.status IN ('queued','running')").fetchone()[0]*16_000_000
+                reserved=con.execute("SELECT count(*) FROM jobs j JOIN executions e USING(job_id) WHERE json_extract(j.record_json,'$.schema_version') IN (4,5) AND e.status IN ('queued','running')").fetchone()[0]*ANALYSIS_RESERVATION_BYTES
                 total=0;files=0
                 for root in (self.root/'jobs',self.root/'operations',self.workspace):
                     if root.exists():
                         for path in root.rglob('*'):
                             private_member(path,directory=path.is_dir())
                             if path.is_file():total+=path.stat().st_size;files+=1
-                            if total+reserved+16_000_000>100_000_000 or files>60000:raise JobError('job_capacity_reached',409)
+                            if total+reserved+ANALYSIS_RESERVATION_BYTES>MAX_ANALYSIS_BYTES or files>MAX_ANALYSIS_FILES:raise JobError('job_capacity_reached',409)
             raw = record.model_dump()
             con.execute('INSERT INTO jobs(job_id,key_hash,request_sha256,created_at,record_json,record_sha256) VALUES (?,?,?,?,?,?)',
                         (record.job_id, key_hash, record.request_sha256, record.created_at, canonical(raw), fingerprint(raw)))

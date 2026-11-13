@@ -139,7 +139,7 @@ def probe(config):
         token = (config['workspace'] / 'control/access-token.key').read_text().strip()
         info = get('/api/workspace', token)
         return (info.get('workspace_id') == config['workspace_id'] and info.get('kind') == 'keystone.private-workspace-reports'
-                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled', 'review_corrections_enabled', 'review_decisions_enabled'))
+                and all(info.get(k) is True for k in ('input_admission_enabled', 'job_admission_enabled', 'job_worker_enabled', 'review_notes_enabled', 'review_corrections_enabled', 'review_decisions_enabled', 'operations_supported', 'storage_supported'))
                 and all(info.get(k) is False for k in ('live_data_enabled', 'paid_models_enabled')))
     except (OSError, ValueError, HTTPError, URLError):
         return False

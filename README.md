@@ -310,6 +310,18 @@ separate. Decisions have atomic retry receipts, stale-tab protection, paged
 history and snapshot/restore validation. Open Keystone enables recording; manual
 servers opt in with `--enable-review-decisions`.
 
+[Batch 6A](docs/webapp/batch6a-operational-visibility.md) adds a protected
+**Operations** page: component checks, saved job stages/outcomes, import history
+and storage/capacity observations with practical next steps. An Operations-only
+connection remains available when ordinary report loading fails after startup.
+Checks are read-only; unknown counts remain unavailable and financial approval
+stays separate. [Batch 6B](docs/webapp/batch6b-storage-and-evidence.md) adds
+**Storage & evidence**, a full workspace file inventory, an explicit retention
+policy, a stopped-workspace evidence audit, and preserved receipts across repeated
+snapshot/restore cycles. Nothing is automatically deleted. The
+[Batch 6 roadmap](docs/webapp/batch6-operational-readiness.md) retains the subsequent
+installation, privacy and recovery work.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

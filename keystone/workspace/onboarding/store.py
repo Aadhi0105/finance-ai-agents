@@ -546,6 +546,8 @@ class InputStore:
                  ('reports','tree','logs')]
         for path,kind in [('control/jobs.sqlite3','file'),('control/jobs','tree'),('control/operations','tree'),('control/restore-history.json','file')]:
             if (self.root/path).exists():members.append((path,kind,'logs'))
+        for path,kind in [('restore-receipt.json','file'),('recovery','tree')]:
+            if (self.root/path).exists():members.append((path,kind,'logs'))
         # A stopped/failed validator can leave a disposable database copy. It
         # must be inspected before backup; never copy a live DB as a tree member.
         if any((self.root/'staging').rglob('*.duckdb*')):

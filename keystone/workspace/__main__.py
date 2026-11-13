@@ -28,6 +28,8 @@ def main(argv=None):
     snapshot_input=commands.add_parser('snapshot-private',help='Capture a permission-checked local private workspace snapshot after stopping its server')
     snapshot_input.add_argument('--workspace',type=Path,required=True)
     snapshot_input.add_argument('--destination',type=Path,required=True)
+    audit=commands.add_parser('audit-private',help='Check retained evidence after stopping the workspace server; no repair or deletion')
+    audit.add_argument('--workspace',type=Path,required=True)
     restored=commands.add_parser('restore-private',help='Verify and restore a private snapshot to a fresh directory; hold queued work')
     restored.add_argument('snapshot',type=Path)
     restored.add_argument('--destination',type=Path,required=True)
@@ -58,7 +60,17 @@ def main(argv=None):
     release.add_argument('--workspace', type=Path, required=True, help='Private workspace root')
     release.add_argument('--job-id', required=True)
     args = parser.parse_args(argv)
-    if args.command=='restore-private':
+    if args.command=='audit-private':
+        from .lifecycle import audit_private
+        try:
+            result=audit_private(args.workspace)
+            print(json.dumps(result))
+            return 0 if result['state']=='verified' else 2
+        except Exception:
+            print(json.dumps(dict(error=dict(code='evidence_audit_unavailable',
+                message='Stop this workspace server and worker, preserve saved evidence, and inspect local storage before retrying.'))),file=sys.stderr)
+            return 2
+    elif args.command=='restore-private':
         from .onboarding.recovery import restore_private
         from .onboarding.contracts import InputError
         try:
@@ -118,6 +130,8 @@ def main(argv=None):
                         plan=inputs.backup_plan()
                         def check_source():
                             if inputs.backup_plan()!=plan:raise InputError('input_unavailable',503)
+                            from .lifecycle import audit_evidence
+                            if audit_evidence(inputs,lease)['state']!='verified':raise InputError('input_unavailable',503)
                         saved=snapshot(plan,args.destination,quiescent=True,verify_source=check_source)
                         result={'snapshot':str(saved),'protection':'local_snapshot_only','restore_command':'keystone.workspace restore-private'}
                     finally:lease.close()

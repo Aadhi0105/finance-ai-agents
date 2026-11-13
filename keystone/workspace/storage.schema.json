@@ -1,0 +1,219 @@
+{
+  "$defs": {
+    "Area": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "configuration",
+            "input_ledger",
+            "inputs",
+            "staging",
+            "permissions",
+            "reports",
+            "job_ledger",
+            "job_evidence",
+            "operation_evidence",
+            "accounting",
+            "recovery",
+            "runtime",
+            "unrecognised"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "files": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Files"
+        },
+        "bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bytes"
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "attention",
+            "unavailable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "files",
+        "bytes",
+        "state"
+      ],
+      "title": "Area",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.storage",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "observed",
+        "attention",
+        "unavailable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "areas": {
+      "items": {
+        "$ref": "#/$defs/Area"
+      },
+      "maxItems": 13,
+      "minItems": 13,
+      "title": "Areas",
+      "type": "array"
+    },
+    "total_files": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Total Files"
+    },
+    "total_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Total Bytes"
+    },
+    "disk_free_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Free Bytes"
+    },
+    "disk_total_bytes": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Disk Total Bytes"
+    },
+    "retention_policy": {
+      "const": "preserve_until_operator_review",
+      "title": "Retention Policy",
+      "type": "string"
+    },
+    "automatic_deletion": {
+      "const": false,
+      "title": "Automatic Deletion",
+      "type": "boolean"
+    },
+    "deletion_supported": {
+      "const": false,
+      "title": "Deletion Supported",
+      "type": "boolean"
+    },
+    "document_intake_supported": {
+      "const": false,
+      "title": "Document Intake Supported",
+      "type": "boolean"
+    },
+    "reference_check": {
+      "const": "requires_stopped_audit",
+      "title": "Reference Check",
+      "type": "string"
+    },
+    "backup_protection": {
+      "const": "not_established_by_inventory",
+      "title": "Backup Protection",
+      "type": "string"
+    },
+    "financial_approval": {
+      "const": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "production_release_approved": {
+      "const": false,
+      "title": "Production Release Approved",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "workspace_id",
+    "observed_at",
+    "state",
+    "areas",
+    "total_files",
+    "total_bytes",
+    "disk_free_bytes",
+    "disk_total_bytes",
+    "retention_policy",
+    "automatic_deletion",
+    "deletion_supported",
+    "document_intake_supported",
+    "reference_check",
+    "backup_protection",
+    "financial_approval",
+    "production_release_approved"
+  ],
+  "title": "Inventory",
+  "type": "object"
+}

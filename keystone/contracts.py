@@ -27,7 +27,9 @@ def validate_plan(plan):
         if not isinstance(item, dict) or set(item) != {'name', 'path', 'kind', 'role'}:
             raise ValueError('Invalid source fields')
         name = relative(item['name'])
-        if name.parts[0] == 'restore-receipt.json':
+        if name.parts[0] == 'restore-receipt.json' and not (
+                str(name)=='restore-receipt.json' and item['kind']=='file' and item['role']=='logs'
+                and isinstance(item['path'],str) and Path(item['path']).name=='restore-receipt.json'):
             raise ValueError('Reserved restore receipt path')
         if any(name == old or name in old.parents or old in name.parents for old in seen):
             raise ValueError('Overlapping inventory names')

@@ -1,16 +1,18 @@
+import {MAX_STORAGE_BYTES,parseStorage} from '../operations/storage.ts';
 import {ReviewDecisionClient} from '../review/decision-client.ts';
 import {ReviewCorrectionClient} from '../review/correction-client.ts';
 import { InputFailure, safeError, responseError, obj, id, list, parseCapabilities, parseWorkspace, parseEntity, parseDataset, parsePage, parseVersion, parsePreview, parseReceipt, parseJob, jobRequest, localFormats } from './data.ts';
 import type { Capabilities, Entity, Dataset, Version, Preview, Receipt, PrivateJob, JobRequest, Page } from './data.ts';
 import {ReviewNoteClient} from '../review/note-client.ts';
+import {MAX_OPERATIONS_BYTES,parseOperations} from '../operations/data.ts';
 
 export function canonicalLocal(v:unknown):string {if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonicalLocal).join(',')+']';return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonicalLocal((v as Record<string,unknown>)[k])).join(',')+'}';}
 
 type Workspace=ReturnType<typeof parseWorkspace>;
 type PendingImport={preview:Preview;file:Blob;key:string;id:string|null;workspaceId:string};
 type PendingJob={request:JobRequest;key:string;workspaceId:string};
-export type Snapshot={caps:Capabilities|null;connected:boolean;connecting:boolean;workspace:Workspace|null;entities:Entity[];datasets:Dataset[];error:string;refreshing:boolean;importState:'idle'|'sending'|'unconfirmed'|'held';importReceipt:Receipt|null;importError:string;jobState:'idle'|'sending'|'unconfirmed'|'refused';jobError:string;mutationUnknown:boolean};
-const empty:Snapshot={caps:null,connected:false,connecting:false,workspace:null,entities:[],datasets:[],error:'',refreshing:false,importState:'idle',importReceipt:null,importError:'',jobState:'idle',jobError:'',mutationUnknown:false};
+export type Snapshot={caps:Capabilities|null;connected:boolean;connecting:boolean;workspace:Workspace|null;workspaceId:string|null;operationsOnly:boolean;entities:Entity[];datasets:Dataset[];error:string;refreshing:boolean;importState:'idle'|'sending'|'unconfirmed'|'held';importReceipt:Receipt|null;importError:string;jobState:'idle'|'sending'|'unconfirmed'|'refused';jobError:string;mutationUnknown:boolean};
+const empty:Snapshot={caps:null,connected:false,connecting:false,workspace:null,workspaceId:null,operationsOnly:false,entities:[],datasets:[],error:'',refreshing:false,importState:'idle',importReceipt:null,importError:'',jobState:'idle',jobError:'',mutationUnknown:false};
 
 /** One tab, one local authority. No credential, package, request key or private
  * response is written to browser storage, a URL, a log or an HTML attribute. */
@@ -55,7 +57,7 @@ export class PrivateClient {
     this.update({...empty,caps:this.state.caps,mutationUnknown:this.state.mutationUnknown,
       importState:this.importing?'unconfirmed':'idle',jobState:this.submitting?'unconfirmed':'idle'});
   };
-  private async raw(path:string,init:RequestInit={},secret=this.token,write=false):Promise<Response>{
+  private async raw(path:string,init:RequestInit={},secret=this.token,write=false,responseLimit=20_000_000):Promise<Response>{
     if(!/^\/api\/[A-Za-z0-9_/?=&.%-]+$/.test(path)||path.includes('..')||path.includes('//'))throw new InputFailure('unsupported_response');
     const c=new AbortController(),epoch=this.epoch;
     const abort=()=>c.abort();init.signal?.addEventListener('abort',abort,{once:true});if(init.signal?.aborted)c.abort();
@@ -64,7 +66,7 @@ export class PrivateClient {
     try{
       const headers=new Headers(init.headers);if(secret)headers.set('Authorization','Bearer '+secret);
       const r=await this.fetcher(path,{...init,headers,signal:c.signal,cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
-      const limit=r.ok?20_000_000:65536;
+      const limit=r.ok?responseLimit:65536;
       if(Number(r.headers.get('content-length'))>limit)throw new InputFailure('unsupported_response');
       const reader=r.body?.getReader();const chunks:Uint8Array[]=[];let length=0;
       if(reader)try{for(;;){const v=await reader.read();if(v.done)break;length+=v.value.byteLength;if(length>limit)throw new InputFailure('unsupported_response');chunks.push(v.value);}}finally{try{await reader.cancel();}catch{/* Closed response. */}}
@@ -75,30 +77,48 @@ export class PrivateClient {
       return response;
     }catch(e){throw safeError(e);}finally{clearTimeout(timer);this.reads.delete(c);init.signal?.removeEventListener('abort',abort);}
   }
-  private async json(path:string,init:RequestInit={},secret=this.token,write=false):Promise<unknown>{
-    const r=await this.raw(path,init,secret,write);if(!r.headers.get('content-type')?.includes('application/json'))throw new InputFailure('unsupported_response');
+  private async json(path:string,init:RequestInit={},secret=this.token,write=false,responseLimit=20_000_000):Promise<unknown>{
+    const r=await this.raw(path,init,secret,write,responseLimit);if(!r.headers.get('content-type')?.includes('application/json'))throw new InputFailure('unsupported_response');
     try{return JSON.parse(await r.text());}catch{throw new InputFailure('unsupported_response');}
   }
   private async read(path:string){if(!this.state.connected||!this.token)throw new InputFailure('access_required');return this.json(path);}
-  private post(path:string,body:unknown,key?:string){return this.json(path,{method:'POST',headers:{'Content-Type':'application/json',...(key?{'Idempotency-Key':key}:{})},body:JSON.stringify(body)},this.token,true);}
+  private post(path:string,body:unknown,key?:string){if(this.state.operationsOnly)throw new InputFailure('input_disabled',true);return this.json(path,{method:'POST',headers:{'Content-Type':'application/json',...(key?{'Idempotency-Key':key}:{})},body:JSON.stringify(body)},this.token,true);}
   async discover(){const epoch=this.epoch;try{const caps=parseCapabilities(await this.json('/api/execution',{},''));if(epoch===this.epoch)this.update({caps,error:''});}catch(e){if(epoch===this.epoch)this.update({caps:null,error:safeError(e).message});}}
-  async connect(value:string){
+  async connect(value:string,operationsOnly=false){
     this.disconnect();const epoch=this.epoch,secret=value.trim();
     if(!/^[A-Za-z0-9_-]{43}$/.test(secret)){this.update({error:'Use the current local access token from the server’s private control folder.'});return;}
     this.update({connecting:true,error:''});
     try{
       const caps=parseCapabilities(await this.json('/api/execution',{},''));
+      if(operationsOnly){
+        const view=parseOperations(await this.json('/api/operations',{},secret,false,MAX_OPERATIONS_BYTES));
+        if(epoch!==this.epoch)return;
+        this.token=secret;this.update({caps,connected:true,connecting:false,workspaceId:view.workspace_id,operationsOnly:true,error:''});return;
+      }
       const workspace=parseWorkspace(await this.json('/api/workspace',{},secret));
       const [entities,datasets]=await Promise.all([this.json('/api/entities?limit=100',{},secret),this.json('/api/datasets?limit=100',{},secret)]);
       if(epoch!==this.epoch)return;
-      this.token=secret;this.reviewNotes.activate(workspace.id);this.reviewCorrections.activate(workspace.id);this.reviewDecisions.activate(workspace.id);this.update({caps,connected:true,connecting:false,workspace,entities:parsePage(entities,parseEntity).items,datasets:parsePage(datasets,parseDataset).items,error:''});
+      this.token=secret;this.reviewNotes.activate(workspace.id);this.reviewCorrections.activate(workspace.id);this.reviewDecisions.activate(workspace.id);this.update({caps,connected:true,connecting:false,workspace,workspaceId:workspace.id,operationsOnly:false,entities:parsePage(entities,parseEntity).items,datasets:parsePage(datasets,parseDataset).items,error:''});
     }catch(e){if(epoch===this.epoch)this.update({connecting:false,error:safeError(e).message});}
   }
   async refresh(){if(!this.state.connected)return;const epoch=this.epoch,seq=++this.readSequence;this.update({refreshing:true,error:''});
-    try{const [w,e,d,c]=await Promise.all([this.read('/api/workspace'),this.read('/api/entities?limit=100'),this.read('/api/datasets?limit=100'),this.json('/api/execution',{},'')]);
-      if(epoch===this.epoch&&seq===this.readSequence){const workspace=parseWorkspace(w);if(workspace.id!==this.state.workspace?.id)throw new InputFailure('access_required');this.update({workspace,entities:parsePage(e,parseEntity).items,datasets:parsePage(d,parseDataset).items,caps:parseCapabilities(c),error:''});}
+    try{if(this.state.operationsOnly){await this.operations();if(epoch===this.epoch&&seq===this.readSequence)this.update({error:''});return;}
+      const [w,e,d,c]=await Promise.all([this.read('/api/workspace'),this.read('/api/entities?limit=100'),this.read('/api/datasets?limit=100'),this.json('/api/execution',{},'')]);
+      if(epoch===this.epoch&&seq===this.readSequence){const workspace=parseWorkspace(w);if(workspace.id!==this.state.workspaceId)throw new InputFailure('access_required');this.update({workspace,entities:parsePage(e,parseEntity).items,datasets:parsePage(d,parseDataset).items,caps:parseCapabilities(c),error:''});}
     }catch(e){if(epoch===this.epoch&&seq===this.readSequence){const error=safeError(e);this.update({workspace:null,entities:[],datasets:[],error:error.message});}}
     finally{if(epoch===this.epoch&&seq===this.readSequence)this.update({refreshing:false});}
+  }
+  async operations(signal?:AbortSignal){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const workspace=this.state.workspaceId,epoch=this.epoch;
+    const value=await this.json('/api/operations',{signal},this.token,false,MAX_OPERATIONS_BYTES);
+    if(epoch!==this.epoch)throw new InputFailure('access_required');return parseOperations(value,workspace);
+  }
+  async storage(signal?:AbortSignal){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const workspace=this.state.workspaceId,epoch=this.epoch;
+    const value=await this.json('/api/storage',{signal},this.token,false,MAX_STORAGE_BYTES);
+    if(epoch!==this.epoch)throw new InputFailure('access_required');return parseStorage(value,workspace);
   }
   private async mutation(path:string,value:unknown){
     if(!this.state.connected||!this.state.caps?.imports||this.state.mutationUnknown||this.creating)throw new InputFailure('input_disabled');const epoch=this.epoch;this.creating=true;

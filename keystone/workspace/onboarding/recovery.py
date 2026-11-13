@@ -47,7 +47,7 @@ def prepare_restore(stage, final, manifest):
     original=Path(sources['workspace.json']['path']).parent
     if (not original.is_absolute() or original==final or original in final.parents or final in original.parents
             or any(Path(s['path'])!=original/name for name,s in sources.items())
-            or any(name not in required|{'control/jobs','control/operations','control/restore-history.json'}
+            or any(name not in required|{'control/jobs','control/operations','control/restore-history.json','restore-receipt.json','recovery'}
                    and not (name.startswith('accounting/entity-') and name.endswith('/state.duckdb')) for name in sources)):
         raise ValueError('Private inventory identity mismatch')
     # Generic snapshots retain files, not empty directory topology. Reconstruct
