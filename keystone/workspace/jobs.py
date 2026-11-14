@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import stat
 import tempfile
 from urllib.parse import urlsplit
 import uuid
@@ -55,6 +56,7 @@ class Admission:
                     if Path(name).exists():
                         Path(name).unlink()
             self.token = token
+            self._token_identity = private_member(self.token_file)
         except Exception as exc:
             self.close()
             if isinstance(exc, JobError):
@@ -97,9 +99,34 @@ class Admission:
                 or request.method in {'POST','PUT','PATCH','DELETE'} and (headers.get('origin') != self.origin
                     or headers.get('sec-fetch-site') not in (None, 'same-origin'))):
             raise JobError('job_origin_refused', 403)
-        if (self.token is None or len(headers.getlist('authorization')) != 1
+        if (not self.access_key_current() or len(headers.getlist('authorization')) != 1
                 or not secrets.compare_digest(headers.get('authorization', '').encode(), ('Bearer ' + self.token).encode())):
             raise JobError('job_access_required', 403)
+
+    def access_key_current(self):
+        valid=self._access_key_matches()
+        if not valid:self.token=None
+        return valid
+
+    def _access_key_matches(self):
+        """Recheck the session's private key file; replacement never rotates in place."""
+        try:
+            if self.token is None or self.store.closed: return False
+            if any(p.is_symlink() for p in (self.store.root,*self.store.root.parents)): return False
+            if private_member(self.store.root,directory=True)!=self.store._root_identity: return False
+            if private_member(self.token_file)!=self._token_identity: return False
+            fd=os.open(self.token_file,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+            with os.fdopen(fd,'rb') as stream:
+                info=os.fstat(stream.fileno())
+                if (not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or info.st_uid!=os.getuid()
+                        or info.st_mode & 0o077 or (info.st_dev,info.st_ino)!=self._token_identity
+                        or info.st_size!=44): return False
+                value=stream.read(129)
+            return (secrets.compare_digest(value,(self.token+'\n').encode())
+                    and private_member(self.token_file)==self._token_identity
+                    and private_member(self.store.root,directory=True)==self.store._root_identity)
+        except Exception:
+            return False
 
     @staticmethod
     def _safe(action):

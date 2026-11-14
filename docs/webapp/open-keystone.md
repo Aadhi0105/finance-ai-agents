@@ -198,6 +198,25 @@ browser. Unsupported/legacy formats require explicit review, not automatic
 migration. The original doctor command remains available for the earlier CLI
 pilot; use `python -m keystone.installation doctor` for the complete web runtime.
 
+## Access and privacy — Batch 6D
+
+For current access/file observations and a redacted support check, choose
+**Access & privacy**. [Batch 6D](batch6d-access-and-privacy.md) explains its bounded
+checks and the key-replacement procedure. Clearing a tab does not stop the
+server or admitted jobs. Stop the owning launcher and restart to generate a new
+key; the preceding key must fail. There is no automatic idle expiry or separate
+team role in this local pilot.
+
+## Recovery and support — Batch 6E
+
+Choose **Recovery & support** for read-only guidance on the exact saved request
+or import. [The 6E runbook](batch6e-recovery-and-support.md) covers stopped-server
+operator commands, new-directory restoration, offline troubleshooting and safe
+support evidence. Private recovery commands require the server and worker to be
+stopped. Delivery recovery never repeats a financial calculation; a committed
+close can regenerate derivative reports from its verified frozen result.
+Independent encrypted backup and clean-machine recovery remain separate holds.
+
 ## Local verification — 9 November 2026
 
 Twenty launcher tests passed, covering settings, process ownership, build failures,

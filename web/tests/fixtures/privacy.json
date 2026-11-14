@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.privacy",
+  "workspace_id": "workspace-3348b5c76d7e427ba4cc57e315ac8e0b",
+  "observed_at": "2026-11-14T09:48:45.639791+00:00",
+  "state": "checked",
+  "controls": {
+    "local_key": "checked",
+    "workspace_files": "checked",
+    "browser_credentials": "tab_memory_only",
+    "delivery": "protected_no_store",
+    "diagnostic_export": "allowlisted_no_identifiers",
+    "token_rotation": "stop_and_restart",
+    "analyst_identity": "not_authenticated",
+    "automatic_session_expiry": false,
+    "live_data_enabled": false,
+    "paid_models_enabled": false,
+    "external_sharing_enabled": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  },
+  "sources": {
+    "state": "checked",
+    "records": 0,
+    "held_records": 0,
+    "versions": 0,
+    "held_versions": 0,
+    "rights": {
+      "local_retention": {
+        "allowed": 0,
+        "denied": 0,
+        "pending": 0
+      },
+      "local_processing": {
+        "allowed": 0,
+        "denied": 0,
+        "pending": 0
+      },
+      "local_backup": {
+        "allowed": 0,
+        "denied": 0,
+        "pending": 0
+      },
+      "model_transfer": {
+        "allowed": 0,
+        "denied": 0,
+        "pending": 0
+      },
+      "sharing": {
+        "allowed": 0,
+        "denied": 0,
+        "pending": 0
+      }
+    }
+  }
+}

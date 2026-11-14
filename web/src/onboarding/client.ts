@@ -1,4 +1,6 @@
 import {MAX_INSTALLATION_BYTES,parseInstallation} from '../operations/installation.ts';
+import {MAX_PRIVACY_BYTES,parsePrivacy,parsePrivacyDiagnostic} from '../operations/privacy.ts';
+import {MAX_RECOVERY_BYTES,parseRecovery} from '../operations/recovery.ts';
 import {MAX_STORAGE_BYTES,parseStorage} from '../operations/storage.ts';
 import {ReviewDecisionClient} from '../review/decision-client.ts';
 import {ReviewCorrectionClient} from '../review/correction-client.ts';
@@ -126,6 +128,24 @@ export class PrivateClient {
     const workspace=this.state.workspaceId,epoch=this.epoch;
     const value=await this.json('/api/installation',{signal},this.token,false,MAX_INSTALLATION_BYTES);
     if(epoch!==this.epoch)throw new InputFailure('access_required');return parseInstallation(value,workspace);
+  }
+  async privacy(signal?:AbortSignal){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const workspace=this.state.workspaceId,epoch=this.epoch;
+    const value=await this.json('/api/privacy',{signal},this.token,false,MAX_PRIVACY_BYTES);
+    if(epoch!==this.epoch)throw new InputFailure('access_required');return parsePrivacy(value,workspace);
+  }
+  async recovery(signal?:AbortSignal){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const workspace=this.state.workspaceId,epoch=this.epoch;
+    const value=await this.json('/api/recovery',{signal},this.token,false,MAX_RECOVERY_BYTES);
+    if(epoch!==this.epoch)throw new InputFailure('access_required');return parseRecovery(value,workspace);
+  }
+  async downloadPrivacyDiagnostic(){
+    if(!this.state.connected||!this.token||!this.state.workspaceId)throw new InputFailure('access_required');
+    const epoch=this.epoch,value=parsePrivacyDiagnostic(await this.json('/api/privacy/diagnostic',{},this.token,false,MAX_PRIVACY_BYTES));
+    if(epoch!==this.epoch)throw new InputFailure('access_required');
+    this.downloadBytes(new TextEncoder().encode(JSON.stringify(value,null,2)+'\n').buffer,'keystone-access-check.json');
   }
   private async mutation(path:string,value:unknown){
     if(!this.state.connected||!this.state.caps?.imports||this.state.mutationUnknown||this.creating)throw new InputFailure('input_disabled');const epoch=this.epoch;this.creating=true;
