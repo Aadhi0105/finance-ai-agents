@@ -329,6 +329,18 @@ snapshot-copy candidate/previous-version rehearsal. The operator retains the
 previous installation and reviews the evidence before selecting a workspace;
 there is no automatic activation, migration or production approval.
 
+[Batch 6D](docs/webapp/batch6d-access-and-privacy.md) adds **Access & privacy**,
+rechecks the current private key file on protected requests, holds an invalidated
+session until restart, shows local file/source-use observations and provides a
+small allowlisted diagnostic download. The key represents local possession;
+named-analyst authentication, team roles and source licensing remain separate.
+
+[Batch 6E](docs/webapp/batch6e-recovery-and-support.md) adds **Recovery & support**,
+with guidance for exact saved jobs/imports, guarded private operator recovery and
+an immediate stopped audit of newly restored copies. Verified delivery recovery
+preserves original attempts; uncertain outcomes and restored queues remain held.
+The runbook retains independent-backup, key-recovery and clean-machine requirements.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

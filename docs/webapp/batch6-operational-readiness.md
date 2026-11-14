@@ -9,8 +9,8 @@ the declared local pilot. Completing one part is not a production-release claim.
 | **6A — Operational visibility** | Application checks, job stages/outcomes, failures, capacity and actionable operator diagnostics | [Implemented local scope](batch6a-operational-visibility.md) |
 | **6B — Storage and evidence lifecycle** | Full workspace footprint, preserved history, stopped evidence audit, snapshot completeness and explicit no-deletion policy | [Implemented local scope](batch6b-storage-and-evidence.md) |
 | **6C — Installation and updates** | Offline staged setup, source/runtime/build identity, compatibility gates and snapshot-copy update/recovery rehearsal | [Implemented local scope](batch6c-installation-and-updates.md) |
-| **6D — Access and privacy controls** | Local access, tokens/secrets, private delivery, source permissions and diagnostic redaction review | Planned; existing protections remain in force |
-| **6E — Recovery and support** | Interrupted work, restoration, troubleshooting and explicit independent-backup/key/clean-machine requirements | Planned; reuse existing recovery evidence |
+| **6D — Access and privacy controls** | Current local key/file checks, private delivery, source-use holds and allowlisted diagnostic download | [Implemented local scope](batch6d-access-and-privacy.md) |
+| **6E — Recovery and support** | Read-only recovery triage, stopped operator safeguards, immediate fresh-restore audit, troubleshooting and explicit recovery dependencies | [Implemented local scope](batch6e-recovery-and-support.md) |
 
 Another operator should ultimately be able to follow the supported procedures to
 install, run, diagnose and restore Keystone. The unavailable external drive is a

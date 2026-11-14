@@ -1,0 +1,130 @@
+{
+  "empty": {
+    "schema_version": 1,
+    "kind": "keystone.recovery-support",
+    "workspace_id": "workspace-a196ff68bece45f6a16da28a0672dc16",
+    "observed_at": "2026-11-14T11:01:45.549728+00:00",
+    "state": "observed",
+    "worker": "worker_not_enabled",
+    "source_checks": "checked",
+    "job_total": 0,
+    "unreadable_jobs": 0,
+    "import_total": 0,
+    "unreadable_imports": 0,
+    "jobs": [],
+    "imports": [],
+    "protection": {
+      "independent_backup": "not_verified_here",
+      "encryption_key_recovery": "not_verified_here",
+      "clean_machine_recovery": "not_verified_here",
+      "local_restore": "requires_separate_receipt"
+    },
+    "automatic_recovery": false,
+    "automatic_retry": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  },
+  "cases": {
+    "schema_version": 1,
+    "kind": "keystone.recovery-support",
+    "workspace_id": "workspace-a196ff68bece45f6a16da28a0672dc16",
+    "observed_at": "2026-11-14T11:01:45.549728+00:00",
+    "state": "attention",
+    "worker": "worker_process_stopped",
+    "source_checks": "checked",
+    "job_total": 8,
+    "unreadable_jobs": 0,
+    "import_total": 4,
+    "unreadable_imports": 0,
+    "jobs": [
+      {
+        "id": "job-00000000000000000000000000000001",
+        "status": "queued",
+        "restoration_hold": true,
+        "workflow": "research",
+        "guidance": "restored_queue_held"
+      },
+      {
+        "id": "job-00000000000000000000000000000002",
+        "status": "queued",
+        "restoration_hold": false,
+        "workflow": "news",
+        "guidance": "queued_waiting"
+      },
+      {
+        "id": "job-00000000000000000000000000000003",
+        "status": "running",
+        "restoration_hold": false,
+        "workflow": "research",
+        "guidance": "worker_interrupted"
+      },
+      {
+        "id": "job-00000000000000000000000000000004",
+        "status": "delivery_failed",
+        "restoration_hold": false,
+        "workflow": "research",
+        "guidance": "delivery_inspection"
+      },
+      {
+        "id": "job-00000000000000000000000000000005",
+        "status": "outcome_unknown",
+        "restoration_hold": false,
+        "workflow": "events",
+        "guidance": "unknown_outcome"
+      },
+      {
+        "id": "job-00000000000000000000000000000006",
+        "status": "source_changed",
+        "restoration_hold": false,
+        "workflow": "monitoring",
+        "guidance": "source_hold"
+      },
+      {
+        "id": "job-00000000000000000000000000000007",
+        "status": "failed",
+        "restoration_hold": false,
+        "workflow": "close",
+        "guidance": "close_state_inspection"
+      },
+      {
+        "id": "job-00000000000000000000000000000008",
+        "status": "failed",
+        "restoration_hold": false,
+        "workflow": "news",
+        "guidance": "failed_attempt"
+      }
+    ],
+    "imports": [
+      {
+        "id": "import-00000000000000000000000000000001",
+        "state": "reserved",
+        "guidance": "import_in_progress"
+      },
+      {
+        "id": "import-00000000000000000000000000000002",
+        "state": "interrupted",
+        "guidance": "import_inspection"
+      },
+      {
+        "id": "import-00000000000000000000000000000003",
+        "state": "delivery_failed",
+        "guidance": "import_inspection"
+      },
+      {
+        "id": "import-00000000000000000000000000000004",
+        "state": "rejected",
+        "guidance": "import_rejected"
+      }
+    ],
+    "protection": {
+      "independent_backup": "not_verified_here",
+      "encryption_key_recovery": "not_verified_here",
+      "clean_machine_recovery": "not_verified_here",
+      "local_restore": "requires_separate_receipt"
+    },
+    "automatic_recovery": false,
+    "automatic_retry": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  }
+}

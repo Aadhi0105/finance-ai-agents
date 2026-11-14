@@ -56,6 +56,9 @@ def main(argv=None):
     recover.add_argument('--workspace', type=Path, required=True)
     recover.add_argument('--jobs-dir', type=Path, required=True)
     recover.add_argument('--job-id', required=True)
+    recover_private=commands.add_parser('recover-private-job',help='Inspect and recover saved job delivery after stopping this private server and worker; no financial reexecution')
+    recover_private.add_argument('--workspace',type=Path,required=True,help='Private workspace root')
+    recover_private.add_argument('--job-id',required=True)
     release = commands.add_parser('release-uncommitted-close', help='Inspect and release a failed close intent only when no accounting commit exists')
     release.add_argument('--workspace', type=Path, required=True, help='Private workspace root')
     release.add_argument('--job-id', required=True)
@@ -80,20 +83,28 @@ def main(argv=None):
         except Exception:
             print(json.dumps(InputError('input_unavailable',503).envelope()),file=sys.stderr)
             return 2
-    elif args.command=='release-restored-job':
+    elif args.command in {'release-restored-job','recover-private-job','recover-import','release-uncommitted-close'}:
         from .onboarding.recovery import release_restored_job
-        from .job_store import JobStore
+        from .recovery_support import operator_store
+        from .onboarding.store import InputStore
+        from .worker import recover_delivery,release_uncommitted_close
         from .job_contract import JobError
-        store=None
         try:
-            store=JobStore(args.workspace/'control',args.workspace/'reports',worker=True)
-            print(json.dumps(release_restored_job(store,args.job_id,args.reason)))
+            with operator_store(args.workspace) as store:
+                inputs=InputStore(args.workspace,recover=True)
+                if args.command=='release-restored-job':result=release_restored_job(store,args.job_id,args.reason)
+                elif args.command=='recover-import':result=inputs.recover(args.import_id)
+                elif args.command=='release-uncommitted-close':result=release_uncommitted_close(store,args.job_id)
+                else:
+                    job=recover_delivery(store,args.job_id)['job']
+                    result=dict(job_id=job['job_id'],status=job['status'],result_run_id=job['execution']['result']['run_id'],
+                                financial_execution_started=False,financial_approval=False)
+                print(json.dumps(result))
+            return 0
         except Exception:
             print(json.dumps(JobError('job_recovery_unavailable',409).envelope()),file=sys.stderr)
             return 2
-        finally:
-            if store is not None:store.close()
-    elif args.command in {'prepare-private','install-source-permission','revoke-source-permission','recover-import','snapshot-private'}:
+    elif args.command in {'prepare-private','install-source-permission','revoke-source-permission','snapshot-private'}:
         from .onboarding.store import create_workspace,InputStore
         from .onboarding.contracts import InputError
         from .catalog import read_confined,read_json
@@ -114,14 +125,6 @@ def main(argv=None):
                 elif args.command=='revoke-source-permission':
                     inputs.revoke_permission(args.permission_id,args.reason)
                     result={'permission_id':args.permission_id,'status':'revoked','financial_approval':False}
-                elif args.command=='recover-import':
-                    from .job_store import JobStore
-                    from keystone.maintenance import control_write_gate
-                    # Acquiring the session lease requires stopping the server.
-                    lease=JobStore(inputs.root/'control',inputs.root/'reports')
-                    try:
-                        with control_write_gate():result=inputs.recover(args.import_id)
-                    finally:lease.close()
                 else:
                     from .job_store import JobStore
                     from keystone.storage import snapshot
@@ -147,17 +150,20 @@ def main(argv=None):
         from .report_views.publish import project_workspace
         result = project_workspace(args.workspace, args.destination)
         print(json.dumps({'workspace': str(result), 'classification': 'synthetic', 'production_release_approved': False}))
-    elif args.command in {'recover-job','release-uncommitted-close'}:
+    elif args.command=='recover-job':
         from .job_store import JobStore
-        from .worker import recover_delivery, release_uncommitted_close
+        from .worker import recover_delivery
         from .job_contract import JobError
         store = None
         try:
-            if args.command == 'release-uncommitted-close':
-                from .onboarding.store import InputStore
-                inputs = InputStore(args.workspace,recover=True)
-                store = JobStore(inputs.root/'control',inputs.root/'reports',worker=True)
-                print(json.dumps(release_uncommitted_close(store,args.job_id)))
+            from .catalog import Catalog
+            if Catalog(args.workspace).load().schema_version==3:
+                root=args.workspace.absolute().parent
+                if args.workspace.absolute()!=root/'reports' or args.jobs_dir.absolute()!=root/'control':
+                    raise JobError('job_recovery_unavailable',409)
+                # Preserve the existing reports/control spelling, with the same
+                # stop-before-recovery guard as the root-based command.
+                return main(['recover-private-job','--workspace',str(root),'--job-id',args.job_id])
             else:
                 store = JobStore(args.jobs_dir, args.workspace, worker=True)
                 result = recover_delivery(store, args.job_id)['job']

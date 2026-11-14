@@ -92,12 +92,18 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             except JobError as error:
                 response = JSONResponse(error.envelope(), status_code=error.status)
             else:
-                response = await call_next(request)
+                try:
+                    response = await call_next(request)
+                except Exception:
+                    if private is None:raise
+                    from .onboarding.contracts import InputError
+                    response = JSONResponse(InputError('input_unavailable',503).envelope(),status_code=503)
         response.headers.setdefault('Content-Security-Policy', APP_CSP)
         response.headers['Cache-Control'] = 'no-store'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Referrer-Policy'] = 'no-referrer'
         response.headers['Cross-Origin-Resource-Policy'] = 'same-origin'
+        response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
         if request.method == 'HEAD':
             return Response(status_code=response.status_code, headers=dict(response.headers))
         return response
@@ -160,6 +166,27 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
             try:return Installation.model_validate(observe(private.inputs,installation_started,frontend)).model_dump()
             except Exception:raise InputError('input_unavailable',503) from None
 
+        @app.api_route('/api/privacy',methods=['GET','HEAD'])
+        def privacy_observation(request: Request):
+            from .privacy import observe
+            from .onboarding.contracts import InputError
+            if request.query_params:raise InputError()
+            return observe(private)
+
+        @app.api_route('/api/recovery',methods=['GET','HEAD'])
+        def recovery_observation(request: Request):
+            from .recovery_support import observe
+            from .onboarding.contracts import InputError
+            if request.query_params:raise InputError()
+            return observe(private)
+
+        @app.api_route('/api/privacy/diagnostic',methods=['GET','HEAD'])
+        def privacy_diagnostic(request: Request):
+            from .privacy import diagnostic
+            from .onboarding.contracts import InputError
+            if request.query_params:raise InputError()
+            return JSONResponse(diagnostic(private),headers={'Content-Disposition':'attachment; filename="keystone-access-check.json"'})
+
     if admission is not None:
         @app.post('/api/jobs')
         async def submit_job(request: Request):
@@ -219,6 +246,8 @@ def create_app(workspace, frontend=None, *, admission=None, private=None):
                 'operations_supported': private is not None,
                 'storage_supported': private is not None,
                 'installation_supported': private is not None,
+                'privacy_supported': private is not None,
+                'recovery_supported': private is not None,
                 'runs': [catalog.public_run(r) for r in manifest.runs]}
 
     @app.api_route('/api/runs', methods=['GET', 'HEAD'])
