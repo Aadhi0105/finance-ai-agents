@@ -191,8 +191,14 @@ class JobStore:
             raise JobError('job_store_unavailable')
         for suffix in ('-journal', '-wal', '-shm'):
             member = self.path.with_name(self.path.name + suffix)
-            if member.exists() or member.is_symlink():
+            try:
                 private_member(member)
+            except FileNotFoundError:
+                # A DELETE-journal commit may unlink this between metadata
+                # probes. Absence is normal; linked, exposed or unreadable
+                # companions still fail. SQLite retains its own locking and
+                # the read transaction below keeps all records consistent.
+                pass
         con = sqlite3.connect(self.path.as_uri() + ('?mode=rw' if write else '?mode=ro'), uri=True,
                               isolation_level=None, timeout=1)
         try:

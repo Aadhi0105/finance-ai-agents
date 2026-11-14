@@ -39,6 +39,14 @@ The page is available in **Open Operations only** mode with the same local key.
 In that mode, it shows opaque references and guidance; reconnect normally to open
 full job/import records. This is a navigation mode, not a separate access role.
 
+Job-history reads also tolerate normal transaction-file cleanup during a worker
+commit. The file's presence and private-file properties are checked with one
+metadata probe: an already removed companion is absent, while a linked, exposed,
+hard-linked, non-file or unreadable companion still refuses the read. SQLite's
+locking, database validation and single-snapshot record/event checks remain in
+force. This prevents normal DELETE-journal removal from appearing as damaged
+saved history; it does not retry calculations or ignore a real storage error.
+
 `GET/HEAD /api/recovery` returns the closed, workspace-bound recovery contract.
 It reuses bounded verified Operations observations. It accepts no query parameters
 or mutation, runs no recovery command, and returns no source figures, names,
@@ -313,6 +321,13 @@ privacy. All **33 final focused recovery cases** passed; the stopped-mutation
 and fresh-restore audit pair also passed separately. All **612 frontend tests**
 passed, including 41 new recovery cases;
 TypeScript checking and the production build passed.
+
+Closure validation also passed **154 focused backend cases** for transaction-file
+cleanup and related access/recovery paths, and **94 affected cases under a
+separate Python 3.12 environment**. The controlled commit regression reproduced
+the former history-read failure before the fix and passed afterwards. Fifteen
+companion-file cases retain rejection of unsafe mode bits, links, hard links,
+directories and unreadable files across the three SQLite companion names.
 
 All **58 saved evidence files** in the visible rehearsal copy retained identical
 hashes after browser observation. It retained four jobs, no running job and one
