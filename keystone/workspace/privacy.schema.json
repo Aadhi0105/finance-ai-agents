@@ -1,0 +1,292 @@
+{
+  "$defs": {
+    "Controls": {
+      "additionalProperties": false,
+      "properties": {
+        "local_key": {
+          "enum": [
+            "checked",
+            "unavailable"
+          ],
+          "title": "Local Key",
+          "type": "string"
+        },
+        "workspace_files": {
+          "enum": [
+            "checked",
+            "attention",
+            "unavailable"
+          ],
+          "title": "Workspace Files",
+          "type": "string"
+        },
+        "browser_credentials": {
+          "const": "tab_memory_only",
+          "default": "tab_memory_only",
+          "title": "Browser Credentials",
+          "type": "string"
+        },
+        "delivery": {
+          "const": "protected_no_store",
+          "default": "protected_no_store",
+          "title": "Delivery",
+          "type": "string"
+        },
+        "diagnostic_export": {
+          "const": "allowlisted_no_identifiers",
+          "default": "allowlisted_no_identifiers",
+          "title": "Diagnostic Export",
+          "type": "string"
+        },
+        "token_rotation": {
+          "const": "stop_and_restart",
+          "default": "stop_and_restart",
+          "title": "Token Rotation",
+          "type": "string"
+        },
+        "analyst_identity": {
+          "const": "not_authenticated",
+          "default": "not_authenticated",
+          "title": "Analyst Identity",
+          "type": "string"
+        },
+        "automatic_session_expiry": {
+          "const": false,
+          "default": false,
+          "title": "Automatic Session Expiry",
+          "type": "boolean"
+        },
+        "live_data_enabled": {
+          "const": false,
+          "default": false,
+          "title": "Live Data Enabled",
+          "type": "boolean"
+        },
+        "paid_models_enabled": {
+          "const": false,
+          "default": false,
+          "title": "Paid Models Enabled",
+          "type": "boolean"
+        },
+        "external_sharing_enabled": {
+          "const": false,
+          "default": false,
+          "title": "External Sharing Enabled",
+          "type": "boolean"
+        },
+        "financial_approval": {
+          "const": false,
+          "default": false,
+          "title": "Financial Approval",
+          "type": "boolean"
+        },
+        "production_release_approved": {
+          "const": false,
+          "default": false,
+          "title": "Production Release Approved",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "local_key",
+        "workspace_files"
+      ],
+      "title": "Controls",
+      "type": "object"
+    },
+    "Counts": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Allowed",
+          "type": "integer"
+        },
+        "denied": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Denied",
+          "type": "integer"
+        },
+        "pending": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Pending",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "allowed",
+        "denied",
+        "pending"
+      ],
+      "title": "Counts",
+      "type": "object"
+    },
+    "Rights": {
+      "additionalProperties": false,
+      "properties": {
+        "local_retention": {
+          "$ref": "#/$defs/Counts"
+        },
+        "local_processing": {
+          "$ref": "#/$defs/Counts"
+        },
+        "local_backup": {
+          "$ref": "#/$defs/Counts"
+        },
+        "model_transfer": {
+          "$ref": "#/$defs/Counts"
+        },
+        "sharing": {
+          "$ref": "#/$defs/Counts"
+        }
+      },
+      "required": [
+        "local_retention",
+        "local_processing",
+        "local_backup",
+        "model_transfer",
+        "sharing"
+      ],
+      "title": "Rights",
+      "type": "object"
+    },
+    "Sources": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "checked",
+            "attention",
+            "unavailable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "records": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Records"
+        },
+        "held_records": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Held Records"
+        },
+        "versions": {
+          "anyOf": [
+            {
+              "maximum": 200,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Versions"
+        },
+        "held_versions": {
+          "anyOf": [
+            {
+              "maximum": 200,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Held Versions"
+        },
+        "rights": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Rights"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "records",
+        "held_records",
+        "versions",
+        "held_versions",
+        "rights"
+      ],
+      "title": "Sources",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.privacy",
+      "default": "keystone.privacy",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "maxLength": 80,
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "checked",
+        "attention",
+        "unavailable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "controls": {
+      "$ref": "#/$defs/Controls"
+    },
+    "sources": {
+      "$ref": "#/$defs/Sources"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "observed_at",
+    "state",
+    "controls",
+    "sources"
+  ],
+  "title": "Privacy",
+  "type": "object"
+}

@@ -128,6 +128,9 @@ def prepare_restore(stage, final, manifest):
         con.commit()
     if history_path.exists():history_path.unlink()
     write_new(history_path,c.canonical(history))
+    # Snapshots exclude runtime leases. A fresh empty lease lets operators run
+    # the stopped audit/recovery *before* opening a server or generating a key.
+    write_new(stage/'control/session.lock',b'')
     return [dict(kind='private_workspace_recovery',**info)]
 
 

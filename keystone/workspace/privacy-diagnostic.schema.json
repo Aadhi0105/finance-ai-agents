@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "Controls": {
+      "additionalProperties": false,
+      "properties": {
+        "local_key": {
+          "enum": [
+            "checked",
+            "unavailable"
+          ],
+          "title": "Local Key",
+          "type": "string"
+        },
+        "workspace_files": {
+          "enum": [
+            "checked",
+            "attention",
+            "unavailable"
+          ],
+          "title": "Workspace Files",
+          "type": "string"
+        },
+        "browser_credentials": {
+          "const": "tab_memory_only",
+          "default": "tab_memory_only",
+          "title": "Browser Credentials",
+          "type": "string"
+        },
+        "delivery": {
+          "const": "protected_no_store",
+          "default": "protected_no_store",
+          "title": "Delivery",
+          "type": "string"
+        },
+        "diagnostic_export": {
+          "const": "allowlisted_no_identifiers",
+          "default": "allowlisted_no_identifiers",
+          "title": "Diagnostic Export",
+          "type": "string"
+        },
+        "token_rotation": {
+          "const": "stop_and_restart",
+          "default": "stop_and_restart",
+          "title": "Token Rotation",
+          "type": "string"
+        },
+        "analyst_identity": {
+          "const": "not_authenticated",
+          "default": "not_authenticated",
+          "title": "Analyst Identity",
+          "type": "string"
+        },
+        "automatic_session_expiry": {
+          "const": false,
+          "default": false,
+          "title": "Automatic Session Expiry",
+          "type": "boolean"
+        },
+        "live_data_enabled": {
+          "const": false,
+          "default": false,
+          "title": "Live Data Enabled",
+          "type": "boolean"
+        },
+        "paid_models_enabled": {
+          "const": false,
+          "default": false,
+          "title": "Paid Models Enabled",
+          "type": "boolean"
+        },
+        "external_sharing_enabled": {
+          "const": false,
+          "default": false,
+          "title": "External Sharing Enabled",
+          "type": "boolean"
+        },
+        "financial_approval": {
+          "const": false,
+          "default": false,
+          "title": "Financial Approval",
+          "type": "boolean"
+        },
+        "production_release_approved": {
+          "const": false,
+          "default": false,
+          "title": "Production Release Approved",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "local_key",
+        "workspace_files"
+      ],
+      "title": "Controls",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.privacy-diagnostic",
+      "default": "keystone.privacy-diagnostic",
+      "title": "Kind",
+      "type": "string"
+    },
+    "observed_at": {
+      "maxLength": 80,
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "checked",
+        "attention",
+        "unavailable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "controls": {
+      "$ref": "#/$defs/Controls"
+    },
+    "source_use": {
+      "enum": [
+        "checked",
+        "attention",
+        "unavailable"
+      ],
+      "title": "Source Use",
+      "type": "string"
+    }
+  },
+  "required": [
+    "observed_at",
+    "state",
+    "controls",
+    "source_use"
+  ],
+  "title": "Diagnostic",
+  "type": "object"
+}

@@ -195,6 +195,79 @@ def test_http_history_pages_cover_more_than_one_page_without_loss_or_overlap(iso
     assert len(receipt['jobs']) == 30 and receipt['registered_runs'] == 5
 
 
+def test_job_read_survives_a_journal_removed_by_a_committing_worker(isolated, monkeypatch):
+    from contextlib import contextmanager
+    import threading
+    import keystone.workspace.job_store as ledger
+    service=Admission(isolated/'workspace',isolated/'control',ORIGIN)
+    writer=JobStore(isolated/'control',isolated/'workspace',worker=True)
+    committing,allow_commit,finished=threading.Event(),threading.Event(),threading.Event()
+    real_connect=writer._connect;real_member=ledger.private_member
+    reader_thread=threading.get_ident();errors=[];observed=[]
+    journal=writer.path.with_name(writer.path.name+'-journal')
+    @contextmanager
+    def traced(*args,**kwargs):
+        with real_connect(*args,**kwargs) as con:
+            def trace(sql):
+                if sql=='COMMIT':
+                    committing.set()
+                    allow_commit.wait(5)
+            con.set_trace_callback(trace)
+            yield con
+    def probe(path,**kwargs):
+        if path==journal and threading.get_ident()==reader_thread and committing.is_set():
+            assert journal.exists()
+            allow_commit.set()
+            assert finished.wait(3) and not errors
+            assert not journal.exists()
+            observed.append('journal_removed_at_probe')
+        return real_member(path,**kwargs)
+    def advance():
+        try:writer.claim_next()
+        except Exception as error:errors.append(error)
+        finally:finished.set()
+    thread=None
+    try:
+        admitted,_=service.submit(dict(workflow='close',source_run_id='close-example'),'journal-removal-read')
+        monkeypatch.setattr(writer,'_connect',traced)
+        monkeypatch.setattr(ledger,'private_member',probe)
+        thread=threading.Thread(target=advance);thread.start()
+        assert committing.wait(3)
+        result=service.get(admitted['job_id'])
+        assert observed==['journal_removed_at_probe']
+        assert result['job']['status']=='running' and result['job']['execution']['attempt']==1
+        assert result['events'][-1]['event']=='claimed'
+    finally:
+        allow_commit.set()
+        if thread is not None:thread.join(timeout=5)
+        writer.close();service.close()
+
+
+@pytest.mark.parametrize('suffix',['-journal','-wal','-shm'])
+@pytest.mark.parametrize('fault',['mode','link','hardlink','directory','unreadable'])
+def test_transient_companion_handling_still_refuses_unsafe_files(isolated,monkeypatch,suffix,fault):
+    import os
+    import keystone.workspace.job_store as ledger
+    service=Admission(isolated/'workspace',isolated/'control',ORIGIN)
+    try:
+        admitted,_=service.submit(dict(workflow='close',source_run_id='close-example'),'unsafe-companion')
+        member=service.store.path.with_name(service.store.path.name+suffix)
+        if fault=='directory':member.mkdir(mode=0o700)
+        elif fault=='link':member.symlink_to(isolated/'missing-target')
+        else:
+            member.write_bytes(b'Fictional unsafe companion');member.chmod(0o600)
+            if fault=='mode':member.chmod(0o644)
+            elif fault=='hardlink':os.link(member,isolated/'retained-link')
+            else:
+                real=ledger.private_member
+                def unreadable(path,**kwargs):
+                    if path==member:raise PermissionError('Fictional unreadable transaction file')
+                    return real(path,**kwargs)
+                monkeypatch.setattr(ledger,'private_member',unreadable)
+        with pytest.raises(JobError,match='job_store_unavailable'):service.get(admitted['job_id'])
+    finally:service.close()
+
+
 def test_job_reads_keep_state_and_events_on_one_snapshot_during_a_worker_commit(isolated, monkeypatch):
     from contextlib import contextmanager
     import threading

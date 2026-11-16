@@ -1,0 +1,305 @@
+{
+  "$defs": {
+    "Import": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^import-[a-f0-9]{32}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "reserved",
+            "receiving",
+            "validating",
+            "rejected",
+            "interrupted",
+            "delivery_failed"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "guidance": {
+          "enum": [
+            "import_in_progress",
+            "import_inspection",
+            "import_rejected"
+          ],
+          "title": "Guidance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "state",
+        "guidance"
+      ],
+      "title": "Import",
+      "type": "object"
+    },
+    "Job": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^job-[a-f0-9]{32}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "workflow": {
+          "enum": [
+            "research",
+            "monitoring",
+            "events",
+            "news",
+            "close"
+          ],
+          "title": "Workflow",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "review_required",
+            "source_changed",
+            "failed",
+            "outcome_unknown",
+            "delivery_failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "restoration_hold": {
+          "title": "Restoration Hold",
+          "type": "boolean"
+        },
+        "guidance": {
+          "enum": [
+            "restored_queue_held",
+            "queued_waiting",
+            "work_in_progress",
+            "worker_interrupted",
+            "delivery_inspection",
+            "unknown_outcome",
+            "source_hold",
+            "failed_attempt",
+            "close_state_inspection"
+          ],
+          "title": "Guidance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "workflow",
+        "status",
+        "restoration_hold",
+        "guidance"
+      ],
+      "title": "Job",
+      "type": "object"
+    },
+    "Protection": {
+      "additionalProperties": false,
+      "properties": {
+        "independent_backup": {
+          "const": "not_verified_here",
+          "default": "not_verified_here",
+          "title": "Independent Backup",
+          "type": "string"
+        },
+        "encryption_key_recovery": {
+          "const": "not_verified_here",
+          "default": "not_verified_here",
+          "title": "Encryption Key Recovery",
+          "type": "string"
+        },
+        "clean_machine_recovery": {
+          "const": "not_verified_here",
+          "default": "not_verified_here",
+          "title": "Clean Machine Recovery",
+          "type": "string"
+        },
+        "local_restore": {
+          "const": "requires_separate_receipt",
+          "default": "requires_separate_receipt",
+          "title": "Local Restore",
+          "type": "string"
+        }
+      },
+      "title": "Protection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "keystone.recovery-support",
+      "default": "keystone.recovery-support",
+      "title": "Kind",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,79}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "maxLength": 80,
+      "title": "Observed At",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "observed",
+        "attention",
+        "unavailable"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "worker": {
+      "enum": [
+        "worker_process_running",
+        "worker_not_enabled",
+        "worker_queue_waiting",
+        "worker_process_stopped"
+      ],
+      "title": "Worker",
+      "type": "string"
+    },
+    "source_checks": {
+      "enum": [
+        "checked",
+        "held",
+        "unavailable"
+      ],
+      "title": "Source Checks",
+      "type": "string"
+    },
+    "job_total": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Job Total"
+    },
+    "unreadable_jobs": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Unreadable Jobs"
+    },
+    "import_total": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Import Total"
+    },
+    "unreadable_imports": {
+      "anyOf": [
+        {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Unreadable Imports"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/Job"
+      },
+      "maxItems": 1000,
+      "title": "Jobs",
+      "type": "array"
+    },
+    "imports": {
+      "items": {
+        "$ref": "#/$defs/Import"
+      },
+      "maxItems": 1000,
+      "title": "Imports",
+      "type": "array"
+    },
+    "protection": {
+      "$ref": "#/$defs/Protection",
+      "default": {
+        "independent_backup": "not_verified_here",
+        "encryption_key_recovery": "not_verified_here",
+        "clean_machine_recovery": "not_verified_here",
+        "local_restore": "requires_separate_receipt"
+      }
+    },
+    "automatic_recovery": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Recovery",
+      "type": "boolean"
+    },
+    "automatic_retry": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Retry",
+      "type": "boolean"
+    },
+    "financial_approval": {
+      "const": false,
+      "default": false,
+      "title": "Financial Approval",
+      "type": "boolean"
+    },
+    "production_release_approved": {
+      "const": false,
+      "default": false,
+      "title": "Production Release Approved",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "observed_at",
+    "state",
+    "worker",
+    "source_checks",
+    "job_total",
+    "unreadable_jobs",
+    "import_total",
+    "unreadable_imports",
+    "jobs",
+    "imports"
+  ],
+  "title": "Recovery",
+  "type": "object"
+}
