@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.pilot-record",
+  "protocol_id": "webapp-pilot/1",
+  "protocol_sha256": "8bad3ce44016813f80412ad73ad195ff8059410ba9291916fd92bc15f50c8693",
+  "schema_sha256": "ef322ae17388654a42303766f5070e07194cae7f0ddb0291b6d1e7c952089bc4",
+  "candidate": {
+    "state": "unassigned",
+    "commit": null,
+    "source_sha256": null,
+    "lock_sha256": null,
+    "frontend_source_sha256": null,
+    "configuration_sha256": null,
+    "input_manifest_sha256": null,
+    "frozen_at": null,
+    "environment": null
+  },
+  "results": [
+    {
+      "check_id": "P7-UAT-01",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-02",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-03",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-04",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-05",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-06",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-07",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-08",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-09",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-UAT-10",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-01",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-02",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-03",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-04",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-05",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-06",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-07",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-08",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-09",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-10",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-11",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-OPS-12",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-REV-01",
+      "status": "not_assessed",
+      "attempts": []
+    },
+    {
+      "check_id": "P7-REV-02",
+      "status": "not_assessed",
+      "attempts": []
+    }
+  ],
+  "decision": {
+    "pilot_acceptance": "not_recorded_by_this_evidence_tool",
+    "financial_approval": false,
+    "production_release_approved": false
+  }
+}

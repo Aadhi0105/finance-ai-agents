@@ -341,6 +341,13 @@ an immediate stopped audit of newly restored copies. Verified delivery recovery
 preserves original attempts; uncertain outcomes and restored queues remain held.
 The runbook retains independent-backup, key-recovery and clean-machine requirements.
 
+[Batch 7A](docs/webapp/batch7-pilot-acceptance.md) defines the next single-analyst,
+offline pilot across all four agents: five workflows, one research correction,
+24 acceptance checks and a version-bound blank evidence record. A read-only
+consistency checker validates the specification and later local record format.
+The analyst trial, operational rehearsal and readiness decision are still
+unassessed; this preparation grants no financial or production approval.
+
 ## Read the result before acting on it
 
 A completed calculation, a publishable report, and an externally verified source

@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "keystone.pilot-record/1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "kind": {
+      "const": "keystone.pilot-record"
+    },
+    "protocol_id": {
+      "const": "webapp-pilot/1"
+    },
+    "protocol_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "schema_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "unassigned",
+            "frozen"
+          ]
+        },
+        "commit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lock_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frontend_source_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "configuration_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_manifest_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frozen_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "maxLength": 80
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "platform": {
+                  "const": "Darwin"
+                },
+                "architecture": {
+                  "const": "arm64"
+                },
+                "python": {
+                  "type": "string",
+                  "pattern": "^3\\.11\\.[0-9]+$"
+                },
+                "os_version": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "node": {
+                  "type": "string",
+                  "pattern": "^24\\.[0-9]+\\.[0-9]+$"
+                },
+                "pnpm": {
+                  "const": "11.25.0"
+                }
+              },
+              "required": [
+                "platform",
+                "architecture",
+                "python",
+                "os_version",
+                "node",
+                "pnpm"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "commit",
+        "source_sha256",
+        "lock_sha256",
+        "frontend_source_sha256",
+        "configuration_sha256",
+        "input_manifest_sha256",
+        "frozen_at",
+        "environment"
+      ]
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "pattern": "^P7-(?:UAT|OPS|REV)-[0-9]{2}$"
+          },
+          "status": {
+            "enum": [
+              "not_assessed",
+              "in_progress",
+              "passed",
+              "failed",
+              "blocked"
+            ]
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^attempt-[a-f0-9]{32}$"
+                },
+                "actor": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "role": {
+                      "enum": [
+                        "analyst",
+                        "operator"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "identity_verification": {
+                      "const": "local_unverified"
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "label",
+                    "identity_verification"
+                  ]
+                },
+                "outcome": {
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "blocked"
+                  ]
+                },
+                "started_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "maxLength": 80
+                },
+                "finished_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "maxLength": 80
+                },
+                "observed": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4000
+                },
+                "assistance": {
+                  "enum": [
+                    "none",
+                    "instructions",
+                    "developer_intervention"
+                  ]
+                },
+                "assistance_detail": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1600
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 240,
+                        "pattern": "^evidence/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "bytes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20000000
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256",
+                      "bytes"
+                    ]
+                  },
+                  "maxItems": 16
+                },
+                "blocking_reason": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1600
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "actor",
+                "outcome",
+                "started_at",
+                "finished_at",
+                "observed",
+                "assistance",
+                "assistance_detail",
+                "evidence",
+                "blocking_reason"
+              ]
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "check_id",
+          "status",
+          "attempts"
+        ]
+      },
+      "minItems": 24,
+      "maxItems": 24
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pilot_acceptance": {
+          "const": "not_recorded_by_this_evidence_tool"
+        },
+        "financial_approval": {
+          "const": false
+        },
+        "production_release_approved": {
+          "const": false
+        }
+      },
+      "required": [
+        "pilot_acceptance",
+        "financial_approval",
+        "production_release_approved"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "protocol_id",
+    "protocol_sha256",
+    "schema_sha256",
+    "candidate",
+    "results",
+    "decision"
+  ]
+}
