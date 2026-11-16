@@ -16,10 +16,11 @@ Another operator should ultimately be able to follow the supported procedures to
 install, run, diagnose and restore Keystone. The unavailable external drive is a
 deferred dependency; local restoration does not establish device-loss protection.
 
-Batch 7 then defines the pilot scope and acceptance criteria, runs analyst
-usability/interpretation and operational rehearsals, and assembles the evidence
-for an explicit release decision. Authorised sources, real-company close data
-and disaster recovery remain scope-dependent requirements.
+[Batch 7](batch7-pilot-acceptance.md) defines the pilot scope and acceptance
+criteria in 7A, then schedules analyst usability/interpretation in 7B, operational
+rehearsals in 7C and an evidence/readiness decision in 7D. The 7A specification
+starts all 24 trial checks unassessed; it approves no release. Authorised sources,
+real-company close data and disaster recovery retain separate requirements.
 
 The later six-part document/PDF intake programme retains its own scope. Complete
 all six intake parts before starting the [broader backend enhancement programme](post-intake-backend-roadmap.md).

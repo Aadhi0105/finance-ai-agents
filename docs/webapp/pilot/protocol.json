@@ -1,0 +1,678 @@
+{
+  "schema_version": 1,
+  "kind": "keystone.pilot-protocol",
+  "id": "webapp-pilot/1",
+  "prepared_on": "2026-11-16",
+  "planning_baseline_commit": "2b8229685dabac6a13376ee1b6d8ed70efd6aaeb",
+  "scope": {
+    "purpose": "private_personal_evaluation",
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "python_family": "3.11",
+    "node_major": 24,
+    "pnpm": "11.25.0",
+    "analysts": 1,
+    "agents": [
+      "agent1",
+      "agent2",
+      "agent3",
+      "agent4"
+    ],
+    "workflows": [
+      "research",
+      "monitoring",
+      "events",
+      "news",
+      "close"
+    ],
+    "classification": "synthetic",
+    "network": "loopback_only",
+    "live_data": false,
+    "paid_models": false,
+    "external_sharing": false,
+    "document_intake": false,
+    "team_authentication": false,
+    "financial_approval": false,
+    "production_release_approved": false
+  },
+  "workload": {
+    "base_calculations": 5,
+    "research_replacement_calculations": 1,
+    "total_calculations": 6,
+    "accepted_input_versions": 6,
+    "datasets": 5,
+    "concurrency": 1,
+    "source_policy": "fictional_content_scoped_local_retention_processing_backup_only",
+    "source_dates": "freeze_before_trial_never_refresh_accepted_inputs",
+    "evidence_retrieval": "all_registered_artifacts_for_all_six_results",
+    "fault_rehearsals": "separate_isolated_copies_excluded_from_base_workload"
+  },
+  "trial_targets": {
+    "status": "predeclared_for_bounded_trial_not_production_sla",
+    "read_seconds": 12,
+    "write_confirmation_seconds": 75,
+    "job_submit_to_terminal_seconds": 120,
+    "workspace_growth_bytes": 100000000,
+    "provider_requests": 0,
+    "model_requests": 0,
+    "model_output_tokens": 0,
+    "scope_change_policy": "revise_protocol_and_start_new_candidate_record_before_retesting"
+  },
+  "tolerances": {
+    "source_monetary_values": "exact retained decimal strings",
+    "close_amounts": "exact integer cents",
+    "ratios_absolute": "0.000000001",
+    "event_returns_absolute": "0.000000001",
+    "conditional_dcf": "max(1 base currency unit, 0.000000001 relative)",
+    "display": "half one unit of the last displayed digit; exact-value evidence still required",
+    "unavailable": "expected unavailable/held is a valid outcome only when explained accurately"
+  },
+  "checks": [
+    {
+      "id": "P7-UAT-01",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Open and identify the pilot",
+      "pass_condition": "Launch the selected committed application, connect to the selected fictional workspace, identify its offline/synthetic scope, acknowledge the predeclared trial budget, and distinguish local access from financial or production approval.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-ACC-001"
+      ]
+    },
+    {
+      "id": "P7-UAT-02",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Research: periods, figures and source",
+      "pass_condition": "Identify FY2023-2025, revenue EUR 800m/900m/1bn, FY2025 operating margin 12% and FCFF EUR 80m; trace an exact figure to its retained supplied observation and explain missing earlier cash-flow components.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A1-001",
+        "V1-A1-002",
+        "V1-DAT-003"
+      ]
+    },
+    {
+      "id": "P7-UAT-03",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Research: conditional value and unavailable research",
+      "pass_condition": "Explain the explicit valuation assumptions and fictional quote date; distinguish a conditional model value from a broker target, and identify unavailable consensus/named analyst research without inventing recommendations.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A1-001",
+        "V1-A1-002",
+        "V1-DAT-002"
+      ]
+    },
+    {
+      "id": "P7-UAT-04",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Monitoring: stable breach and missing observation",
+      "pass_condition": "Explain the 2 to 3.5 to 3.5 leverage history against below 3: new then stable active breach. Explain that missing latest coverage is unavailable, not its earlier value 4, and that this supplied-history run is not a contractual covenant certification or persistent monitoring cycle.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A2-001",
+        "V1-A2-002",
+        "V1-DAT-002"
+      ]
+    },
+    {
+      "id": "P7-UAT-05",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Events: historical arithmetic and held inference",
+      "pass_condition": "Identify one event/issuer, abnormal returns 1%, 2%, 3% and CAR 6%; explain the supplied market-model basis, unverified event provenance/design, held inference and absence of a next-event forecast.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A3-001",
+        "V1-DAT-003"
+      ]
+    },
+    {
+      "id": "P7-UAT-06",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "News: coverage, duplicates and unavailable tone",
+      "pass_condition": "Reconcile five supplied articles: one stale, one unrelated, one duplicate pair and one relevant unscored story. Explain 2 positive tokens / 6 words = 1/3 for the scored story; distinguish unavailable tone from neutral and the frozen cutoff from current news.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A3-002",
+        "V1-DAT-002"
+      ]
+    },
+    {
+      "id": "P7-UAT-07",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Close: reconcile budget and actual",
+      "pass_condition": "Reconcile YTD profit 36000 to 39000 cents: sales +6000 cents, costs +3000 cents, net profit +3000 cents. Explain cost-versus-profit sign and any forecast assumptions, with no company/controller approval inferred.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A4-001",
+        "V1-A4-002"
+      ]
+    },
+    {
+      "id": "P7-UAT-08",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Record and revisit review decisions",
+      "pass_condition": "Save an exact-scope question and change request, reopen and acknowledge an item, retrieve its history, and explain why notes/acknowledgements do not release financial restrictions or authenticate an approver.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-ACC-002"
+      ]
+    },
+    {
+      "id": "P7-UAT-09",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Link a correction and deliberately rerun",
+      "pass_condition": "Import the fictional research successor with FY2025 operating income 130m, link it to the original version without automatic execution, explicitly run it, reconcile margin 13% and FCFF 87.5m, and verify separate new review with original history retained. Explain that this single-field fictional change is an arithmetic/lineage exercise, not a reconciled company restatement.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A1-001",
+        "V1-ACC-002",
+        "V1-EXE-001"
+      ]
+    },
+    {
+      "id": "P7-UAT-10",
+      "phase": "7B",
+      "actor": "analyst",
+      "title": "Navigate complete evidence and reconnect",
+      "pass_condition": "For all five families use a chart with keyboard controls and exact values, inspect its source, compare the complete reading copy/download and original history, reconnect to the same saved result, and distinguish observation/cutoff from retrieval time.",
+      "production_gates": [
+        "V1-UAT-001",
+        "V1-A1-002",
+        "V1-A4-002",
+        "V1-DAT-003"
+      ]
+    },
+    {
+      "id": "P7-OPS-01",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Freeze installation and supported configuration",
+      "pass_condition": "Record a clean candidate commit, source/build/lock/configuration/input-manifest fingerprints, full environment and fresh doctor/build checks. Unsupported or changed identities remain held.",
+      "production_gates": [
+        "V1-REL-001",
+        "V1-DAT-003"
+      ]
+    },
+    {
+      "id": "P7-OPS-02",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Verify local access and private delivery",
+      "pass_condition": "Refuse unauthorised/cross-origin access and changed/exposed keys, verify restart rotation and no-store delivery, and inspect the allowlisted diagnostic for seeded secret/name/path leakage.",
+      "production_gates": [
+        "V1-ACC-001",
+        "V1-ACC-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-03",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Replay a request without duplicate consequence",
+      "pass_condition": "Same key/body returns the original identity; changed body conflicts. Preserve one claimed attempt and no duplicate accounting result, including concurrent job-history reads during a worker commit.",
+      "production_gates": [
+        "V1-EXE-001",
+        "V1-A4-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-04",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Handle uncertain and stale review saves",
+      "pass_condition": "Lost acknowledgements keep the exact original retry identity; stale report/history or changed bodies refuse. Reconnection cannot silently redirect a save or lose confirmed review history.",
+      "production_gates": [
+        "V1-EXE-001",
+        "V1-EXE-002",
+        "V1-ACC-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-05",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Keep source-use and stale-data holds",
+      "pass_condition": "In isolated copies expire/revoke content-scoped permission and alter source/evidence; preserve stored history while refusing dependent reads/actions/backup. Missing, stale or incompatible observations never become substituted current facts.",
+      "production_gates": [
+        "V1-DAT-001",
+        "V1-DAT-002",
+        "V1-OPS-001"
+      ]
+    },
+    {
+      "id": "P7-OPS-06",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Enforce declared input and storage limits",
+      "pass_condition": "Exercise eligible at-bound inputs and one-over refusals, pending-job/evidence capacity and safe storage-write failures using separate fault fixtures. No partial accepted result, truncation or automatic deletion.",
+      "production_gates": [
+        "V1-EXE-001",
+        "V1-OPS-001",
+        "V1-OPS-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-07",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Recover a complete saved delivery",
+      "pass_condition": "In a controlled copy fail publication after completion, recover the verified original result twice, retain attempt one and original operation receipt, and observe zero financial dispatch/calculation calls during recovery.",
+      "production_gates": [
+        "V1-EXE-002",
+        "V1-OPS-001",
+        "V1-A4-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-08",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Hold unknown outcomes and inspect close commits",
+      "pass_condition": "A missing/changed completion proof cannot trigger another attempt. Private recovery refuses active server/worker/surviving mutator. A failed close requires committed-versus-no-commit inspection; derived output recovery never repeats its accounting commit.",
+      "production_gates": [
+        "V1-EXE-002",
+        "V1-OPS-001",
+        "V1-A4-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-09",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Restore complete local evidence into a new copy",
+      "pass_condition": "Snapshot the quiescent full pilot workspace; verify/restore to a new destination; immediately audit without a server/key; compare inputs, results, reviews and accounting evidence. Rotate keys, hold queued work, refuse corruption/existing destinations, and preserve the original.",
+      "production_gates": [
+        "V1-STO-001",
+        "V1-STO-002",
+        "V1-STO-003",
+        "V1-STO-004",
+        "V1-A4-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-10",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Rehearse an isolated update and recovery",
+      "pass_condition": "Use separate candidate/previous installations and snapshot copies; check exact readiness and an injected candidate failure, preserve previous-code recovery and original source, and do not automatically activate/migrate/release a queue.",
+      "production_gates": [
+        "V1-REL-001",
+        "V1-REL-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-11",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Use operational and support guidance",
+      "pass_condition": "Inspect normal, held, failed and unreadable states through Operations/Storage/Installation/Privacy/Recovery and the offline runbook. Unknown counts remain unknown; the redacted check is reviewed before any separate sharing.",
+      "production_gates": [
+        "V1-OPS-001",
+        "V1-ACC-002"
+      ]
+    },
+    {
+      "id": "P7-OPS-12",
+      "phase": "7C",
+      "actor": "operator",
+      "title": "Measure the exact sequential trial workload",
+      "pass_condition": "Record every read/write/job duration, six original calculation identities, workspace start/peak/end logical bytes and zero provider/model usage. Meet the predeclared trial targets or record failure; installation/cache/snapshot/fault-copy size is reported separately.",
+      "production_gates": [
+        "V1-OPS-002",
+        "V1-EXE-003"
+      ]
+    },
+    {
+      "id": "P7-REV-01",
+      "phase": "7D",
+      "actor": "operator",
+      "title": "Assemble version-bound evidence",
+      "pass_condition": "All 7B/7C checks have an expected/actual result, final supported candidate binding, evidence hashes, actor and retained attempt history. Assisted/failed/stale results need a separate valid retest; no historical component report is copied as a new pilot pass. Freeze the pre-decision pack with the explicit human-decision check still pending.",
+      "production_gates": [
+        "V1-REL-003"
+      ]
+    },
+    {
+      "id": "P7-REV-02",
+      "phase": "7D",
+      "actor": "analyst",
+      "title": "Record the scoped readiness decision",
+      "pass_condition": "Review all current trial results, unresolved dependencies, accepted limitations and suspension conditions. Record a distinct explicit pilot decision against the exact candidate; do not mark production or financial approval through the evidence record.",
+      "production_gates": [
+        "V1-REL-003"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "DEP-BACKUP",
+      "status": "deferred",
+      "scope": "production",
+      "detail": "Independent physically separate encrypted destination not yet available; no external copy authorised."
+    },
+    {
+      "id": "DEP-KEYS",
+      "status": "blocked",
+      "scope": "production",
+      "detail": "Independent recovery of backup-unlocking secrets has not been demonstrated."
+    },
+    {
+      "id": "DEP-DR",
+      "status": "blocked",
+      "scope": "production",
+      "detail": "Only this Mac is available; second-machine restoration and measured device-loss targets remain pending."
+    },
+    {
+      "id": "DEP-RIGHTS",
+      "status": "blocked",
+      "scope": "real_source_use",
+      "detail": "Yahoo/other real-source permissions remain separate; synthetic operator records confer no provider entitlement."
+    },
+    {
+      "id": "DEP-FPA",
+      "status": "blocked",
+      "scope": "company_close_acceptance",
+      "detail": "Authorised company budget/actuals and controller review remain unavailable."
+    },
+    {
+      "id": "DEP-NEWS",
+      "status": "not_assessed",
+      "scope": "real_news_quality",
+      "detail": "Representative human-labelled real-news evaluation is required for its production claim."
+    },
+    {
+      "id": "DEP-ACCESSIBILITY",
+      "status": "not_assessed",
+      "scope": "wider_device_and_accessibility_claims",
+      "detail": "Physical touch, screen reader, PDF print reconciliation and physical printing retain separate evidence needs."
+    },
+    {
+      "id": "DEP-CAPACITY",
+      "status": "not_assessed",
+      "scope": "production_capacity",
+      "detail": "These small-workload targets do not resolve global workload/capacity or service-level acceptance."
+    }
+  ],
+  "production_crosswalk": [
+    {
+      "gate": "V1-DAT-001",
+      "disposition": "blocked_external",
+      "pilot_checks": [
+        "P7-OPS-05"
+      ],
+      "reason": "Real-provider and source-use rights require separate current evidence."
+    },
+    {
+      "gate": "V1-DAT-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-03",
+        "P7-UAT-04",
+        "P7-UAT-06",
+        "P7-OPS-05"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-DAT-003",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-02",
+        "P7-UAT-05",
+        "P7-UAT-10",
+        "P7-OPS-01"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-EXE-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-09",
+        "P7-OPS-03",
+        "P7-OPS-04",
+        "P7-OPS-06"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-EXE-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-04",
+        "P7-OPS-07",
+        "P7-OPS-08"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-EXE-003",
+      "disposition": "out_of_pilot",
+      "pilot_checks": [
+        "P7-OPS-12"
+      ],
+      "reason": "This trial uses zero paid requests; earlier opt-in paid-call limits are not exercised or approved here."
+    },
+    {
+      "gate": "V1-STO-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-09"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-STO-002",
+      "disposition": "blocked_external",
+      "pilot_checks": [
+        "P7-OPS-09"
+      ],
+      "reason": "Independent encrypted backup, recovered keys and a second-machine drill are still pending."
+    },
+    {
+      "gate": "V1-STO-003",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-09"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-STO-004",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-09"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-ACC-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-01",
+        "P7-OPS-02"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-ACC-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-08",
+        "P7-UAT-09",
+        "P7-OPS-02",
+        "P7-OPS-04",
+        "P7-OPS-11"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-REL-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-01",
+        "P7-OPS-10"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-REL-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-10"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-OPS-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-05",
+        "P7-OPS-06",
+        "P7-OPS-07",
+        "P7-OPS-08",
+        "P7-OPS-11"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-OPS-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-OPS-06",
+        "P7-OPS-12"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-UAT-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-01",
+        "P7-UAT-02",
+        "P7-UAT-03",
+        "P7-UAT-04",
+        "P7-UAT-05",
+        "P7-UAT-06",
+        "P7-UAT-07",
+        "P7-UAT-08",
+        "P7-UAT-09",
+        "P7-UAT-10"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-REL-003",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-REV-01",
+        "P7-REV-02"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A1-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-02",
+        "P7-UAT-03",
+        "P7-UAT-09"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A1-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-02",
+        "P7-UAT-03",
+        "P7-UAT-10"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A2-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-04"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A2-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-04"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A3-001",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-05"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    },
+    {
+      "gate": "V1-A3-002",
+      "disposition": "blocked_external",
+      "pilot_checks": [
+        "P7-UAT-06"
+      ],
+      "reason": "A representative human-labelled real-news quality evaluation is outside this synthetic word-count trial."
+    },
+    {
+      "gate": "V1-A4-001",
+      "disposition": "blocked_external",
+      "pilot_checks": [
+        "P7-UAT-07"
+      ],
+      "reason": "Authorised company data and controller acceptance are not available."
+    },
+    {
+      "gate": "V1-A4-002",
+      "disposition": "supporting_only",
+      "pilot_checks": [
+        "P7-UAT-07",
+        "P7-UAT-10",
+        "P7-OPS-03",
+        "P7-OPS-07",
+        "P7-OPS-08",
+        "P7-OPS-09"
+      ],
+      "reason": "Bounded current-pilot evidence only; the complete Production v1 gate retains its separate status and sign-off."
+    }
+  ],
+  "historical_evidence": [
+    {
+      "path": "docs/webapp/batch4d-workflow-acceptance.md",
+      "use": "Prior engineering volume/failure evidence; rerun affected candidate checks in 7C."
+    },
+    {
+      "path": "docs/webapp/batch5d-review-decisions.md",
+      "use": "Prior engineering review-flow evidence; not the deferred human interpretation trial."
+    },
+    {
+      "path": "docs/webapp/batch6e-recovery-and-support.md",
+      "use": "Prior local recovery evidence; no independent-device claim."
+    },
+    {
+      "path": "docs/webapp/native-reports/reader-trial.md",
+      "use": "Earlier unfilled interpretation/physical-accessibility questions; include applicable interpretation in 7B."
+    },
+    {
+      "path": "docs/production/v1/acceptance-matrix.md",
+      "use": "All 26 production gate statuses remain separately governed."
+    }
+  ]
+}
