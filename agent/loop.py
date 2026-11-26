@@ -137,6 +137,10 @@ def _blocks_to_api(blocks):
             out.append({'type': 'tool_use', 'id': b.id, 'name': b.name, 'input': deepcopy(b.input)})
         elif b.type == 'text' and isinstance(b.text, str):
             out.append({'type': 'text', 'text': b.text})
+        elif (b.type in ('thinking', 'redacted_thinking') and isinstance(getattr(b, 'raw', None), dict)
+              and b.raw.get('type') == b.type):
+            # Opaque; must be replayed to the API exactly as received.
+            out.append(deepcopy(b.raw))
         else:
             raise ValueError('unsupported content block')
     return out

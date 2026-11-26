@@ -21,7 +21,7 @@ def proposal():
                              'source_urls': ['https://example.org/issuer']} for t in ['ASM.AS', 'BESI.AS']]}
 
 
-def sdk(monkeypatch, text, stop='end_turn', block_type='text'):
+def sdk(monkeypatch, text, stop='end_turn', block_type='text', leading=()):
     """Mock HTTP only: exercise AnthropicModel.respond and SDK response conversion."""
     import anthropic
     from anthropic import _base_client
@@ -32,7 +32,7 @@ def sdk(monkeypatch, text, stop='end_turn', block_type='text'):
         requests.append(json.loads(request.content))
         return httpx.Response(200, json={'id': 'msg_test', 'type': 'message', 'role': 'assistant',
                               'model': 'test-model', 'stop_reason': stop, 'stop_sequence': None,
-                              'content': [{'type': block_type, 'text': text}],
+                              'content': [*leading, {'type': block_type, 'text': text}],
                               'usage': {'input_tokens': 20, 'output_tokens': 40}})
     client = anthropic.Anthropic(api_key='test-key', http_client=httpx.Client(transport=httpx.MockTransport(handler)))
     monkeypatch.setattr(peers.AnthropicModel, '_lazy_client', lambda self: client)
@@ -67,6 +67,21 @@ def test_real_shared_adapter_and_audited_unverified_decision(monkeypatch):
     assert audit['model'] and audit['system'] and audit['messages'] and audit['response'] and audit['usage']
     assert checkpoints[-1]['pinned_peer_set']['peers'] == result['peers']
 
+
+
+def test_thinking_blocks_before_the_proposal_are_ignored(monkeypatch):
+    thinking = {'type': 'thinking', 'thinking': '', 'signature': 'sig'}
+    sdk(monkeypatch, json.dumps(proposal()), leading=[thinking])
+    result = peers.propose_peers('asml.as', live=True)
+    assert result['peers'] == ['ASM.AS', 'BESI.AS']
+    assert result['proposal_audit']['status'] == 'accepted_unverified'
+
+
+def test_thinking_only_response_is_refused(monkeypatch):
+    sdk(monkeypatch, '', block_type='thinking')
+    with pytest.raises(peers.PeerProposalError) as error:
+        peers.propose_peers('asml.as', live=True)
+    assert error.value.code == 'incomplete_or_refused_model_response'
 
 @pytest.mark.parametrize('raw,stop', [
     ('I cannot help. {"peers": ["ASM.AS"]}', 'end_turn'),

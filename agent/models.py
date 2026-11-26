@@ -38,11 +38,27 @@ class ToolUseBlock:
 
 
 @dataclass
+class ThinkingBlock:
+    """A thinking or redacted_thinking block, kept opaque.
+
+    Models with always-on thinking return these alongside text and tool_use
+    blocks. The API requires them to be sent back unchanged on the next turn of
+    a tool loop, so the loop replays `raw` verbatim and never reads or edits it.
+    """
+    type: str
+    raw: dict
+
+
+@dataclass
 class ModelResponse:
     stop_reason: str          # "tool_use" or "end_turn"
     content: list             # list[TextBlock | ToolUseBlock]
     usage: dict = field(default_factory=dict)
     request_id: str | None = None
+
+
+THINKING_TYPES = ("thinking", "redacted_thinking")
+SUPPORTED_TYPES = ("text", "tool_use") + THINKING_TYPES
 
 
 # --- interface ------------------------------------------------------------
@@ -97,10 +113,9 @@ class AnthropicModel(ModelClient):
         # Model string is read from AGENT_MODEL so you never hardcode a value
         # that goes stale on the next release. Confirm the exact string your key
         # can call with:  curl https://api.anthropic.com/v1/models -H "x-api-key: $ANTHROPIC_API_KEY" -H "anthropic-version: 2023-06-01"
-        # Default to a proven non-thinking model. A thinking/reasoning model returns
-        # ThinkingBlocks this loop is not built to carry across turns, which stalls
-        # the tool cycle. Override AGENT_MODEL only for a text+tool_use model.
-        self.model = model or os.environ.get("AGENT_MODEL", "claude-sonnet-4-5-20250929")
+        # Claude Opus 5.5 always thinks: responses can include thinking blocks,
+        # which are carried as opaque ThinkingBlocks and replayed unchanged.
+        self.model = model or os.environ.get("AGENT_MODEL", "claude-opus-5-5")
         self.max_tokens = max_tokens
         self._client = None
 
@@ -134,12 +149,14 @@ class AnthropicModel(ModelClient):
                 blocks.append(ToolUseBlock(id=b.id, name=b.name, input=dict(b.input)))
             elif b.type == "text":
                 blocks.append(TextBlock(text=b.text))
+            elif b.type in THINKING_TYPES:
+                blocks.append(ThinkingBlock(type=b.type, raw=b.model_dump(exclude_none=True)))
             # Reject unsupported blocks below, including mixed responses.
-        if any(getattr(b, "type", None) not in ("text", "tool_use") for b in resp.content):
+        if any(getattr(b, "type", None) not in SUPPORTED_TYPES for b in resp.content):
             kinds = sorted({getattr(b, "type", "?") for b in resp.content})
             raise RuntimeError(
-                f"model returned unsupported block types {kinds} (a thinking "
-                f"model?); set AGENT_MODEL to a text+tool_use model.")
+                f"model returned unsupported block types {kinds}; set AGENT_MODEL "
+                f"to a model that returns only text, tool_use and thinking blocks.")
         return ModelResponse(stop_reason=resp.stop_reason, content=blocks,
                              usage=resp.usage.model_dump() if resp.usage else {},
                              request_id=getattr(resp, "_request_id", None) or getattr(resp, "id", None))

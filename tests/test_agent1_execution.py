@@ -159,9 +159,40 @@ def test_model_adapter_metadata_and_unsupported_blocks():
     model._client = SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: response))
     result = model.respond('s',[],[])
     assert result.usage == {'output_tokens':3} and result.request_id == 'id'
-    response.content.append(SimpleNamespace(type='thinking'))
+    response.content.append(SimpleNamespace(type='server_tool_use'))
     with pytest.raises(RuntimeError):
         model.respond('s',[],[])
+
+
+def test_default_model_is_opus_5_5(monkeypatch):
+    monkeypatch.delenv('AGENT_MODEL', raising=False)
+    assert AnthropicModel().model == 'claude-opus-5-5'
+    monkeypatch.setenv('AGENT_MODEL', 'override-model')
+    assert AnthropicModel().model == 'override-model'
+
+
+def test_thinking_blocks_are_kept_and_replayed_unchanged():
+    raw = {'type': 'thinking', 'thinking': '', 'signature': 'sig-abc'}
+    calls = []
+    turns = iter([
+        SimpleNamespace(stop_reason='tool_use', id='m1', usage=None, content=[
+            SimpleNamespace(type='thinking', model_dump=lambda **kw: dict(raw)),
+            SimpleNamespace(type='tool_use', id='t1', name='sample', input={'count': 1})]),
+        SimpleNamespace(stop_reason='end_turn', id='m2', usage=None, content=[
+            SimpleNamespace(type='redacted_thinking', model_dump=lambda **kw: {'type': 'redacted_thinking', 'data': 'opaque'}),
+            SimpleNamespace(type='text', text='done')]),
+    ])
+    model = AnthropicModel(model='test')
+    model._client = SimpleNamespace(messages=SimpleNamespace(
+        create=lambda **kw: calls.append(deepcopy(kw['messages'])) or next(turns)))
+    state = RunState('T')
+    outcome = run_agent(model=model, registry=Registry(), state=state, system='system', goal='goal')
+    assert outcome.status == 'completed' and outcome.text == 'done'
+    # The second request replays the first turn's thinking block verbatim, before its tool call.
+    assistant = calls[1][1]
+    assert assistant['role'] == 'assistant' and assistant['content'][0] == raw
+    assert assistant['content'][1]['type'] == 'tool_use'
+    json.dumps(state.execution_record(), allow_nan=False)
 
 
 def test_shared_triage_interface_stays_string(monkeypatch):

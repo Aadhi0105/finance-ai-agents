@@ -128,9 +128,12 @@ def _propose_via_model(ticker, checkpoint=None):
                  response=[{'type': getattr(b, 'type', 'unknown'),
                             'text': getattr(b, 'text', '')} for b in resp.content])
     save()
-    if resp.stop_reason != 'end_turn' or not resp.content or any(getattr(b, 'type', None) != 'text' for b in resp.content):
+    # Thinking blocks carry no answer text; only text blocks form the proposal.
+    text_blocks = [b for b in resp.content if getattr(b, 'type', None) == 'text']
+    if (resp.stop_reason != 'end_turn' or not text_blocks
+            or any(getattr(b, 'type', None) not in ('text', 'thinking', 'redacted_thinking') for b in resp.content)):
         fail('incomplete_or_refused_model_response')
-    raw = ''.join(b.text for b in resp.content).strip()
+    raw = ''.join(b.text for b in text_blocks).strip()
     if len(raw) > 100000:
         fail('oversized_model_response')
     fenced = re.fullmatch(r'```(?:json)?\s*\n([\s\S]*?)\n```', raw)
